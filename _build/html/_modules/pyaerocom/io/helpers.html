@@ -192,6 +192,44 @@
               <span class="s2">&quot;daily&quot;</span>   <span class="p">:</span>  <span class="s2">&quot;days&quot;</span><span class="p">,</span>
               <span class="s2">&quot;monthly&quot;</span> <span class="p">:</span>  <span class="s2">&quot;days&quot;</span><span class="p">}</span>
 
+<div class="viewcode-block" id="read_ebas_flags_file"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.helpers.read_ebas_flags_file">[docs]</a><span class="k">def</span> <span class="nf">read_ebas_flags_file</span><span class="p">(</span><span class="n">ebas_flags_csv</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads file ebas_flags.csv</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        dict </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="k">import</span> <span class="n">BrowseDict</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ebas_flags_csv</span><span class="p">)</span> <span class="k">as</span> <span class="n">fio</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fio</span><span class="p">:</span>
+            <span class="n">spl</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val_str</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Failed to read flag information in row </span><span class="si">{}</span><span class="s1"> (Check if entries in ebas_flags.csv are quoted)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+            <span class="n">info_str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">info_str</span> <span class="o">=</span> <span class="n">info_str</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Failed to read flag information in row </span><span class="si">{}</span><span class="s1"> (Check if entries in ebas_flags.csv are quoted)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+            <span class="n">isvalid</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">val_str</span> <span class="o">==</span> <span class="s1">&#39;V&#39;</span> <span class="k">else</span> <span class="kc">False</span>
+            <span class="n">valid</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">isvalid</span>
+            <span class="n">values</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">val_str</span>
+            <span class="n">info</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_str</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="n">valid</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="n">values</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
 <div class="viewcode-block" id="add_file_to_log"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.helpers.add_file_to_log">[docs]</a><span class="k">def</span> <span class="nf">add_file_to_log</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">err_msg</span><span class="p">):</span>
     
     <span class="k">try</span><span class="p">:</span>

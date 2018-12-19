@@ -1,0 +1,1189 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyaerocom.config &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="pyaerocom  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config_files.html">Configuration files</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyaerocom.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyaerocom.config</h1><div class="highlight"><pre>
+<span></span><span class="c1">################################################################</span>
+<span class="c1"># config.py</span>
+<span class="c1">#</span>
+<span class="c1"># configuration class for the aerocom python tools </span>
+<span class="c1">#</span>
+<span class="c1"># this file is part of the aerocom_pt package</span>
+<span class="c1">#</span>
+<span class="c1">#################################################################</span>
+<span class="c1"># Created 20171106 by Jan Griesfeller for Met Norway</span>
+<span class="c1">#</span>
+<span class="c1"># Last changed: See git log</span>
+<span class="c1">#################################################################</span>
+
+<span class="c1">#Copyright (C) 2017 met.no</span>
+<span class="c1">#Contact information:</span>
+<span class="c1">#Norwegian Meteorological Institute</span>
+<span class="c1">#Box 43 Blindern</span>
+<span class="c1">#0313 OSLO</span>
+<span class="c1">#NORWAY</span>
+<span class="c1">#E-mail: jan.griesfeller@met.no</span>
+<span class="c1">#This program is free software; you can redistribute it and/or modify</span>
+<span class="c1">#it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#the Free Software Foundation; either version 3 of the License, or</span>
+<span class="c1">#(at your option) any later version.</span>
+<span class="c1">#This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</span>
+<span class="c1">#GNU General Public License for more details.</span>
+<span class="c1">#You should have received a copy of the GNU General Public License</span>
+<span class="c1">#along with this program; if not, write to the Free Software</span>
+<span class="c1">#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,</span>
+<span class="c1">#MA 02110-1301, USA</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Provides access to pyaerocom specific configuration values</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
+<span class="kn">import</span> <span class="nn">pyaerocom.obs_io</span> <span class="k">as</span> <span class="nn">obs_io</span>
+<span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">list_to_shortstr</span><span class="p">,</span> <span class="n">dict_to_str</span><span class="p">,</span>
+                                         <span class="n">chk_make_subdir</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.variable</span> <span class="k">import</span> <span class="n">AllVariables</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+<span class="k">except</span><span class="p">:</span> 
+    <span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+    
+
+<span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class containing relevant paths for read and write routines</span>
+<span class="sd">    </span>
+<span class="sd">    TODO: write docstring</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># NAMES</span>
+    <span class="c1"># default names of the different obs networks</span>
+    <span class="c1"># might get overwritten from paths.ini see func read_config</span>
+    
+    <span class="c1">#: Aeronet Sun V2 access names</span>
+    <span class="n">AERONET_SUN_V2L15_AOD_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV2Lev1.5.daily&#39;</span>
+    <span class="n">AERONET_SUN_V2L15_AOD_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSun_2.0_NRT&#39;</span>
+    <span class="n">AERONET_SUN_V2L2_AOD_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV2Lev2.daily&#39;</span>
+    <span class="n">AERONET_SUN_V2L2_AOD_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV2Lev2.AP&#39;</span>
+    
+    <span class="c1">#: Aeronet SDA V2 access names</span>
+    <span class="n">AERONET_SUN_V2L2_SDA_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSDAV2Lev2.daily&#39;</span>
+    <span class="n">AERONET_SUN_V2L2_SDA_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSDAV2Lev2.AP&#39;</span>
+    
+    <span class="c1"># Aeronet V2 inversion products</span>
+    <span class="n">AERONET_INV_V2L15_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetInvV2Lev1.5.daily&#39;</span>
+    <span class="n">AERONET_INV_V2L15_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetInvV2Lev1.5.AP&#39;</span>
+    <span class="n">AERONET_INV_V2L2_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetInvV2Lev2.daily&#39;</span>
+    <span class="n">AERONET_INV_V2L2_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetInvV2Lev2.AP&#39;</span>
+    
+    <span class="c1">#: Aeronet Sun V3 access names</span>
+    <span class="n">AERONET_SUN_V3L15_AOD_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV3Lev1.5.daily&#39;</span>
+    <span class="n">AERONET_SUN_V3L15_AOD_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV3Lev1.5.AP&#39;</span>
+    <span class="n">AERONET_SUN_V3L2_AOD_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span>
+    <span class="n">AERONET_SUN_V3L2_AOD_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV3Lev2.AP&#39;</span>
+    
+    <span class="c1">#: Aeronet SDA V3 access names</span>
+    <span class="n">AERONET_SUN_V3L15_SDA_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSDAV3Lev1.5.daily&#39;</span>
+    <span class="n">AERONET_SUN_V3L15_SDA_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSDAV3Lev1.5.AP&#39;</span>
+    <span class="n">AERONET_SUN_V3L2_SDA_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSDAV3Lev2.daily&#39;</span>
+    <span class="n">AERONET_SUN_V3L2_SDA_ALL_POINTS_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetSDAV3Lev2.AP&#39;</span>
+
+    <span class="c1">#: Aeront V3 inversions</span>
+    <span class="n">AERONET_INV_V3L15_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetInvV3Lev1.5.daily&#39;</span>
+    <span class="n">AERONET_INV_V3L2_DAILY_NAME</span> <span class="o">=</span> <span class="s1">&#39;AeronetInvV3Lev2.daily&#39;</span>
+    
+    <span class="c1">#: EBAS name</span>
+    <span class="n">EBAS_MULTICOLUMN_NAME</span> <span class="o">=</span> <span class="s1">&#39;EBASMC&#39;</span>
+    
+    <span class="c1">#: EEA nmea</span>
+    <span class="n">EEA_NAME</span> <span class="o">=</span> <span class="s1">&#39;EEAAQeRep&#39;</span>
+
+    <span class="c1">#: Earlinet access name;</span>
+    <span class="n">EARLINET_NAME</span> <span class="o">=</span> <span class="s1">&#39;EARLINET&#39;</span>
+    
+    <span class="c1">#: Lowest possible year in data</span>
+    <span class="n">MIN_YEAR</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">#: Highest possible year in data</span>
+    <span class="n">MAX_YEAR</span> <span class="o">=</span> <span class="mi">20000</span>
+    
+    <span class="c1">#: This boolean can be used to enable / disable the former (i.e. use</span>
+    <span class="c1">#: available wavelengths of variable in a certain range around variable</span>
+    <span class="c1">#: wavelength).</span>
+    <span class="n">OBS_ALLOW_ALT_WAVELENGTHS</span> <span class="o">=</span> <span class="n">obs_io</span><span class="o">.</span><span class="n">OBS_ALLOW_ALT_WAVELENGTHS</span>
+    
+    <span class="c1">#: Wavelength tolerance for observations imports</span>
+    <span class="n">OBS_WAVELENGTH_TOL_NM</span> <span class="o">=</span> <span class="n">obs_io</span><span class="o">.</span><span class="n">OBS_WAVELENGTH_TOL_NM</span>
+    
+    <span class="c1">#: not used at the moment</span>
+    <span class="n">GCOSPERCENTCRIT</span> <span class="o">=</span>   <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">GCOSABSCRIT</span>     <span class="o">=</span>   <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">0.04</span><span class="p">)</span>
+    
+    <span class="c1">#names of the different obs networks</span>
+    <span class="n">OBSNET_NONE</span> <span class="o">=</span> <span class="s1">&#39;NONE&#39;</span>
+    <span class="n">NOMODELNAME</span> <span class="o">=</span> <span class="s1">&#39;OBSERVATIONS-ONLY&#39;</span>
+
+    <span class="c1">#: Name of the file containing the revision string of an obs data network</span>
+    <span class="n">REVISION_FILE</span> <span class="o">=</span> <span class="s1">&#39;Revision.txt&#39;</span>
+
+    
+    <span class="n">BASEDIR_PPI</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/lustre&#39;</span><span class="p">,</span> <span class="s1">&#39;storeA&#39;</span><span class="p">,</span> <span class="s1">&#39;project&#39;</span><span class="p">,</span> <span class="s1">&#39;aerocom&#39;</span><span class="p">)</span> 
+    <span class="n">BASEDIR_USER_SERVER</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/metno&#39;</span><span class="p">,</span> <span class="s1">&#39;aerocom-users-database&#39;</span><span class="p">)</span>
+    
+    
+    <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="fm">__dir__</span>
+    <span class="n">_config_ini</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="fm">__dir__</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;paths.ini&#39;</span><span class="p">)</span>
+    <span class="n">_config_ini_user_server</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="fm">__dir__</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;paths_user_server.ini&#39;</span><span class="p">)</span>
+    <span class="n">_config_ini_testdata</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="fm">__dir__</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;paths_testdata.ini&#39;</span><span class="p">)</span>
+    
+    <span class="n">_config_files</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;metno&#39;</span>                  <span class="p">:</span> <span class="n">_config_ini</span><span class="p">,</span>
+                     <span class="s1">&#39;aerocom-users-database&#39;</span> <span class="p">:</span> <span class="n">_config_ini_user_server</span><span class="p">,</span>
+                     <span class="s1">&#39;pyaerocom-testdata&#39;</span>     <span class="p">:</span> <span class="n">_config_ini_testdata</span><span class="p">}</span>
+    
+    <span class="n">_outhomename</span> <span class="o">=</span> <span class="s1">&#39;pyaerocom&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_base_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_base_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">cache_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colocateddata_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">write_fileio_err_log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                 <span class="n">activate_caching</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        
+        <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">print_log</span><span class="p">,</span> <span class="n">logger</span>
+        <span class="c1">#: Settings for reading and writing of gridded data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">GRID_IO</span> <span class="o">=</span> <span class="n">GridIO</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span> <span class="o">=</span> <span class="n">print_log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="n">config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_infer_config_file</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+        <span class="c1"># Directories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span> <span class="o">=</span> <span class="n">model_base_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span> <span class="o">=</span> <span class="n">obs_base_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span> <span class="o">=</span> <span class="n">cache_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span> <span class="o">=</span> <span class="n">output_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colocateddatadir</span> <span class="o">=</span> <span class="n">colocateddata_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_caching_active</span> <span class="o">=</span> <span class="n">activate_caching</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="c1"># Attributes that are used to store import results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MODELDIRS</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">WRITE_FILEIO_ERR_LOG</span> <span class="o">=</span> <span class="n">write_fileio_err_log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DONOTCACHEFILE</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ebas_flag_info</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="n">config_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            
+            <span class="n">keep_basedirs</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="n">model_base_dir</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="n">obs_base_dir</span><span class="p">):</span>
+                <span class="n">keep_basedirs</span><span class="o">=</span><span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">keep_basedirs</span><span class="p">)</span>
+                
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">traceback</span> <span class="k">import</span> <span class="n">format_exc</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_outputdirs</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to init config. Error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        
+    <span class="k">def</span> <span class="nf">_infer_config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Infer the database configuration to be loaded&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;/lustre&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># check if host is connected (lustre may be mounted locally but</span>
+                <span class="c1"># not connected). THe listdir command will raise FileNotFoundError</span>
+                <span class="c1"># if directory is mounted but not connected</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;/lustre/storeA&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Init data paths for lustre&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_files</span><span class="p">[</span><span class="s1">&#39;metno&#39;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;/metno&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># check if host is connected (lustre may be mounted locally but</span>
+                <span class="c1"># not connected). THe listdir command will raise FileNotFoundError</span>
+                <span class="c1"># if directory is mounted but not connected</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;/metno/aerocom-users-database&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Init data paths for users database&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_files</span><span class="p">[</span><span class="s1">&#39;aerocom-users-database&#39;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Init data paths for Aerocom users server&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_files</span><span class="p">[</span><span class="s1">&#39;aerocom-users-database&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HOMEDIR</span><span class="p">,</span> <span class="s1">&#39;pyaerocom-testdata&#39;</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Init data paths for pyaerocom testdata&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_files</span><span class="p">[</span><span class="s1">&#39;pyaerocom-testdata&#39;</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">load_default</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">None</span>
+            
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ALL_DATABASE_IDS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;ID&#39;s of available database configurations&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_files</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">HOMEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Home directory of user&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">OUTPUTDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">COLOCATEDDATADIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colocateddatadir</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">OUT_BASEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">warn</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Attribute OUT_BASEDIR is deprecated. Please &#39;</span>
+                                <span class="s1">&#39;use OUTPUTDIR instead&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUTDIR</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">CACHING</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Activate writing of and reading from cache files&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caching_active</span>
+    
+    <span class="nd">@CACHING</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">CACHING</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_caching_active</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">OBSDATACACHEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+        <span class="n">warn</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Attr. was renamed (but still works). &#39;</span>
+                                <span class="s1">&#39;Please us CACHEDIR instead&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">CACHEDIR</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">CACHEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cache directory&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Cache directory is not defined&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">,</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">print_log</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Failed to access CACHEDIR: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="s1">&#39;Deactivating caching&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_caching_active</span> <span class="o">=</span> <span class="kc">False</span>
+            
+    <span class="nd">@CACHEDIR</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">CACHEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cache directory&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input directory does not exist </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_access</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot write to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span> <span class="o">=</span> <span class="n">val</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">VAR_PARAM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instance of class AllVariables (for default variable information)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#has not been accessed before</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span> <span class="o">=</span> <span class="n">AllVariables</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">LOGFILESDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Directory where logfiles are stored&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logdir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OUTPUTDIR</span><span class="p">,</span> <span class="s1">&#39;_log&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">logdir</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">print_log</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Failed to access LOGFILESDIR: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                           <span class="s1">&#39;Deactivating file logging&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">WRITE_FILEIO_ERR_LOG</span> <span class="o">=</span> <span class="kc">False</span>
+            
+       
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">MODELBASEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Base directory of model data</span>
+<span class="sd">        </span>
+<span class="sd">        If changed, all relevant subdirectories are updated as well.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span>
+    
+    <span class="nd">@MODELBASEDIR</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">MODELBASEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Input directory does not exist&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_data_dirs</span><span class="p">()</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">OBSBASEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Base directory of model data&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span>
+    
+    <span class="nd">@OBSBASEDIR</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">OBSBASEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Input directory does not exist&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_data_dirs</span><span class="p">()</span>
+    
+    <span class="nd">@property</span> 
+    <span class="k">def</span> <span class="nf">BASEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Base directory of data</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        If this attribute is changed it changes both, :attr:`MODELBASEDIR` and</span>
+<span class="sd">        :attr:`OBSBASEDIR`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span>
+    
+    <span class="nd">@BASEDIR</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">BASEDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Cannot change data base directory. Input directory &#39;</span>
+                          <span class="s1">&#39;does not exist&#39;</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span> <span class="o">=</span> <span class="n">value</span>
+        
+        <span class="n">subdirs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">print_log</span>
+        <span class="k">if</span> <span class="s1">&#39;aerocom0&#39;</span> <span class="ow">in</span> <span class="n">subdirs</span><span class="p">:</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initiating directories for lustre&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_ini</span><span class="p">,</span> 
+                             <span class="n">keep_basedirs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;obsdata&#39;</span> <span class="ow">in</span> <span class="n">subdirs</span><span class="p">:</span> <span class="c1">#test dataset</span>
+            
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initiating directories for pyaerocom testdataset&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_ini_testdata</span><span class="p">,</span> 
+                             <span class="n">keep_basedirs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;_cache&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;AMAP&#39;</span> <span class="ow">in</span> <span class="n">subdirs</span><span class="p">:</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initiating directories for AEROCOM users database&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_ini_user_server</span><span class="p">,</span> 
+                             <span class="n">keep_basedirs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>    
+        
+         
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">READY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if relevant directories exist, returns True or False&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_directories</span><span class="p">())</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">EBASMC_SQL_DATABASE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Path to EBAS SQL database&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span><span class="p">[</span><span class="s2">&quot;EBASMC&quot;</span><span class="p">][</span><span class="s2">&quot;PATH&quot;</span><span class="p">],</span> 
+                                <span class="s1">&#39;ebas_file_index.sqlite3&#39;</span><span class="p">)</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">EBASMC_DATA_DIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Data directory of EBAS multicolumn files&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span><span class="p">[</span><span class="s2">&quot;EBASMC&quot;</span><span class="p">][</span><span class="s2">&quot;PATH&quot;</span><span class="p">],</span> <span class="s1">&#39;data/&#39;</span><span class="p">)</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">EBAS_FLAGS_FILE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="fm">__dir__</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="fm">__dir__</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;ebas_flags.csv&#39;</span><span class="p">)</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">OBSDIRS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Direcories of observation networks&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;PATH&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    
+    <span class="nd">@property</span> 
+    <span class="k">def</span> <span class="nf">OBS_START_YEARS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start years of observation networks&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;START_YEAR&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">OBS_IDS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List of all IDs of observations&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+    
+    <span class="k">def</span> <span class="nf">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if directory exists&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_write_access</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;_tmp&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">)</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_read_access</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">check_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks all predefined data directories for availability</span>
+<span class="sd">        </span>
+<span class="sd">        Prints each directory that is not available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Checking data directories&#39;</span><span class="p">)</span>
+        <span class="n">ok</span> <span class="o">=</span><span class="kc">True</span>
+        <span class="c1">#model_dirs = []</span>
+        <span class="c1"># CHECK BASIC DATA READING DIRECTORIES</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Model base directory </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span><span class="p">))</span>
+            <span class="n">ok</span><span class="o">=</span><span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Observations base directory </span><span class="si">{}</span><span class="s2"> does not &quot;</span>
+                                <span class="s2">&quot;exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span><span class="p">))</span>
+            <span class="n">ok</span><span class="o">=</span><span class="kc">False</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_outputdirs</span><span class="p">()</span> <span class="o">*</span> <span class="n">ok</span>
+    
+    <span class="k">def</span> <span class="nf">init_outputdirs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initiate output directories based on current configuration</span>
+<span class="sd">        </span>
+<span class="sd">        Checks, and if applicable, writes / creates required output directories</span>
+<span class="sd">        (i.e. :attrs:`OUTPUTDIR, CACHEDIR, COLOCATEDDATADIR`).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True, if everything is okay, False if not</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out_ok</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span><span class="p">):</span>
+            <span class="n">out_ok</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HOMEDIR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outhomename</span><span class="p">)</span>
+                <span class="n">out_ok</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Failed to create </span><span class="si">{}</span><span class="s1"> directory in home directory&#39;</span>
+                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outhomename</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">out_ok</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Cannot establish write access to output directory </span><span class="si">{}</span><span class="s1">&#39;</span>
+                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_colocateddatadir</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">_read_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_colocateddatadir</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_colocateddatadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span><span class="p">,</span>
+                                                  <span class="s1">&#39;colocated_data&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span><span class="p">,</span> <span class="s1">&#39;_cache&#39;</span><span class="p">)</span>
+        
+        
+        <span class="c1"># if this file exists no cache file is read</span>
+        <span class="c1"># used to ease debugging</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">CACHEDIR</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHEDIR</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DONOTCACHEFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHEDIR</span><span class="p">,</span> <span class="s1">&#39;DONOTCACHE&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DONOTCACHEFILE</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_caching_active</span><span class="o">=</span><span class="kc">False</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Cannot establish write access to cache &#39;</span>
+                             <span class="s1">&#39;directory </span><span class="si">{}</span><span class="s1">. Deactivating caching of files&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_caching_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">out_ok</span>
+    
+    <span class="k">def</span> <span class="nf">add_model_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add new model directory&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MODELDIRS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MODELBASEDIR</span><span class="p">,</span> <span class="s1">&#39;dirname&#39;</span><span class="p">))</span>
+        
+    <span class="k">def</span> <span class="nf">change_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_name</span><span class="o">=</span><span class="s1">&#39;metno&#39;</span><span class="p">,</span> <span class="n">keep_root</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Changes the path setup for a specific data environment</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        database_name : str</span>
+<span class="sd">            name of path environment for database. To see available database</span>
+<span class="sd">            ID&#39;s use :attr:`ALL_DATABASE_IDS`</span>
+<span class="sd">        keep_root : bool</span>
+<span class="sd">            if True, :attr:`BASEDIR` remains unchanged and paths in</span>
+<span class="sd">            corresponding ini files are set relative to current :attr:`BASEDIR`.</span>
+<span class="sd">            Else, :attr:`BASEDIR` is updated using the specifications </span>
+<span class="sd">            provided in the corresponding ini file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">database_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ALL_DATABASE_IDS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unkown database name </span><span class="si">{}</span><span class="s1">. Please choose from &#39;</span>
+                             <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">database_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ALL_DATABASE_IDS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_files</span><span class="p">[</span><span class="n">database_name</span><span class="p">],</span> 
+                         <span class="n">keep_basedirs</span><span class="o">=</span><span class="n">keep_root</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_basedirs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reload config file (for details see :func:`read_config`)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config_ini</span><span class="p">,</span> <span class="n">keep_basedirs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>    
+    <span class="k">def</span> <span class="nf">EBAS_FLAG_INFO</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Information about EBAS flags</span>
+<span class="sd">        </span>
+<span class="sd">        Dictionary containing 3 dictionaries (keys: ```valid, values, info```) </span>
+<span class="sd">        that contain information about validity of each flag (```valid```), </span>
+<span class="sd">        their actual values (```values```, e.g. V, M, I)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ebas_flag_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="k">import</span> <span class="n">read_ebas_flags_file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ebas_flag_info</span> <span class="o">=</span> <span class="n">read_ebas_flags_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EBAS_FLAGS_FILE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ebas_flag_info</span>
+    
+    <span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">,</span> <span class="n">keep_basedirs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read and import form paths.ini&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Configuration file paths.ini at </span><span class="si">%s</span><span class="s2"> does not exist &quot;</span>
+                          <span class="s2">&quot;or is not a file&quot;</span>
+                          <span class="o">%</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
+        <span class="n">cr</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="n">cr</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cr</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s1">&#39;outputfolders&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_basedirs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">cachedir</span> <span class="o">=</span> <span class="n">cr</span><span class="p">[</span><span class="s1">&#39;outputfolders&#39;</span><span class="p">][</span><span class="s1">&#39;CACHEDIR&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_access</span><span class="p">(</span><span class="n">cachedir</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="s1">&#39;Cannot write to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cachedir</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_cachedir</span> <span class="o">=</span> <span class="n">cr</span><span class="p">[</span><span class="s1">&#39;outputfolders&#39;</span><span class="p">][</span><span class="s1">&#39;CACHEDIR&#39;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Failed to init cache directory from config &#39;</span>
+                         <span class="s1">&#39;file. Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_basedirs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">outdir</span> <span class="o">=</span> <span class="n">cr</span><span class="p">[</span><span class="s1">&#39;outputfolders&#39;</span><span class="p">][</span><span class="s1">&#39;OUTPUTDIR&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_access</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="s1">&#39;Cannot write to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">outdir</span><span class="p">))</span>
+                        
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span> <span class="o">=</span> <span class="n">outdir</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_colocateddatadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> 
+                                                          <span class="s1">&#39;colocated_data&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Failed to init output and colocated data directory &#39;</span>
+                         <span class="s1">&#39;from config file. Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                    
+        
+        <span class="c1">#init base directories for Model data</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_basedirs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span><span class="p">):</span>
+            <span class="n">_dir</span> <span class="o">=</span> <span class="n">cr</span><span class="p">[</span><span class="s1">&#39;modelfolders&#39;</span><span class="p">][</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;$HOME&#39;</span> <span class="ow">in</span> <span class="n">_dir</span><span class="p">:</span>
+                <span class="n">_dir</span> <span class="o">=</span> <span class="n">_dir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$HOME&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span> <span class="o">=</span> <span class="n">_dir</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">MODELDIRS</span> <span class="o">=</span> <span class="p">(</span><span class="n">cr</span><span class="p">[</span><span class="s1">&#39;modelfolders&#39;</span><span class="p">][</span><span class="s1">&#39;dir&#39;</span><span class="p">]</span><span class="o">.</span>
+                          <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$</span><span class="si">{BASEDIR}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modelbasedir</span><span class="p">)</span><span class="o">.</span>
+                          <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+
+        <span class="c1">#Read directories for observation location</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_basedirs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span><span class="p">):</span>
+            <span class="n">_dir</span> <span class="o">=</span> <span class="n">cr</span><span class="p">[</span><span class="s1">&#39;obsfolders&#39;</span><span class="p">][</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;$HOME&#39;</span> <span class="ow">in</span> <span class="n">_dir</span><span class="p">:</span>
+                <span class="n">_dir</span> <span class="o">=</span> <span class="n">_dir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$HOME&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span> <span class="o">=</span> <span class="n">_dir</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_init_obsconfig</span><span class="p">(</span><span class="n">cr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">print_log</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Failed to initiate obs config. Error: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+        <span class="n">cr</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_directories</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">_add_obsname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">name_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_NAME&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+        <span class="bp">self</span><span class="p">[</span><span class="n">name_str</span><span class="p">]</span> <span class="o">=</span>  <span class="n">name</span>
+        <span class="k">return</span> <span class="n">name_str</span>
+        
+    <span class="k">def</span> <span class="nf">_add_obsnames_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cr</span><span class="p">):</span>
+        <span class="n">names_cfg</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">obsname</span><span class="p">,</span> <span class="n">ID</span> <span class="ow">in</span> <span class="n">cr</span><span class="p">[</span><span class="s1">&#39;obsnames&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">name_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_NAME&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obsname</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">name_str</span><span class="p">]</span> <span class="o">=</span>  <span class="n">ID</span>
+            <span class="n">names_cfg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">names_cfg</span>
+            
+    <span class="k">def</span> <span class="nf">_init_obsconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cr</span><span class="p">):</span>
+        
+        <span class="n">names_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_obsnames_config</span><span class="p">(</span><span class="n">cr</span><span class="p">)</span>
+        
+        <span class="n">OBSCONFIG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span>
+        <span class="k">for</span> <span class="n">obsname</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">cr</span><span class="p">[</span><span class="s1">&#39;obsfolders&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">obsname</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;basedir&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">name_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_NAME&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obsname</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">name_str</span> <span class="ow">in</span> <span class="n">names_cfg</span><span class="p">:</span>
+                <span class="n">ID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name_str</span><span class="p">]</span>    
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_obsname</span><span class="p">(</span><span class="n">obsname</span><span class="p">)</span>
+            <span class="n">OBSCONFIG</span><span class="p">[</span><span class="n">ID</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$</span><span class="si">{BASEDIR}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsbasedir</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$HOME&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span>
+            <span class="n">OBSCONFIG</span><span class="p">[</span><span class="n">ID</span><span class="p">][</span><span class="s1">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span>
+            
+        <span class="k">for</span> <span class="n">obsname</span><span class="p">,</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">cr</span><span class="p">[</span><span class="s1">&#39;obsstartyears&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_NAME&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obsname</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">NAME</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">ID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">NAME</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ID</span> <span class="ow">in</span> <span class="n">OBSCONFIG</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">OBSCONFIG</span><span class="p">[</span><span class="n">ID</span><span class="p">][</span><span class="s1">&#39;START_YEAR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span> <span class="o">=</span> <span class="n">OBSCONFIG</span>
+    
+    <span class="k">def</span> <span class="nf">add_data_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a network to the data search structure</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            name of network </span>
+<span class="sd">        data_dir : str</span>
+<span class="sd">            directory where data files are stored</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            if the network name is already reserved </span>
+<span class="sd">        ValueError</span>
+<span class="sd">            if the data directory does not exist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon... need some refactoring before&#39;</span><span class="p">)</span>
+        <span class="n">name_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_NAME&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">name_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Network with ID </span><span class="si">{}</span><span class="s1"> does already exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name_str</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data directory does not exist&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="n">name_str</span><span class="p">]</span> <span class="o">=</span>  <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;PATH&#39;</span> <span class="p">:</span> <span class="n">data_dir</span><span class="p">}</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L15_AOD_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L15_AOD_DAILY_NAME][&#39;PATH&#39;] =\</span>
+<span class="c1">#         cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V2L15_AOD_DAILY&#39;].\</span>
+<span class="c1">#         replace(&#39;${BASEDIR}&#39;, self._obsbasedir)</span>
+<span class="c1">#         </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L15_AOD_DAILY_NAME][&#39;START_YEAR&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V2L15_AOD_DAILY&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L15_AOD_ALL_POINTS_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L15_AOD_ALL_POINTS_NAME][&#39;PATH&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V2L15_AOD_ALL_POINTS&#39;].\</span>
+<span class="c1">#             replace(&#39;${BASEDIR}&#39;, self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L15_AOD_ALL_POINTS_NAME][&#39;START_YEAR&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V2L15_AOD_ALL_POINTS&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_AOD_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_AOD_DAILY_NAME][&#39;PATH&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V2L2_AOD_DAILY&#39;].\</span>
+<span class="c1">#             replace(&#39;${BASEDIR}&#39;, self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_AOD_DAILY_NAME][&#39;START_YEAR&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V2L2_AOD_DAILY&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_AOD_ALL_POINTS_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_AOD_ALL_POINTS_NAME][&#39;PATH&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V2L2_AOD_ALL_POINTS&#39;].\</span>
+<span class="c1">#             replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_AOD_ALL_POINTS_NAME][&#39;START_YEAR&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V2L2_AOD_ALL_POINTS&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_SDA_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_SDA_DAILY_NAME][&#39;PATH&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V2L2_SDA_DAILY&#39;].\</span>
+<span class="c1">#             replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_SDA_DAILY_NAME][&#39;START_YEAR&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V2L2_SDA_DAILY&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_SDA_ALL_POINTS_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_SDA_ALL_POINTS_NAME][&#39;PATH&#39;] =\</span>
+<span class="c1">#             cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V2L2_SDA_ALL_POINTS&#39;].\</span>
+<span class="c1">#             replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V2L2_SDA_ALL_POINTS_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V2L2_SDA_ALL_POINTS&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_AOD_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_AOD_DAILY_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V3L15_AOD_DAILY&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_AOD_DAILY_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V3L15_AOD_DAILY&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_AOD_ALL_POINTS_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_AOD_ALL_POINTS_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V3L15_AOD_ALL_POINTS&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_AOD_ALL_POINTS_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V3L15_AOD_ALL_POINTS&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_AOD_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_AOD_DAILY_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V3L2_AOD_DAILY&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_AOD_DAILY_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V3L2_AOD_DAILY&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_AOD_ALL_POINTS_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_AOD_ALL_POINTS_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V3L2_AOD_ALL_POINTS&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_AOD_ALL_POINTS_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V3L2_AOD_ALL_POINTS&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_SDA_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_SDA_DAILY_NAME][&#39;PATH&#39;] = \</span>
+<span class="c1">#             cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V3L15_SDA_DAILY&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L15_SDA_DAILY_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V3L15_SDA_DAILY&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_SDA_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_SDA_DAILY_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V3L2_SDA_DAILY&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_SDA_DAILY_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V3L2_SDA_DAILY&#39;]</span>
+<span class="c1"># </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_SDA_ALL_POINTS_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_SDA_ALL_POINTS_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_SUN_V3L2_SDA_ALL_POINTS&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_SUN_V3L2_SDA_ALL_POINTS_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_SUN_V3L2_SDA_ALL_POINTS&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L15_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L15_DAILY_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_INV_V2L15_DAILY&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L15_DAILY_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_INV_V2L15_DAILY&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L15_ALL_POINTS_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L15_ALL_POINTS_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_INV_V2L15_ALL_POINTS&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L15_ALL_POINTS_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_INV_V2L15_ALL_POINTS&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L2_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L2_DAILY_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_INV_V2L2_DAILY&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L2_DAILY_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_INV_V2L2_DAILY&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L2_ALL_POINTS_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L2_ALL_POINTS_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_INV_V2L2_ALL_POINTS&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V2L2_ALL_POINTS_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_INV_V2L2_ALL_POINTS&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         # Aeronet v3 inversions</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V3L15_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V3L15_DAILY_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_INV_V3L15_DAILY&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V3L15_DAILY_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_INV_V2L15_DAILY&#39;]</span>
+<span class="c1">#         </span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V3L2_DAILY_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V3L2_DAILY_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;AERONET_INV_V3L2_DAILY&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.AERONET_INV_V3L2_DAILY_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;AERONET_INV_V2L15_DAILY&#39;]</span>
+<span class="c1">#         </span>
+<span class="c1">#         OBSCONFIG[self.EBAS_MULTICOLUMN_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.EBAS_MULTICOLUMN_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;EBAS_MULTICOLUMN&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.EBAS_MULTICOLUMN_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;EBAS_MULTICOLUMN&#39;]</span>
+<span class="c1">#     </span>
+<span class="c1">#         OBSCONFIG[self.EEA_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.EEA_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;EEA&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.EEA_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;EEA&#39;]</span>
+<span class="c1"># </span>
+<span class="c1">#         OBSCONFIG[self.EARLINET_NAME] = {}</span>
+<span class="c1">#         OBSCONFIG[self.EARLINET_NAME][&#39;PATH&#39;] = cr[&#39;obsfolders&#39;][&#39;EARLINET&#39;].replace(&#39;${BASEDIR}&#39;,self._obsbasedir)</span>
+<span class="c1">#         OBSCONFIG[self.EARLINET_NAME][&#39;START_YEAR&#39;] = cr[&#39;obsstartyears&#39;][&#39;EARLINET&#39;]</span>
+<span class="c1"># =============================================================================</span>
+        
+    <span class="k">def</span> <span class="nf">short_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deprecated method&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>    
+    
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="s2">&quot;Pyaerocom </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span><span class="o">*</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;VAR_PARAM&#39;</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">list_to_shortstr</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">all_vars</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="si">%s</span><span class="s2"> (dict)&quot;</span> <span class="o">%</span><span class="n">k</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="si">%s</span><span class="s2"> (list)&quot;</span> <span class="o">%</span><span class="n">k</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="n">list_to_shortstr</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+<span class="k">class</span> <span class="nc">GridIO</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Settings class for managing IO settings</span>
+<span class="sd">    </span>
+<span class="sd">    This class includes options related to the import of grid data. This </span>
+<span class="sd">    includes both options related to file search as well as preprocessing </span>
+<span class="sd">    options.</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    FILE_TYPE : str</span>
+<span class="sd">        file type of data files. Defaults to .nc</span>
+<span class="sd">    TS_TYPES : list</span>
+<span class="sd">        list of strings specifying temporal resolution options encrypted in</span>
+<span class="sd">        file names.</span>
+<span class="sd">    DEL_TIME_BOUNDS : bool</span>
+<span class="sd">        if True, preexisting bounds on time are deleted when grid data is </span>
+<span class="sd">        loaded. Else, nothing is done. Aerocom default is True</span>
+<span class="sd">    SHIFT_LONS : bool</span>
+<span class="sd">        if True, longitudes are shifted to </span>
+<span class="sd">        -180 &lt;= lon &lt;= 180 when data is loaded (in case they are defined </span>
+<span class="sd">        0 &lt;= lon &lt;= 360. Aerocom default is True.</span>
+<span class="sd">    CHECK_TIME_FILENAME : bool</span>
+<span class="sd">        the times stored in NetCDF files may be wrong or not stored according</span>
+<span class="sd">        to the CF conventions. If True, the times are checked and if </span>
+<span class="sd">        :attr:`CORRECT_TIME_FILENAME`, corrected for on data import based what</span>
+<span class="sd">        is encrypted in the </span>
+<span class="sd">        file name. In case of Aerocom models, it is ensured that the filename </span>
+<span class="sd">        contains both the year and the temporal resolution in the filenames </span>
+<span class="sd">        (for details see :class:`pyaerocom.io.FileConventionRead`).</span>
+<span class="sd">        Aerocom default is True</span>
+<span class="sd">    CORRECT_TIME_FILENAME : bool</span>
+<span class="sd">        if True and time dimension in data is found to be different from </span>
+<span class="sd">        filename, it is attempted to be corrected</span>
+<span class="sd">    EQUALISE_METADATA : bool</span>
+<span class="sd">        if True (and if metadata varies between different NetCDF files that are</span>
+<span class="sd">        supposed to be merged in time), the metadata in all loaded objects is </span>
+<span class="sd">        unified based on the metadata of the first grid (otherwise, </span>
+<span class="sd">        concatenating them in time might not work using the Iris interface).</span>
+<span class="sd">        This might need to be reviewed and should be used with care if </span>
+<span class="sd">        specific metadata aspects of individual files need to be accessed.</span>
+<span class="sd">        Aerocom default is True</span>
+<span class="sd">    USE_RENAMED_DIR : bool</span>
+<span class="sd">        if True, data files are searched within a subdirectory named &quot;renamed&quot; </span>
+<span class="sd">        that needs to exist withing the data directory of a certain model or</span>
+<span class="sd">        obs data type. Aerocom default is True.</span>
+<span class="sd">    USE_FILECONVENTION : bool</span>
+<span class="sd">        if True, file names are strictly required to follow one of the file</span>
+<span class="sd">        naming conventions that can be specified in the file </span>
+<span class="sd">        `file_conventions.ini &lt;https://github.com/metno/pyaerocom/tree/master/</span>
+<span class="sd">        pyaerocom/data&gt;`__. Aerocom default is True.</span>
+<span class="sd">    INCLUDE_SUBDIRS : bool</span>
+<span class="sd">        if True, search for files is expanded to all subdirecories included in</span>
+<span class="sd">        data directory. Aerocom default is False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_AEROCOM</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FILE_TYPE&#39;</span><span class="p">:</span> <span class="s1">&#39;.nc&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;TS_TYPES&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;3hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;yearly&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;DEL_TIME_BOUNDS&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="s1">&#39;SHIFT_LONS&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="s1">&#39;CHECK_TIME_FILENAME&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="s1">&#39;CORRECT_TIME_FILENAME&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="s1">&#39;CHECK_DIM_COORDS&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="s1">&#39;EQUALISE_METADATA&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="s1">&#39;USE_RENAMED_DIR&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="s1">&#39;INCLUDE_SUBDIRS&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+    <span class="n">_DEFAULT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FILE_TYPE&#39;</span><span class="p">:</span> <span class="s1">&#39;.nc&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;TS_TYPES&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;3hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;yearly&#39;</span><span class="p">],</span>
+             <span class="s1">&#39;DEL_TIME_BOUNDS&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+             <span class="s1">&#39;SHIFT_LONS&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;CHECK_TIME_FILENAME&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;CORRECT_TIME_FILENAME&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;CHECK_DIM_COORDS&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;EQUALISE_METADATA&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;USE_RENAMED_DIR&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">&#39;INCLUDE_SUBDIRS&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">FILE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;.nc&#39;</span>
+        <span class="c1"># it is important to keep them in the order from highest to lowest</span>
+        <span class="c1"># resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TS_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;3hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;yearly&#39;</span><span class="p">]</span>
+        <span class="c1">#delete time bounds if they exist in netCDF files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEL_TIME_BOUNDS</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1">#shift longitudes to -180 -&gt; 180 repr (if applicable)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SHIFT_LONS</span> <span class="o">=</span> <span class="kc">True</span> 
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">CHECK_TIME_FILENAME</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CORRECT_TIME_FILENAME</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">CHECK_DIM_COORDS</span> <span class="o">=</span> <span class="kc">False</span>
+         <span class="c1"># check and update metadata dictionary on Cube load since </span>
+         <span class="c1"># iris concatenate of Cubes only works if metadata is equal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EQUALISE_METADATA</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">USE_RENAMED_DIR</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">INCLUDE_SUBDIRS</span> <span class="o">=</span> <span class="kc">False</span>
+        
+    <span class="k">def</span> <span class="nf">load_aerocom_default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_AEROCOM</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">load_default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DEFAULT</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert object to dictionary</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            settings dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
+    
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Import settings from dictionary&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dictionary</span><span class="p">:</span>
+            <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">dictionary</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set item</span>
+<span class="sd">        </span>
+<span class="sd">        GridIO[&quot;&lt;key&gt;&quot;] = value &lt;=&gt; GridIO.&lt;key&gt; = value</span>
+<span class="sd">        &lt;=&gt; GridIO.__setitem__(&lt;key&gt;, value)</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IOError </span>
+<span class="sd">            if key is not a valid setting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Could not update IO setting: Invalid key&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get item using curly brackets</span>
+<span class="sd">        </span>
+<span class="sd">        GridIO[&quot;&lt;key&gt;&quot;] =&gt; value</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid attribute&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="s2">&quot;Pyaerocom </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> 
+                                      <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span><span class="o">*</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+                                      <span class="n">dict_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())))</span>
+        
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     pya.const.BASEDIR = &#39;/home/jonasg/aerocom-users-database&#39;</span>
+<span class="c1">#     </span>
+<span class="c1">#     pya.browse_database(&#39;Aeronet*&#39;)</span>
+<span class="c1"># =============================================================================</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, met.no.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

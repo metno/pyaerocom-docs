@@ -631,7 +631,6 @@
         <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">]</span>
         <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;dataset_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;dataset_name&#39;</span><span class="p">]</span>
         <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
-        
         <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
             
         <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -659,13 +658,17 @@
         <span class="n">dtime</span> <span class="o">=</span> <span class="n">dtime</span><span class="p">[</span><span class="n">overlap</span><span class="p">]</span>
         <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtime</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_convert</span><span class="p">:</span>
+            <span class="n">stat_data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_idx</span><span class="p">[</span><span class="n">meta_idx</span><span class="p">][</span><span class="n">var</span><span class="p">][</span><span class="n">overlap</span><span class="p">]</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAINDEX</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">data_as_series</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">data_as_series</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dtime</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtime</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_monotonic</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span>
                 <span class="k">if</span> <span class="n">interp_nans</span><span class="p">:</span>
                     <span class="n">coverage</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">coverage</span> <span class="o">&lt;</span> <span class="n">min_coverage_interp</span><span class="p">:</span>
@@ -686,10 +689,18 @@
             <span class="n">stat_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">stat_data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">except</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Unit for variable </span><span class="si">{}</span><span class="s1"> is not available&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
             <span class="k">if</span> <span class="s1">&#39;var_info&#39;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">and</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]:</span>
                 <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
+            
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+                <span class="n">stat_data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stat_data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># there is overlapping data</span>
+        
+        
         <span class="k">return</span> <span class="n">stat_data</span>
     
 <div class="viewcode-block" id="UngriddedData.to_station_data_all"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.to_station_data_all">[docs]</a>    <span class="k">def</span> <span class="nf">to_station_data_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
@@ -1707,10 +1718,12 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stat_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No stations could be found for input &#39;</span>
                                         <span class="s1">&#39;specs (var, start, stop, freq)&#39;</span><span class="p">)</span>
-            <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">stat_names</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stat_data</span><span class="p">:</span>
-                <span class="n">lons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">])</span>
-                <span class="n">lats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">stat</span><span class="o">.</span><span class="n">station_name</span> <span class="ow">in</span> <span class="n">stat_names</span><span class="p">:</span>
+                    <span class="n">stat_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">station_name</span><span class="p">)</span>
+                    <span class="n">lons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">])</span>
+                    <span class="n">lats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">])</span>
                 
         <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;label&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_str</span>

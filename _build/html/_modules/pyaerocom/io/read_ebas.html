@@ -209,7 +209,47 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">EbasNasaAmesFile</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">VariableDefinitionError</span><span class="p">,</span> <span class="n">NotInFileError</span><span class="p">,</span>
                                   <span class="n">EbasFileError</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="k">import</span> <span class="n">BrowseDict</span>
 
+<div class="viewcode-block" id="ReadEbasOptions"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.read_ebas.ReadEbasOptions">[docs]</a><span class="k">class</span> <span class="nc">ReadEbasOptions</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Options for EBAS reading routine</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    PREFER_STATISTICS : list</span>
+<span class="sd">        preferred order of data statistics. Some files may contain multiple </span>
+<span class="sd">        columns for one variable, where each column corresponds to one of the</span>
+<span class="sd">        here defined statistics that where applied to the data. This attribute</span>
+<span class="sd">        is only considered for ebas variables, that have not explicitely defined</span>
+<span class="sd">        what statistics to use (and in which preferred order, if appicable).</span>
+<span class="sd">        Reading preferences for all Ebas variables are specified in the file</span>
+<span class="sd">        ebas_config.ini in the data directory of pyaerocom.</span>
+<span class="sd">    IGNORE_STATISTICS : list</span>
+<span class="sd">        columns that have either of these statistics applied are ignored for </span>
+<span class="sd">        variable data reading.</span>
+<span class="sd">    WAVELENGTH_TOL_NM : int</span>
+<span class="sd">        Wavelength tolerance in nm for reading of (wavelength dependent) </span>
+<span class="sd">        variables. If multiple matches occur (e.g. query -&gt; variable at 550nm</span>
+<span class="sd">        but file contains 3 columns of that variable, e.g. at 520, 530 and </span>
+<span class="sd">        540 nm), then the closest wavelength to the queried wavelength is used</span>
+<span class="sd">        within the specified tolerance level.</span>
+<span class="sd">    REMOVE_INVALID_FLAGS : bool</span>
+<span class="sd">        If True, the flag columns in the NASA Ames files are read and decoded </span>
+<span class="sd">        (using :func:`EbasFlagCol.decode`) and the (up to 3 flags for each </span>
+<span class="sd">        measurement) are evaluated as valid / invalid using the information </span>
+<span class="sd">        stored in against the </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">PREFER_STATISTICS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;arithmetic mean&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IGNORE_STATISTICS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;percentile:15.87&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;percentile:84.13&#39;</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">WAVELENGTH_TOL_NM</span> <span class="o">=</span> <span class="mi">50</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">REMOVE_INVALID_FLAGS</span> <span class="o">=</span> <span class="kc">False</span></div>
+        
 <div class="viewcode-block" id="ReadEbas"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.read_ebas.ReadEbas">[docs]</a><span class="k">class</span> <span class="nc">ReadEbas</span><span class="p">(</span><span class="n">ReadUngriddedBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Interface for reading EBAS data</span>
 
@@ -225,27 +265,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="c1">#: version log of this class (for caching)</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.09_&quot;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
-    
-    <span class="c1">#: preferred order of data statistics. Some files may contain multiple </span>
-    <span class="c1">#: columns for one variable, where each column corresponds to one of the</span>
-    <span class="c1">#: here defined statistics that where applied to the data. This attribute</span>
-    <span class="c1">#: is only considered for ebas variables, that have not explicitely defined</span>
-    <span class="c1">#: what statistics to use (and in which preferred order, if appicable).</span>
-    <span class="c1">#: Reading preferences for all Ebas variables are specified in the file</span>
-    <span class="c1">#: ebas_config.ini in the data directory of pyaerocom</span>
-    <span class="n">PREFER_STATISTICS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;arithmetic mean&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;median&#39;</span><span class="p">]</span>
-    
-    <span class="n">PREFER_LEVEL</span><span class="o">=</span><span class="mi">2</span>
-    
-    <span class="n">IGNORE_STATISTICS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;percentile:15.87&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;percentile:84.13&#39;</span><span class="p">]</span>
-    <span class="c1">#: Wavelength tolerance in nm for reading of variables. If multiple matches</span>
-    <span class="c1">#: occure, the closest wavelength to the desired wavelength is chosen</span>
-    <span class="c1">#: e.g. if 50 and for variable at 550nm, accept everything in interval</span>
-    <span class="c1">#: {500, 600}</span>
-    <span class="n">WAVELENGTH_TOL_NM</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.11_&quot;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
     
     <span class="c1">#: Name of dataset (OBS_ID)</span>
     <span class="n">DATASET_NAME</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">EBAS_MULTICOLUMN_NAME</span>
@@ -261,10 +281,7 @@
     <span class="c1"># TODO: check and redefine </span>
     <span class="c1">#: default variables for read method</span>
     <span class="n">DEFAULT_VARS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;absc550aer&#39;</span><span class="p">,</span> <span class="c1"># light absorption coefficient</span>
-                    <span class="s1">&#39;absc550lt1aer&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;scatc550lt1aer&#39;</span><span class="p">,</span>
-                    <span class="p">]</span> <span class="c1"># light scattering coefficient</span>
+                    <span class="s1">&#39;scatc550aer&#39;</span><span class="p">]</span> <span class="c1"># light scattering coefficient</span>
     
     <span class="c1">#: Temporal resolution codes that (so far) can be understood by pyaerocom</span>
     <span class="n">TS_TYPE_CODES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;1h&#39;</span>   <span class="p">:</span>   <span class="s1">&#39;hourly&#39;</span><span class="p">,</span>
@@ -291,6 +308,10 @@
     
         <span class="nb">super</span><span class="p">(</span><span class="n">ReadEbas</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">)</span>
         
+        <span class="c1">#ReadUngriddedBase.__init__(self, dataset_to_read)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="n">ReadEbasOptions</span><span class="p">()</span>
+        
+        <span class="c1">#self.opts = ReadEbasOptions()</span>
         <span class="c1">#: loaded instances of aerocom variables (instances of </span>
         <span class="c1">#: :class:`Variable` object, is written in get_file_list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loaded_aerocom_vars</span> <span class="o">=</span> <span class="p">{}</span>
@@ -299,11 +320,12 @@
         <span class="c1">#: :class:`EbasVarInfo` object, is updated in read_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loaded_ebas_vars</span> <span class="o">=</span> <span class="p">{}</span>
         
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">logtofile</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filelog</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="c1">#: SQL database interface class used to retrieve file paths for vars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_index</span> <span class="o">=</span> <span class="n">EbasFileIndex</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">last_sql_request</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql_requests</span> <span class="o">=</span> <span class="p">[]</span>
         
         <span class="c1">#: original file lists retrieved for each variable individually using</span>
         <span class="c1">#: SQL request. Since some of the files in the lists for each variable</span>
@@ -318,7 +340,21 @@
         <span class="c1">#: this is filled in method get_file_list and specifies variables </span>
         <span class="c1">#: to be read from each file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files_contain</span> <span class="o">=</span> <span class="p">[]</span>
-        
+      
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filelog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;File logger&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filelog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">logging</span>
+            <span class="n">logdir</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">LOGFILESDIR</span>
+            <span class="n">logfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logdir</span><span class="p">,</span> <span class="s1">&#39;ReadEbas_</span><span class="si">{}</span><span class="s1">.log&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__version__</span><span class="p">))</span>
+            <span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">logfile</span><span class="p">)</span>
+            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;ebas_io&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filelog</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filelog</span>
+    
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_FILEMASK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Irrelevant for EBAS implementation, since SQL &quot;</span>
@@ -333,6 +369,26 @@
     <span class="k">def</span> <span class="nf">PROVIDES_VARIABLES</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List of variables provided by the interface&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ebas_vars</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AUX_REQUIRES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">PREFER_STATISTICS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List containing preferred statistics columns&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">PREFER_STATISTICS</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">IGNORE_STATISTICS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List containing column statistics keys to be ignored&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">IGNORE_STATISTICS</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">WAVELENGTH_TOL_NM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wavelength tolerance in nm for columns&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">WAVELENGTH_TOL_NM</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">REMOVE_INVALID_FLAGS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean specifying whether to use EBAS flag columns&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">REMOVE_INVALID_FLAGS</span>
 
     <span class="k">def</span> <span class="nf">_merge_lists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lists_per_var</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Merge dictionary of lists for each variable into one list</span>
@@ -467,10 +523,10 @@
                                     <span class="n">stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
                     <span class="n">constraints</span><span class="p">[</span><span class="s1">&#39;station_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span>
                                     
-            <span class="bp">self</span><span class="o">.</span><span class="n">last_sql_request</span> <span class="o">=</span> <span class="n">req</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">make_sql_request</span><span class="p">(</span><span class="o">**</span><span class="n">constraints</span><span class="p">)</span>
+            <span class="n">req</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">make_sql_request</span><span class="p">(</span><span class="o">**</span><span class="n">constraints</span><span class="p">)</span>
             
             <span class="n">filenames</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_file_names</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
-            
+            <span class="bp">self</span><span class="o">.</span><span class="n">sql_requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
             <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
                 <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">EBASMC_DATA_DIR</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
@@ -803,13 +859,16 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">colnums</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Something went wrong...please debug&#39;</span><span class="p">)</span>
             <span class="n">colnum</span> <span class="o">=</span> <span class="n">colnums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">colnum</span><span class="p">]</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#             if np.isnan(data).sum() == totnum:</span>
-<span class="c1">#                 self.logger.warning(&#39;All values are NaN&#39;.format(var))</span>
-<span class="c1"># =============================================================================   </span>
-            <span class="n">data_out</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
             <span class="n">_col</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="n">colnum</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">colnum</span><span class="p">]</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">REMOVE_INVALID_FLAGS</span><span class="p">:</span>
+                <span class="n">invalid</span> <span class="o">=</span> <span class="o">~</span><span class="n">file</span><span class="o">.</span><span class="n">flag_col_info</span><span class="p">[</span><span class="n">_col</span><span class="o">.</span><span class="n">flag_col</span><span class="p">]</span><span class="o">.</span><span class="n">valid</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">invalid</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                
+                
+            <span class="n">data_out</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+            
             <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;unit&#39;</span> <span class="ow">in</span> <span class="n">_col</span><span class="p">:</span> <span class="c1">#make sure a unit is assigned to data column</span>
                 <span class="n">_col</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">unit</span>
             <span class="k">if</span> <span class="s1">&#39;wavelength&#39;</span> <span class="ow">in</span> <span class="n">_col</span><span class="p">:</span>
@@ -831,13 +890,13 @@
             <span class="k">raise</span> <span class="n">EbasFileError</span><span class="p">(</span><span class="s1">&#39;All data columns of specified input variables &#39;</span>
                                 <span class="s1">&#39;are NaN in </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">time_stamps</span>
+        
         <span class="c1"># compute additional variables (if applicable)</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_compute</span><span class="p">:</span>
             <span class="n">data_out</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded_ebas_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
             
         <span class="n">data_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_additional_vars</span><span class="p">(</span><span class="n">data_out</span><span class="p">,</span> <span class="n">vars_to_compute</span><span class="p">)</span>
         
-            
         <span class="n">contains_vars</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">vars_to_compute</span><span class="p">)</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;contains_vars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">contains_vars</span>
         
@@ -870,7 +929,12 @@
 <span class="sd">        -------</span>
 <span class="sd">        UngriddedData</span>
 <span class="sd">            data object</span>
-<span class="sd">        &quot;&quot;&quot;</span>     
+<span class="sd">        &quot;&quot;&quot;</span>    
+        
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">constraints</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_VARS</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -887,7 +951,7 @@
         <span class="n">files</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">first_file</span><span class="p">:</span><span class="n">last_file</span><span class="p">]</span>
         <span class="n">files_contain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_contain</span><span class="p">[</span><span class="n">first_file</span><span class="p">:</span><span class="n">last_file</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_failed</span> <span class="o">=</span> <span class="p">[]</span>
-        
+            
         <span class="n">data_obj</span> <span class="o">=</span> <span class="n">UngriddedData</span><span class="p">()</span>
 
         <span class="n">meta_key</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -924,7 +988,6 @@
                                     <span class="s1">&#39;Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">_file</span><span class="p">),</span>
                                                        <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
                 <span class="k">continue</span>
-                
             
             <span class="c1"># Fill the metatdata dict</span>
             <span class="c1"># the location in the data set is time step dependent!</span>
@@ -1006,28 +1069,53 @@
                                                            <span class="s1">&#39;revision_date&#39;</span><span class="p">])</span>
         <span class="n">data_obj</span><span class="o">.</span><span class="n">data_revision</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">DATASET_NAME</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_revision</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data_obj</span>
+        
         <span class="k">return</span> <span class="n">data_obj</span></div></div>
     
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     def __contains__(self, key):</span>
+<span class="c1">#         &#39;&#39;&#39;Options</span>
+<span class="c1">#         </span>
+<span class="c1">#         Used </span>
+<span class="c1">#         &#39;&#39;&#39;</span>
+<span class="c1">#         return True if key in ReadEbasOptions().keys() else False</span>
+<span class="c1"># =============================================================================</span>
+    
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     def __dir__(self):</span>
+<span class="c1">#         </span>
+<span class="c1">#         _dir = super(ReadEbas, self).__dir__()</span>
+<span class="c1">#         _dir.extend(self.opts.keys())</span>
+<span class="c1">#         return _dir</span>
+<span class="c1">#     </span>
+<span class="c1">#     def __setattr__(self, key, val):</span>
+<span class="c1">#         if key in self.opts:</span>
+<span class="c1">#             self.opts.__setattr__(key, val)</span>
+<span class="c1">#         super(ReadEbas, self).__setattr__(key, val)</span>
+<span class="c1">#         </span>
+<span class="c1">#     def __getattr__(self, key):</span>
+<span class="c1">#         if key in self.opts:</span>
+<span class="c1">#             return self.opts[key]</span>
+<span class="c1">#         return super(ReadEbas, self).__getattr__(key)</span>
+<span class="c1"># =============================================================================</span>
+    
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    
+    <span class="n">r</span> <span class="o">=</span> <span class="n">ReadEbas</span><span class="p">()</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    
+    <span class="k">raise</span> <span class="ne">Exception</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
     <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">change_verbosity</span>
     <span class="n">change_verbosity</span><span class="p">(</span><span class="s1">&#39;critical&#39;</span><span class="p">)</span>
 
     <span class="n">r</span> <span class="o">=</span> <span class="n">ReadEbas</span><span class="p">()</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;absc550dryaer&#39;</span><span class="p">],</span>
-                  <span class="n">station_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Zep*&#39;</span><span class="p">])</span>
+    <span class="n">data_all</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">last_file</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data_all</span><span class="p">(</span><span class="s1">&#39;absc550dryaer&#39;</span><span class="p">,</span> <span class="n">keep_na</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">REMOVE_INVALID_FLAGS</span><span class="o">=</span><span class="kc">True</span>
     
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">absc550dryaer</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;All values are NaN&#39;</span><span class="p">)</span>
-            <span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="n">data_clean</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">last_file</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     
     
 </pre></div>
