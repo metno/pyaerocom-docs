@@ -226,10 +226,10 @@
     <span class="n">_FILEMASK</span> <span class="o">=</span> <span class="s1">&#39;*.lev20&#39;</span>
     
     <span class="c1">#: version log of this class (for caching)</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.15_&quot;</span> <span class="o">+</span> <span class="n">ReadAeronetBase</span><span class="o">.</span><span class="n">__baseversion__</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.16_&quot;</span> <span class="o">+</span> <span class="n">ReadAeronetBase</span><span class="o">.</span><span class="n">__baseversion__</span>
     
     <span class="c1">#: Name of dataset (OBS_ID)</span>
-    <span class="n">DATASET_NAME</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">AERONET_SUN_V2L2_AOD_DAILY_NAME</span>
+    <span class="n">DATA_ID</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">AERONET_SUN_V2L2_AOD_DAILY_NAME</span>
     
     <span class="c1">#: List of all datasets supported by this interface</span>
     <span class="n">SUPPORTED_DATASETS</span> <span class="o">=</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">AERONET_SUN_V2L2_AOD_DAILY_NAME</span><span class="p">,</span> 
@@ -327,7 +327,7 @@
         
         <span class="c1">#create empty data object (is dictionary with extended functionality)</span>
         <span class="n">data_out</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
-        <span class="n">data_out</span><span class="o">.</span><span class="n">dataset_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATASET_NAME</span>
+        <span class="n">data_out</span><span class="o">.</span><span class="n">data_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span>
         
         <span class="c1">#create empty array for all variables that are supposed to be read</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_read</span><span class="p">:</span>
@@ -344,9 +344,9 @@
             <span class="n">i_dummy</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;=|\,&#39;</span><span class="p">,</span> <span class="n">c_dummy</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()))</span>
             <span class="n">dict_loc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">i_dummy</span><span class="p">,</span> <span class="n">i_dummy</span><span class="p">))</span>
 
-            <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;stat_lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dict_loc</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
-            <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;stat_lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dict_loc</span><span class="p">[</span><span class="s1">&#39;long&#39;</span><span class="p">])</span>
-            <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;stat_alt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dict_loc</span><span class="p">[</span><span class="s1">&#39;elev&#39;</span><span class="p">])</span>
+            <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dict_loc</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
+            <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dict_loc</span><span class="p">[</span><span class="s1">&#39;long&#39;</span><span class="p">])</span>
+            <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dict_loc</span><span class="p">[</span><span class="s1">&#39;elev&#39;</span><span class="p">])</span>
             <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_loc</span><span class="p">[</span><span class="s1">&#39;Location&#39;</span><span class="p">]</span>
             <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_loc</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">]</span>
             <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TS_TYPE</span>

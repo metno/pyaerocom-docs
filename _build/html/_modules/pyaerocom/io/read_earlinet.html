@@ -203,7 +203,7 @@
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">StationData</span><span class="p">,</span> <span class="n">VerticalProfile</span><span class="p">,</span> <span class="n">Variable</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">UngriddedData</span>
 
-<span class="c1"># TODO: Include backscatter signal ???</span>
+<span class="c1"># TODO: Include backscatter signal</span>
 <span class="c1"># TODO: Check file order </span>
 <span class="c1"># TODO: Check station names -&gt; they are NOT UNIQUE (e.g. Potenza...) -&gt; maybe</span>
 <div class="viewcode-block" id="ReadEarlinet"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.read_earlinet.ReadEarlinet">[docs]</a><span class="k">class</span> <span class="nc">ReadEarlinet</span><span class="p">(</span><span class="n">ReadUngriddedBase</span><span class="p">):</span>
@@ -212,10 +212,10 @@
     <span class="n">_FILEMASK</span> <span class="o">=</span> <span class="s1">&#39;*.e*&#39;</span>
     
     <span class="c1">#: version log of this class (for caching)</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.10_&quot;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.11_&quot;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
     
     <span class="c1">#: Name of dataset (OBS_ID)</span>
-    <span class="n">DATASET_NAME</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">EARLINET_NAME</span>
+    <span class="n">DATA_ID</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">EARLINET_NAME</span>
     
     <span class="c1">#: List of all datasets supported by this interface</span>
     <span class="n">SUPPORTED_DATASETS</span> <span class="o">=</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">EARLINET_NAME</span><span class="p">]</span>
@@ -250,8 +250,8 @@
                          <span class="n">start_date</span>         <span class="o">=</span> <span class="s1">&#39;StartDate&#39;</span><span class="p">,</span>
                          <span class="n">start_utc</span>          <span class="o">=</span> <span class="s1">&#39;StartTime_UT&#39;</span><span class="p">,</span>
                          <span class="n">stop_utc</span>           <span class="o">=</span> <span class="s1">&#39;StopTime_UT&#39;</span><span class="p">,</span>
-                         <span class="n">stat_lon</span>           <span class="o">=</span> <span class="s1">&#39;Longitude_degrees_east&#39;</span><span class="p">,</span>
-                         <span class="n">stat_lat</span>           <span class="o">=</span> <span class="s1">&#39;Latitude_degrees_north&#39;</span><span class="p">,</span>
+                         <span class="n">longitude</span>           <span class="o">=</span> <span class="s1">&#39;Longitude_degrees_east&#39;</span><span class="p">,</span>
+                         <span class="n">latitude</span>           <span class="o">=</span> <span class="s1">&#39;Latitude_degrees_north&#39;</span><span class="p">,</span>
                          <span class="n">wavelength_emis</span>    <span class="o">=</span> <span class="s1">&#39;EmissionWavelength_nm&#39;</span><span class="p">,</span>
                          <span class="n">wavelength_det</span>     <span class="o">=</span> <span class="s1">&#39;DetectionWavelength_nm&#39;</span><span class="p">,</span>
                          <span class="n">res_raw_m</span>          <span class="o">=</span> <span class="s1">&#39;ResolutionRaw_meter&#39;</span><span class="p">,</span>
@@ -262,7 +262,7 @@
                          <span class="n">detection_mode</span>     <span class="o">=</span> <span class="s1">&#39;DetectionMode&#39;</span><span class="p">,</span>
                          <span class="n">res_eval</span>           <span class="o">=</span> <span class="s1">&#39;ResolutionEvaluated&#39;</span><span class="p">,</span>
                          <span class="n">input_params</span>       <span class="o">=</span> <span class="s1">&#39;InputParameters&#39;</span><span class="p">,</span>
-                         <span class="n">stat_alt</span>           <span class="o">=</span> <span class="s1">&#39;Altitude_meter_asl&#39;</span><span class="p">,</span>
+                         <span class="n">altitude</span>           <span class="o">=</span> <span class="s1">&#39;Altitude_meter_asl&#39;</span><span class="p">,</span>
                          <span class="n">eval_method</span>        <span class="o">=</span> <span class="s1">&#39;EvaluationMethod&#39;</span><span class="p">)</span>
 
     <span class="n">PROVIDES_VARIABLES</span> <span class="o">=</span> <span class="p">[</span><span class="c1">#&#39;ec5503daer&#39;, &#39;ec5503daer_err&#39;,</span>
@@ -312,7 +312,7 @@
         <span class="c1">#create empty data object (is dictionary with extended functionality)</span>
         <span class="n">data_out</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;stat_code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
-        <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;dataset_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATASET_NAME</span>
+        <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TS_TYPE</span>
            
         <span class="c1"># create empty arrays for all variables that are supposed to be read</span>
@@ -483,7 +483,7 @@
                     <span class="n">metadata</span><span class="p">[</span><span class="n">meta_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
                     <span class="n">metadata</span><span class="p">[</span><span class="n">meta_key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">station_data</span><span class="o">.</span><span class="n">get_meta</span><span class="p">())</span>
                     <span class="n">metadata</span><span class="p">[</span><span class="n">meta_key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">station_data</span><span class="o">.</span><span class="n">get_station_coords</span><span class="p">())</span>
-                    <span class="n">metadata</span><span class="p">[</span><span class="n">meta_key</span><span class="p">][</span><span class="s1">&#39;dataset_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATASET_NAME</span>
+                    <span class="n">metadata</span><span class="p">[</span><span class="n">meta_key</span><span class="p">][</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span>
                     <span class="n">metadata</span><span class="p">[</span><span class="n">meta_key</span><span class="p">][</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="c1"># this is a list with indices of this station for each variable</span>
                     <span class="c1"># not sure yet, if we really need that or if it speeds up things</span>
@@ -541,7 +541,7 @@
                 
         <span class="c1"># shorten data_obj._data to the right number of points</span>
         <span class="n">data_obj</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data_obj</span><span class="o">.</span><span class="n">_data</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span>
-        <span class="n">data_obj</span><span class="o">.</span><span class="n">data_revision</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">DATASET_NAME</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_revision</span>
+        <span class="n">data_obj</span><span class="o">.</span><span class="n">data_revision</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_revision</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data_obj</span>
         <span class="k">return</span> <span class="n">data_obj</span></div>
         

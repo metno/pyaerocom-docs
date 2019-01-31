@@ -231,8 +231,79 @@
                          <span class="s1">&#39;monthly&#39;</span>    <span class="p">:</span> <span class="s1">&#39;%b %Y&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;yearly&#39;</span>    <span class="p">:</span> <span class="s1">&#39;%Y&#39;</span><span class="p">}</span>
 
-<span class="n">NUM_KEYS_META</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stat_lon&#39;</span><span class="p">,</span> <span class="s1">&#39;stat_lat&#39;</span><span class="p">,</span> <span class="s1">&#39;stat_alt&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;altitude&#39;</span><span class="p">]</span>
+<span class="n">NUM_KEYS_META</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;altitude&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="station_data_to_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.station_data_to_timeseries">[docs]</a><span class="k">def</span> <span class="nf">station_data_to_timeseries</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">pref_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                               <span class="n">sort_by_largest</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Order stations based on their significance and resolve conflicts&quot;&quot;&quot;</span>
+    <span class="c1"># first sort based on number of data points (ignor NaNs)</span>
+    <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">StationData</span>
+    
+    <span class="c1"># make sure the data is provided as pandas.Series object</span>
+    <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stat</span><span class="p">[</span><span class="n">var_name</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data needs to be provided as pandas Series in &#39;</span>
+                             <span class="s1">&#39;individual station data objects&#39;</span><span class="p">)</span>
+        
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">pref_attr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">stats</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="n">pref_attr</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">stats</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()))</span>
+    
+    <span class="k">if</span> <span class="n">sort_by_largest</span><span class="p">:</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        
+    <span class="n">vals_merged</span><span class="p">,</span> <span class="n">idx_merged</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">vals_removed</span><span class="p">,</span> <span class="n">idx_removed</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    
+    
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;overlap&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#             s = s.groupby(s.index).mean()</span>
+<span class="c1">#             stat.overlap_removed = True</span>
+<span class="c1"># =============================================================================</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1">#there is data</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_merged</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># we&#39;re not in the first station</span>
+                <span class="n">overlap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">idx_merged</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                <span class="c1"># there is an overlap ignore data from this station (we have sorted </span>
+                <span class="c1"># above by significance based on total no. of datapoints)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+                    <span class="n">s</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">overlap</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">removed</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">overlap</span><span class="p">]</span>
+                    <span class="n">idx_removed</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">removed</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">vals_removed</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">removed</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+                    
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">vals_merged</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+                <span class="n">idx_merged</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                
+                <span class="c1"># make sure each timestamp only occurs once </span>
+                <span class="c1"># TODO: this may be removed if functionality is tested</span>
+                <span class="n">pdidx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">idx_merged</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdidx</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdidx</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please debug&#39;</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">merged</span><span class="o">.</span><span class="n">var_info</span><span class="p">:</span>
+                <span class="n">merged</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">merged</span><span class="o">.</span><span class="n">merge_var_info</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
+            <span class="n">merged</span><span class="o">.</span><span class="n">merge_meta</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">vals_merged</span><span class="p">,</span> <span class="n">idx_merged</span><span class="p">)</span>
+    <span class="n">overlap</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">vals_removed</span><span class="p">,</span> <span class="n">idx_removed</span><span class="p">)</span>
+    
+    <span class="n">merged</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="n">idx_merged</span>
+    <span class="n">merged</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span>
+    <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_overlap&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">)]</span> <span class="o">=</span> <span class="n">overlap</span>
+    
+    <span class="k">return</span> <span class="p">(</span><span class="n">merged</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="resample_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.resample_timeseries">[docs]</a><span class="k">def</span> <span class="nf">resample_timeseries</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Resample a timeseries (pandas.Series)</span>

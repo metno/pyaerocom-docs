@@ -456,28 +456,29 @@
 <div class="viewcode-block" id="EbasFlagCol.decode"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_nasa_ames.EbasFlagCol.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decode raw flag column&quot;&quot;&quot;</span>
         <span class="n">flags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span> <span class="c1"># rmooves all points that are 0, i.e. that contain no flag (valid measurements)</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="n">not_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="n">not_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_ok</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">decoded</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">invalid</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">_decoded</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">_valid</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">not_ok</span><span class="p">:</span>
                 <span class="n">item</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:.9f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[:</span><span class="mi">3</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">])]</span>
                 <span class="n">_invalid</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">FLAG_INFO</span><span class="o">.</span><span class="n">valid</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">FLAG_INFO</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span> <span class="c1">#is invalid</span>
+                    <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">100</span><span class="p">:</span>
+                        <span class="n">_invalid</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span> <span class="c1"># since all other flags are irrelevant if 100 is flagged</span>
+                    <span class="k">elif</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">FLAG_INFO</span><span class="o">.</span><span class="n">valid</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">FLAG_INFO</span><span class="o">.</span><span class="n">valid</span><span class="p">[</span><span class="n">val</span><span class="p">]:</span> <span class="c1">#is invalid</span>
                         <span class="n">_invalid</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">break</span>
-                <span class="n">decoded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-                <span class="n">invalid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_invalid</span><span class="p">)</span>
-        
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">flags</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span>
-                <span class="n">valid</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">invalid</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Failed to decode flag&#39;</span><span class="p">)</span>
+                        
+                <span class="n">_decoded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+                <span class="n">_valid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="ow">not</span> <span class="n">_invalid</span><span class="p">)</span>
+            
+            <span class="n">flags</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">_decoded</span><span class="p">)</span>
+            <span class="n">valid</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">_valid</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span> <span class="o">=</span> <span class="n">valid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_decoded</span> <span class="o">=</span> <span class="n">flags</span></div></div>
         
@@ -871,6 +872,10 @@
         
                 
 <div class="viewcode-block" id="EbasNasaAmesFile.compute_time_stamps"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_nasa_ames.EbasNasaAmesFile.compute_time_stamps">[docs]</a>    <span class="k">def</span> <span class="nf">compute_time_stamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute time stamps from first two data columns&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;endtime&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NasaAmesReadError</span><span class="p">(</span><span class="s1">&#39;2nd column is not endtime or does not &#39;</span>
+                                    <span class="s1">&#39;have the same unit as 1st column (starttime)&#39;</span><span class="p">)</span>
         <span class="n">offs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_date</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIMEUNIT2SECFAC</span><span class="p">:</span>
@@ -1018,24 +1023,17 @@
         <span class="k">if</span> <span class="n">replace_invalid_nan</span><span class="p">:</span>
             <span class="n">dep_dat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals_invalid</span><span class="p">)):</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">col</span> <span class="o">=</span> <span class="n">dep_dat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
-                    <span class="n">cond</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">==</span> <span class="n">val</span>
-                    <span class="n">col</span><span class="p">[</span><span class="n">cond</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                    <span class="n">dep_dat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
-                <span class="k">except</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to replace invalid values with &quot;</span>
-                                   <span class="s2">&quot;NaNs in column </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">col_names</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">dep_dat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+                <span class="n">cond</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">==</span> <span class="n">val</span>
+                <span class="n">col</span><span class="p">[</span><span class="n">cond</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">dep_dat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
+
             <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">dep_dat</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
         
         <span class="k">if</span> <span class="n">convert_timestamps</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">compute_time_stamps</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to compute time stamps.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                               <span class="s2">&quot;Error message: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-        
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_time_stamps</span><span class="p">()</span>
+            
         <span class="bp">self</span><span class="o">.</span><span class="n">assign_flagcols</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_flags</span><span class="p">(</span><span class="n">evaluate</span><span class="o">=</span><span class="n">evaluate_flags</span><span class="p">)</span>
         
@@ -1093,31 +1091,25 @@
     
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">DIR_MC</span> <span class="o">=</span> <span class="s2">&quot;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/EBASMultiColumn/data/data/&quot;</span>
-    <span class="n">FILES_MC</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DE0043G.20080101000000.20160708144500.nephelometer..aerosol.1y.1h.DE09L_tsi_neph_3563.DE09L_nephelometer.lev2.nas&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;CA0420G.20040101000000.20150618072433.filter_absorption_photometer.aerosol_absorption_coefficient.aerosol.11w.1h.CA01L_Radiance-Research_PSAP-3W_ALT.CA01L_abs_coef..nas&#39;</span><span class="p">]</span>
+    <span class="n">FILES_MC</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DE0043G.20080101000000.20160708144500.nephelometer..aerosol.1y.1h.DE09L_tsi_neph_3563.DE09L_nephelometer.lev2.nas&#39;</span><span class="p">]</span>
     
     
     <span class="n">file_mc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR_MC</span><span class="p">,</span> <span class="n">FILES_MC</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        
+    <span class="n">mc</span> <span class="o">=</span> <span class="n">EbasNasaAmesFile</span><span class="p">(</span><span class="n">file_mc</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">mc</span><span class="p">)</span>
     
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_mc</span><span class="p">)</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="c1">#alert = EbasNasaAmesFile(DIR_MC + FILES_MC[1])</span>
+    <span class="c1">#print(alert)</span>
     
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     mc = EbasNasaAmesFile(file_mc)</span>
-<span class="c1">#     print(mc)</span>
-<span class="c1">#     </span>
-<span class="c1"># =============================================================================</span>
-    <span class="n">alert</span> <span class="o">=</span> <span class="n">EbasNasaAmesFile</span><span class="p">(</span><span class="n">DIR_MC</span> <span class="o">+</span> <span class="n">FILES_MC</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+    <span class="c1">#df = alert.to_dataframe()</span>
     
-    <span class="n">df</span> <span class="o">=</span> <span class="n">alert</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
-    
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">alert</span><span class="o">.</span><span class="n">_find_col_matches</span><span class="p">(</span><span class="s1">&#39;aerosol_absorption_coefficient&#39;</span><span class="p">,</span>
-                                  <span class="n">statistics</span><span class="o">=</span><span class="s1">&#39;arithmetic mean&#39;</span><span class="p">)</span>
+    <span class="c1">#idx = alert._find_col_matches(&#39;aerosol_absorption_coefficient&#39;,</span>
+    <span class="c1">#                              statistics=&#39;arithmetic mean&#39;)</span>
     
     
     
-    <span class="n">alert</span><span class="o">.</span><span class="n">plot_var</span><span class="p">(</span><span class="s1">&#39;aerosol_absorption_coefficient&#39;</span><span class="p">,</span> <span class="n">data_level</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1">#alert.plot_var(&#39;aerosol_absorption_coefficient&#39;, data_level=2)</span>
     
 </pre></div>
 

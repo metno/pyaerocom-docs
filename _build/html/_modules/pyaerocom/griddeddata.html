@@ -274,6 +274,7 @@
                              <span class="n">region</span>         <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
         
         
+        <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">od</span><span class="p">(</span><span class="n">unit_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1">#attribute used to store area weights (if applicable, see method</span>
         <span class="c1">#area_weights)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_area_weights</span> <span class="o">=</span> <span class="kc">None</span>
@@ -283,15 +284,17 @@
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
                 
-        <span class="k">if</span> <span class="n">convert_unit_on_init</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span>
-                <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">has_unit</span> <span class="ow">and</span> <span class="n">var</span><span class="o">.</span><span class="n">unit</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Converting unit of data&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span>
+            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">has_unit</span> <span class="ow">and</span> <span class="n">var</span><span class="o">.</span><span class="n">unit</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Converting unit of data&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;unit_ok&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">convert_unit_on_init</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">convert_unit</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
-            <span class="k">except</span> <span class="p">(</span><span class="n">VariableDefinitionError</span><span class="p">,</span> <span class="ne">MemoryError</span><span class="p">):</span>
-                <span class="k">pass</span>
-    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;unit_ok&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">VariableDefinitionError</span><span class="p">,</span> <span class="ne">MemoryError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;unit_ok&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data_revision</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Revision string from file Revision.txt in the main data directory</span>
@@ -807,7 +810,7 @@
             
             <span class="n">data</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> 
                                <span class="n">longitude</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span>
-                               <span class="n">dataset_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                               <span class="n">data_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             
             <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
             <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -1081,7 +1084,7 @@
                 <span class="nb">str</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">year</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">]</span>
         <span class="k">return</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fconv</span><span class="o">.</span><span class="n">file_sep</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.nc&#39;</span></div>
     
-<div class="viewcode-block" id="GriddedData.compute_at_stations_file"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.compute_at_stations_file">[docs]</a>    <span class="k">def</span> <span class="nf">compute_at_stations_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stat_lats</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stat_lons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="GriddedData.compute_at_stations_file"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.compute_at_stations_file">[docs]</a>    <span class="k">def</span> <span class="nf">compute_at_stations_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latitudes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">longitudes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">obs_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates and saves new netcdf file at input lat / lon coordinates</span>
@@ -1089,18 +1092,15 @@
 <span class="sd">        This method can be used to reduce the size of too large grid files.</span>
 <span class="sd">        It reduces the lon / lat dimensionality corresponding to the locations</span>
 <span class="sd">        of the input lat / lon coordinates.</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        stat_lats </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">UngriddedData</span><span class="p">,</span> <span class="n">print_log</span>
         <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Computing AtStations file. This may take a while&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs_data</span><span class="p">,</span> <span class="n">UngriddedData</span><span class="p">):</span>
-            <span class="n">stat_lons</span> <span class="o">=</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">longitude</span>
-            <span class="n">stat_lats</span> <span class="o">=</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">latitude</span>
+            <span class="n">longitudes</span> <span class="o">=</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">longitude</span>
+            <span class="n">latitudes</span> <span class="o">=</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">latitude</span>
         
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">stat_lons</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">stat_lats</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">longitudes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">latitudes</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Longitude and latitude arrays need to have the &#39;</span>
                              <span class="s1">&#39;same length (since they are supposed to belong) &#39;</span>
                              <span class="s1">&#39;to station_coordinates&#39;</span><span class="p">)</span>
@@ -1114,7 +1114,7 @@
         <span class="n">lon_idx</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">lat_idx</span> <span class="o">=</span> <span class="p">[]</span>
         
-        <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">stat_lats</span><span class="p">,</span> <span class="n">stat_lons</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">latitudes</span><span class="p">,</span> <span class="n">longitudes</span><span class="p">):</span>
             <span class="n">lon_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_index</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lon</span><span class="p">))</span>
             <span class="n">lat_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_index</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">lat</span><span class="p">))</span>
         

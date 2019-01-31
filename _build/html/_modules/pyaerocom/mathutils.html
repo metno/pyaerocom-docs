@@ -177,6 +177,8 @@
 <span class="c1">### LAMBDA FUNCTIONS</span>
 <span class="n">in_range</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">high</span>
 
+<span class="c1">### OTHER FUNCTIONS</span>
+
 <div class="viewcode-block" id="haversine"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.haversine">[docs]</a><span class="k">def</span> <span class="nf">haversine</span><span class="p">(</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">6371.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Haversine formula</span>
 <span class="sd">    </span>
@@ -217,7 +219,40 @@
  
     <span class="k">return</span> <span class="n">radius</span> <span class="o">*</span> <span class="n">c</span></div>
 
-<span class="c1">### OTHER FUNCTIONS</span>
+<div class="viewcode-block" id="is_within_radius_km"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.is_within_radius_km">[docs]</a><span class="k">def</span> <span class="nf">is_within_radius_km</span><span class="p">(</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">,</span> <span class="n">alt0</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat1</span><span class="p">,</span> <span class="n">alt1</span><span class="p">,</span> <span class="n">maxdist_km</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if two lon/lat coordinates are within a certain distance to each other</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lon0 : float</span>
+<span class="sd">        longitude of first point in decimal degrees</span>
+<span class="sd">    lat0 : float</span>
+<span class="sd">        latitude of first point in decimal degrees</span>
+<span class="sd">    alt0 : float</span>
+<span class="sd">        altitude of first point in m</span>
+<span class="sd">    lon1 : float</span>
+<span class="sd">        longitude of second point in decimal degrees</span>
+<span class="sd">    lat1 : float </span>
+<span class="sd">        latitude of second point in decimal degrees</span>
+<span class="sd">    alt1 : float</span>
+<span class="sd">        altitude of second point in m</span>
+<span class="sd">    maxdist_km : float </span>
+<span class="sd">        maximum distance between two points in km</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True, if coordinates are within specified distance to each other, else</span>
+<span class="sd">        False</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hordist</span> <span class="o">=</span> <span class="n">haversine</span><span class="p">(</span><span class="n">lon0</span><span class="p">,</span> <span class="n">lat0</span><span class="p">,</span> <span class="n">lon1</span><span class="p">,</span> <span class="n">lat1</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">hordist</span><span class="p">,</span> <span class="p">(</span><span class="n">alt0</span> <span class="o">-</span> <span class="n">alt1</span><span class="p">)</span><span class="o">/</span><span class="mi">1000</span><span class="p">))</span>
+    
+    <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">maxdist_km</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
 <div class="viewcode-block" id="calc_statistics"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_statistics">[docs]</a><span class="k">def</span> <span class="nf">calc_statistics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">,</span> <span class="n">lowlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">highlim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calc statistical properties from two data arrays</span>
 <span class="sd">    </span>
@@ -691,7 +726,7 @@
 <span class="sd">    rh_colname : str</span>
 <span class="sd">        column name of RH data</span>
 <span class="sd">    rh_max_percent : int</span>
-<span class="sd">        maximum relative humitdity</span>
+<span class="sd">        maximum relative humidity</span>
 <span class="sd">        </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -699,12 +734,14 @@
 <span class="sd">        modified data dictionary with new dry data column </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">data_colname</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
     <span class="n">rh</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">rh_colname</span><span class="p">]</span>
     
-    <span class="n">vals</span><span class="p">[</span><span class="n">rh</span><span class="o">&gt;</span><span class="n">rh_max_percent</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="n">vals</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rh</span><span class="p">)]</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">high_rh</span> <span class="o">=</span> <span class="n">rh</span> <span class="o">&gt;</span> <span class="n">rh_max_percent</span>
     
-    <span class="c1">#data[var_name] = vals</span>
+    <span class="n">vals</span><span class="p">[</span><span class="n">high_rh</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">vals</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rh</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    
     <span class="k">return</span> <span class="n">vals</span>
     
 <div class="viewcode-block" id="exponent"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.exponent">[docs]</a><span class="k">def</span> <span class="nf">exponent</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>

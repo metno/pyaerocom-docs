@@ -402,18 +402,23 @@
         <span class="n">cache_hit_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_cache</span><span class="p">:</span>
             <span class="c1"># initate cache handler</span>
-            <span class="n">cache</span> <span class="o">=</span> <span class="n">CacheHandlerUngridded</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">vars_available</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cache</span><span class="o">.</span><span class="n">check_and_load</span><span class="p">():</span>
-                <span class="n">all_avail</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_available</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">cache</span><span class="o">.</span><span class="n">loaded_data</span><span class="p">:</span>
-                        <span class="n">all_avail</span> <span class="o">=</span> <span class="kc">False</span>
-                        <span class="k">break</span>
-                <span class="k">if</span> <span class="n">all_avail</span><span class="p">:</span>
-                    <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found Cache match for </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                   <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">))</span>
-                    <span class="n">cache_hit_flag</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">loaded_data</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cache</span> <span class="o">=</span> <span class="n">CacheHandlerUngridded</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">vars_available</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cache</span><span class="o">.</span><span class="n">check_and_load</span><span class="p">():</span>
+                    <span class="n">all_avail</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_available</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">cache</span><span class="o">.</span><span class="n">loaded_data</span><span class="p">:</span>
+                            <span class="n">all_avail</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="n">all_avail</span><span class="p">:</span>
+                        <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found Cache match for </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">))</span>
+                        <span class="n">cache_hit_flag</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">loaded_data</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Fatal: compatibility error between old &#39;</span>
+                                      <span class="s1">&#39;cache file and current version of code &#39;</span><span class="p">)</span>
+                <span class="n">cache_hit_flag</span> <span class="o">=</span> <span class="kc">False</span>
             
         <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_hit_flag</span><span class="p">:</span>
             <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No Cache match found for </span><span class="si">{}</span><span class="s1"> in </span><span class="si">{}</span><span class="s1">. &#39;</span>
@@ -491,13 +496,17 @@
     
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 
-    <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="n">ignore_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span> <span class="n">ignore_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     
-    <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">([</span><span class="n">const</span><span class="o">.</span><span class="n">AERONET_SUN_V2L2_AOD_DAILY_NAME</span><span class="p">,</span>
-                        <span class="n">const</span><span class="o">.</span><span class="n">AERONET_SUN_V3L2_AOD_DAILY_NAME</span><span class="p">],</span> 
-                    <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> 
-                    <span class="n">last_file</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span><span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
     
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     data = reader.read([const.AERONET_SUN_V2L2_AOD_DAILY_NAME,</span>
+<span class="c1">#                         const.AERONET_SUN_V3L2_AOD_DAILY_NAME], </span>
+<span class="c1">#                     vars_to_retrieve=&#39;od550aer&#39;, </span>
+<span class="c1">#                     last_file=10)</span>
+<span class="c1">#     </span>
+<span class="c1"># =============================================================================</span>
     
     
     
