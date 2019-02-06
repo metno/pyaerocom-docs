@@ -198,6 +198,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#read-all-files">Read all files</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#merging-of-several-stationdata-objects-into-one">Merging of several StationData objects into one</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#get-list-of-all-files-containing-scattering-data-for-ebas-station-jungfraujoch">Get list of all files containing scattering data for EBAS station Jungfraujoch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comment-for-convenience">Comment for convenience….</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-about-overlapping-data">What about overlapping data ??</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-prioritise-certain-stations-from-others-when-deciding-what-goes-into-overlap-and-what-into-the-final-timeseries">How to prioritise certain stations from others, when deciding what goes into overlap and what into the final timeseries?</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
@@ -326,7 +333,7 @@ displayed in the flowchart.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Init</span> <span class="n">data</span> <span class="n">paths</span> <span class="k">for</span> <span class="n">lustre</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.008213520050048828</span> <span class="n">s</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.006315708160400391</span> <span class="n">s</span>
 </pre></div>
 </div>
 <div class="section" id="check-data-directory">
@@ -763,9 +770,11 @@ familiar with Python).</p>
 var_info ({&#39;od550aer&#39;: {&#39;overlap&#39;: False}})
    od550aer (&lt;class &#39;dict&#39;&gt;)
     overlap: False
+overlap (BrowseDict())
 station_name: Leipzig
 instrument_name: sun_photometer
 PI: Brent_Holben
+filename: None
 ts_type: daily
 latitude: 51.352500000000006
 longitude: 12.435277999999998
@@ -775,6 +784,7 @@ dataset_name: None
 data_product: None
 data_version: None
 data_level: None
+revision_date: None
 ts_type_src: daily
 
 Data arrays
@@ -793,10 +803,11 @@ od550aer (Series, 2894 items)
 </div>
 <p>As you can see, this station contains a time-series of the AOD at 550
 nm. If you like, you can plot this time-series:</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">station_data</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39; xg&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Leipzig AOD all times&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">station_data</span><span class="o">.</span><span class="n">insert_nans</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">station_data</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Leipzig AOD all times&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f5578170278</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <img alt="_images/tut00_get_started_70_1.png" src="_images/tut00_get_started_70_1.png" />
@@ -806,13 +817,11 @@ only for the year 2010). And you can overlay different curves, by
 passing the axes instance returned by the plotting method:</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span><span class="o">=</span><span class="n">aeronet_data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Leipzig&#39;</span><span class="p">,</span>
                                 <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
-                                <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
-                                                            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span>
+                                <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">=</span><span class="n">aeronet_data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Leipzig&#39;</span><span class="p">,</span>
                                 <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
                                 <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
-                                                              <span class="n">label</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
                                                               <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Leipzig AODs 2010&#39;</span><span class="p">)</span>
@@ -841,9 +850,11 @@ bouldering trip, you may call:</p>
                      <span class="s1">&#39;2006-11-01T00:00:00.000000000&#39;</span><span class="p">,</span> <span class="s1">&#39;2006-12-01T00:00:00.000000000&#39;</span><span class="p">],</span>
                     <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;datetime64[ns]&#39;</span><span class="p">)),</span>
              <span class="p">(</span><span class="s1">&#39;var_info&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;od550aer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;overlap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}),</span>
+             <span class="p">(</span><span class="s1">&#39;overlap&#39;</span><span class="p">,</span> <span class="n">BrowseDict</span><span class="p">()),</span>
              <span class="p">(</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Fontainebleau&#39;</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s1">&#39;sun_photometer&#39;</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;PI&#39;</span><span class="p">,</span> <span class="s1">&#39;Brent_Holben&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;ts_type&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="mf">48.406666999999985</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="mf">2.6802780000000004</span><span class="p">),</span>
@@ -853,6 +864,7 @@ bouldering trip, you may call:</p>
              <span class="p">(</span><span class="s1">&#39;data_product&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;data_version&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;data_level&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;revision_date&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="mi">2006</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>    <span class="mf">0.176742</span>
               <span class="mi">2006</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">01</span>    <span class="mf">0.176013</span>
@@ -949,7 +961,7 @@ sides.</p>
 <span class="n">Successfully</span> <span class="n">interpolated</span> <span class="n">cube</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fd5e90850f0</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f5559ff2ac8</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <img alt="_images/tut00_get_started_85_3.png" src="_images/tut00_get_started_85_3.png" />
@@ -3956,6 +3968,698 @@ the order of the request.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">7</span>
 </pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="merging-of-several-stationdata-objects-into-one">
+<h2>Merging of several StationData objects into one<a class="headerlink" href="#merging-of-several-stationdata-objects-into-one" title="Permalink to this headline">¶</a></h2>
+<p>This notebook illustrates how one can merge several instances
+StationData objects into one objects. This merging only works for data
+from the same station and a typical case is if the data source files for
+one station are separated into many single files containing only parts
+of the data (e.g. if the files contain only one year of data).</p>
+<p>In the following, the example of the EBAS database is used for
+illustration. In particular, we will focus on the retrieval of the
+aerosol light scattering coefficients at 550 nm (<strong>scatc550aer</strong> in
+AEROCOM naming convention) for the station <strong>*Jungfraujoch*</strong>, located
+in Germany.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Init</span> <span class="n">data</span> <span class="n">paths</span> <span class="k">for</span> <span class="n">lustre</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.008058786392211914</span> <span class="n">s</span>
+</pre></div>
+</div>
+<div class="section" id="get-list-of-all-files-containing-scattering-data-for-ebas-station-jungfraujoch">
+<h3>Get list of all files containing scattering data for EBAS station Jungfraujoch<a class="headerlink" href="#get-list-of-all-files-containing-scattering-data-for-ebas-station-jungfraujoch" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadEbas</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span>
+                            <span class="n">datalevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">station_names</span><span class="o">=</span><span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Reading</span> <span class="n">file</span> <span class="mi">1</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">3</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">5</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">7</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">9</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">11</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">13</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">15</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">17</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">19</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">21</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">23</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+<span class="n">Reading</span> <span class="n">file</span> <span class="mi">25</span> <span class="n">of</span> <span class="mi">26</span> <span class="p">(</span><span class="n">ReadEbas</span><span class="p">)</span>
+
+<span class="n">Pyaerocom</span> <span class="n">UngriddedData</span>
+<span class="o">-----------------------</span>
+<span class="n">Contains</span> <span class="n">networks</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;EBASMC&#39;</span><span class="p">]</span>
+<span class="n">Contains</span> <span class="n">variables</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">]</span>
+<span class="n">Contains</span> <span class="n">instruments</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;IN3563&#39;</span><span class="p">,</span> <span class="s1">&#39;TSI_3563_JFJ_dry&#39;</span><span class="p">,</span> <span class="s1">&#39;Ecotech_Aurora3000_JFJ_dry&#39;</span><span class="p">]</span>
+<span class="n">Total</span> <span class="n">no</span><span class="o">.</span> <span class="n">of</span> <span class="n">meta</span><span class="o">-</span><span class="n">blocks</span><span class="p">:</span> <span class="mi">26</span>
+<span class="n">Filters</span> <span class="n">that</span> <span class="n">were</span> <span class="n">applied</span><span class="p">:</span>
+ <span class="n">Filter</span> <span class="n">time</span> <span class="n">log</span><span class="p">:</span> <span class="mi">20190206180229</span>
+    <span class="n">datalevel</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">station_names</span><span class="p">:</span> <span class="n">Jungfraujoch</span>
+</pre></div>
+</div>
+<p>As you can see, the data has successfully been imported into an instance
+of the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> class. This class is organised <em>by file</em>, that
+is, for each of the 26 files that were imported, there is one metadata
+dictionary assigned. Let’s look at the metadata from the first file:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s1">&#39;IN3563&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;PI&#39;</span><span class="p">,</span> <span class="s1">&#39;Baltensperger, Urs; Weingartner, Ernest&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;ts_type&#39;</span><span class="p">,</span> <span class="s1">&#39;hourly&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="mf">46.5475</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="mf">7.985</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;altitude&#39;</span><span class="p">,</span> <span class="mf">3578.0</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;data_id&#39;</span><span class="p">,</span> <span class="s1">&#39;EBASMC&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;revision_date&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2018-10-31T00:00:00&#39;</span><span class="p">)),</span>
+             <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;var_info&#39;</span><span class="p">,</span>
+              <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span>
+                            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;aerosol_light_scattering_coefficient&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;unit&#39;</span><span class="p">:</span> <span class="s1">&#39;1/Mm&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;wavelength&#39;</span><span class="p">:</span> <span class="s1">&#39;550.0 nm&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;method_ref&#39;</span><span class="p">:</span> <span class="s1">&#39;CH02L_scat_coef&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;matrix&#39;</span><span class="p">:</span> <span class="s1">&#39;aerosol&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;statistics&#39;</span><span class="p">:</span> <span class="s1">&#39;arithmetic mean&#39;</span><span class="p">})])),</span>
+             <span class="p">(</span><span class="s1">&#39;variables&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">])])</span>
+</pre></div>
+</div>
+<p>And the last one:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Ecotech_Aurora3000_JFJ_dry&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;PI&#39;</span><span class="p">,</span> <span class="s1">&#39;Bukowiecki, Nicolas; Baltensperger, Urs&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;ts_type&#39;</span><span class="p">,</span> <span class="s1">&#39;hourly&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="mf">46.5475</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="mf">7.985</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;altitude&#39;</span><span class="p">,</span> <span class="mf">3580.0</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;data_id&#39;</span><span class="p">,</span> <span class="s1">&#39;EBASMC&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;revision_date&#39;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2018-03-20T00:00:00&#39;</span><span class="p">)),</span>
+             <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;CH0001G.20170101000000.20180320151536.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;var_info&#39;</span><span class="p">,</span>
+              <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span>
+                            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;aerosol_light_scattering_coefficient&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;unit&#39;</span><span class="p">:</span> <span class="s1">&#39;1/Mm&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;wavelength&#39;</span><span class="p">:</span> <span class="s1">&#39;525.0 nm&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;statistics&#39;</span><span class="p">:</span> <span class="s1">&#39;arithmetic mean&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;matrix&#39;</span><span class="p">:</span> <span class="s1">&#39;aerosol&#39;</span><span class="p">})])),</span>
+             <span class="p">(</span><span class="s1">&#39;variables&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">])])</span>
+</pre></div>
+</div>
+<p>As you can see, both files contain scattering data but do not share all
+the same metadata attributes (e.g. <code class="docutils literal notranslate"><span class="pre">instrument_name</span></code> is different,
+which might be due to technological updates over time).</p>
+<p>Let’s have a look at the respective time-series for both stations.
+First, convert into instance of <code class="docutils literal notranslate"><span class="pre">StationData</span></code> class and then plot.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">first_file</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="o">=</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">first_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Pyaerocom StationData
+---------------------
+var_info ({&#39;scatc550aer&#39;: {&#39;name&#39;: &#39;aerosol_light_scattering_coefficient&#39;, &#39;unit&#39;: &#39;1/Mm&#39;, &#39;wavelength&#39;: &#39;550.0 nm&#39;, &#39;method_ref&#39;: &#39;CH02L_scat_coef&#39;, &#39;matrix&#39;: &#39;aerosol&#39;, &#39;statistics&#39;: &#39;arithmetic mean&#39;, &#39;overlap&#39;: False}})
+   scatc550aer (&lt;class &#39;dict&#39;&gt;)
+    name: aerosol_light_scattering_coefficient
+    unit: 1/Mm
+    wavelength: 550.0 nm
+    method_ref: CH02L_scat_coef
+    matrix: aerosol
+    statistics: arithmetic mean
+    overlap: False
+overlap (BrowseDict())
+station_name: Jungfraujoch
+instrument_name: IN3563
+PI: Baltensperger, Urs; Weingartner, Ernest
+filename: CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas
+ts_type: hourly
+latitude: 46.5475
+longitude: 7.985
+altitude: 3578.0
+data_id: EBASMC
+dataset_name: None
+data_product: None
+data_version: None
+data_level: None
+revision_date: 2018-10-31T00:00:00
+ts_type_src: hourly
+
+Data arrays
+.................
+dtime (array, 8760 items)
+   [numpy.datetime64(&#39;1995-01-01T00:30:00&#39;)
+    numpy.datetime64(&#39;1995-01-01T01:29:59&#39;)
+    ...
+    numpy.datetime64(&#39;1995-12-31T22:29:59&#39;)
+    numpy.datetime64(&#39;1995-12-31T23:29:59&#39;)]
+
+Pandas Series
+.................
+scatc550aer (Series, 8760 items)
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">last_file</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">last_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Pyaerocom StationData
+---------------------
+var_info ({&#39;scatc550aer&#39;: {&#39;name&#39;: &#39;aerosol_light_scattering_coefficient&#39;, &#39;unit&#39;: &#39;1/Mm&#39;, &#39;wavelength&#39;: &#39;525.0 nm&#39;, &#39;statistics&#39;: &#39;arithmetic mean&#39;, &#39;matrix&#39;: &#39;aerosol&#39;, &#39;overlap&#39;: False}})
+   scatc550aer (&lt;class &#39;dict&#39;&gt;)
+    name: aerosol_light_scattering_coefficient
+    unit: 1/Mm
+    wavelength: 525.0 nm
+    statistics: arithmetic mean
+    matrix: aerosol
+    overlap: False
+overlap (BrowseDict())
+station_name: Jungfraujoch
+instrument_name: Ecotech_Aurora3000_JFJ_dry
+PI: Bukowiecki, Nicolas; Baltensperger, Urs
+filename: CH0001G.20170101000000.20180320151536.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas
+ts_type: hourly
+latitude: 46.5475
+longitude: 7.985
+altitude: 3580.0
+data_id: EBASMC
+dataset_name: None
+data_product: None
+data_version: None
+data_level: None
+revision_date: 2018-03-20T00:00:00
+ts_type_src: hourly
+
+Data arrays
+.................
+dtime (array, 8760 items)
+   [numpy.datetime64(&#39;2017-01-01T00:30:00&#39;)
+    numpy.datetime64(&#39;2017-01-01T01:29:59&#39;)
+    ...
+    numpy.datetime64(&#39;2017-12-31T22:29:59&#39;)
+    numpy.datetime64(&#39;2017-12-31T23:29:59&#39;)]
+
+Pandas Series
+.................
+scatc550aer (Series, 8760 items)
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">first_file</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fef7c4050f0</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_11_1.png" src="_images/add04_stationdata_merging_11_1.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">last_file</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fef7c33f550</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_12_1.png" src="_images/add04_stationdata_merging_12_1.png" />
+<p>As you can see, the files contain data from different years. Now, how
+can we get these objects into one object that contains the timeseries of
+both files from this station?</p>
+<p>This is actually very easy:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">merged</span> <span class="o">=</span> <span class="n">first_file</span><span class="o">.</span><span class="n">merge_other</span><span class="p">(</span><span class="n">last_file</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Pyaerocom StationData
+---------------------
+var_info ({&#39;scatc550aer&#39;: {&#39;name&#39;: &#39;aerosol_light_scattering_coefficient&#39;, &#39;unit&#39;: &#39;1/Mm&#39;, &#39;wavelength&#39;: &#39;550.0 nm;525.0 nm&#39;, &#39;method_ref&#39;: &#39;CH02L_scat_coef&#39;, &#39;matrix&#39;: &#39;aerosol&#39;, &#39;statistics&#39;: &#39;arithmetic mean&#39;, &#39;overlap&#39;: False}})
+   scatc550aer (&lt;class &#39;dict&#39;&gt;)
+    name: aerosol_light_scattering_coefficient
+    unit: 1/Mm
+    wavelength: 550.0 nm;525.0 nm
+    method_ref: CH02L_scat_coef
+    matrix: aerosol
+    statistics: arithmetic mean
+    overlap: False
+overlap (BrowseDict())
+station_name: Jungfraujoch
+instrument_name: IN3563;Ecotech_Aurora3000_JFJ_dry
+PI: Baltensperger, Urs; Weingartner, Ernest;Bukowiecki, Nicolas
+filename: CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas;CH0001G.20170101000000.20180320151536.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas
+ts_type: hourly
+latitude: 46.5475
+longitude: 7.985
+altitude: 3578.0
+data_id: EBASMC
+dataset_name: None
+data_product: None
+data_version: None
+data_level: None
+revision_date (list, 2 items)
+   [numpy.datetime64(&#39;2018-10-31T00:00:00&#39;)
+    numpy.datetime64(&#39;2018-03-20T00:00:00&#39;)]
+
+ts_type_src: hourly
+
+Data arrays
+.................
+dtime (array, 8760 items)
+   [numpy.datetime64(&#39;1995-01-01T00:30:00&#39;)
+    numpy.datetime64(&#39;1995-01-01T01:29:59&#39;)
+    ...
+    numpy.datetime64(&#39;1995-12-31T22:29:59&#39;)
+    numpy.datetime64(&#39;1995-12-31T23:29:59&#39;)]
+
+Pandas Series
+.................
+scatc550aer (Series, 9794 items)
+</pre></div>
+</div>
+<p>As you can see in the output, the merging comprises not only the data
+arrays but also registers any differences in the assoicated metdadata
+(cf. e.g., sampling wavelength 550 nm vs. 525 nm, instrument name, PI)</p>
+<p>Now, have a look at the merged timeseries data.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">merged</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fef7bea3ef0</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_17_1.png" src="_images/add04_stationdata_merging_17_1.png" />
+<p>Looks okay. Let’s merge all 26 files and see if we get a nice long time
+series.</p>
+<p>Retrieve list of <code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">merge_if_multi</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of StationData objects retrieved: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">StationData</span> <span class="n">objects</span> <span class="n">retrieved</span><span class="p">:</span> <span class="mi">26</span>
+</pre></div>
+</div>
+<p>Now merge them into one long time series:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">merged</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Pyaerocom StationData
+---------------------
+var_info ({&#39;scatc550aer&#39;: {&#39;name&#39;: &#39;aerosol_light_scattering_coefficient&#39;, &#39;unit&#39;: &#39;1/Mm&#39;, &#39;wavelength&#39;: &#39;550.0 nm;525.0 nm&#39;, &#39;statistics&#39;: &#39;arithmetic mean&#39;, &#39;matrix&#39;: &#39;aerosol&#39;, &#39;overlap&#39;: False, &#39;method_ref&#39;: &#39;CH02L_scat_coef&#39;, &#39;ts_type&#39;: &#39;hourly&#39;}})
+   scatc550aer (&lt;class &#39;dict&#39;&gt;)
+    name: aerosol_light_scattering_coefficient
+    unit: 1/Mm
+    wavelength: 550.0 nm;525.0 nm
+    statistics: arithmetic mean
+    matrix: aerosol
+    overlap: False
+    method_ref: CH02L_scat_coef
+    ts_type: hourly
+overlap (BrowseDict([(&#39;scatc550aer&#39;, 2015-01-01 00:30:00    0.068376
+2015-01-01 01:29:59    0.255198
+2015-01-01 02:29:59   -0.284809
+2015-01-01 03:30:00    0.123830
+2015-01-01 04:29:59    0.127599
+2015-01-01 05:29:59    0.052224
+2015-01-01 06:30:00   -0.011306
+2015-01-01 07:29:59    0.086143
+2015-01-01 08:29:59   -0.088835
+2015-01-01 09:30:00   -0.084528
+2015-01-01 10:29:59    0.082912
+2015-01-01 11:29:59    0.540007
+2015-01-01 12:30:00    0.062992
+2015-01-01 13:29:59    0.791436
+2015-01-01 14:29:59    0.220202
+2015-01-01 15:30:00   -0.008076
+2015-01-01 16:29:59    0.062992
+2015-01-01 17:29:59    0.386565
+2015-01-01 18:30:00    0.272965
+2015-01-01 19:29:59    0.078067
+2015-01-01 20:29:59    0.375259
+2015-01-01 21:30:00    0.059223
+2015-01-01 22:29:59    0.164209
+2015-01-01 23:29:59   -0.025843
+2015-01-02 00:30:00    0.074836
+2015-01-02 01:29:59    0.159902
+2015-01-02 02:29:59    0.003769
+2015-01-02 03:30:00    0.050070
+2015-01-02 04:29:59    0.156134
+2015-01-02 05:29:59   -0.015613
+                         ...
+2017-12-23 15:30:00    0.504355
+2017-12-23 16:29:59    0.395655
+2017-12-23 17:29:59    0.259811
+2017-12-23 18:30:00    0.258700
+2017-12-23 19:29:59    0.259792
+2017-12-23 20:29:59    0.211566
+2017-12-23 21:30:00    0.296822
+2017-12-23 22:29:59    0.158973
+2017-12-23 23:29:59    0.048703
+2017-12-24 00:30:00    0.103658
+2017-12-24 01:29:59    0.226225
+2017-12-24 02:29:59    0.145462
+2017-12-24 03:30:00    0.081840
+2017-12-24 04:29:59    0.186278
+2017-12-24 05:29:59    0.137102
+2017-12-24 06:30:00    0.192551
+2017-12-24 07:29:59    0.201115
+2017-12-24 08:29:59    0.364645
+2017-12-24 09:30:00    0.375183
+2017-12-24 10:29:59    0.947353
+2017-12-24 11:29:59    0.321736
+2017-12-24 12:30:00    0.601246
+2017-12-24 13:29:59    0.970577
+2017-12-24 14:29:59    0.172226
+2017-12-24 15:30:00    0.161048
+2017-12-24 16:29:59    0.138531
+2017-12-24 17:29:59    0.099212
+2017-12-24 18:30:00    0.186739
+2017-12-24 19:29:59    0.194889
+2017-12-31 23:29:59    0.750785
+Length: 17466, dtype: float64)]))
+   scatc550aer: 2015-01-01 00:30:00    0.068376
+2015-01-01 01:29:59    0.255198
+2015-01-01 02:29:59   -0.284809
+2015-01-01 03:30:00    0.123830
+2015-01-01 04:29:59    0.127599
+2015-01-01 05:29:59    0.052224
+2015-01-01 06:30:00   -0.011306
+2015-01-01 07:29:59    0.086143
+2015-01-01 08:29:59   -0.088835
+2015-01-01 09:30:00   -0.084528
+2015-01-01 10:29:59    0.082912
+2015-01-01 11:29:59    0.540007
+2015-01-01 12:30:00    0.062992
+2015-01-01 13:29:59    0.791436
+2015-01-01 14:29:59    0.220202
+2015-01-01 15:30:00   -0.008076
+2015-01-01 16:29:59    0.062992
+2015-01-01 17:29:59    0.386565
+2015-01-01 18:30:00    0.272965
+2015-01-01 19:29:59    0.078067
+2015-01-01 20:29:59    0.375259
+2015-01-01 21:30:00    0.059223
+2015-01-01 22:29:59    0.164209
+2015-01-01 23:29:59   -0.025843
+2015-01-02 00:30:00    0.074836
+2015-01-02 01:29:59    0.159902
+2015-01-02 02:29:59    0.003769
+2015-01-02 03:30:00    0.050070
+2015-01-02 04:29:59    0.156134
+2015-01-02 05:29:59   -0.015613
+                         ...
+2017-12-23 15:30:00    0.504355
+2017-12-23 16:29:59    0.395655
+2017-12-23 17:29:59    0.259811
+2017-12-23 18:30:00    0.258700
+2017-12-23 19:29:59    0.259792
+2017-12-23 20:29:59    0.211566
+2017-12-23 21:30:00    0.296822
+2017-12-23 22:29:59    0.158973
+2017-12-23 23:29:59    0.048703
+2017-12-24 00:30:00    0.103658
+2017-12-24 01:29:59    0.226225
+2017-12-24 02:29:59    0.145462
+2017-12-24 03:30:00    0.081840
+2017-12-24 04:29:59    0.186278
+2017-12-24 05:29:59    0.137102
+2017-12-24 06:30:00    0.192551
+2017-12-24 07:29:59    0.201115
+2017-12-24 08:29:59    0.364645
+2017-12-24 09:30:00    0.375183
+2017-12-24 10:29:59    0.947353
+2017-12-24 11:29:59    0.321736
+2017-12-24 12:30:00    0.601246
+2017-12-24 13:29:59    0.970577
+2017-12-24 14:29:59    0.172226
+2017-12-24 15:30:00    0.161048
+2017-12-24 16:29:59    0.138531
+2017-12-24 17:29:59    0.099212
+2017-12-24 18:30:00    0.186739
+2017-12-24 19:29:59    0.194889
+2017-12-31 23:29:59    0.750785
+Length: 17466, dtype: float64
+station_name: Jungfraujoch
+instrument_name: TSI_3563_JFJ_dry;Ecotech_Aurora3000_JFJ_dry;IN3563
+PI: Baltensperger, Urs; Weingartner, Ernest;Bukowiecki, Nicolas
+filename: CH0001G.20010101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20100101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20060101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20040101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20080101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20050101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20070101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20110101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20030101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20150101000000.20180321103020.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas;CH0001G.20170101000000.20180320151431.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20160101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20000101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas;CH0001G.20140101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20020101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20090101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20120101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20130101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.19980101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas;CH0001G.19960101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas;CH0001G.20170101000000.20180320151536.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas;CH0001G.19990101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas;CH0001G.20150101000000.20180321102615.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas;CH0001G.20160101000000.20180321103020.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas;CH0001G.19970101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas;CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas
+ts_type: hourly
+latitude: 46.5475
+longitude: 7.985
+altitude: 3580.0
+data_id: EBASMC
+dataset_name: None
+data_product: None
+data_version: None
+data_level: None
+revision_date (list, 3 items)
+   [numpy.datetime64(&#39;2018-03-21T00:00:00&#39;)
+    numpy.datetime64(&#39;2018-03-20T00:00:00&#39;)    numpy.datetime64(&#39;2018-10-31T00:00:00&#39;)]
+
+ts_type_src: hourly
+
+Data arrays
+.................
+dtime (array, 8760 items)
+   [numpy.datetime64(&#39;2001-01-01T00:30:00&#39;)
+    numpy.datetime64(&#39;2001-01-01T01:29:59&#39;)
+    ...
+    numpy.datetime64(&#39;2001-12-31T22:29:59&#39;)
+    numpy.datetime64(&#39;2001-12-31T23:29:59&#39;)]
+
+Pandas Series
+.................
+scatc550aer (Series, 197089 items)
+</pre></div>
+</div>
+<p>And plot…</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+<span class="n">merged</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">merged</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">merged</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fef7c13a0b8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_23_1.png" src="_images/add04_stationdata_merging_23_1.png" />
+</div>
+<div class="section" id="comment-for-convenience">
+<h3>Comment for convenience….<a class="headerlink" href="#comment-for-convenience" title="Permalink to this headline">¶</a></h3>
+<p>Actually, in the default setup you do not really need to think about all
+this. As you might have recognised, when creating the list of
+<code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects from the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object (using method
+<code class="docutils literal notranslate"><span class="pre">to_station_data</span></code>) we parsed the argument <code class="docutils literal notranslate"><span class="pre">merge_if_multi=False</span></code>.</p>
+<p>The default here is <code class="docutils literal notranslate"><span class="pre">True</span></code>, so you can just go ahead and do:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fef7c2688d0</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_25_1.png" src="_images/add04_stationdata_merging_25_1.png" />
+<p>What’s happening here is, that <code class="docutils literal notranslate"><span class="pre">to_station_data</span></code> internally creates a
+list of <code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects and uses the above illustrated method
+<code class="docutils literal notranslate"><span class="pre">merge_station_data</span></code> at the end if the input argument
+<code class="docutils literal notranslate"><span class="pre">merge_if_multi=True</span></code>.</p>
+</div>
+<div class="section" id="what-about-overlapping-data">
+<h3>What about overlapping data ??<a class="headerlink" href="#what-about-overlapping-data" title="Permalink to this headline">¶</a></h3>
+<p>In some situations, there may be overlapping conflicts when merging
+multiple time series into one long time-series. In the following, we
+illustrate how these overlaps are handled if they occur.</p>
+<p>The method <code class="docutils literal notranslate"><span class="pre">merge_station_data</span></code> that is illustrated above has some
+features to handle overlapping data and in any case, all overlaps that
+were detected are stored in the <code class="docutils literal notranslate"><span class="pre">overlap</span></code> attribute of the merged
+<code class="docutils literal notranslate"><span class="pre">StationData</span></code> object. Let’s check first if there are any overlaps in
+the Jungfraujoch data:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">merged</span><span class="o">.</span><span class="n">overlap</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BrowseDict</span><span class="p">([(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">00</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.068376</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">01</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.255198</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">02</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>   <span class="o">-</span><span class="mf">0.284809</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">03</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.123830</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">04</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.127599</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">05</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.052224</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">06</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>   <span class="o">-</span><span class="mf">0.011306</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">07</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.086143</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">08</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>   <span class="o">-</span><span class="mf">0.088835</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">09</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>   <span class="o">-</span><span class="mf">0.084528</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">10</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.082912</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">11</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.540007</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">12</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.062992</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">13</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.791436</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">14</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.220202</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">15</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>   <span class="o">-</span><span class="mf">0.008076</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">16</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.062992</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">17</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.386565</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">18</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.272965</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">19</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.078067</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">20</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.375259</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">21</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.059223</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">22</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.164209</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span> <span class="mi">23</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>   <span class="o">-</span><span class="mf">0.025843</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">00</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.074836</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">01</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.159902</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">02</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.003769</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">03</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.050070</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">04</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.156134</span>
+             <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="mi">05</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>   <span class="o">-</span><span class="mf">0.015613</span>
+                                      <span class="o">...</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">15</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.504355</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">16</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.395655</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">17</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.259811</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">18</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.258700</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">19</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.259792</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">20</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.211566</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">21</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.296822</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">22</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.158973</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">23</span> <span class="mi">23</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.048703</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">00</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.103658</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">01</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.226225</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">02</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.145462</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">03</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.081840</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">04</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.186278</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">05</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.137102</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">06</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.192551</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">07</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.201115</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.364645</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">09</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.375183</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">10</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.947353</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">11</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.321736</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">12</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.601246</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">13</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.970577</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">14</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.172226</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.161048</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">16</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.138531</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">17</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.099212</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">18</span><span class="p">:</span><span class="mi">30</span><span class="p">:</span><span class="mi">00</span>    <span class="mf">0.186739</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">24</span> <span class="mi">19</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.194889</span>
+             <span class="mi">2017</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span> <span class="mi">23</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">59</span>    <span class="mf">0.750785</span>
+             <span class="n">Length</span><span class="p">:</span> <span class="mi">17466</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>Apparently, there is. You can check out these data (in comparison with
+the retrieved time series) as follows:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">merged</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">add_overlaps</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fef7c52b780</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_30_1.png" src="_images/add04_stationdata_merging_30_1.png" />
+</div>
+<div class="section" id="how-to-prioritise-certain-stations-from-others-when-deciding-what-goes-into-overlap-and-what-into-the-final-timeseries">
+<h3>How to prioritise certain stations from others, when deciding what goes into overlap and what into the final timeseries?<a class="headerlink" href="#how-to-prioritise-certain-stations-from-others-when-deciding-what-goes-into-overlap-and-what-into-the-final-timeseries" title="Permalink to this headline">¶</a></h3>
+<p>The method <code class="docutils literal notranslate"><span class="pre">merge_station_data</span></code> provides a bunch of options to handle
+that. Things do not be written twice so please read the docstring of the
+method:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">merge_station_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+Help on function merge_station_data in module pyaerocom.helpers:
+
+merge_station_data(stats, var_name, pref_attr=None, sort_by_largest=True, fill_missing_nan=True, <a href="#id5"><span class="problematic" id="id6">**</span></a>add_meta_keys)
+    Merge multiple StationData objects (from one station) into one instance
+
+    Note
+    ----
+    - all input <code class="xref py py-class docutils literal notranslate"><span class="pre">StationData</span></code> objects need to have same attributes       <code class="docutils literal notranslate"><span class="pre">station_name</span></code>, <code class="docutils literal notranslate"><span class="pre">latitude</span></code>, <code class="docutils literal notranslate"><span class="pre">longitude</span></code> and <code class="docutils literal notranslate"><span class="pre">altitude</span></code>
+
+    Parameters
+    ----------
+    stats : list
+        list containing <code class="xref py py-class docutils literal notranslate"><span class="pre">StationData</span></code> objects (note: all of these
+        objects must contain variable data for the specified input variable)
+    var_name : str
+        data variable name that is to be merged
+    pref_attr
+        optional argument that may be used to specify a metadata attribute
+        that is available in all input <code class="xref py py-class docutils literal notranslate"><span class="pre">StationData</span></code> objects and that
+        is used to order the input stations by relevance. The associated values
+        of this attribute need to be sortable (e.g. revision_date). This is
+        only relevant in case overlaps occur. If unspecified the relevance of
+        the stations is sorted based on the length of the associated data
+        arrays.
+    sort_by_largest : bool
+        if True, the result from the sorting is inverted. E.g. if
+        <code class="docutils literal notranslate"><span class="pre">pref_attr</span></code> is unspecified, then the stations will be sorted based on
+        the length of the data vectors, starting with the shortest, ending with
+        the longest. This sorting result will then be inverted, if
+        <code class="docutils literal notranslate"><span class="pre">sort_by_largest=True</span></code>, so that the longest time series get's highest
+        importance. If, e.g. <code class="docutils literal notranslate"><span class="pre">pref_attr='revision_date'</span></code>, then the stations
+        are sorted by the associated revision date value, starting with the
+        earliest, ending with the latest (which will also be inverted if
+        this argument is set to True)
+    fill_missing_nan : bool
+        if True, the resulting time series is filled with NaNs. NOTE: this
+        requires that information about the temporal resolution (ts_type) of
+        the data is available in each of the StationData objects.
+</pre>
+<p>In particular, <code class="docutils literal notranslate"><span class="pre">pref_attr</span></code> and <code class="docutils literal notranslate"><span class="pre">sort_by_largest</span></code> are relevant here.</p>
+<p><strong>NOTE</strong>: if <code class="docutils literal notranslate"><span class="pre">pref_attr</span></code> is unspecified, then the stations are sorted
+based on the number of valid measurement points for the input variable.
+This was done in the merged time series that we retrieved above.</p>
+<p>Now, in the following, let’s not use the number of available data points
+(to sort the stations by relevance) but prefer stations that have a more
+recent data revision date.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">merged_pref_awesomeness</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">pref_attr</span><span class="o">=</span><span class="s1">&#39;awesomeness&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">pya</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">MetaDataError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failed merging, error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Failed</span> <span class="n">merging</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Cannot sort station relevance by attribute awesomeness. At least one of the input stations does not contain this attribute&#39;</span><span class="p">,)</span>
+</pre></div>
+</div>
+<p>Unfortunately, the <code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects do not contain an attribute
+<code class="docutils literal notranslate"><span class="pre">awesomeness</span></code> by which we could sort. Let’s go with <code class="docutils literal notranslate"><span class="pre">revision_date</span></code>
+instead:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># recompute stations, since we overwrote one above</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">merge_if_multi</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">merged_pref_recent_revision</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">pref_attr</span><span class="o">=</span><span class="s1">&#39;revision_date&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">merged_pref_recent_revision</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">add_overlaps</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fef7c228c50</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_37_1.png" src="_images/add04_stationdata_merging_37_1.png" />
+<p>Let’s see if there is any difference to the previous method (resample to
+daily resolution):</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Overlaps (prefer longer timeseries)&#39;</span><span class="p">,</span>
+                                                             <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="n">merged_pref_recent_revision</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span>
+                                                                             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Overlaps (prefer more recent)&#39;</span><span class="p">,</span>
+                                                                             <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">Legend</span> <span class="n">at</span> <span class="mh">0x7fef7c2d7048</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_39_1.png" src="_images/add04_stationdata_merging_39_1.png" />
+<p>As you can see, the merging strategy can make an impact and it is
+important to define a reasonable strategy. In this case, it is certainly
+more reliable to use the data with the more recent revision date.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">merged_pref_recent_revision</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">],</span>
+                 <span class="n">merged</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/add04_stationdata_merging_41_0.png" src="_images/add04_stationdata_merging_41_0.png" />
 </div>
 </div>
 </div>

@@ -217,7 +217,7 @@ displayed in the flowchart.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Init</span> <span class="n">data</span> <span class="n">paths</span> <span class="k">for</span> <span class="n">lustre</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.008213520050048828</span> <span class="n">s</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.006315708160400391</span> <span class="n">s</span>
 </pre></div>
 </div>
 <div class="section" id="check-data-directory">
@@ -654,9 +654,11 @@ familiar with Python).</p>
 var_info ({&#39;od550aer&#39;: {&#39;overlap&#39;: False}})
    od550aer (&lt;class &#39;dict&#39;&gt;)
     overlap: False
+overlap (BrowseDict())
 station_name: Leipzig
 instrument_name: sun_photometer
 PI: Brent_Holben
+filename: None
 ts_type: daily
 latitude: 51.352500000000006
 longitude: 12.435277999999998
@@ -666,6 +668,7 @@ dataset_name: None
 data_product: None
 data_version: None
 data_level: None
+revision_date: None
 ts_type_src: daily
 
 Data arrays
@@ -684,10 +687,11 @@ od550aer (Series, 2894 items)
 </div>
 <p>As you can see, this station contains a time-series of the AOD at 550
 nm. If you like, you can plot this time-series:</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">station_data</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39; xg&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Leipzig AOD all times&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">station_data</span><span class="o">.</span><span class="n">insert_nans</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">station_data</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Leipzig AOD all times&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f5578170278</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <img alt="_images/tut00_get_started_70_1.png" src="_images/tut00_get_started_70_1.png" />
@@ -697,13 +701,11 @@ only for the year 2010). And you can overlay different curves, by
 passing the axes instance returned by the plotting method:</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span><span class="o">=</span><span class="n">aeronet_data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Leipzig&#39;</span><span class="p">,</span>
                                 <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
-                                <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
-                                                            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span>
+                                <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">=</span><span class="n">aeronet_data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Leipzig&#39;</span><span class="p">,</span>
                                 <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
                                 <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_variable</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
-                                                              <span class="n">label</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
                                                               <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Leipzig AODs 2010&#39;</span><span class="p">)</span>
@@ -732,9 +734,11 @@ bouldering trip, you may call:</p>
                      <span class="s1">&#39;2006-11-01T00:00:00.000000000&#39;</span><span class="p">,</span> <span class="s1">&#39;2006-12-01T00:00:00.000000000&#39;</span><span class="p">],</span>
                     <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;datetime64[ns]&#39;</span><span class="p">)),</span>
              <span class="p">(</span><span class="s1">&#39;var_info&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;od550aer&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;overlap&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}),</span>
+             <span class="p">(</span><span class="s1">&#39;overlap&#39;</span><span class="p">,</span> <span class="n">BrowseDict</span><span class="p">()),</span>
              <span class="p">(</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Fontainebleau&#39;</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s1">&#39;sun_photometer&#39;</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;PI&#39;</span><span class="p">,</span> <span class="s1">&#39;Brent_Holben&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;ts_type&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="mf">48.406666999999985</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="mf">2.6802780000000004</span><span class="p">),</span>
@@ -744,6 +748,7 @@ bouldering trip, you may call:</p>
              <span class="p">(</span><span class="s1">&#39;data_product&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;data_version&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;data_level&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;revision_date&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="mi">2006</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>    <span class="mf">0.176742</span>
               <span class="mi">2006</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">01</span>    <span class="mf">0.176013</span>
@@ -840,7 +845,7 @@ sides.</p>
 <span class="n">Successfully</span> <span class="n">interpolated</span> <span class="n">cube</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7fd5e90850f0</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f5559ff2ac8</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <img alt="_images/tut00_get_started_85_3.png" src="_images/tut00_get_started_85_3.png" />

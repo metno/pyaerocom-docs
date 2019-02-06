@@ -178,7 +178,7 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="k">import</span> <span class="n">in_range</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">same_meta_dict</span><span class="p">,</span> 
                                <span class="n">start_stop_str</span><span class="p">,</span>
-                               <span class="n">start_stop</span><span class="p">)</span>
+                               <span class="n">start_stop</span><span class="p">,</span> <span class="n">merge_station_data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UngriddedData"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData">[docs]</a><span class="k">class</span> <span class="nc">UngriddedData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class representing ungridded data</span>
@@ -231,7 +231,7 @@
 <span class="sd">        index of this variable in data numpy array (in column specified by</span>
 <span class="sd">        :attr:`_VARINDEX`)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.16&#39;</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.17&#39;</span>
     
     <span class="n">_METADATAKEYINDEX</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">_TIMEINDEX</span> <span class="o">=</span> <span class="mi">1</span>
@@ -433,8 +433,9 @@
     <span class="c1"># TODO: see docstring</span>
 <div class="viewcode-block" id="UngriddedData.to_station_data"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.to_station_data">[docs]</a>    <span class="k">def</span> <span class="nf">to_station_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta_idx</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                         <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interp_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                        <span class="n">min_coverage_interp</span><span class="o">=</span><span class="mf">0.68</span><span class="p">,</span> 
-                        <span class="n">data_as_series</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                        <span class="n">min_coverage_interp</span><span class="o">=</span><span class="mf">0.68</span><span class="p">,</span> <span class="n">data_as_series</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                        <span class="n">merge_if_multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">merge_pref_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                        <span class="n">merge_sort_by_largest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">insert_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert data from one station to :class:`StationData`</span>
 <span class="sd">        </span>
 <span class="sd">        Todo</span>
@@ -465,7 +466,25 @@
 <span class="sd">            roughly corresponding to 1 sigma)</span>
 <span class="sd">        data_as_series : bool</span>
 <span class="sd">            if True, all data columns are returned as time-series</span>
-<span class="sd">            </span>
+<span class="sd">        merge_if_multi : bool</span>
+<span class="sd">            if True and if data request results in multiple instances of </span>
+<span class="sd">            StationData objects, then these are attempted to be merged into one </span>
+<span class="sd">            :class:`StationData` object using :func:`merge_station_data`</span>
+<span class="sd">        merge_pref_attr </span>
+<span class="sd">            only relevant for merging of multiple matches: preferred attribute </span>
+<span class="sd">            that is used to sort the individual StationData objects by relevance.</span>
+<span class="sd">            Needs to be available in each of the individual StationData objects.</span>
+<span class="sd">            For details cf. :attr:`pref_attr` in docstring of </span>
+<span class="sd">            :func:`merge_station_data`. Example could be `revision_date`. If </span>
+<span class="sd">            None, then the stations will be sorted based on the number of </span>
+<span class="sd">            available data points (if :attr:`merge_sort_by_largest` is True, </span>
+<span class="sd">            which is default).</span>
+<span class="sd">        merge_sort_by_largest : bool</span>
+<span class="sd">            only relevant for merging of multiple matches: cf. prev. attr. and</span>
+<span class="sd">            docstring of :func:`merge_station_data` method.</span>
+<span class="sd">        insert_nans : bool</span>
+<span class="sd">            if True, then the retrieved :class:`StationData` objects are filled</span>
+<span class="sd">            with NaNs </span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -475,15 +494,6 @@
 <span class="sd">            detected for that station (e.g. data from different instruments), </span>
 <span class="sd">            else single instance of StationData</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="c1"># user asks explicitely for station name, find all meta indices</span>
-            <span class="c1"># that match this station</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">meta_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_station_indices</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No such station </span><span class="si">{}</span><span class="s1"> in UngriddedData&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">meta_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">meta_idx</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_convert</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">vars_to_convert</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_to_convert</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -491,6 +501,18 @@
             <span class="n">stop</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2200&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">start_stop</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># user asks explicitely for station name, find all meta indices</span>
+            <span class="c1"># that match this station</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">meta_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_station_indices</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No such station </span><span class="si">{}</span><span class="s1"> in UngriddedData&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">meta_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">meta_idx</span><span class="p">]</span>
+        
             
         <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -513,8 +535,24 @@
                 <span class="n">stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">VarNotAvailableError</span><span class="p">:</span>
                 <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">merge_if_multi</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vars_to_convert</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Cannot yet merge multiple stations &#39;</span>
+                                          <span class="s1">&#39;with multiple variables.&#39;</span><span class="p">)</span>
+            <span class="n">merged</span> <span class="o">=</span> <span class="n">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="p">,</span>
+                                        <span class="n">pref_attr</span><span class="o">=</span><span class="n">merge_pref_attr</span><span class="p">,</span>
+                                        <span class="n">sort_by_largest</span><span class="o">=</span><span class="n">merge_sort_by_largest</span><span class="p">)</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="p">[</span><span class="n">merged</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">insert_nans</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_convert</span><span class="p">:</span>
+                    <span class="n">stat</span><span class="o">.</span><span class="n">insert_nans</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No data could be retrieved for request&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># return StationData object and not list </span>
+            <span class="k">return</span> <span class="n">stats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
         <span class="k">return</span> <span class="n">stats</span></div>
         
     <span class="k">def</span> <span class="nf">_metablock_to_stationdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta_idx</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="p">,</span> 

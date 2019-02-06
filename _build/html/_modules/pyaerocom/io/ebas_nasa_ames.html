@@ -521,7 +521,8 @@
 <span class="sd">        base class</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">TIMEUNIT2SECFAC</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">days</span> <span class="o">=</span> <span class="mi">3600</span><span class="o">*</span><span class="mi">24</span><span class="p">)</span>
+    <span class="n">TIMEUNIT2SECFAC</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">days</span> <span class="o">=</span> <span class="mi">3600</span><span class="o">*</span><span class="mi">24</span><span class="p">,</span>
+                           <span class="n">Days</span> <span class="o">=</span> <span class="mi">3600</span><span class="o">*</span><span class="mi">24</span><span class="p">)</span>
     
     <span class="n">ERR_LOW_STATS</span> <span class="o">=</span> <span class="s1">&#39;percentile:15.87&#39;</span>
     <span class="n">ERR_HIGH_STATS</span> <span class="o">=</span> <span class="s1">&#39;percentile:84.13&#39;</span>
@@ -621,30 +622,11 @@
         <span class="n">totnum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_arr</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">totnum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;No data available in file&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">totnum</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">num_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">num_arr</span><span class="p">])</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#         elif totnum == 1:</span>
+<span class="c1">#             num_arr = np.asarray([num_arr])</span>
+<span class="c1"># =============================================================================</span>
         <span class="k">return</span> <span class="n">basedate</span> <span class="o">+</span> <span class="p">(</span><span class="n">num_arr</span> <span class="o">*</span> <span class="n">mulfac_to_sec</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;timedelta64[s]&quot;</span><span class="p">)</span></div>
-    
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     def decode_flags_col(self, colnum=None):</span>
-<span class="c1">#         &quot;&quot;&quot;Decode flags column</span>
-<span class="c1">#         </span>
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         colnum : int</span>
-<span class="c1">#             flag column number (only relevant if file contains multiple flag</span>
-<span class="c1">#             columns)</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if colnum is None:</span>
-<span class="c1">#             l = self.col_names</span>
-<span class="c1">#             flag_cols = [i for (i, item) in enumerate(l) if &quot;numflag&quot; in item]</span>
-<span class="c1">#             if len(flag_cols) &gt; 1:</span>
-<span class="c1">#                 raise ValueError(&quot;Found multiple flag columns: {}. Please &quot;</span>
-<span class="c1">#                                  &quot;specify which column to decode.&quot;.format(flag_cols))</span>
-<span class="c1">#             colnum = flag_cols[0]</span>
-<span class="c1">#         elif not self.var_defs[colnum].is_flag:</span>
-<span class="c1">#             raise IndexError(&quot;Provided column number is not a flag column&quot;)</span>
-<span class="c1"># =============================================================================</span>
     
 <div class="viewcode-block" id="EbasNasaAmesFile.get_colnames_unique"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_nasa_ames.EbasNasaAmesFile.get_colnames_unique">[docs]</a>    <span class="k">def</span> <span class="nf">get_colnames_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a list of unique column names&quot;&quot;&quot;</span>
@@ -873,7 +855,7 @@
                 
 <div class="viewcode-block" id="EbasNasaAmesFile.compute_time_stamps"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_nasa_ames.EbasNasaAmesFile.compute_time_stamps">[docs]</a>    <span class="k">def</span> <span class="nf">compute_time_stamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute time stamps from first two data columns&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;endtime&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NasaAmesReadError</span><span class="p">(</span><span class="s1">&#39;2nd column is not endtime or does not &#39;</span>
                                     <span class="s1">&#39;have the same unit as 1st column (starttime)&#39;</span><span class="p">)</span>
         <span class="n">offs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_date</span>
@@ -884,7 +866,7 @@
         
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numarr_to_datetime64</span><span class="p">(</span><span class="n">offs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">mulfac</span><span class="p">)</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numarr_to_datetime64</span><span class="p">(</span><span class="n">offs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">mulfac</span><span class="p">)</span>
-        
+            
         <span class="bp">self</span><span class="o">.</span><span class="n">time_stamps</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">*.</span><span class="mi">5</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span></div>
     
@@ -1044,10 +1026,14 @@
         <span class="sd">&quot;&quot;&quot;Import variable definition line from NASA Ames file&quot;&quot;&quot;</span>
         <span class="n">spl</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">line_from_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">spl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">EbasColDef</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
                           <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                           <span class="n">is_var</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                          <span class="n">unit</span><span class="o">=</span><span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                          <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;numflag&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>    
             <span class="n">data</span><span class="o">.</span><span class="n">is_var</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1091,7 +1077,7 @@
     
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">DIR_MC</span> <span class="o">=</span> <span class="s2">&quot;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/EBASMultiColumn/data/data/&quot;</span>
-    <span class="n">FILES_MC</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DE0043G.20080101000000.20160708144500.nephelometer..aerosol.1y.1h.DE09L_tsi_neph_3563.DE09L_nephelometer.lev2.nas&#39;</span><span class="p">]</span>
+    <span class="n">FILES_MC</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;US0035R.20150826222034.20160117041718.nephelometer..pm10.5mn.1h.US06L_TSI_3563_BND_pm10.US06L_scat_coef.lev2.nas&#39;</span><span class="p">]</span>
     
     
     <span class="n">file_mc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR_MC</span><span class="p">,</span> <span class="n">FILES_MC</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
