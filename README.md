@@ -4,6 +4,6 @@ HTML files for pyaerocom website. The files are generated using [Sphinx](http://
 
 The pyaerocom website is hosted here:
 
-http://aerocom.met.no/pyaerocom/
+https://pyaerocom.met.no/
 
 
