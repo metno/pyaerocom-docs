@@ -240,15 +240,6 @@
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">k</span><span class="p">](</span><span class="n">v</span><span class="p">)</span></div>
-    
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     def __setitem__(self, key, val):</span>
-<span class="c1">#         super(DataSource, self).__setitem__(key, val)</span>
-<span class="c1">#         if key == &#39;data_id&#39;:</span>
-<span class="c1">#             self._parse_source_info_from_ini()</span>
-<span class="c1"># =============================================================================</span>
-            
-            
               
 <div class="viewcode-block" id="StationMetaData"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.StationMetaData">[docs]</a><span class="k">class</span> <span class="nc">StationMetaData</span><span class="p">(</span><span class="n">DataSource</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This object defines a standard for station metadata in pyaerocom</span>
@@ -264,41 +255,52 @@
 <span class="sd">    </span>
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    station_name</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        name of file (may be full path or only filename)</span>
+<span class="sd">    station_id : str</span>
+<span class="sd">        Code or unique ID of station</span>
+<span class="sd">    station_name :str</span>
 <span class="sd">        name or ID of a station. Note, that the concept of a station in </span>
 <span class="sd">        pyaerocom is not necessarily related to a fixed coordinate. A station</span>
 <span class="sd">        can also be a satellite, ship, or a human walking around and measuring</span>
 <span class="sd">        something</span>
-<span class="sd">    instrument_name </span>
+<span class="sd">    instrument_name : str</span>
 <span class="sd">        name (or ID) of instrument</span>
-<span class="sd">    PI </span>
+<span class="sd">    PI : str</span>
 <span class="sd">        principal investigator</span>
-<span class="sd">    ts_type</span>
+<span class="sd">    country : str</span>
+<span class="sd">        string specifying country (or country ID)</span>
+<span class="sd">    ts_type : str</span>
 <span class="sd">        frequency of data (e.g. monthly). Note the difference between </span>
 <span class="sd">        :attr:`ts_type_src` of :class:`DataSource`, which specifies the freq.</span>
 <span class="sd">        of the original files.</span>
-<span class="sd">    latitude</span>
+<span class="sd">    latitude : float</span>
 <span class="sd">        latitude coordinate</span>
-<span class="sd">    longitude </span>
+<span class="sd">    longitude : float</span>
 <span class="sd">        longitude coordinate</span>
-<span class="sd">    altitude</span>
+<span class="sd">    altitude : float</span>
 <span class="sd">        altitude coordinate</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
         
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">station_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">station_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instrument_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">PI</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">country</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">altitude</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">altitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         
         <span class="nb">super</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span></div>
-        
+     
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="n">StationMetaData</span><span class="p">(</span><span class="n">data_id</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span>
                            <span class="n">ts_type</span> <span class="o">=</span> <span class="s1">&#39;blaaaa&#39;</span><span class="p">)</span>
@@ -349,7 +351,8 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

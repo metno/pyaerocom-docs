@@ -397,15 +397,15 @@ be done using the <code class="docutils literal notranslate"><span class="pre">c
 </pre></div>
 </div>
 <p>This worked, but however, is it fast?</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-[t.point for t in times_ecmwf.cells()]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">point</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">cells</span><span class="p">()]</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>156 ms ± 3.65 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-[t.point for t in times_aatsr.cells()]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">point</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_aatsr</span><span class="o">.</span><span class="n">cells</span><span class="p">()]</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>137 ms ± 3.56 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
@@ -415,15 +415,15 @@ be done using the <code class="docutils literal notranslate"><span class="pre">c
 will not be accepted by pandas as a valid datetime object. We can,
 however, convert the datapoints to numpy datetime64 objects during the
 conversion (if we want).</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-[np.datetime64(t.point) for t in times_ecmwf.cells()]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">cells</span><span class="p">()]</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>178 ms ± 18.4 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-[np.datetime64(t.point) for t in times_aatsr.cells()]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_aatsr</span><span class="o">.</span><span class="n">cells</span><span class="p">()]</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>190 ms ± 26 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
@@ -441,8 +441,8 @@ we shall see below, the conversion can be significantly accelarated if
 we do not use the iris interface provided by the <code class="docutils literal notranslate"><span class="pre">cell(index)</span></code> method
 and the <code class="docutils literal notranslate"><span class="pre">cells()</span></code> iterator, but rather directly use the underlying
 <code class="docutils literal notranslate"><span class="pre">cftime</span></code> library (that iris uses).</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-[np.datetime64(t) for t in times_ecmwf.units.num2date(times_ecmwf.points)]
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span><span class="n">times_ecmwf</span><span class="o">.</span><span class="n">points</span><span class="p">)]</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2.2 ms ± 140 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
@@ -515,8 +515,8 @@ cftime_to_datetime64(times, cfunit=None, calendar=None)
     &gt;&gt;&gt; cftime_to_datetime64(10, cfunit_str, &quot;gregorian&quot;)
     array(['2018-01-11T00:00:00.000000'], dtype='datetime64[us]')
 </pre>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-pya_tconversion(times_ecmwf.points, times_ecmwf.units)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="n">pya_tconversion</span><span class="p">(</span><span class="n">times_ecmwf</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>539 µs ± 119 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
@@ -524,8 +524,8 @@ pya_tconversion(times_ecmwf.points, times_ecmwf.units)
 </div>
 <p>For the AATSR data, the method is slower, since here, the slower
 <code class="docutils literal notranslate"><span class="pre">num2date</span></code> method is used.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-pya_tconversion(times_aatsr.points, times_aatsr.units)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="n">pya_tconversion</span><span class="p">(</span><span class="n">times_aatsr</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">times_aatsr</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2.44 ms ± 87 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
@@ -538,15 +538,15 @@ microseconds. And at the same time the new method ensures that we have
 them in a format that also pandas understands.</p>
 <p>The method is also the standard conversion method in the
 <code class="docutils literal notranslate"><span class="pre">GriddedData.time_stamps()</span></code> method:</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-data_ecmwf.time_stamps()
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="n">data_ecmwf</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>531 µs ± 45.2 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="k">timeit</span>
-data_aatsr.time_stamps()
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+<span class="n">data_aatsr</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2.53 ms ± 53.5 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
@@ -601,7 +601,8 @@ data_aatsr.time_stamps()
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

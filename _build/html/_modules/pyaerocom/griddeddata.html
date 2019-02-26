@@ -184,13 +184,16 @@
                                   <span class="n">DimensionOrderError</span><span class="p">,</span>
                                   <span class="n">NDimError</span><span class="p">,</span> <span class="n">DataDimensionError</span><span class="p">,</span>
                                   <span class="n">VariableDefinitionError</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_time_constraint</span><span class="p">,</span> 
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_time_rng_constraint</span><span class="p">,</span>
+                               <span class="n">get_lon_rng_constraint</span><span class="p">,</span>
+                               <span class="n">get_lat_rng_constraint</span><span class="p">,</span>
                                <span class="n">cftime_to_datetime64</span><span class="p">,</span>
                                <span class="n">str_to_iris</span><span class="p">,</span>
                                <span class="n">IRIS_AGGREGATORS</span><span class="p">,</span>
                                <span class="n">to_pandas_timestamp</span><span class="p">,</span>
                                <span class="n">TS_TYPE_TO_NUMPY_FREQ</span><span class="p">,</span>
-                               <span class="n">datetime2str</span><span class="p">)</span>
+                               <span class="n">datetime2str</span><span class="p">,</span>
+                               <span class="n">isrange</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="k">import</span> <span class="n">closest_index</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.stationdata</span> <span class="k">import</span> <span class="n">StationData</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.region</span> <span class="k">import</span> <span class="n">Region</span>
@@ -271,7 +274,8 @@
                              <span class="n">ts_type</span>        <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
                              <span class="n">regridded</span>      <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                              <span class="n">computed</span>       <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                             <span class="n">region</span>         <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+                             <span class="n">region</span>         <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">reader</span>         <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
         
         
         <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">od</span><span class="p">(</span><span class="n">unit_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -309,6 +313,19 @@
     
                 <span class="k">return</span> <span class="n">revision</span>
         <span class="k">return</span> <span class="s1">&#39;n/a&#39;</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instance of reader class from which this object was created&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;reader&#39;</span><span class="p">]</span>
+    
+    <span class="nd">@reader</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">ReadGridded</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">ReadGridded</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input reader </span><span class="si">{}</span><span class="s1"> is not a support reader class for &#39;</span>
+                             <span class="s1">&#39;gridded data...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;reader&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -384,44 +401,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Failed to round start time </span><span class="si">{}</span><span class="s1"> to beggining of &#39;</span>
                              <span class="s1">&#39;frequency </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[us]&#39;</span><span class="p">)</span>
-    
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     @property</span>
-<span class="c1">#     def longitude(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Longitudes of data&quot;&quot;&quot;</span>
-<span class="c1">#         if self.is_cube:</span>
-<span class="c1">#             return self.grid.coord(&quot;longitude&quot;)</span>
-<span class="c1">#         </span>
-<span class="c1">#     @longitude.setter</span>
-<span class="c1">#     def longitude(self, value):</span>
-<span class="c1">#         raise AttributeError(&quot;Longitudes cannot be changed, please check &quot;</span>
-<span class="c1">#                              &quot;underlying data type stored in attribute grid&quot;)</span>
-<span class="c1">#     </span>
-<span class="c1">#     @property</span>
-<span class="c1">#     def latitude(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Latitudes of data&quot;&quot;&quot;</span>
-<span class="c1">#         if self.is_cube:</span>
-<span class="c1">#             return self.grid.coord(&quot;latitude&quot;)</span>
-<span class="c1">#         </span>
-<span class="c1">#     @latitude.setter</span>
-<span class="c1">#     def latitude(self, value):</span>
-<span class="c1">#         raise AttributeError(&quot;Latitudes cannot be changed, please check &quot;</span>
-<span class="c1">#                              &quot;underlying data type stored in attribute grid&quot;)</span>
-<span class="c1"># =============================================================================</span>
-        
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     @property</span>
-<span class="c1">#     def time(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Time dimension of data&quot;&quot;&quot;</span>
-<span class="c1">#         if self.is_cube:</span>
-<span class="c1">#             return self.grid.coord(&quot;time&quot;)</span>
-<span class="c1">#         </span>
-<span class="c1">#     @time.setter</span>
-<span class="c1">#     def time(self, value):</span>
-<span class="c1">#         raise AttributeError(&quot;Time array cannot be changed, please check &quot;</span>
-<span class="c1">#                              &quot;underlying data type stored in attribute grid&quot;)</span>
-<span class="c1"># =============================================================================</span>
-            
+   
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Underlying grid data object&quot;&quot;&quot;</span>
@@ -458,8 +438,20 @@
     <span class="nd">@property</span> 
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;ID of model to which data belongs&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Deprecated attribute name, please use data_id instead&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
     
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;ID of data object (e.g. model run ID, obsnetwork ID)</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        This attribute was formerly named ``name`` which is alse the </span>
+<span class="sd">        corresponding attribute name in :attr:`suppl_info`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Checks if underlying data type is of type :class:`iris.cube.Cube`&quot;&quot;&quot;</span>
@@ -541,6 +533,7 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">area_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Area weights of lat / lon grid&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">calc_area_weights</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area_weights</span>
@@ -552,7 +545,22 @@
 <div class="viewcode-block" id="GriddedData.check_dim_coords"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.check_dim_coords">[docs]</a>    <span class="k">def</span> <span class="nf">check_dim_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check dimension coordinates of grid data&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-        
+     
+<div class="viewcode-block" id="GriddedData.init_reader"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.init_reader">[docs]</a>    <span class="k">def</span> <span class="nf">init_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_info</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initiate reader class&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Existing reader class will be overwritten&#39;</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">ReadGridded</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">print_info</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">----Initiated reader class----</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">print_log</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Failed to initiate reader class: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
+            
 <div class="viewcode-block" id="GriddedData.load_input"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.load_input">[docs]</a>    <span class="k">def</span> <span class="nf">load_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Import input as cube</span>
 <span class="sd">        </span>
@@ -585,7 +593,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">var_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">var_name</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Failed to convert variable name </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">))</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Failed to convert variable name </span><span class="si">{}</span><span class="s1">&#39;</span>
+                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">))</span></div>
         
      
 <div class="viewcode-block" id="GriddedData.convert_unit"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.convert_unit">[docs]</a>    <span class="k">def</span> <span class="nf">convert_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_unit</span><span class="p">):</span>
@@ -610,8 +619,8 @@
 
 <div class="viewcode-block" id="GriddedData.check_coord_order"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.check_coord_order">[docs]</a>    <span class="k">def</span> <span class="nf">check_coord_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Wrapper for :func:`check_dimcoords_tseries`&quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Method was renamed, please use &#39;</span>
-                                       <span class="s1">&#39;check_dimcoords_tseries&#39;</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Method was renamed, please use &#39;</span>
+                                          <span class="s1">&#39;check_dimcoords_tseries&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_dimcoords_tseries</span><span class="p">()</span></div>
     
 <div class="viewcode-block" id="GriddedData.check_dimcoords_tseries"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.check_dimcoords_tseries">[docs]</a>    <span class="k">def</span> <span class="nf">check_dimcoords_tseries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -684,7 +693,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">new_order</span><span class="p">)</span></div>
         
     <span class="k">def</span> <span class="nf">_check_altitude_access</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         <span class="n">coord_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">coord_name</span> <span class="o">==</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -692,8 +700,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">coord_name</span> <span class="ow">in</span> <span class="n">conv</span><span class="o">.</span><span class="n">supported</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="n">arg_info</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">coord_name</span><span class="p">]</span>
-        <span class="n">args_dict</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">name1</span>
         <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">possible_vals</span> <span class="ow">in</span> <span class="n">arg_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">pass</span>
             
@@ -750,7 +756,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">check_dimcoords_tseries</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">DimensionOrderError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reorder_dimensions_tseries</span><span class="p">()</span>
-        <span class="c1"># if the method makes it to this point, the it is 3 or 4 dimensional </span>
+        <span class="c1"># if the method makes it to this point, it is 3 or 4 dimensional </span>
         <span class="c1"># and the first 3 dimensions are time, latitude, longitude.</span>
         
         <span class="c1"># init input for sample points</span>
@@ -850,7 +856,7 @@
         
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># check if vertical scheme can be converted into valid iris </span>
-            <span class="c1"># aggregator (in which case vertical dimension is collopsed)</span>
+            <span class="c1"># aggregator (in which case vertical dimension is collapsed)</span>
             <span class="n">aggr</span> <span class="o">=</span> <span class="n">str_to_iris</span><span class="p">(</span><span class="n">vert_scheme</span><span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collapsed</span><span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="n">aggr</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -902,12 +908,85 @@
                 <span class="s1">&#39;name&#39;</span>          <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span>   <span class="p">:</span> <span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">)}</span></div>
         
-<div class="viewcode-block" id="GriddedData.sel"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.sel">[docs]</a>    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">_closest_time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find closest index to input in time dimension&quot;&quot;&quot;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">date2num</span><span class="p">(</span><span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">nearest_neighbour_index</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
     
-<div class="viewcode-block" id="GriddedData.isel"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.isel">[docs]</a>    <span class="k">def</span> <span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="GriddedData.find_closest_index"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.find_closest_index">[docs]</a>    <span class="k">def</span> <span class="nf">find_closest_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">dimcoord_vals</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find the closest indices for dimension coordinate values&quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dimcoord_vals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;No such dimension </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;time&#39;</span><span class="p">:</span>
+                <span class="n">idx</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closest_time_idx</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">idx</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_neighbour_index</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">idx</span></div>
+    
+<div class="viewcode-block" id="GriddedData.isel"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.isel">[docs]</a>    <span class="k">def</span> <span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_neirest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">dimcoord_vals</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select subset by dimension names</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        This is a BETA version, please use with care</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **dimcoord_vals </span>
+<span class="sd">            key / value pairs specifying coordinate values to be extracted</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        GriddedData</span>
+<span class="sd">            subset data object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rng_funs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;time&#39;</span>   <span class="p">:</span> <span class="n">get_time_rng_constraint</span><span class="p">,</span>
+                    <span class="s1">&#39;longitude&#39;</span> <span class="p">:</span> <span class="n">get_lon_rng_constraint</span><span class="p">,</span>
+                    <span class="s1">&#39;latitude&#39;</span> <span class="p">:</span> <span class="n">get_lat_rng_constraint</span><span class="p">}</span>
         
+        <span class="n">coord_vals</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dimcoord_vals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">is_rng</span> <span class="o">=</span> <span class="n">isrange</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_rng</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">rng_funs</span><span class="p">[</span><span class="n">dim</span><span class="p">](</span><span class="n">val</span><span class="p">)</span>
+                <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;time&#39;</span><span class="p">:</span>
+                    <span class="n">_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closest_time_idx</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                    <span class="n">_cval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">_idx</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">use_neirest</span> <span class="ow">and</span> <span class="n">_cval</span> <span class="o">!=</span> <span class="n">val</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">DataExtractionError</span><span class="p">(</span><span class="s1">&#39;No such value </span><span class="si">{}</span><span class="s1"> in dim </span><span class="si">{}</span><span class="s1">. &#39;</span>
+                                                  <span class="s1">&#39;Use option use_neirest to &#39;</span>
+                                                  <span class="s1">&#39;disregard and extract &#39;</span>
+                                                  <span class="s1">&#39;neirest neighbour&#39;</span><span class="o">.</span><span class="n">format</span>
+                                                  <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_neighbour_index</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                    <span class="n">_cval</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="n">_idx</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">use_neirest</span> <span class="ow">and</span> <span class="n">_cval</span> <span class="o">!=</span> <span class="n">val</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">DataExtractionError</span><span class="p">(</span><span class="s1">&#39;No such value </span><span class="si">{}</span><span class="s1"> in dim </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                                  <span class="s1">&#39;Use option use_neirest to &#39;</span>
+                                                  <span class="s1">&#39;disregard and extract &#39;</span>
+                                                  <span class="s1">&#39;neirest neighbour&#39;</span><span class="o">.</span><span class="n">format</span>
+                                                  <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+                <span class="n">coord_vals</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cval</span>
+                
+        <span class="k">if</span> <span class="n">coord_vals</span><span class="p">:</span>
+            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">coord_values</span><span class="o">=</span><span class="n">coord_vals</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">cadd</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">&amp;</span> <span class="n">cadd</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">subset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataExtractionError</span><span class="p">(</span><span class="s1">&#39;Failed to extract subset for input &#39;</span>
+                                      <span class="s1">&#39;coordinates </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dimcoord_vals</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">subset</span></div>
+                    
     <span class="c1"># TODO: Test, confirm and remove beta flag in docstring</span>
 <div class="viewcode-block" id="GriddedData.downscale_time"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.downscale_time">[docs]</a>    <span class="k">def</span> <span class="nf">downscale_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Downscale in time to predefined resolution resolution</span>
@@ -1039,7 +1118,7 @@
                               <span class="n">Timestamp</span><span class="p">(</span><span class="n">time_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">time_range</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cropping along time axis based on Timestamps&quot;</span><span class="p">)</span>
-                <span class="n">time_constraint</span> <span class="o">=</span> <span class="n">get_time_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">time_range</span><span class="p">)</span>
+                <span class="n">time_constraint</span> <span class="o">=</span> <span class="n">get_time_rng_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">time_range</span><span class="p">)</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">time_constraint</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">time_range</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cropping along time axis based on indices&quot;</span><span class="p">)</span>
@@ -1463,6 +1542,7 @@
     
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices_or_attr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;x.__getitem__(y) &lt;==&gt; x[y]&quot;&quot;&quot;</span>
+   
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices_or_attr</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">indices_or_attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">indices_or_attr</span><span class="p">]</span>
@@ -1684,7 +1764,8 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

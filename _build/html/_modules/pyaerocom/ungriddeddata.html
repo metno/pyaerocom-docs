@@ -169,16 +169,18 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
 <span class="kn">import</span> <span class="nn">fnmatch</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span><span class="p">,</span> <span class="n">print_log</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">DataExtractionError</span><span class="p">,</span> <span class="n">VarNotAvailableError</span><span class="p">,</span>
                                   <span class="n">TimeMatchError</span><span class="p">,</span> <span class="n">DataCoverageError</span><span class="p">,</span>
-                                  <span class="n">MetaDataError</span><span class="p">)</span>
+                                  <span class="n">MetaDataError</span><span class="p">,</span> <span class="n">StationNotFoundError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">StationData</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="k">import</span> <span class="n">in_range</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">same_meta_dict</span><span class="p">,</span> 
                                <span class="n">start_stop_str</span><span class="p">,</span>
                                <span class="n">start_stop</span><span class="p">,</span> <span class="n">merge_station_data</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="k">import</span> <span class="n">StationMetaData</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">VerticalProfile</span>
 
 <div class="viewcode-block" id="UngriddedData"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData">[docs]</a><span class="k">class</span> <span class="nc">UngriddedData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class representing ungridded data</span>
@@ -230,9 +232,27 @@
 <span class="sd">        mapping of variable name (keys, e.g. od550aer) to numerical variable </span>
 <span class="sd">        index of this variable in data numpy array (in column specified by</span>
 <span class="sd">        :attr:`_VARINDEX`)</span>
+<span class="sd">        </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_points : :obj:`int`, optional</span>
+<span class="sd">        inital number of total datapoints (number of rows in 2D dataarray)</span>
+<span class="sd">    add_cols : :obj:`list`, optional</span>
+<span class="sd">        list of additional index column names of 2D datarray.</span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.17&#39;</span>
+    <span class="c1">#: version of class (for caching)</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.19&#39;</span>
     
+    <span class="c1">#: inital total number of rows in dataarray</span>
+    <span class="n">_ROWNO</span> <span class="o">=</span> <span class="mi">10000</span>
+    <span class="c1">#: default number of rows that are dynamically added if total number of </span>
+    <span class="c1">#: data rows is reached.</span>
+    <span class="n">_CHUNKSIZE</span> <span class="o">=</span> <span class="mi">1000</span>
+    
+    <span class="c1">#: The following indices specify what the individual rows of the datarray</span>
+    <span class="c1">#: are reserved for. These may be expanded when creating an instance of </span>
+    <span class="c1">#: this class by providing a list of additional index names.</span>
     <span class="n">_METADATAKEYINDEX</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">_TIMEINDEX</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">_LATINDEX</span> <span class="o">=</span> <span class="mi">2</span>
@@ -243,12 +263,8 @@
     <span class="n">_DATAHEIGHTINDEX</span> <span class="o">=</span> <span class="mi">7</span>
     <span class="n">_DATAERRINDEX</span> <span class="o">=</span> <span class="mi">8</span> <span class="c1"># col where errors can be stored</span>
     <span class="n">_DATAFLAGINDEX</span> <span class="o">=</span> <span class="mi">9</span> <span class="c1"># can be used to store flags</span>
-    <span class="n">_TRASHINDEX</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1">#index where invalid data can be moved to (e.g. when outliers are removed)</span>
-    
-
-    <span class="n">_COLNO</span> <span class="o">=</span> <span class="mi">11</span>
-    <span class="n">_ROWNO</span> <span class="o">=</span> <span class="mi">10000</span>
-    <span class="n">_CHUNKSIZE</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">_STOPTIMEINDEX</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># can be used to store stop time of acq. </span>
+    <span class="n">_TRASHINDEX</span> <span class="o">=</span> <span class="mi">11</span> <span class="c1">#index where invalid data can be moved to (e.g. when outliers are removed)</span>
     
     <span class="c1"># The following number denotes the kept precision after the decimal dot of</span>
     <span class="c1"># the location (e.g denotes lat = 300.12345)</span>
@@ -256,11 +272,16 @@
     <span class="n">_LOCATION_PRECISION</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">_LAT_OFFSET</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">90.</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">STANDARD_META_KEYS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_index</span><span class="p">(</span><span class="n">add_cols</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">num_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">num_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ROWNO</span>
+            
+        
         <span class="c1">#keep private, this is not supposed to be used by the user</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="n">num_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_COLNO</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">num_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_COLNO</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_revision</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
@@ -268,6 +289,42 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">var_idx</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_hist</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span>
+    
+    <span class="k">def</span> <span class="nf">_init_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init index mapping for columns in dataarray&quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">od</span><span class="p">(</span><span class="n">metadata</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_METADATAKEYINDEX</span><span class="p">,</span>
+                 <span class="n">time</span>           <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TIMEINDEX</span><span class="p">,</span>
+                 <span class="n">stoptime</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_STOPTIMEINDEX</span><span class="p">,</span>
+                 <span class="n">latitude</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LATINDEX</span><span class="p">,</span>
+                 <span class="n">longitude</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LONINDEX</span><span class="p">,</span>
+                 <span class="n">altitude</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ALTITUDEINDEX</span><span class="p">,</span>
+                 <span class="n">varidx</span>         <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_VARINDEX</span><span class="p">,</span>
+                 <span class="n">data</span>           <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAINDEX</span><span class="p">,</span>
+                 <span class="n">dataerr</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAERRINDEX</span><span class="p">,</span>
+                 <span class="n">dataaltitude</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAHEIGHTINDEX</span><span class="p">,</span>
+                 <span class="n">dataflag</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAFLAGINDEX</span><span class="p">,</span>
+                 <span class="n">trash</span>          <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TRASHINDEX</span><span class="p">)</span>
+        
+        <span class="n">next_idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">add_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_cols</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for add_cols. Need list or tuple&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">add_cols</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot add new index with name </span><span class="si">{}</span><span class="s1"> since &#39;</span>
+                                     <span class="s1">&#39;this index already exists at column &#39;</span>
+                                     <span class="s1">&#39;position </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">idx</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span>
+                <span class="n">idx</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">next_idx</span>
+                <span class="n">next_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">idx</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_COLNO</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">)</span>
     
 <div class="viewcode-block" id="UngriddedData.copy"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Make a copy of this object</span>
@@ -421,19 +478,37 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;adding chunk, new array size (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>                </div>
     
     <span class="k">def</span> <span class="nf">_find_station_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">station_pattern</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find indices of all metadata blocks matching input station name</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        station_pattern : str</span>
+<span class="sd">            station name or wildcard pattern</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">           list containing all metadata indices that match the input station</span>
+<span class="sd">           name or pattern</span>
+<span class="sd">           </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        StationNotFoundError</span>
+<span class="sd">            if no such station exists in this data object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">],</span> <span class="n">station_pattern</span><span class="p">):</span>
                 <span class="n">idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No station available in UngriddedData that &#39;</span>
-                             <span class="s1">&#39;matches pattern </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">station_pattern</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">StationNotFoundError</span><span class="p">(</span><span class="s1">&#39;No station available in UngriddedData &#39;</span>
+                                       <span class="s1">&#39;that matches name or pattern </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">station_pattern</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">idx</span>
     
     <span class="c1"># TODO: see docstring</span>
 <div class="viewcode-block" id="UngriddedData.to_station_data"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.to_station_data">[docs]</a>    <span class="k">def</span> <span class="nf">to_station_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta_idx</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                        <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interp_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                        <span class="n">min_coverage_interp</span><span class="o">=</span><span class="mf">0.68</span><span class="p">,</span> <span class="n">data_as_series</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                        <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  
                         <span class="n">merge_if_multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">merge_pref_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                         <span class="n">merge_sort_by_largest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">insert_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert data from one station to :class:`StationData`</span>
@@ -464,8 +539,6 @@
 <span class="sd">        min_coverage_interp : float</span>
 <span class="sd">            required coverage fraction for interpolation (default is 0.68, i.e.</span>
 <span class="sd">            roughly corresponding to 1 sigma)</span>
-<span class="sd">        data_as_series : bool</span>
-<span class="sd">            if True, all data columns are returned as time-series</span>
 <span class="sd">        merge_if_multi : bool</span>
 <span class="sd">            if True and if data request results in multiple instances of </span>
 <span class="sd">            StationData objects, then these are attempted to be merged into one </span>
@@ -492,10 +565,13 @@
 <span class="sd">            StationData object(s) containing results. list is only returned if </span>
 <span class="sd">            input for meta_idx is station name and multiple matches are </span>
 <span class="sd">            detected for that station (e.g. data from different instruments), </span>
-<span class="sd">            else single instance of StationData</span>
+<span class="sd">            else single instance of StationData. All variable time series are</span>
+<span class="sd">            inserted as pandas Series</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_convert</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">vars_to_convert</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_to_convert</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">vars_to_convert</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vars_to_convert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">contains_vars</span>
         <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;1970&#39;</span><span class="p">)</span>
             <span class="n">stop</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2200&#39;</span><span class="p">)</span>
@@ -505,61 +581,48 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="c1"># user asks explicitely for station name, find all meta indices</span>
             <span class="c1"># that match this station</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">meta_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_station_indices</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No such station </span><span class="si">{}</span><span class="s1"> in UngriddedData&#39;</span>
-                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">))</span>
+            <span class="n">meta_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_station_indices</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">meta_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">meta_idx</span><span class="p">]</span>
         
-            
+        <span class="n">stats</span> <span class="o">=</span> <span class="p">[]</span>    
         <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metablock_to_stationdata</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
-                                                  <span class="n">vars_to_convert</span><span class="p">,</span>  
-                                                  <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> 
-                                                  <span class="n">interp_nans</span><span class="p">,</span> 
-                                                  <span class="n">min_coverage_interp</span><span class="p">,</span> 
-                                                  <span class="n">data_as_series</span><span class="p">)</span>
         
-        <span class="n">stats</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">meta_idx</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metablock_to_stationdata</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> 
                                                       <span class="n">vars_to_convert</span><span class="p">,</span>  
-                                                      <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> 
-                                                      <span class="n">interp_nans</span><span class="p">,</span> 
-                                                      <span class="n">min_coverage_interp</span><span class="p">,</span> 
-                                                      <span class="n">data_as_series</span><span class="p">)</span>
+                                                      <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
                 <span class="n">stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">VarNotAvailableError</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">VarNotAvailableError</span><span class="p">,</span> <span class="n">TimeMatchError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping meta index </span><span class="si">{}</span><span class="s1">. Reason: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">merge_if_multi</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vars_to_convert</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Cannot yet merge multiple stations &#39;</span>
                                           <span class="s1">&#39;with multiple variables.&#39;</span><span class="p">)</span>
             <span class="n">merged</span> <span class="o">=</span> <span class="n">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="p">,</span>
                                         <span class="n">pref_attr</span><span class="o">=</span><span class="n">merge_pref_attr</span><span class="p">,</span>
-                                        <span class="n">sort_by_largest</span><span class="o">=</span><span class="n">merge_sort_by_largest</span><span class="p">)</span>
+                                        <span class="n">sort_by_largest</span><span class="o">=</span><span class="n">merge_sort_by_largest</span><span class="p">,</span>
+                                        <span class="n">fill_missing_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1">#done below</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="p">[</span><span class="n">merged</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">insert_nans</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_convert</span><span class="p">:</span>
-                    <span class="n">stat</span><span class="o">.</span><span class="n">insert_nans</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_convert</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">freq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">stat</span><span class="o">.</span><span class="n">resample_timeseries</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># this does also insert NaNs, thus elif in next</span>
+                <span class="k">elif</span> <span class="n">insert_nans</span><span class="p">:</span>
+                    <span class="n">stat</span><span class="o">.</span><span class="n">insert_nans_timeseries</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No data could be retrieved for request&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> data could not be retrieved for meta &#39;</span>
+                                    <span class="s1">&#39; index (or station name) </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vars_to_convert</span><span class="p">,</span> <span class="n">meta_idx</span><span class="p">))</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># return StationData object and not list </span>
             <span class="k">return</span> <span class="n">stats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        
         <span class="k">return</span> <span class="n">stats</span></div>
         
     <span class="k">def</span> <span class="nf">_metablock_to_stationdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta_idx</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="p">,</span> 
-                                  <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                                  <span class="n">interp_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                                  <span class="n">min_coverage_interp</span><span class="o">=</span><span class="mf">0.68</span><span class="p">,</span> 
-                                  <span class="n">data_as_series</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                                  <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert one metadata index to StationData (helper method)</span>
 <span class="sd">        </span>
 <span class="sd">        See :func:`to_station_data` for input parameters</span>
@@ -567,26 +630,24 @@
         <span class="c1"># may or may not be defined in metadata block</span>
         <span class="n">check_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="s1">&#39;revision_date&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;station_name_orig&#39;</span><span class="p">]</span>
-        <span class="n">stat_data</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
         
         <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">meta_idx</span><span class="p">]</span>
         
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">check_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-                <span class="n">stat_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-                
-        <span class="c1"># do not return anything for stations without data</span>
-        <span class="c1"># TODO: consider writing longitude, latitude and altitude</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">]</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
+                <span class="n">sd</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_META_KEYS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                <span class="n">sd</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;ts_type&#39;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">sd</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
+            
+        <span class="c1"># assign station coordinates explicitely</span>
+        <span class="k">for</span> <span class="n">ck</span> <span class="ow">in</span> <span class="n">sd</span><span class="o">.</span><span class="n">STANDARD_COORD_KEYS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ck</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                <span class="n">sd</span><span class="o">.</span><span class="n">station_coords</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span>
         
         <span class="k">if</span> <span class="n">vars_to_convert</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">vars_to_convert</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span>
@@ -595,71 +656,77 @@
             <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;None of the input variables matches, &#39;</span>
                                        <span class="s1">&#39;or station does not contain data. </span><span class="si">{}</span><span class="s1">&#39;</span>
                                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]))</span>
-        <span class="n">first_var</span> <span class="o">=</span> <span class="n">vars_to_convert</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">indices_first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_idx</span><span class="p">[</span><span class="n">meta_idx</span><span class="p">][</span><span class="n">first_var</span><span class="p">]</span>
-        <span class="n">dtime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">indices_first</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TIMEINDEX</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[s]&#39;</span><span class="p">)</span>
+        <span class="c1">#_data = self._get_subset(meta_idx)</span>
         
-        <span class="c1"># TODO: remove try except block</span>
-        <span class="n">tmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">dtime</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">,</span> <span class="n">dtime</span> <span class="o">&lt;=</span> <span class="n">stop</span><span class="p">)</span>
-  
-        <span class="k">if</span> <span class="n">tmask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">TimeMatchError</span><span class="p">(</span><span class="s1">&#39;No data available for station </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">) in &#39;</span>
-                                 <span class="s1">&#39;time interval </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">],</span>
-                                         <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">],</span>
-                                         <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">))</span>
-        <span class="n">dtime</span> <span class="o">=</span> <span class="n">dtime</span><span class="p">[</span><span class="n">tmask</span><span class="p">]</span>
-        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtime</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_convert</span><span class="p">:</span>
-            <span class="n">stat_data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_idx</span><span class="p">[</span><span class="n">meta_idx</span><span class="p">][</span><span class="n">var</span><span class="p">][</span><span class="n">tmask</span><span class="p">]</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAINDEX</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">data_as_series</span><span class="p">:</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dtime</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtime</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_monotonic</span><span class="p">:</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span>
-                <span class="k">if</span> <span class="n">interp_nans</span><span class="p">:</span>
-                    <span class="n">coverage</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">coverage</span> <span class="o">&lt;</span> <span class="n">min_coverage_interp</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> data of station </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">) in &#39;</span>
-                                                <span class="s1">&#39;time interval </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1"> contains &#39;</span>
-                                                <span class="s1">&#39;too many invalid measurements &#39;</span>
-                                                <span class="s1">&#39;for interpolation.&#39;</span>
-                                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">,</span>
-                                                        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">],</span>
-                                                        <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">],</span>
-                                                        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">))</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">freq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="n">resample_timeseries</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="n">resample_timeseries</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">freq</span><span class="p">)</span> 
-                    <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">freq</span>
-                    <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
-            <span class="n">stat_data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">stat_data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Unit for variable </span><span class="si">{}</span><span class="s1"> is not available&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
-            <span class="k">if</span> <span class="s1">&#39;var_info&#39;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">and</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]:</span>
-                <span class="n">stat_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
             
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
-                <span class="n">stat_data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  
+            <span class="c1"># get indices of this variable</span>
+            <span class="n">var_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_idx</span><span class="p">[</span><span class="n">meta_idx</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
+            
+            <span class="c1"># vector of timestamps corresponding to this variable</span>
+            <span class="n">dtime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">var_idx</span><span class="p">,</span> 
+                               <span class="bp">self</span><span class="o">.</span><span class="n">_TIMEINDEX</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[s]&#39;</span><span class="p">)</span>
+            
+            <span class="c1"># get subset</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">var_idx</span><span class="p">]</span>
+            
+            <span class="c1"># make sure to extract only valid timestamps</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">stop</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            
+            <span class="c1"># create access mask for valid time stamps</span>
+            <span class="n">tmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">dtime</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">,</span> 
+                                   <span class="n">dtime</span> <span class="o">&lt;=</span> <span class="n">stop</span><span class="p">)</span>
+            
+            <span class="c1"># make sure there is some valid data</span>
+            <span class="k">if</span> <span class="n">tmask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TimeMatchError</span><span class="p">(</span><span class="s1">&#39;No data available for station </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">) in &#39;</span>
+                                     <span class="s1">&#39;time interval </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sd</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">],</span>
+                                             <span class="n">sd</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">],</span>
+                                             <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">))</span>
+                
+            <span class="n">dtime</span> <span class="o">=</span> <span class="n">dtime</span><span class="p">[</span><span class="n">tmask</span><span class="p">]</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[</span><span class="n">tmask</span><span class="p">]</span>
+            
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAINDEX</span><span class="p">]</span>
+            <span class="n">vals_err</span> <span class="o">=</span> <span class="n">subset</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAERRINDEX</span><span class="p">]</span>
+            <span class="n">altitude</span> <span class="o">=</span>  <span class="n">subset</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DATAHEIGHTINDEX</span><span class="p">]</span>
+                
+            <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">dtime</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_monotonic</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+            <span class="n">sd</span><span class="o">.</span><span class="n">data_err</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals_err</span>
+        
+            <span class="n">sd</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">sd</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+            
+            <span class="c1"># check if there is information about altitude (then relevant 3D</span>
+            <span class="c1"># variables and parameters are included too)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">altitude</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s1">&#39;altitude&#39;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]:</span>
+                    <span class="n">sd</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span>
+                <span class="n">sd</span><span class="o">.</span><span class="n">altitude</span> <span class="o">=</span> <span class="n">altitude</span>
+            <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]:</span>
+                <span class="n">sd</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">stat_data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="c1"># there is overlapping data</span>
+                <span class="n">sd</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
         
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+                <span class="n">sd</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sd</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;overlap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         
-        <span class="k">return</span> <span class="n">stat_data</span>
+        <span class="k">return</span> <span class="n">sd</span>
     
 <div class="viewcode-block" id="UngriddedData.to_station_data_all"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.to_station_data_all">[docs]</a>    <span class="k">def</span> <span class="nf">to_station_data_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                            <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interp_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                            <span class="n">min_coverage_interp</span><span class="o">=</span><span class="mf">0.68</span><span class="p">,</span> <span class="n">keep_na</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert all possible stations to :class:`StationData` objects</span>
+                            <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_stats_nodata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert all data to :class:`StationData` objects</span>
+<span class="sd">        </span>
+<span class="sd">        Creates one instance of :class:`StationData` for each metadata block in </span>
+<span class="sd">        this object. For datasets like Aeronet, this corresponds to one</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -674,13 +741,12 @@
 <span class="sd">            pandas.Timestamp)</span>
 <span class="sd">        freq : str</span>
 <span class="sd">            pandas frequency string (e.g. &#39;D&#39; for daily, &#39;M&#39; for month end)</span>
-<span class="sd">        interp_nans : bool</span>
-<span class="sd">            if True, all NaN values in the time series for each </span>
-<span class="sd">            variable are interpolated using linear interpolation</span>
-<span class="sd">        min_coverage_interp : float</span>
-<span class="sd">            required coverage fraction for interpolation (default is 0.68, i.e.</span>
-<span class="sd">            roughly corresponding to 1 sigma)</span>
-<span class="sd">        drop_na </span>
+<span class="sd">            or valid pyaerocom ts_type (e.g. &#39;hourly&#39;, &#39;monthly&#39;).</span>
+<span class="sd">        </span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            additional keyword args passed to :func:`to_station_data` (e.g.</span>
+<span class="sd">            `merge_if_multi, merge_pref_attr, merge_sort_by_largest, </span>
+<span class="sd">            insert_nans`)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -696,8 +762,7 @@
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> 
-                                            <span class="n">stop</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">interp_nans</span><span class="p">,</span> 
-                                            <span class="n">min_coverage_interp</span><span class="p">)</span>
+                                            <span class="n">stop</span><span class="p">,</span> <span class="n">freq</span><span class="p">)</span>
                 
                 <span class="n">out_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="c1"># catch the exceptions that are acceptable</span>
@@ -707,7 +772,7 @@
                                <span class="s1">&#39;Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
                 <span class="c1"># append None to make sure indices of stations are </span>
                 <span class="c1"># preserved in output array</span>
-                <span class="k">if</span> <span class="n">keep_na</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">include_stats_nodata</span><span class="p">:</span>
                     <span class="n">out_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out_data</span></div>
     
@@ -858,9 +923,10 @@
             <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="n">low</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">low</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">minimum</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Setting </span><span class="si">{}</span><span class="s1"> outlier lower lim: </span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">low</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">high</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">high</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">maximum</span>
-            
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Setting </span><span class="si">{}</span><span class="s1"> outlier upper lim: </span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">high</span><span class="p">))</span>
         <span class="n">var_idx</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">var_idx</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
         <span class="n">var_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[:,</span> <span class="n">new</span><span class="o">.</span><span class="n">_VARINDEX</span><span class="p">]</span> <span class="o">==</span> <span class="n">var_idx</span>
         
@@ -1694,7 +1760,7 @@
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
-        <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">print_log</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">Filter</span>
         <span class="kn">from</span> <span class="nn">pyaerocom.plot.plotcoordinates</span> <span class="k">import</span> <span class="n">plot_coordinates</span>
         <span class="kn">from</span> <span class="nn">pyaerocom.plot.mapping</span> <span class="k">import</span> <span class="n">set_map_ticks</span>
     
@@ -1730,7 +1796,8 @@
             
         <span class="k">else</span><span class="p">:</span>
             <span class="n">stat_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_station_data_all</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> 
-                                                 <span class="n">ts_type</span><span class="p">,</span> <span class="n">keep_na</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                                                 <span class="n">ts_type</span><span class="p">,</span> 
+                                                 <span class="n">include_stats_nodata</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stat_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No stations could be found for input &#39;</span>
@@ -1751,7 +1818,7 @@
         <span class="n">region</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">_region</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">lon_range_plot</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">lat_range_plot</span><span class="p">)</span>
-        
+    
         <span class="n">ax</span> <span class="o">=</span> <span class="n">set_map_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> 
                            <span class="n">region</span><span class="o">.</span><span class="n">lon_ticks</span><span class="p">,</span> 
                            <span class="n">region</span><span class="o">.</span><span class="n">lat_ticks</span><span class="p">)</span>
@@ -1879,7 +1946,7 @@
 <span class="sd">        pandas.Series</span>
 <span class="sd">            time series data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Outdated method, please use to_timeseries&#39;</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Outdated method, please use to_timeseries&#39;</span><span class="p">))</span>
         
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> 
                                      <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
@@ -1970,15 +2037,20 @@
     
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
     
+    
+    
     <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;EBASMC&#39;</span><span class="p">,</span> 
                                        <span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;absc550aer&#39;</span><span class="p">],</span>
                                        <span class="n">station_names</span><span class="o">=</span><span class="s1">&#39;Puy*&#39;</span><span class="p">)</span>
     
     <span class="n">data1</span> <span class="o">=</span>  <span class="n">data</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
     
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">data1</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;P*&#39;</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
-    <span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">station_data_to_timeseries</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span>
-                                           <span class="n">pref_attr</span><span class="o">=</span><span class="s1">&#39;revision_date&#39;</span><span class="p">)</span>
+    <span class="n">stat</span> <span class="o">=</span> <span class="n">data1</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;P*&#39;</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> 
+                                  <span class="n">merge_if_multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">merge_pref_attr</span><span class="o">=</span><span class="s1">&#39;revision_date&#39;</span><span class="p">)</span>
+    
+    <span class="n">stat</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">add_overlaps</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
     
     
     
@@ -2030,7 +2102,8 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

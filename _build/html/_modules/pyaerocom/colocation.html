@@ -608,6 +608,8 @@
     
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
     
     <span class="n">reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;ECMWF_OSUITE&#39;</span><span class="p">)</span>
     <span class="n">model_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span>
@@ -615,30 +617,34 @@
     <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">)</span>
     <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
     
-    <span class="n">colocated_data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">colocation</span><span class="o">.</span><span class="n">colocate_gridded_ungridded_2D</span><span class="p">(</span><span class="n">model_data</span><span class="p">,</span> <span class="n">obs_data</span><span class="p">)</span>
+    <span class="n">colocated_data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">colocation</span><span class="o">.</span><span class="n">colocate_gridded_ungridded</span><span class="p">(</span><span class="n">model_data</span><span class="p">,</span> 
+                                                               <span class="n">obs_data</span><span class="p">,</span>
+                                                               <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
     
-    
-    <span class="n">r</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;ECMWF_CAMS_REAN&#39;</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span>
-    
-    <span class="n">obs_r1</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;MODIS6.terra&#39;</span><span class="p">)</span>
-    <span class="n">obs1</span> <span class="o">=</span> <span class="n">obs_r1</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span>
-    
-    <span class="n">obs_r2</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">)</span>
-    <span class="n">obs2</span> <span class="o">=</span> <span class="n">obs_r2</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
-    
-    <span class="n">coll_data1</span> <span class="o">=</span> <span class="n">colocate_gridded_gridded</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">obs1</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
-    
-    <span class="n">coll_data1</span><span class="o">.</span><span class="n">plot_scatter</span><span class="p">()</span>
-    
-    <span class="n">coll_data2</span> <span class="o">=</span> <span class="n">colocate_gridded_ungridded_2D</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">obs2</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
-    <span class="n">coll_data2</span><span class="o">.</span><span class="n">plot_scatter</span><span class="p">()</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">obs1</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">obs2</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">coll_data1</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">coll_data2</span><span class="p">)</span>
+    <span class="n">colocated_data</span><span class="o">.</span><span class="n">plot_scatter</span><span class="p">()</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     r = pya.io.ReadGridded(&#39;ECMWF_CAMS_REAN&#39;)</span>
+<span class="c1">#     model = r.read_var(&#39;od550aer&#39;, start=2010)</span>
+<span class="c1">#     </span>
+<span class="c1">#     obs_r1 = pya.io.ReadGridded(&#39;MODIS6.terra&#39;)</span>
+<span class="c1">#     obs1 = obs_r1.read_var(&#39;od550aer&#39;, start=2010)</span>
+<span class="c1">#     </span>
+<span class="c1">#     obs_r2 = pya.io.ReadUngridded(&#39;AeronetSunV3Lev2.daily&#39;)</span>
+<span class="c1">#     obs2 = obs_r2.read(vars_to_retrieve=&#39;od550aer&#39;)</span>
+<span class="c1">#     </span>
+<span class="c1">#     coll_data1 = colocate_gridded_gridded(model, obs1, ts_type=&#39;monthly&#39;)</span>
+<span class="c1">#     </span>
+<span class="c1">#     coll_data1.plot_scatter()</span>
+<span class="c1">#     </span>
+<span class="c1">#     coll_data2 = colocate_gridded_ungridded_2D(model, obs2, ts_type=&#39;monthly&#39;)</span>
+<span class="c1">#     coll_data2.plot_scatter()</span>
+<span class="c1">#     </span>
+<span class="c1">#     print(model)</span>
+<span class="c1">#     print(obs1)</span>
+<span class="c1">#     print(obs2)</span>
+<span class="c1">#     print(coll_data1)</span>
+<span class="c1">#     print(coll_data2)</span>
+<span class="c1"># =============================================================================</span>
 </pre></div>
 
            </div>
@@ -685,7 +691,8 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

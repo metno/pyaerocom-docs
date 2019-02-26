@@ -172,19 +172,20 @@
 <span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.test.settings</span> <span class="k">import</span> <span class="n">TEST_RTOL</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.test.settings</span> <span class="k">import</span> <span class="n">TEST_RTOL</span><span class="p">,</span> <span class="n">lustre_unavail</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.readgridded</span> <span class="k">import</span> <span class="n">ReadGriddedMulti</span>
 
-<span class="n">MODELS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AATSR_SU_v4.3&quot;</span><span class="p">,</span> <span class="s2">&quot;CAM5.3-Oslo_CTRL2016&quot;</span><span class="p">,</span> <span class="s1">&#39;ECHAM6-SALSA_AP3-CTRL2015&#39;</span><span class="p">]</span>
+<span class="n">MODELS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AATSR_SU_v4.3&quot;</span><span class="p">,</span> <span class="s2">&quot;CAM5.3-Oslo_CTRL2016&quot;</span><span class="p">,</span> 
+          <span class="s1">&#39;ECHAM6-SALSA_AP3-CTRL2015&#39;</span><span class="p">]</span>
 <span class="n">TEST_VARS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;od550aer&quot;</span><span class="p">,</span> <span class="s2">&quot;od550dust&quot;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="dataset"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgriddedmulti.dataset">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="dataset"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgriddedmulti.dataset">[docs]</a><span class="nd">@lustre_unavail</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">dataset</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39;Read ECMWF data between 2003 and 2008</span>
-<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="n">ReadGriddedMulti</span><span class="p">(</span><span class="n">MODELS</span><span class="p">,</span> <span class="s1">&#39;2010&#39;</span><span class="p">,</span><span class="s1">&#39;2011&#39;</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="test_info_available"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgriddedmulti.test_info_available">[docs]</a><span class="k">def</span> <span class="nf">test_info_available</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>    
+
+<div class="viewcode-block" id="test_info_available"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgriddedmulti.test_info_available">[docs]</a><span class="nd">@lustre_unavail</span>    
+<span class="k">def</span> <span class="nf">test_info_available</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>    
     <span class="n">ids_nominal</span> <span class="o">=</span> <span class="n">MODELS</span>
     <span class="n">vars_nominal</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;abs550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;ang4487aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550dust&#39;</span><span class="p">,</span> 
                     <span class="s1">&#39;od550erraer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550gt1aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550lt1aer&#39;</span><span class="p">],</span>
@@ -197,9 +198,8 @@
                      <span class="s1">&#39;loadss&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550bc&#39;</span><span class="p">,</span> <span class="s1">&#39;od550dust&#39;</span><span class="p">,</span> <span class="s1">&#39;od550oa&#39;</span><span class="p">,</span> 
                      <span class="s1">&#39;od550so4&#39;</span><span class="p">,</span> <span class="s1">&#39;od550ss&#39;</span><span class="p">,</span> <span class="s1">&#39;sconcbc&#39;</span><span class="p">,</span> <span class="s1">&#39;sconcdust&#39;</span><span class="p">,</span> <span class="s1">&#39;sconcoa&#39;</span><span class="p">,</span> 
                      <span class="s1">&#39;sconcso4&#39;</span><span class="p">,</span> <span class="s1">&#39;sconcss&#39;</span><span class="p">]]</span>
-    <span class="n">years_nominal</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2002</span><span class="p">,</span> <span class="mi">2003</span><span class="p">,</span> <span class="mi">2004</span><span class="p">,</span> <span class="mi">2005</span><span class="p">,</span> <span class="mi">2006</span><span class="p">,</span> <span class="mi">2007</span><span class="p">,</span> <span class="mi">2008</span><span class="p">,</span> <span class="mi">2009</span><span class="p">,</span> <span class="mi">2010</span><span class="p">,</span> 
-                      <span class="mi">2011</span><span class="p">,</span> <span class="mi">2012</span><span class="p">],</span>
-                     <span class="p">[</span><span class="mi">2006</span><span class="p">,</span> <span class="mi">2008</span><span class="p">,</span> <span class="mi">2010</span><span class="p">],</span>
+    <span class="n">years_nominal</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2011</span><span class="p">,</span> <span class="mi">2012</span><span class="p">],</span>
+                     <span class="p">[</span><span class="mi">2010</span><span class="p">],</span>
                      <span class="p">[</span><span class="mi">2010</span><span class="p">]]</span>
     
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">MODELS</span><span class="p">):</span>
@@ -207,8 +207,9 @@
         <span class="k">assert</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">ids_nominal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="n">vars_nominal</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">years</span><span class="p">,</span> <span class="n">years_nominal</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
-        
-<div class="viewcode-block" id="test_read_vars"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgriddedmulti.test_read_vars">[docs]</a><span class="k">def</span> <span class="nf">test_read_vars</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+
+<div class="viewcode-block" id="test_read_vars"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgriddedmulti.test_read_vars">[docs]</a><span class="nd">@lustre_unavail</span>        
+<span class="k">def</span> <span class="nf">test_read_vars</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">TEST_VARS</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
                           <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     
@@ -216,8 +217,9 @@
     <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ECHAM6-SALSA_AP3-CTRL2015&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">TEST_VARS</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s2">&quot;monthly&quot;</span><span class="p">)</span>
     
     <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span></div>
-                
-<div class="viewcode-block" id="test_data_available"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgriddedmulti.test_data_available">[docs]</a><span class="k">def</span> <span class="nf">test_data_available</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+
+<div class="viewcode-block" id="test_data_available"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgriddedmulti.test_data_available">[docs]</a><span class="nd">@lustre_unavail</span>                
+<span class="k">def</span> <span class="nf">test_data_available</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
     <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">MODELS</span><span class="p">,</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -294,7 +296,8 @@
       <script type="text/javascript" src="../../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
