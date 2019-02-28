@@ -1317,6 +1317,28 @@ latter is used.</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="pyaerocom.ungriddeddata.UngriddedData.find_station_meta_indices">
+<code class="descname">find_station_meta_indices</code><span class="sig-paren">(</span><em>station_name_or_pattern</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/ungriddeddata.html#UngriddedData.find_station_meta_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.ungriddeddata.UngriddedData.find_station_meta_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find indices of all metadata blocks matching input station name</p>
+<p>You may also use wildcard pattern as input (e.g. <em>Potenza</em>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>station_pattern</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – station name or wildcard pattern</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list containing all metadata indices that match the input station
+name or pattern</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">StationNotFoundError</span></code> – if no such station exists in this data object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="pyaerocom.ungriddeddata.UngriddedData.to_station_data">
 <code class="descname">to_station_data</code><span class="sig-paren">(</span><em>meta_idx</em>, <em>vars_to_convert=None</em>, <em>start=None</em>, <em>stop=None</em>, <em>freq=None</em>, <em>merge_if_multi=True</em>, <em>merge_pref_attr=None</em>, <em>merge_sort_by_largest=True</em>, <em>insert_nans=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/ungriddeddata.html#UngriddedData.to_station_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.ungriddeddata.UngriddedData.to_station_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert data from one station to <code class="xref py py-class docutils literal notranslate"><span class="pre">StationData</span></code></p>
@@ -1474,19 +1496,28 @@ measurements there is already data in the trash.</p>
 <dd><p>Set all values in trash column to NaN</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="pyaerocom.ungriddeddata.UngriddedData.station_coordinates">
+<code class="descname">station_coordinates</code><a class="headerlink" href="#pyaerocom.ungriddeddata.UngriddedData.station_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>dictionary with station coordinates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary containing station coordinates (latitude, longitude,
+altitude -&gt; values) for all stations (keys) where these parameters
+are accessible.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="pyaerocom.ungriddeddata.UngriddedData.filter_by_meta">
 <code class="descname">filter_by_meta</code><span class="sig-paren">(</span><em>**filter_attributes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/ungriddeddata.html#UngriddedData.filter_by_meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.ungriddeddata.UngriddedData.filter_by_meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flexible method to filter these data based on input meta specs</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Beta version</p>
-</div>
-<div class="admonition-todo admonition" id="index-5">
-<p class="first admonition-title">Todo</p>
-<p class="last">Check filter history (attr filter_hist) before applying filter in
-order to see if filter(s) already have been applied before</p>
-</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1566,7 +1597,7 @@ determine single locations</p>
 <p class="last">If there is an overlap in time between the data, the blocks are not
 merged</p>
 </div>
-<div class="admonition-todo admonition" id="index-6">
+<div class="admonition-todo admonition" id="index-5">
 <p class="first admonition-title">Todo</p>
 <p class="last">Keep mapping of <code class="docutils literal notranslate"><span class="pre">var_info</span></code> (if defined in <code class="docutils literal notranslate"><span class="pre">metadata</span></code>) to data
 points (e.g. EBAS), since the data sources may be at different
@@ -1755,20 +1786,21 @@ station in the other object</p>
 
 <dl class="method">
 <dt id="pyaerocom.ungriddeddata.UngriddedData.get_timeseries">
-<code class="descname">get_timeseries</code><span class="sig-paren">(</span><em>station</em>, <em>var_name</em>, <em>start=None</em>, <em>stop=None</em>, <em>ts_type=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/ungriddeddata.html#UngriddedData.get_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.ungriddeddata.UngriddedData.get_timeseries" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_timeseries</code><span class="sig-paren">(</span><em>station_name</em>, <em>var_name</em>, <em>start=None</em>, <em>stop=None</em>, <em>ts_type=None</em>, <em>insert_nans=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/ungriddeddata.html#UngriddedData.get_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.ungriddeddata.UngriddedData.get_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get variable timeseries data for a certain station</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – station name or index of station in metadata dict</li>
+<li><strong>station_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – station name or index of station in metadata dict</li>
 <li><strong>var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – name of variable to be retrieved</li>
 <li><strong>start</strong> – start time (optional)</li>
 <li><strong>stop</strong> – stop time (optional). If start time is provided and stop time not,
 then only the corresponding year inferred from start time will be
 considered</li>
-<li><strong>ts_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – temporal resolution</li>
+<li><strong>ts_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – temporal resolution (can be pyaerocom ts_type or pandas freq.
+string)</li>
 <li><strong>**kwargs</strong> – Additional keyword args passed to method <a class="reference internal" href="#pyaerocom.ungriddeddata.UngriddedData.to_station_data" title="pyaerocom.ungriddeddata.UngriddedData.to_station_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_station_data()</span></code></a></li>
 </ul>
 </td>
@@ -1785,14 +1817,14 @@ considered</li>
 
 <dl class="method">
 <dt id="pyaerocom.ungriddeddata.UngriddedData.plot_station_timeseries">
-<code class="descname">plot_station_timeseries</code><span class="sig-paren">(</span><em>station</em>, <em>var_name</em>, <em>start=None</em>, <em>stop=None</em>, <em>ts_type=None</em>, <em>vmin=None</em>, <em>vmax=None</em>, <em>ax=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/ungriddeddata.html#UngriddedData.plot_station_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.ungriddeddata.UngriddedData.plot_station_timeseries" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot_station_timeseries</code><span class="sig-paren">(</span><em>station_name</em>, <em>var_name</em>, <em>start=None</em>, <em>stop=None</em>, <em>ts_type=None</em>, <em>insert_nans=True</em>, <em>ax=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/ungriddeddata.html#UngriddedData.plot_station_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.ungriddeddata.UngriddedData.plot_station_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot time series of station and variable</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>station</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – station name or index of station in metadata dict</li>
+<li><strong>station_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>) – station name or index of station in metadata dict</li>
 <li><strong>var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – name of variable to be retrieved</li>
 <li><strong>start</strong> – start time (optional)</li>
 <li><strong>stop</strong> – stop time (optional). If start time is provided and stop time not,
@@ -2228,7 +2260,7 @@ and methods that use the latter (e.g. <a class="reference internal" href="#pyaer
 <dt id="pyaerocom.colocateddata.ColocatedData.from_csv">
 <code class="descname">from_csv</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/colocateddata.html#ColocatedData.from_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.colocateddata.ColocatedData.from_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read data from CSV file</p>
-<div class="admonition-todo admonition" id="index-7">
+<div class="admonition-todo admonition" id="index-6">
 <p class="first admonition-title">Todo</p>
 <p class="last">Complete docstring</p>
 </div>
@@ -2261,7 +2293,7 @@ and methods that use the latter (e.g. <a class="reference internal" href="#pyaer
 <dl class="attribute">
 <dt id="pyaerocom.stationdata.StationData.dtime">
 <code class="descname">dtime</code><a class="headerlink" href="#pyaerocom.stationdata.StationData.dtime" title="Permalink to this definition">¶</a></dt>
-<dd><p>list / array containing index values</p>
+<dd><p>list / array containing time index values</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2561,7 +2593,7 @@ available in this object and the provided other object)</li>
 <dt id="pyaerocom.stationdata.StationData.merge_other">
 <code class="descname">merge_other</code><span class="sig-paren">(</span><em>other</em>, <em>var_name</em>, <em>**add_meta_keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/stationdata.html#StationData.merge_other"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.stationdata.StationData.merge_other" title="Permalink to this definition">¶</a></dt>
 <dd><p>Merge other station data object</p>
-<div class="admonition-todo admonition" id="index-8">
+<div class="admonition-todo admonition" id="index-7">
 <p class="first admonition-title">Todo</p>
 <p class="last">Should be independent of variable, i.e. it should be able to merge all
 data that is in the other object into this, even if this object does
@@ -2654,7 +2686,7 @@ cannot be found in <a class="reference internal" href="#pyaerocom.stationdata.St
 
 <dl class="method">
 <dt id="pyaerocom.stationdata.StationData.resample_timeseries">
-<code class="descname">resample_timeseries</code><span class="sig-paren">(</span><em>var_name</em>, <em>ts_type</em>, <em>how='mean'</em>, <em>inplace=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/stationdata.html#StationData.resample_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.stationdata.StationData.resample_timeseries" title="Permalink to this definition">¶</a></dt>
+<code class="descname">resample_timeseries</code><span class="sig-paren">(</span><em>var_name</em>, <em>ts_type</em>, <em>how='mean'</em>, <em>inplace=False</em>, <em>min_num_obs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/stationdata.html#StationData.resample_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.stationdata.StationData.resample_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resample one of the time-series in this object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2667,6 +2699,10 @@ frequency string)</li>
 <li><strong>how</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – how should the resampled data be averaged (e.g. mean, median)</li>
 <li><strong>inplace</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – if True, then the current data object stored in self, will be
 overwritten with the resampled time-series</li>
+<li><strong>min_num_obs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>, optional) – minimum number of observations required per period (when downsampling).
+E.g. if input is in daily resolution and freq is monthly and
+min_num_obs is 10, then all months that have less than 10 days of data
+are set to nan.</li>
 </ul>
 </td>
 </tr>
@@ -2747,7 +2783,7 @@ is provided, i.e. if resampling is applied)</li>
 
 <dl class="method">
 <dt id="pyaerocom.stationdata.StationData.plot_timeseries">
-<code class="descname">plot_timeseries</code><span class="sig-paren">(</span><em>var_name</em>, <em>freq=None</em>, <em>resample_how='mean'</em>, <em>add_overlaps=False</em>, <em>legend=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/stationdata.html#StationData.plot_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.stationdata.StationData.plot_timeseries" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot_timeseries</code><span class="sig-paren">(</span><em>var_name</em>, <em>freq=None</em>, <em>resample_how='mean'</em>, <em>add_overlaps=False</em>, <em>legend=True</em>, <em>tit=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/stationdata.html#StationData.plot_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.stationdata.StationData.plot_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot timeseries for variable</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -2770,6 +2806,7 @@ pyaerocom ts_type).</li>
 is provided, i.e. if resampling is applied)</li>
 <li><strong>add_overlaps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – if True and if overlapping data exists for this variable, it will
 be added to the plot.</li>
+<li><strong>tit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – title of plot, if None, default title is used</li>
 <li><strong>**kwargs</strong> – additional keyword args passed to matplotlib <code class="docutils literal notranslate"><span class="pre">plot</span></code> method</li>
 </ul>
 </td>
@@ -3140,7 +3177,7 @@ of the original files.</p>
 <dt id="pyaerocom.colocation.colocate_gridded_gridded">
 <code class="descclassname">pyaerocom.colocation.</code><code class="descname">colocate_gridded_gridded</code><span class="sig-paren">(</span><em>gridded_data</em>, <em>gridded_data_ref</em>, <em>ts_type=None</em>, <em>start=None</em>, <em>stop=None</em>, <em>filter_name=None</em>, <em>regrid_scheme='areaweighted'</em>, <em>vert_scheme=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/colocation.html#colocate_gridded_gridded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.colocation.colocate_gridded_gridded" title="Permalink to this definition">¶</a></dt>
 <dd><p>Colocate 2 gridded data objects</p>
-<div class="admonition-todo admonition" id="index-9">
+<div class="admonition-todo admonition" id="index-8">
 <p class="first admonition-title">Todo</p>
 <ul class="last simple">
 <li>Complete docstring</li>
@@ -3918,7 +3955,7 @@ variables is available in this object</li>
 number of models and specific for a certain time interval (that can be
 defined, but must not be defined). Largely based on
 <a class="reference internal" href="#pyaerocom.io.readgridded.ReadGridded" title="pyaerocom.io.readgridded.ReadGridded"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReadGridded</span></code></a>.</p>
-<div class="admonition-todo admonition" id="index-10">
+<div class="admonition-todo admonition" id="index-9">
 <p class="first admonition-title">Todo</p>
 <p class="last">Sub-class from ReadGridded</p>
 </div>
@@ -4749,7 +4786,7 @@ here, the default minimum / maximum value is used (accessed via
 <p class="first admonition-title">See also</p>
 <p class="last">Base classes <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadAeronetBase</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadUngriddedBase</span></code></p>
 </div>
-<div class="admonition-todo admonition" id="index-11">
+<div class="admonition-todo admonition" id="index-10">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check level 1.5 data and include</p>
 </div>
@@ -5196,7 +5233,7 @@ here, the default minimum / maximum value is used (accessed via
 <em class="property">class </em><code class="descclassname">pyaerocom.io.read_aeronet_sdav2.</code><code class="descname">ReadAeronetSdaV2</code><span class="sig-paren">(</span><em>dataset_to_read=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/io/read_aeronet_sdav2.html#ReadAeronetSdaV2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.io.read_aeronet_sdav2.ReadAeronetSdaV2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyaerocom.io.readaeronetbase.ReadAeronetBase" title="pyaerocom.io.readaeronetbase.ReadAeronetBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyaerocom.io.readaeronetbase.ReadAeronetBase</span></code></a></p>
 <p>Interface for reading Aeronet Sun V2 Level 2 data</p>
-<div class="admonition-todo admonition" id="index-12">
+<div class="admonition-todo admonition" id="index-11">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check if also level 1.5 works and include</p>
 </div>
@@ -8071,7 +8108,7 @@ in <code class="docutils literal notranslate"><span class="pre">SUPPORTED_DATASE
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-13">
+<div class="admonition-todo admonition" id="index-12">
 <p class="first admonition-title">Todo</p>
 <ul class="last simple">
 <li>Check for negative values vs. detection limit</li>
@@ -10866,7 +10903,7 @@ the <a class="reference external" href="https://github.com/metno/pyaerocom/blob/
 <p class="first admonition-title">Note</p>
 <p class="last">BETA version (currently being tested)</p>
 </div>
-<div class="admonition-todo admonition" id="index-14">
+<div class="admonition-todo admonition" id="index-13">
 <p class="first admonition-title">Todo</p>
 <p class="last">Include also temporal filtering and other filter options (e.g. variable,
 etc.)</p>
@@ -11406,7 +11443,15 @@ deprecated, but will continue to work)</li>
 <p>This module contains scatter plot routines for Aerocom data.</p>
 <dl class="function">
 <dt id="pyaerocom.plot.plotscatter.plot_scatter">
-<code class="descclassname">pyaerocom.plot.plotscatter.</code><code class="descname">plot_scatter</code><span class="sig-paren">(</span><em>x_vals</em>, <em>y_vals</em>, <em>var_name=None</em>, <em>var_name_ref=None</em>, <em>x_name=None</em>, <em>y_name=None</em>, <em>start=None</em>, <em>stop=None</em>, <em>ts_type=None</em>, <em>unit=None</em>, <em>stations_ok=None</em>, <em>filter_name=None</em>, <em>lowlim_stats=None</em>, <em>highlim_stats=None</em>, <em>loglog=None</em>, <em>savefig=False</em>, <em>save_dir=None</em>, <em>save_name=None</em>, <em>ax=None</em>, <em>figsize=None</em>, <em>fontsize_base=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/plot/plotscatter.html#plot_scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.plot.plotscatter.plot_scatter" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyaerocom.plot.plotscatter.</code><code class="descname">plot_scatter</code><span class="sig-paren">(</span><em>x_vals</em>, <em>y_vals</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/plot/plotscatter.html#plot_scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.plot.plotscatter.plot_scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scatter plot</p>
+<p>Currently a wrapper for high-level method plot_scatter_aerocom (same module,
+see there for details)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyaerocom.plot.plotscatter.plot_scatter_aerocom">
+<code class="descclassname">pyaerocom.plot.plotscatter.</code><code class="descname">plot_scatter_aerocom</code><span class="sig-paren">(</span><em>x_vals</em>, <em>y_vals</em>, <em>var_name=None</em>, <em>var_name_ref=None</em>, <em>x_name=None</em>, <em>y_name=None</em>, <em>start=None</em>, <em>stop=None</em>, <em>ts_type=None</em>, <em>unit=None</em>, <em>stations_ok=None</em>, <em>filter_name=None</em>, <em>lowlim_stats=None</em>, <em>highlim_stats=None</em>, <em>loglog=None</em>, <em>savefig=False</em>, <em>save_dir=None</em>, <em>save_name=None</em>, <em>ax=None</em>, <em>figsize=None</em>, <em>fontsize_base=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/plot/plotscatter.html#plot_scatter_aerocom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.plot.plotscatter.plot_scatter_aerocom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method that performs a scatter plot of data in AEROCOM format</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -11443,7 +11488,7 @@ an example)</p>
 <p class="first admonition-title">Note</p>
 <p class="last">This is a beta version and thus, might undergo major changes</p>
 </div>
-<div class="admonition-todo admonition" id="index-15">
+<div class="admonition-todo admonition" id="index-14">
 <p class="first admonition-title">Todo</p>
 <ul class="last simple">
 <li>Review y axis limits (default variable info)</li>
@@ -11830,7 +11875,7 @@ the data is available in each of the StationData objects.</li>
 
 <dl class="function">
 <dt id="pyaerocom.helpers.resample_timeseries">
-<code class="descclassname">pyaerocom.helpers.</code><code class="descname">resample_timeseries</code><span class="sig-paren">(</span><em>s</em>, <em>freq</em>, <em>how='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/helpers.html#resample_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.helpers.resample_timeseries" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyaerocom.helpers.</code><code class="descname">resample_timeseries</code><span class="sig-paren">(</span><em>s</em>, <em>freq</em>, <em>how='mean'</em>, <em>min_num_obs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/helpers.html#resample_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.helpers.resample_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resample a timeseries (pandas.Series)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -11841,6 +11886,10 @@ the data is available in each of the StationData objects.</li>
 <li><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – new temporal resolution (can be pandas freq. string, or pyaerocom
 ts_type)</li>
 <li><strong>how</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – choose from mean or median</li>
+<li><strong>min_num_obs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></a>, optional) – minimum number of observations required per period (when downsampling).
+E.g. if input is in daily resolution and freq is monthly and
+min_num_obs is 10, then all months that have less than 10 days of data
+are set to nan.</li>
 </ul>
 </td>
 </tr>

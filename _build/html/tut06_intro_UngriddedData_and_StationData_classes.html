@@ -1,0 +1,1017 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction into the UngriddedData class and the StationData class &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pyaerocom  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_testsuite.html">Tests (for developers)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files.html">Configuration files</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Introduction into the UngriddedData class and the StationData class</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tut06_intro_UngriddedData_and_StationData_classes.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="introduction-into-the-ungriddeddata-class-and-the-stationdata-class">
+<h1>Introduction into the UngriddedData class and the StationData class<a class="headerlink" href="#introduction-into-the-ungriddeddata-class-and-the-stationdata-class" title="Permalink to this headline">¶</a></h1>
+<p>This notebook introduces 2 of the most relevant data objects that exist
+in pyaerocom:</p>
+<div class="section" id="pyaerocom-ungriddeddata">
+<h2><a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=ungriddeddata#pyaerocom.ungriddeddata.UngriddedData">pyaerocom.UngriddedData</a><a class="headerlink" href="#pyaerocom-ungriddeddata" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Designed to hold a whole database of observations, that is,
+timeseries data for multiple variables from multiple stations around
+the globe.</li>
+<li>Supports also 3D variables (e.g.&nbsp;timeseries of lidar profiles).</li>
+<li>Usually, one instance of this data object contains a single network,
+but it can also contain more than one network.</li>
+</ul>
+</div>
+<div class="section" id="pyaerocom-stationdata">
+<h2><a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=ungriddeddata#pyaerocom.stationdata.StationData">pyaerocom.StationData</a><a class="headerlink" href="#pyaerocom-stationdata" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Data object that contains data <strong>from a single station</strong>.</li>
+<li>Includes metadata and variable timeseries data.</li>
+<li>Arbitrary number of variables supported.</li>
+</ul>
+<div class="section" id="note">
+<h3><strong>NOTE</strong><a class="headerlink" href="#note" title="Permalink to this headline">¶</a></h3>
+<p>This notebook is currently under development and gives only a brief and
+incomplete introduction into the two data objects.</p>
+</div>
+<div class="section" id="the-ungriddeddata-object">
+<h3>The <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object<a class="headerlink" href="#the-ungriddeddata-object" title="Permalink to this headline">¶</a></h3>
+<p>The first part of the tutorial shows some features of the
+<code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object.</p>
+</div>
+</div>
+<div class="section" id="import-the-ungriddeddata-object-that-was-created-in-the-previous-tutorial">
+<h2>Import the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object that was created in the previous tutorial<a class="headerlink" href="#import-the-ungriddeddata-object-that-was-created-in-the-previous-tutorial" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+<span class="c1"># read the data from the storage</span>
+<span class="o">%</span><span class="k">store</span> -r data
+
+<span class="n">data</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Initating</span> <span class="n">pyaerocom</span> <span class="n">configuration</span>
+<span class="n">Checking</span> <span class="n">server</span> <span class="n">configuration</span> <span class="o">...</span>
+<span class="n">Checking</span> <span class="n">access</span> <span class="n">to</span><span class="p">:</span> <span class="o">/</span><span class="n">lustre</span><span class="o">/</span><span class="n">storeA</span>
+<span class="n">Access</span> <span class="n">to</span> <span class="n">lustre</span> <span class="n">database</span><span class="p">:</span> <span class="kc">True</span>
+<span class="n">Init</span> <span class="n">data</span> <span class="n">paths</span> <span class="k">for</span> <span class="n">lustre</span>
+<span class="n">Expired</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.017</span> <span class="n">s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UngriddedData</span> <span class="o">&lt;</span><span class="n">networks</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">];</span> <span class="nb">vars</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;od550aer&#39;</span><span class="p">];</span> <span class="n">instruments</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;sun_photometer&#39;</span><span class="p">];</span><span class="n">No</span><span class="o">.</span> <span class="n">of</span> <span class="n">stations</span><span class="p">:</span> <span class="mi">1199</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-an-overview-map-of-all-stations">
+<h2>Create an overview map of all stations<a class="headerlink" href="#create-an-overview-map-of-all-stations" title="Permalink to this headline">¶</a></h2>
+<p>Before digging a little deeper into the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object, let’s
+get an overview of the bigger picture:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plots all stations as red dots</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">plot_station_coordinates</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+<span class="c1"># add all stations that contain AOD data in 2010 in green</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">plot_station_coordinates</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
+                                   <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
+                                   <span class="n">stop</span><span class="o">=</span><span class="mi">2011</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;lime&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_4_0.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_4_0.png" />
+<p>As you can see, you can specify additional input parameters, e.g.&nbsp;to
+display only stations that contain variable data or to specify a time
+interval.</p>
+<p>In any case, it is always good to know about the help function:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plot_station_coordinates</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+Help on method plot_station_coordinates in module pyaerocom.ungriddeddata:
+
+plot_station_coordinates(var_name=None, filter_name=None, start=None, stop=None, ts_type=None, color='r', marker='o', markersize=8, fontsize_base=10, <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) method of pyaerocom.ungriddeddata.UngriddedData instance
+    Plot station coordinates on a map
+
+    All input parameters are optional and may be used to add constraints
+    related to which stations are plotted. Default is all stations of all
+    times.
+
+    Parameters
+    ----------
+
+    var_name : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional
+        name of variable to be retrieved
+    filter_name : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional
+        name of filter (e.g. EUROPE-noMOUNTAINS)
+    start
+        start time (optional)
+    stop
+        stop time (optional). If start time is provided and stop time not,
+        then only the corresponding year inferred from start time will be
+        considered
+    ts_type : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional
+        temporal resolution
+    color : str
+        color of stations on map
+    marker : str
+        marker type of stations
+    markersize : int
+        size of station markers
+    fontsize_base : int
+        basic fontsize
+    <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs
+        Addifional keyword args passed to
+        <code class="xref py py-func docutils literal notranslate"><span class="pre">pyaerocom.plot.plot_coordinates()</span></code>
+
+    Returns
+    -------
+    axes
+        matplotlib axes instance
+</pre>
+</div>
+<div class="section" id="quicklook-plotting-of-station-timeseries">
+<h2>Quicklook plotting of station timeseries<a class="headerlink" href="#quicklook-plotting-of-station-timeseries" title="Permalink to this headline">¶</a></h2>
+<p>Time series of individual stations can be plotted as follows:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">plot_station_timeseries</span><span class="p">(</span><span class="n">station_name</span><span class="o">=</span><span class="s1">&#39;Granada&#39;</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_8_0.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_8_0.png" />
+</div>
+<div class="section" id="access-metadata-of-the-data-files-that-were-read">
+<h2>Access metadata of the data files that were read<a class="headerlink" href="#access-metadata-of-the-data-files-that-were-read" title="Permalink to this headline">¶</a></h2>
+<p>Look into the metadata of the different files. Metadata can be accessed
+via the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> attribute, and there is one metadatadictionary for
+each file that was read:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1199</span>
+</pre></div>
+</div>
+<p>Access metadata of first file (index 0):</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;var_info&#39;</span><span class="p">,</span>
+              <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)]))])),</span>
+             <span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="mf">45.3139</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="mf">12.508299999999998</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;altitude&#39;</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="s1">&#39;AAOT&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;PI&#39;</span><span class="p">,</span> <span class="s1">&#39;Brent_Holben&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;ts_type&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;data_id&#39;</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;variables&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;od550aer&#39;</span><span class="p">]),</span>
+             <span class="p">(</span><span class="s1">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s1">&#39;sun_photometer&#39;</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="filtering-of-the-data">
+<h2>Filtering of the data<a class="headerlink" href="#filtering-of-the-data" title="Permalink to this headline">¶</a></h2>
+<p>So far, you can filter <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> objects by common metadata
+attributes. For instance:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">subset</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter_by_meta</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">longitude</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="n">altitude</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pyaerocom</span> <span class="n">UngriddedData</span>
+<span class="o">-----------------------</span>
+<span class="n">Contains</span> <span class="n">networks</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">]</span>
+<span class="n">Contains</span> <span class="n">variables</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;od550aer&#39;</span><span class="p">]</span>
+<span class="n">Contains</span> <span class="n">instruments</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;sun_photometer&#39;</span><span class="p">]</span>
+<span class="n">Total</span> <span class="n">no</span><span class="o">.</span> <span class="n">of</span> <span class="n">meta</span><span class="o">-</span><span class="n">blocks</span><span class="p">:</span> <span class="mi">160</span>
+<span class="n">Filters</span> <span class="n">that</span> <span class="n">were</span> <span class="n">applied</span><span class="p">:</span>
+ <span class="n">Filter</span> <span class="n">time</span> <span class="n">log</span><span class="p">:</span> <span class="mi">20190228175037</span>
+    <span class="n">latitude</span><span class="p">:</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">longitude</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span>
+    <span class="n">altitude</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">subset</span><span class="o">.</span><span class="n">plot_station_coordinates</span><span class="p">();</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_15_0.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_15_0.png" />
+</div>
+<div class="section" id="other-attributes-that-may-be-useful">
+<h2>Other attributes that may be useful<a class="headerlink" href="#other-attributes-that-may-be-useful" title="Permalink to this headline">¶</a></h2>
+<p>Access all station names and print the first 4:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stat_names</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">station_name</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">stat_names</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;AAOT&#39;</span><span class="p">,</span> <span class="s1">&#39;AOE_Baotou&#39;</span><span class="p">,</span> <span class="s1">&#39;ARM_Ascension_Is&#39;</span><span class="p">,</span> <span class="s1">&#39;ARM_Barnstable_MA&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Essentially, what <code class="docutils literal notranslate"><span class="pre">data.station_name</span></code> does is, it iterates over all
+metadata-dictionaries (that are stored in <code class="docutils literal notranslate"><span class="pre">data.metadata</span></code>, and are
+organised <em>per file that was read</em>) and extracts the <code class="docutils literal notranslate"><span class="pre">station_name</span></code>
+attribute and appends it to a list which is then returned by the method.</p>
+<p>Hence, the list of station names corresponds to the list of
+metadata-blocks / files that are stored in the data object:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">stat_names</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1199</span>
+</pre></div>
+</div>
+<p>In a similar manner, you can access coordinates latitude, longitude and
+altitude arrays for all files.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lons</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">longitude</span>
+<span class="n">lons</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">12.508299999999998</span><span class="p">,</span>
+ <span class="mf">109.62879999999998</span><span class="p">,</span>
+ <span class="o">-</span><span class="mf">14.349805999999996</span><span class="p">,</span>
+ <span class="o">-</span><span class="mf">70.29006100000001</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">latitude</span>
+<span class="n">lats</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">45.3139</span><span class="p">,</span> <span class="mf">40.851699999999994</span><span class="p">,</span> <span class="o">-</span><span class="mf">7.966963999999998</span><span class="p">,</span> <span class="mf">41.669588999999995</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alts</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">altitude</span>
+<span class="n">alts</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">1314.0</span><span class="p">,</span> <span class="mf">341.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="list-of-unique-station-names">
+<h2>List of unique station names<a class="headerlink" href="#list-of-unique-station-names" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned earlier, some databases provide more than one data file per
+station. Since the ungridded reading (see previous) tutorial is done
+<em>per data file</em>, this means that their can be more than one
+metadata-block per station (not the case here, though). In any case, you
+can get a list of unique station names using:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unique_names</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">unique_station_names</span>
+<span class="n">unique_names</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;AAOT&#39;</span><span class="p">,</span> <span class="s1">&#39;AOE_Baotou&#39;</span><span class="p">,</span> <span class="s1">&#39;ARM_Ascension_Is&#39;</span><span class="p">,</span> <span class="s1">&#39;ARM_Barnstable_MA&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-all-station-coordinates">
+<h2>Get all station coordinates<a class="headerlink" href="#get-all-station-coordinates" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stat_coords</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">station_coordinates</span>
+<span class="n">stat_coords</span><span class="p">[</span><span class="s1">&#39;Mace_Head&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="mf">53.32583000000001</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">9.89944</span><span class="p">,</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span> <span class="mf">20.0</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="stationdata-access-the-data-from-individual-stations">
+<h3><code class="docutils literal notranslate"><span class="pre">StationData</span></code>: Access the data from individual stations<a class="headerlink" href="#stationdata-access-the-data-from-individual-stations" title="Permalink to this headline">¶</a></h3>
+<p>As you could see above the metadata dictionaries in the
+<code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> class for each file do only contain the associated
+metadata. For the sake of performance the actual data arrays are all
+stored in one big 2D numpy array (which does not need to bother you too
+much) which is accessible in the <code class="docutils literal notranslate"><span class="pre">_data</span></code> attribute of the
+<code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object (if you like to dive into it).</p>
+<p><strong>In most cases that concern model evaluation, the observation data is
+analysed station-by-station. For this purpose the StationData class was
+designed, which is introduced below.</strong></p>
+<p>Starting from an instance of the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object, the
+individual station data (i.e.&nbsp;time series of one or more variables +
+metadata) can be accessed using the method:</p>
+<p><a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=to_station_data#pyaerocom.ungriddeddata.UngriddedData.to_station_data">UngriddedData.to_station_data</a></p>
+<p>or using the square brackets <code class="docutils literal notranslate"><span class="pre">[]</span></code> which is equivalent to the former as
+it is only a wrapper for <code class="docutils literal notranslate"><span class="pre">to_station_data</span></code>. This meants, calling</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">UngriddedData</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>will give you the same output as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">UngriddedData</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>that is, the data associated with the first file that was read (i.e.&nbsp;the
+first metadata-block in the object) into the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object
+(see previous tutorial for details regarding the reading of ungridded
+observation networks).</p>
+<p>To specify the station, you can either use the metadata index of the
+corresponding data file (<code class="docutils literal notranslate"><span class="pre">meta_idx=9</span></code>, for 10th file) <strong>or</strong> you can
+specify the station name or a wildcard specifying the station name.</p>
+<p>The method returns a
+<a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=stationdata#pyaerocom.stationdata.StationData">pyaerocom.StationData</a>
+object, which is a dictionary-like object which contains data vectors
+and time-stamps as well as metadata.</p>
+<p>Below we will illustrate the several options to access station data (and
+show that they contain the same data):</p>
+<p>Option 1. Get station data using the corresponding metadata indices that match the station name</p>
+<p>Find index (or indices) that match the station name:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">find_station_meta_indices</span><span class="p">(</span><span class="s1">&#39;Granada&#39;</span><span class="p">)</span>
+<span class="n">index</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">488.0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The result shows that there is one file that matches this station name
+(as we would expect for AERONET data) and the corresponding metadata
+index is 488.</p>
+<p>To access the data, you can use the method <code class="docutils literal notranslate"><span class="pre">to_station_data</span></code>. It helps
+to have a look into the options of this method:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+Help on method to_station_data in module pyaerocom.ungriddeddata:
+
+to_station_data(meta_idx, vars_to_convert=None, start=None, stop=None, freq=None, merge_if_multi=True, merge_pref_attr=None, merge_sort_by_largest=True, insert_nans=False) method of pyaerocom.ungriddeddata.UngriddedData instance
+    Convert data from one station to <code class="xref py py-class docutils literal notranslate"><span class="pre">StationData</span></code>
+
+    Todo
+    ----
+    - Review for retrieval of profile data (e.g. Lidar data)
+
+    Parameters
+    ----------
+    meta_idx : float
+        index of station or name of station.
+    vars_to_convert : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional
+        variables that are supposed to be converted. If None, use all
+        variables that are available for this station
+    start
+        start time, optional (if not None, input must be convertible into
+        pandas.Timestamp)
+    stop
+        stop time, optional (if not None, input must be convertible into
+        pandas.Timestamp)
+    freq : str
+        pandas frequency string (e.g. 'D' for daily, 'M' for month end) or
+        valid pyaerocom ts_type
+    interp_nans : bool
+        if True, all NaN values in the time series for each
+        variable are interpolated using linear interpolation
+    min_coverage_interp : float
+        required coverage fraction for interpolation (default is 0.68, i.e.
+        roughly corresponding to 1 sigma)
+    merge_if_multi : bool
+        if True and if data request results in multiple instances of
+        StationData objects, then these are attempted to be merged into one
+        <code class="xref py py-class docutils literal notranslate"><span class="pre">StationData</span></code> object using <code class="xref py py-func docutils literal notranslate"><span class="pre">merge_station_data()</span></code>
+    merge_pref_attr
+        only relevant for merging of multiple matches: preferred attribute
+        that is used to sort the individual StationData objects by relevance.
+        Needs to be available in each of the individual StationData objects.
+        For details cf. <code class="xref py py-attr docutils literal notranslate"><span class="pre">pref_attr</span></code> in docstring of
+        <code class="xref py py-func docutils literal notranslate"><span class="pre">merge_station_data()</span></code>. Example could be <cite>revision_date</cite>. If
+        None, then the stations will be sorted based on the number of
+        available data points (if <code class="xref py py-attr docutils literal notranslate"><span class="pre">merge_sort_by_largest</span></code> is True,
+        which is default).
+    merge_sort_by_largest : bool
+        only relevant for merging of multiple matches: cf. prev. attr. and
+        docstring of <code class="xref py py-func docutils literal notranslate"><span class="pre">merge_station_data()</span></code> method.
+    insert_nans : bool
+        if True, then the retrieved <code class="xref py py-class docutils literal notranslate"><span class="pre">StationData</span></code> objects are filled
+        with NaNs
+
+    Returns
+    -------
+    StationData or list
+        StationData object(s) containing results. list is only returned if
+        input for meta_idx is station name and multiple matches are
+        detected for that station (e.g. data from different instruments),
+        else single instance of StationData. All variable time series are
+        inserted as pandas Series
+</pre>
+<p>So the first input argument takes either the metadata index, or the name
+of the station. Here we use the metadata index option using the index
+that we just retrieved:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">granada_opt1</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="n">meta_idx</span><span class="o">=</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">insert_nans</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">granada_opt1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyaerocom</span><span class="o">.</span><span class="n">stationdata</span><span class="o">.</span><span class="n">StationData</span>
+</pre></div>
+</div>
+<p>The returned data type is an instance of the
+<a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=stationdata#pyaerocom.stationdata.StationData">pyaerocom.StationData</a>
+class.</p>
+<p><strong>NOTE:</strong> if there is more than one index match for one station (i.e.
+<code class="docutils literal notranslate"><span class="pre">data.find_station_meta_indices('Granada')</span></code> returns more than one
+match), then, using Option 1, you would need to call <code class="docutils literal notranslate"><span class="pre">to_station_data</span></code>
+for each of the index matches. Alternatively you could use either of the
+following methods, which automatically merge the individual
+<code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects into one, in case of multiple matches for that
+station name.</p>
+<p>Let’s have a quick look at the <code class="docutils literal notranslate"><span class="pre">StationData</span></code> object (it is a
+dictionary-like object and simple to use):</p>
+</div>
+</div>
+<div class="section" id="option-2-retrieve-station-data-using-the-station-name-directly">
+<h2>Option 2: Retrieve station data using the station name directly<a class="headerlink" href="#option-2-retrieve-station-data-using-the-station-name-directly" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">granada_opt2</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Granada&#39;</span><span class="p">,</span> <span class="n">insert_nans</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Other than option 1, in case of multiple meta-index matches, this method
+automatically merges the individual data objects.</p>
+<p>Option 3: Use […] notation</p>
+<p>This is a wrapper for the method <code class="docutils literal notranslate"><span class="pre">to_station_data</span></code> so you may use
+meta-index or station name for access.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">granada_opt3_1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+<span class="n">granada_opt3_2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Granada&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Let’s have a look if the data objects are really the same (by plotting the AOD timeseries for the 4 different options):</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">granada_opt1</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Option 1&#39;</span><span class="p">,</span> <span class="n">tit</span><span class="o">=</span><span class="s1">&#39;Method: UngriddedData.to_station_data()&#39;</span><span class="p">)</span>
+<span class="n">granada_opt2</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Option 2&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="c1"># plot the results from the [] access option into a new figure (don&#39;t pass ax)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">granada_opt3_1</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Option 3.1 (using meta-index)&#39;</span><span class="p">,</span>
+                                    <span class="n">tit</span><span class="o">=</span><span class="s1">&#39;Method: UngriddedData[]&#39;</span><span class="p">)</span>
+<span class="n">granada_opt3_2</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Option 3.2 (using station name)&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f34b631c630</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_43_1.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_43_1.png" />
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_43_2.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_43_2.png" />
+<p>Looks good. Let’s explore the <code class="docutils literal notranslate"><span class="pre">StationData</span></code> object a little more (you
+can print it and it will get you a nice overview):</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">granada_opt1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Pyaerocom StationData
+---------------------
+var_info (BrowseDict([(&#39;od550aer&#39;, OrderedDict([(&#39;unit&#39;, &#39;1&#39;), (&#39;overlap&#39;, False), (&#39;ts_type&#39;, &#39;daily&#39;)]))]))
+   od550aer (&lt;class &#39;collections.OrderedDict&#39;&gt;)
+    unit: 1
+    overlap: False
+    ts_type: daily
+station_coords ({&#39;latitude&#39;: 37.163999999999994, &#39;longitude&#39;: -3.605, &#39;altitude&#39;: 680.0})
+   latitude: 37.163999999999994
+   longitude: -3.605
+   altitude: 680.0
+data_err (BrowseDict([(&#39;od550aer&#39;, array([nan, nan, nan, ..., nan, nan, nan]))]))
+   od550aer (array, 2758 items)
+   [nan
+    nan
+    ...
+    nan
+    nan]
+
+overlap:
+filename: None
+station_id: None
+station_name: Granada
+instrument_name: sun_photometer
+PI: Brent_Holben
+country: None
+ts_type: daily
+latitude: 37.163999999999994
+longitude: -3.605
+altitude: 680.0
+data_id: AeronetSunV3Lev2.daily
+dataset_name: None
+data_product: None
+data_version: None
+data_level: None
+revision_date: None
+ts_type_src: daily
+
+Data arrays
+.................
+dtime (array, 4774 items)
+   [numpy.datetime64(&#39;2004-12-29T00:00:00.000000000&#39;)
+    numpy.datetime64(&#39;2004-12-30T00:00:00.000000000&#39;)
+    ...
+    numpy.datetime64(&#39;2018-01-22T00:00:00.000000000&#39;)
+    numpy.datetime64(&#39;2018-01-23T00:00:00.000000000&#39;)]
+
+Pandas Series
+.................
+od550aer (Series, 4774 items)
+</pre></div>
+</div>
+<p>You can see that the <code class="docutils literal notranslate"><span class="pre">StationData</span></code> object contains both metadata (e.g.
+<code class="docutils literal notranslate"><span class="pre">PI</span></code>) and data vectors which can be either 1D numpy arrays or python
+lists (e.g. <code class="docutils literal notranslate"><span class="pre">dtime</span></code>) or <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> objects (e.g.&nbsp;variable
+<code class="docutils literal notranslate"><span class="pre">od550aer</span></code>). All attributes can be accessed and manipulated either
+using dictionary style access (i.e. <code class="docutils literal notranslate"><span class="pre">[]</span></code> notation), or using the <code class="docutils literal notranslate"><span class="pre">.</span></code>
+operator.</p>
+<p>Here some examples:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get longitude using &quot;[]&quot; notation</span>
+<span class="n">granada_opt1</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">3.605</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get longitude using &quot;.&quot; notation</span>
+<span class="n">granada_opt1</span><span class="o">.</span><span class="n">longitude</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">3.605</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># assign longitude using &quot;.&quot; notation and display new value (again using &quot;[]&quot; notation)</span>
+<span class="n">granada_opt1</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">granada_opt1</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">42</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">granada_opt1</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;Granada&#39;</span>
+</pre></div>
+</div>
+<p>Get station name:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">granada_opt1</span><span class="o">.</span><span class="n">station_name</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;Granada&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="small-detour-through-the-pandas-world">
+<h2>Small detour through the <code class="docutils literal notranslate"><span class="pre">pandas</span></code> world<a class="headerlink" href="#small-detour-through-the-pandas-world" title="Permalink to this headline">¶</a></h2>
+<p>As you can see in the output above, the time-series data in the
+<code class="docutils literal notranslate"><span class="pre">StationData</span></code> object is an instance of the <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> class.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aod_data</span> <span class="o">=</span> <span class="n">granada_opt1</span><span class="o">.</span><span class="n">od550aer</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">aod_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pandas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span>
+</pre></div>
+</div>
+<p><strong>NOTE</strong>: pyaerocom relies on pandas, so if you are not familiar with
+the pandas library, it is a good advice to make yourself familiar with
+it (especially if you are interested in timeseries analysis). See <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/getting_started/10min.html">here
+for a short introduction into
+pandas</a>.</p>
+<p>Anyways, you should know about the 2 basic datatypes of pandas which
+are:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html">pandas.Series</a></li>
+<li><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame%20.html">pandas.DataFrame</a></li>
+</ul>
+<p>Both objects are very similar in their handling and the <code class="docutils literal notranslate"><span class="pre">Series</span></code> class
+can be imagined as a <em>single column</em> of the <code class="docutils literal notranslate"><span class="pre">Dataframe</span></code> object which
+is a table-like object that has columns (e.g.&nbsp;variables) and rows
+(e.g.&nbsp;time-stamps). It is hence, easy to go back and forth between the
+two objects.</p>
+<p>Anyways, here is some examples what you can do with an instance of the
+<code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> object that we just accessed from the
+<code class="docutils literal notranslate"><span class="pre">pyaerocom.StationData</span></code> object from Granada (and which we named
+<code class="docutils literal notranslate"><span class="pre">aod_data</span></code>).</p>
+<p>First, you can get a basic clue about the data by using the <code class="docutils literal notranslate"><span class="pre">describe</span></code>
+method:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aod_data</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">count</span>    <span class="mf">2758.000000</span>
+<span class="n">mean</span>        <span class="mf">0.138543</span>
+<span class="n">std</span>         <span class="mf">0.104699</span>
+<span class="nb">min</span>         <span class="mf">0.015534</span>
+<span class="mi">25</span><span class="o">%</span>         <span class="mf">0.072014</span>
+<span class="mi">50</span><span class="o">%</span>         <span class="mf">0.108543</span>
+<span class="mi">75</span><span class="o">%</span>         <span class="mf">0.170734</span>
+<span class="nb">max</span>         <span class="mf">1.278507</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+<p>Second, you may plot it:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aod_data</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_58_0.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_58_0.png" />
+<p>Third, you may extract subsets using <em>fancy indexing</em>:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aod_data_march2010</span> <span class="o">=</span> <span class="n">aod_data</span><span class="p">[</span><span class="s1">&#39;2010-3-1&#39;</span><span class="p">:</span><span class="s1">&#39;2010-4-1&#39;</span><span class="p">]</span>
+<span class="n">aod_data_march2010</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f34bd32bf98</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_60_1.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_60_1.png" />
+<p>Or fourth, resample to another frequency:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aod_data_monthly</span> <span class="o">=</span> <span class="n">aod_data</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+<span class="n">aod_data_monthly</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f34bd2b37f0</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_62_1.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_62_1.png" />
+<p>Or fifth, resample to lower frequency, but require a minimum number of
+observations per period:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">monthly_with_count</span> <span class="o">=</span> <span class="n">aod_data</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
+<span class="n">monthly_with_count</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2004-12-31</th>
+      <td>0.038038</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2005-01-31</th>
+      <td>0.081300</td>
+      <td>28</td>
+    </tr>
+    <tr>
+      <th>2005-02-28</th>
+      <td>0.111567</td>
+      <td>24</td>
+    </tr>
+    <tr>
+      <th>2005-03-31</th>
+      <td>0.156312</td>
+      <td>17</td>
+    </tr>
+    <tr>
+      <th>2005-04-30</th>
+      <td>0.154527</td>
+      <td>26</td>
+    </tr>
+  </tbody>
+</table>
+</div><p>Now, here you see an example, where <code class="docutils literal notranslate"><span class="pre">pandas</span></code> automatically converted
+our Series (which is single variable) to a DataFrame (which is a table),
+since we told the resampler above, to aggregate monthly mean and monthly
+count.</p>
+<p>Now let’s say we require at least 15 observations (here, days, since our
+original dataset is in daily resolution) per month:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">invalid_mask</span> <span class="o">=</span> <span class="n">monthly_with_count</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">15</span>
+<span class="n">monthly_with_count</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">][</span><span class="n">invalid_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<span class="n">aod_monthly_min15d</span> <span class="o">=</span> <span class="n">monthly_with_count</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+<span class="n">aod_monthly_min15d</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2004</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span>         <span class="n">NaN</span>
+<span class="mi">2005</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">31</span>    <span class="mf">0.081300</span>
+<span class="mi">2005</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">28</span>    <span class="mf">0.111567</span>
+<span class="mi">2005</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">31</span>    <span class="mf">0.156312</span>
+<span class="mi">2005</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">30</span>    <span class="mf">0.154527</span>
+<span class="n">Freq</span><span class="p">:</span> <span class="n">M</span><span class="p">,</span> <span class="n">Name</span><span class="p">:</span> <span class="n">mean</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+<p>Now plot both the monthly timeseries from above without constraint and
+the one with constraint:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">aod_data_monthly</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Monthly without constraint&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">aod_monthly_min15d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;x-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Monthly (at least 15 days per month)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_68_0.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_68_0.png" />
+<p>As you can see, there is quite some months missing when applying the
+filter.</p>
+<p>You may also be intersted in a climatology:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aod_monthly_climatology</span> <span class="o">=</span> <span class="n">aod_data_monthly</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">aod_data_monthly</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">aod_monthly_climatology</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span>     <span class="mf">0.090553</span>
+<span class="mi">2</span>     <span class="mf">0.130528</span>
+<span class="mi">3</span>     <span class="mf">0.118712</span>
+<span class="mi">4</span>     <span class="mf">0.134921</span>
+<span class="mi">5</span>     <span class="mf">0.148511</span>
+<span class="mi">6</span>     <span class="mf">0.166422</span>
+<span class="mi">7</span>     <span class="mf">0.177145</span>
+<span class="mi">8</span>     <span class="mf">0.191789</span>
+<span class="mi">9</span>     <span class="mf">0.142857</span>
+<span class="mi">10</span>    <span class="mf">0.117423</span>
+<span class="mi">11</span>    <span class="mf">0.092444</span>
+<span class="mi">12</span>    <span class="mf">0.083954</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+<p>And do the same for the monthly data with minimum 15 days per month that
+we created above:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">aod_monthly_climatology_min15d</span> <span class="o">=</span> <span class="n">aod_monthly_min15d</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">aod_monthly_min15d</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">aod_monthly_climatology_min15d</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span>     <span class="mf">0.091438</span>
+<span class="mi">2</span>     <span class="mf">0.137147</span>
+<span class="mi">3</span>     <span class="mf">0.119908</span>
+<span class="mi">4</span>     <span class="mf">0.140677</span>
+<span class="mi">5</span>     <span class="mf">0.147466</span>
+<span class="mi">6</span>     <span class="mf">0.166284</span>
+<span class="mi">7</span>     <span class="mf">0.188155</span>
+<span class="mi">8</span>     <span class="mf">0.182201</span>
+<span class="mi">9</span>     <span class="mf">0.137702</span>
+<span class="mi">10</span>    <span class="mf">0.113832</span>
+<span class="mi">11</span>    <span class="mf">0.071302</span>
+<span class="mi">12</span>    <span class="mf">0.089056</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">mean</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">aod_monthly_climatology</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Monthly climatology (no constraint)&#39;</span><span class="p">)</span>
+<span class="n">aod_monthly_climatology_min15d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Monthly climatology (min 15 days/month)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f34bed47dd8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_74_1.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_74_1.png" />
+<p>That was enough of a detour into the pandas world. As you shall see
+below, some of these pandas features are also provided in the pyaerocom
+data objects (e.g.&nbsp;resampling) and more will follow soon!</p>
+</div>
+<div class="section" id="plotting-of-timeseries-data-directly-from-stationdata-class">
+<h2>Plotting of timeseries data directly from <a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=stationdata#pyaerocom.stationdata.StationData">StationData</a> class<a class="headerlink" href="#plotting-of-timeseries-data-directly-from-stationdata-class" title="Permalink to this headline">¶</a></h2>
+<p>Let’s come back to the <code class="docutils literal notranslate"><span class="pre">StationData</span></code> object. Below are some more
+examples that show how you can plot the timeseries directly from the
+<code class="docutils literal notranslate"><span class="pre">StationData</span></code> object. This includes to do a resampling out of the box
+when plotting:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">granada_opt1</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">granada_opt1</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">granada_opt1</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_77_0.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_77_0.png" />
+<p>The resampling of the timeseries in the plotting method is done
+automatically (if input <code class="docutils literal notranslate"><span class="pre">ts_type</span></code> is provided).</p>
+<p>Currently, this does not apply additional constraints such as a minimum
+number of available observations when downsampling (like we showed
+above). From the yearly data (green dots) you can see clearly that this
+can be an issue, especially for the first and the last year.</p>
+<p>In order to account for it, you may to the following:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># convert to monthly with at least 5 days per month</span>
+<span class="n">od550aer_monthly</span> <span class="o">=</span> <span class="n">granada_opt1</span><span class="o">.</span><span class="n">resample_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># assign to our StationData</span>
+<span class="n">granada_opt1</span><span class="p">[</span><span class="s1">&#39;od550aer_monthly&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">od550aer_monthly</span>
+
+<span class="c1"># convert to yearly with at least 6 months per year</span>
+<span class="n">od550aer_yearly_constrained</span> <span class="o">=</span> <span class="n">granada_opt1</span><span class="o">.</span><span class="n">resample_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer_monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compare the result with the yearly product plotted above:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">granada_opt1</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">od550aer_yearly_constrained</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;od550aer (yearly constrained)&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">granada_opt1</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/tut06_intro_UngriddedData_and_StationData_classes_81_0.png" src="_images/tut06_intro_UngriddedData_and_StationData_classes_81_0.png" />
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, met.no.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
