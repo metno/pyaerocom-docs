@@ -88,9 +88,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
@@ -179,7 +180,8 @@
 
 <span class="c1">### OTHER FUNCTIONS</span>
 
-<div class="viewcode-block" id="calc_statistics"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_statistics">[docs]</a><span class="k">def</span> <span class="nf">calc_statistics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">,</span> <span class="n">lowlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">highlim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="calc_statistics"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_statistics">[docs]</a><span class="k">def</span> <span class="nf">calc_statistics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">,</span> <span class="n">lowlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">highlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">min_num_valid</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calc statistical properties from two data arrays</span>
 <span class="sd">    </span>
 <span class="sd">    Calculates the following statistical properties based on the two provided</span>
@@ -187,17 +189,18 @@
 <span class="sd">    provided after the arrows):</span>
 <span class="sd">        </span>
 <span class="sd">        - Mean value of both arrays -&gt; refdata_mean, data_mean</span>
+<span class="sd">        - Standard deviation of both arrays -&gt; refdata_std, data_std</span>
 <span class="sd">        - RMS (Root mean square) -&gt; rms</span>
-<span class="sd">        - NMB (Normalised mean bias), in percent-&gt; nmb</span>
-<span class="sd">        - MNMB (Modified normalised mean bias), in percent -&gt; mnmb</span>
-<span class="sd">        - FGE (Fractional gross error), in percent -&gt; fge</span>
+<span class="sd">        - NMB (Normalised mean bias) -&gt; nmb</span>
+<span class="sd">        - MNMB (Modified normalised mean bias) -&gt; mnmb</span>
+<span class="sd">        - FGE (Fractional gross error) -&gt; fge</span>
 <span class="sd">        - R (Pearson correlation coefficient) -&gt; R</span>
 <span class="sd">        - R_spearman (Spearman corr. coeff) -&gt; R_spearman</span>
 <span class="sd">        </span>
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    Nans are removed from the input arrays, information about no. of removed</span>
-<span class="sd">    points can be inferred from keys `totnum` and `success` in return dict.</span>
+<span class="sd">    points can be inferred from keys `totnum` and `num_valid` in return dict.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -211,6 +214,9 @@
 <span class="sd">        where either ``data`` or ``ref_data`` is smaller than 0 are removed)</span>
 <span class="sd">    highlim : float</span>
 <span class="sd">        upper end of considered value range</span>
+<span class="sd">    min_num_valid : int</span>
+<span class="sd">        minimum number of valid measurements required to compute statistical</span>
+<span class="sd">        parameters.</span>
 <span class="sd">        </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -230,37 +236,63 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input. Data arrays must be one dimensional&#39;</span><span class="p">)</span>
         
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    
     <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span> <span class="o">*</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    
-    <span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">lowlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&gt;</span><span class="n">lowlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&gt;</span><span class="n">lowlim</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-        <span class="n">ref_data</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">highlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-        <span class="n">ref_data</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-    
-    <span class="n">difference</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">ref_data</span>
     <span class="n">num_points</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
     
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;refdata_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;data_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;rms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">difference</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">num_points</span><span class="p">)</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span><span class="o">*</span><span class="mf">100.</span>
-    <span class="n">tmp</span> <span class="o">=</span> <span class="n">difference</span> <span class="o">/</span> <span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="n">ref_data</span><span class="p">)</span>
-    
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">num_points</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">*</span> <span class="mf">100.</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;fge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">num_points</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span> <span class="c1">#* 100.</span>
-    <span class="c1">#result[&#39;fge&#39;] = 2. / np.sum(np.abs(tmp)) * 100.</span>
-    
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_spearman&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_kendall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kendalltau</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;totnum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_points</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;num_valid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_points</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;refdata_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;refdata_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;data_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;data_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">num_points</span> <span class="o">&gt;</span> <span class="n">min_num_valid</span><span class="p">:</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lowlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&gt;</span><span class="n">lowlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&gt;</span><span class="n">lowlim</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+            <span class="n">ref_data</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">highlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+            <span class="n">ref_data</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        
+        <span class="n">difference</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">ref_data</span>
+        
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;rms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;fge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_spearman&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lowlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&gt;</span><span class="n">lowlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&gt;</span><span class="n">lowlim</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+            <span class="n">ref_data</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">highlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+            <span class="n">ref_data</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        
+        <span class="n">difference</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">ref_data</span>
+        
+        
+        
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;rms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">difference</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">num_points</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span> <span class="c1">#*100.</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">difference</span> <span class="o">/</span> <span class="p">(</span><span class="n">data</span> <span class="o">+</span> <span class="n">ref_data</span><span class="p">)</span>
+        
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">num_points</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="c1"># * 100.</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;fge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">num_points</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span> <span class="c1">#* 100.</span>
+        <span class="c1">#result[&#39;fge&#39;] = 2. / np.sum(np.abs(tmp)) * 100.</span>
+        
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_spearman&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_kendall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kendalltau</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+     
     <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="closest_index"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.closest_index">[docs]</a><span class="k">def</span> <span class="nf">closest_index</span><span class="p">(</span><span class="n">num_array</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>

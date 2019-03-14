@@ -88,9 +88,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
@@ -193,14 +194,18 @@
 <span class="sd">        last revision date of dataset</span>
 <span class="sd">    ts_type_src </span>
 <span class="sd">        sampling frequency as defined in data files (use None if undefined)</span>
-<span class="sd">    </span>
-<span class="sd">    </span>
+<span class="sd">    stat_merge_pref_attr : str</span>
+<span class="sd">        optional, a metadata attribute that is available in data and that</span>
+<span class="sd">        is used to order the individual stations by relevance in case overlaps</span>
+<span class="sd">        occur. The associated values of this attribute need to be sortable </span>
+<span class="sd">        (e.g. revision_date). This is only relevant in case overlaps occur. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dataset_name</span>  <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">data_product</span>  <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">data_version</span>  <span class="o">=</span>   <span class="nb">float</span><span class="p">,</span>
                   <span class="n">data_level</span>    <span class="o">=</span>   <span class="nb">float</span><span class="p">,</span>
                   <span class="n">ts_type_src</span>   <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">stat_merge_pref_attr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">,</span> 
                   <span class="n">revision_date</span> <span class="o">=</span>   <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">)</span>
     
     <span class="n">_ini_file_name</span> <span class="o">=</span> <span class="s1">&#39;data_sources.ini&#39;</span>
@@ -214,6 +219,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">revision_date</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">ts_type_src</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">stat_merge_pref_attr</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -238,8 +245,10 @@
         <span class="n">cfg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">k</span><span class="p">](</span><span class="n">v</span><span class="p">)</span></div>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">k</span><span class="p">](</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
               
 <div class="viewcode-block" id="StationMetaData"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.StationMetaData">[docs]</a><span class="k">class</span> <span class="nc">StationMetaData</span><span class="p">(</span><span class="n">DataSource</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This object defines a standard for station metadata in pyaerocom</span>
@@ -300,6 +309,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">altitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         
         <span class="nb">super</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span></div>
+                
      
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="n">StationMetaData</span><span class="p">(</span><span class="n">data_id</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span>

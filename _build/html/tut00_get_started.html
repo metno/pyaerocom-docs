@@ -87,9 +87,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="readme.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
@@ -219,7 +220,7 @@ displayed in the flowchart.</p>
 <span class="n">Checking</span> <span class="n">access</span> <span class="n">to</span><span class="p">:</span> <span class="o">/</span><span class="n">lustre</span><span class="o">/</span><span class="n">storeA</span>
 <span class="n">Access</span> <span class="n">to</span> <span class="n">lustre</span> <span class="n">database</span><span class="p">:</span> <span class="kc">True</span>
 <span class="n">Init</span> <span class="n">data</span> <span class="n">paths</span> <span class="k">for</span> <span class="n">lustre</span>
-<span class="n">Expired</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.018</span> <span class="n">s</span>
+<span class="n">Expired</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.043</span> <span class="n">s</span>
 </pre></div>
 </div>
 <div class="section" id="check-data-directory">
@@ -653,10 +654,11 @@ familiar with Python).</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Pyaerocom StationData
 ---------------------
-var_info (BrowseDict([(&#39;od550aer&#39;, OrderedDict([(&#39;unit&#39;, &#39;1&#39;), (&#39;overlap&#39;, False)]))]))
+var_info (BrowseDict([(&#39;od550aer&#39;, OrderedDict([(&#39;unit&#39;, &#39;1&#39;), (&#39;overlap&#39;, False), (&#39;ts_type&#39;, &#39;daily&#39;)]))]))
    od550aer (&lt;class &#39;collections.OrderedDict&#39;&gt;)
     unit: 1
     overlap: False
+    ts_type: daily
 station_coords ({&#39;latitude&#39;: 51.352500000000006, &#39;longitude&#39;: 12.435277999999998, &#39;altitude&#39;: 125.0})
    latitude: 51.352500000000006
    longitude: 12.435277999999998
@@ -669,7 +671,7 @@ data_err (BrowseDict([(&#39;od550aer&#39;, array([nan, nan, nan, ..., nan, nan, 
     nan
     nan]
 
-overlap (BrowseDict())
+overlap:
 filename: None
 station_id: None
 station_name: Leipzig
@@ -687,19 +689,20 @@ data_version: None
 data_level: None
 revision_date: None
 ts_type_src: daily
+stat_merge_pref_attr: None
 
 Data arrays
 .................
-dtime (array, 2894 items)
-   [numpy.datetime64(&#39;2001-05-20T12:00:00.000000000&#39;)
-    numpy.datetime64(&#39;2001-05-21T12:00:00.000000000&#39;)
+dtime (array, 6364 items)
+   [numpy.datetime64(&#39;2001-05-20T00:00:00.000000000&#39;)
+    numpy.datetime64(&#39;2001-05-21T00:00:00.000000000&#39;)
     ...
-    numpy.datetime64(&#39;2018-10-20T12:00:00.000000000&#39;)
-    numpy.datetime64(&#39;2018-10-21T12:00:00.000000000&#39;)]
+    numpy.datetime64(&#39;2018-10-20T00:00:00.000000000&#39;)
+    numpy.datetime64(&#39;2018-10-21T00:00:00.000000000&#39;)]
 
 Pandas Series
 .................
-od550aer (Series, 2894 items)
+od550aer (Series, 6364 items)
 </pre></div>
 </div>
 <p>As you can see, this station contains a time-series of the AOD at 550
@@ -708,7 +711,7 @@ nm. If you like, you can plot this time-series:</p>
 <span class="n">station_data</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7f31106185c0</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">_subplots</span><span class="o">.</span><span class="n">AxesSubplot</span> <span class="n">at</span> <span class="mh">0x7efc74f24ef0</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <img alt="_images/tut00_get_started_70_1.png" src="_images/tut00_get_started_70_1.png" />
@@ -794,6 +797,7 @@ bouldering trip, you may call:</p>
              <span class="p">(</span><span class="s1">&#39;data_level&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;revision_date&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;stat_merge_pref_attr&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
              <span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="mi">2006</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">15</span>    <span class="mf">0.176742</span>
               <span class="mi">2006</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">15</span>    <span class="mf">0.176013</span>
               <span class="mi">2006</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">15</span>    <span class="mf">0.252403</span>

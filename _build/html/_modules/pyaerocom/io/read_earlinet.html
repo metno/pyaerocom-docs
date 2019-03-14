@@ -88,9 +88,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
@@ -210,7 +211,7 @@
     <span class="n">_FILEMASK</span> <span class="o">=</span> <span class="s1">&#39;*.*&#39;</span>
     
     <span class="c1">#: version log of this class (for caching)</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.12_&quot;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.13_&quot;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
     
     <span class="c1">#: Name of dataset (OBS_ID)</span>
     <span class="n">DATA_ID</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">EARLINET_NAME</span>
@@ -271,6 +272,12 @@
                          <span class="n">altitude</span>           <span class="o">=</span> <span class="s1">&#39;Altitude_meter_asl&#39;</span><span class="p">,</span>
                          <span class="n">eval_method</span>        <span class="o">=</span> <span class="s1">&#39;EvaluationMethod&#39;</span><span class="p">)</span>
     
+    <span class="c1">#: metadata keys that are needed for reading (must be values in </span>
+    <span class="c1">#: :attr:`META_NAMES_FILE`)</span>
+    <span class="n">META_NEEDED</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Location&#39;</span><span class="p">,</span> <span class="s1">&#39;StartDate&#39;</span><span class="p">,</span> <span class="s1">&#39;StartTime_UT&#39;</span><span class="p">,</span> <span class="s1">&#39;StopTime_UT&#39;</span><span class="p">,</span> 
+                   <span class="s1">&#39;Longitude_degrees_east&#39;</span><span class="p">,</span> <span class="s1">&#39;Latitude_degrees_north&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;Altitude_meter_asl&#39;</span><span class="p">]</span>
+    
     <span class="c1">#: Metadata keys from :attr:`META_NAMES_FILE` that are additional to </span>
     <span class="c1">#: standard keys defined in :class:`StationMetaData` and that are supposed </span>
     <span class="c1">#: to be inserted into :class:`UngriddedData` object created in :func:`read`</span>
@@ -292,10 +299,12 @@
     
     <span class="n">PROVIDES_VARIABLES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">VAR_PATTERNS_FILE</span><span class="p">)</span>
     
-    <span class="n">EXCLUDE_FILES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cirrus.txt&#39;</span><span class="p">,</span> 
-                     <span class="s1">&#39;etna.txt&#39;</span><span class="p">,</span> 
-                     <span class="s1">&#39;forest_fires.txt&#39;</span><span class="p">,</span> 
-                     <span class="s1">&#39;saharan_dust.txt&#39;</span><span class="p">]</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     EXCLUDE_FILES = [&#39;cirrus.txt&#39;, </span>
+<span class="c1">#                      &#39;etna.txt&#39;, </span>
+<span class="c1">#                      &#39;forest_fires.txt&#39;, </span>
+<span class="c1">#                      &#39;saharan_dust.txt&#39;]</span>
+<span class="c1"># =============================================================================</span>
     <span class="n">EXCLUDE_CASES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cirrus.txt&#39;</span><span class="p">]</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -318,8 +327,10 @@
         
         <span class="c1">#: files that were actually excluded from reading</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">excluded_files</span> <span class="o">=</span> <span class="p">[]</span>
+     
     
-<div class="viewcode-block" id="ReadEarlinet.read_file"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.read_earlinet.ReadEarlinet.read_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_errs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReadEarlinet.read_file"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.read_earlinet.ReadEarlinet.read_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">remove_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read EARLINET file and return it as instance of :class:`StationData`</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -329,19 +340,32 @@
 <span class="sd">        vars_to_retrieve : :obj:`list`, optional</span>
 <span class="sd">            list of str with variable names to read. If None, use</span>
 <span class="sd">            :attr:`DEFAULT_VARS`</span>
-<span class="sd">        read_errs : bool</span>
+<span class="sd">        read_err : bool</span>
 <span class="sd">            if True, uncertainty data is also read (where available).</span>
-<span class="sd">    </span>
+<span class="sd">        remove_outliers : bool</span>
+<span class="sd">            if True, outliers are removed for each variable using the</span>
+<span class="sd">            `minimum` and `maximum` attributes for that variable (accessed </span>
+<span class="sd">            via pyaerocom.const.VAR_PARAM[var_name]).</span>
+<span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        StationData </span>
 <span class="sd">            dict-like object containing results</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">read_errs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#use default setting</span>
-            <span class="n">read_errs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">READ_ERR</span>
-            
+        <span class="k">if</span> <span class="n">read_err</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#use default setting</span>
+            <span class="n">read_err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">READ_ERR</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_to_retrieve</span><span class="p">]</span>
+        <span class="n">_vars</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAR_PATTERNS_FILE</span><span class="p">:</span> <span class="c1">#make sure to only read what is supported by this file</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAR_PATTERNS_FILE</span><span class="p">[</span><span class="n">var</span><span class="p">]):</span>
+                    <span class="n">_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1"># will be computed</span>
+                <span class="n">_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+                
         <span class="c1"># implemented in base class</span>
-        <span class="n">vars_to_read</span><span class="p">,</span> <span class="n">vars_to_compute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_vars_to_retrieve</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">)</span>
+        <span class="n">vars_to_read</span><span class="p">,</span> <span class="n">vars_to_compute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_vars_to_retrieve</span><span class="p">(</span><span class="n">_vars</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vars_to_compute</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This feature has not yet implemented, as &quot;</span>
@@ -368,18 +392,18 @@
         <span class="n">data_in</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAMES_FILE</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            
-            <span class="n">data_out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_in</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NEEDED</span><span class="p">:</span>
+                <span class="n">_meta</span> <span class="o">=</span> <span class="n">data_in</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">_meta</span> <span class="o">=</span> <span class="n">data_in</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">_meta</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">data_out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_meta</span>
+                
         
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;\s|,&#39;</span><span class="p">,</span> <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#         except:</span>
-<span class="c1">#             self.logger.warning(&#39;Unusual location string detected. Earlinet &#39;</span>
-<span class="c1">#                                 &#39;location string expected to be comma separated &#39;</span>
-<span class="c1">#                                 &#39;city, country information, got: &#39;</span>
-<span class="c1">#                                 &#39;{}&#39;.format(data_out[&#39;location&#39;]))</span>
-<span class="c1"># =============================================================================</span>
-        
+
         <span class="n">str_dummy</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">StartDate</span><span class="p">)</span>
         <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span> <span class="o">=</span> <span class="n">str_dummy</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">str_dummy</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">str_dummy</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span>
 
@@ -398,14 +422,21 @@
         
         <span class="n">stop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">stopstring</span><span class="p">)</span>
         
+        <span class="c1"># in case measurement goes over midnight into a new day</span>
         <span class="k">if</span> <span class="n">stop</span> <span class="o">&lt;</span> <span class="n">dtime</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Fatal: stop time is earlier than start time. &#39;</span>
-                            <span class="s1">&#39;Developers: check if data has StopDate or similar&#39;</span><span class="p">)</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="n">stop</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;[D]&#39;</span><span class="p">)</span>
+            
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dtime</span><span class="p">]</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;stopdtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">stop</span><span class="p">]</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;has_zdust&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">contains_vars</span> <span class="o">=</span> <span class="p">[]</span>
+        
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_read</span><span class="p">:</span>
+            <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
+            <span class="n">err_read</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">unit_ok</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">outliers_removed</span> <span class="o">=</span> <span class="kc">False</span>
+            
             <span class="n">netcdf_var_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAR_NAMES_FILE</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
             <span class="c1"># check if the desired variable is in the file</span>
             <span class="k">if</span> <span class="n">netcdf_var_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_in</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
@@ -417,7 +448,10 @@
             <span class="n">arr</span> <span class="o">=</span> <span class="n">data_in</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">netcdf_var_name</span><span class="p">]</span>
             <span class="c1"># the actual data as numpy array (or float if 0-D data, e.g. zdust)</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+            
+            <span class="c1"># CONVERT UNIT</span>
             <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span>
+            
             <span class="n">unames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAR_UNIT_NAMES</span><span class="p">[</span><span class="n">netcdf_var_name</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">unames</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
@@ -431,36 +465,58 @@
                 <span class="n">unit_fac</span> <span class="o">=</span> <span class="n">unit_conversion_fac</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
                 <span class="n">val</span> <span class="o">*=</span> <span class="n">unit_fac</span>
                 <span class="n">unit</span> <span class="o">=</span> <span class="n">to_unit</span>
+                <span class="n">unit_ok</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Failed to convert unit: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Failed to convert unit of </span><span class="si">{}</span><span class="s1"> in file &#39;</span>
+                                        <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> (Earlinet): Error: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                
+            <span class="c1"># import errors if applicable</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">if</span> <span class="n">read_err</span> <span class="ow">and</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ERR_VARNAMES</span><span class="p">:</span>
+                <span class="n">err_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ERR_VARNAMES</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">err_name</span> <span class="ow">in</span> <span class="n">data_in</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                    <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">err_name</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">unit_ok</span><span class="p">:</span>
+                        <span class="n">err</span> <span class="o">*=</span> <span class="n">unit_fac</span>
+                    <span class="n">err_read</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="c1"># 1D variable</span>
             <span class="k">if</span> <span class="n">var</span> <span class="o">==</span> <span class="s1">&#39;zdust&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Fatal: dust layer height data must be &#39;</span>
                                      <span class="s1">&#39;single value&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">info</span><span class="o">.</span><span class="n">minimum</span> <span class="o">&lt;=</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="n">info</span><span class="o">.</span><span class="n">maximum</span><span class="p">:</span>
+        
+                <span class="k">if</span> <span class="n">unit_ok</span> <span class="ow">and</span> <span class="n">info</span><span class="o">.</span><span class="n">minimum</span> <span class="o">&lt;</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="n">info</span><span class="o">.</span><span class="n">maximum</span><span class="p">:</span>
+                    <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;zdust value </span><span class="si">{}</span><span class="s1"> out of range, &#39;</span>
+                                            <span class="s1">&#39;setting to NaN&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="k">if</span> <span class="n">err</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_VAL_NAN</span><span class="p">:</span>
+                    <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        
+                        
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Invalid value of variable zdust &quot;</span>
                                         <span class="s2">&quot;in file </span><span class="si">{}</span><span class="s2">. Skipping...!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
                     <span class="k">continue</span>
                
                 <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;has_zdust&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">data_out</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="n">data_out</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
                 
 
             <span class="c1">#elif var.startswith(&#39;ec&#39;):</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Extinction data must be one dimensional&#39;</span><span class="p">)</span>
-                <span class="n">val</span><span class="p">[</span><span class="n">val</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_VAL_NAN</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="c1"># Remove NaN equivalent values</span>
+                <span class="n">val</span><span class="p">[</span><span class="n">val</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">_MAX_VAL_NAN</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    
                 <span class="n">wvlg</span> <span class="o">=</span> <span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">wavelength_nm</span>
                 <span class="n">wvlg_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAMES_FILE</span><span class="p">[</span><span class="s1">&#39;wavelength_emis&#39;</span><span class="p">]</span>
-                
+            
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">wvlg</span> <span class="o">==</span> <span class="n">data_in</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">wvlg_str</span><span class="p">]:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No wavelength match&#39;</span><span class="p">)</span>
                     <span class="k">continue</span>
-                
-                <span class="c1"># create instance of ProfileData</span>
-                <span class="n">profile</span> <span class="o">=</span> <span class="n">VerticalProfile</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">var</span><span class="p">)</span>
                 
                 <span class="n">alt_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ALTITUDE_ID</span>
                 <span class="n">alt_data</span> <span class="o">=</span> <span class="n">data_in</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">alt_id</span><span class="p">]</span>
@@ -476,33 +532,43 @@
                         <span class="n">alt_unit</span> <span class="o">=</span> <span class="n">to_alt_unit</span>
                     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Failed to convert unit: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-                <span class="n">profile</span><span class="o">.</span><span class="n">altitude</span> <span class="o">=</span> <span class="n">alt_vals</span>
                 
-                <span class="n">profile</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
-                <span class="n">profile</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alt_unit</span>
-                <span class="n">profile</span><span class="o">.</span><span class="n">data</span>  <span class="o">=</span> <span class="n">val</span>
-                <span class="n">profile</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="n">dtime</span>
-                <span class="n">profile</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
-                <span class="n">profile</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">unit</span>
-                
-                <span class="k">if</span> <span class="n">read_errs</span> <span class="ow">and</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ERR_VARNAMES</span><span class="p">:</span>
-                    <span class="n">err_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ERR_VARNAMES</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">err_name</span> <span class="ow">in</span> <span class="n">data_in</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
-                        <span class="n">errs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">err_name</span><span class="p">])</span>
-                        <span class="n">errs</span><span class="p">[</span><span class="n">errs</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_VAL_NAN</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                        <span class="k">if</span> <span class="n">unit_fac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="n">errs</span> <span class="o">*=</span> <span class="n">unit_fac</span>
-                        <span class="n">profile</span><span class="o">.</span><span class="n">data_err</span> <span class="o">=</span> <span class="n">errs</span>
-                
+                <span class="c1"># remove outliers from data, if applicable</span>
+                <span class="k">if</span> <span class="n">remove_outliers</span> <span class="ow">and</span> <span class="n">unit_ok</span><span class="p">:</span>
+                    <span class="c1"># REMOVE OUTLIERS</span>
+                    <span class="n">outlier_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">val</span> <span class="o">&lt;</span> <span class="n">info</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> 
+                                                 <span class="n">val</span> <span class="o">&gt;</span> <span class="n">info</span><span class="o">.</span><span class="n">maximum</span><span class="p">)</span>
+                    <span class="n">val</span><span class="p">[</span><span class="n">outlier_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    
+                    <span class="k">if</span> <span class="n">err_read</span><span class="p">:</span>
+                        <span class="n">err</span><span class="p">[</span><span class="n">outlier_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="n">outliers_removed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># remove outliers from errors if applicable</span>
+                <span class="k">if</span> <span class="n">err_read</span><span class="p">:</span>
+                    <span class="n">err</span><span class="p">[</span><span class="n">err</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_VAL_NAN</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        
+                <span class="c1"># create instance of ProfileData</span>
+                <span class="n">profile</span> <span class="o">=</span> <span class="n">VerticalProfile</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">val</span><span class="p">,</span>
+                                          <span class="n">altitude</span><span class="o">=</span><span class="n">alt_vals</span><span class="p">,</span>
+                                          <span class="n">dtime</span><span class="o">=</span><span class="n">dtime</span><span class="p">,</span>
+                                          <span class="n">var_name</span><span class="o">=</span><span class="n">var</span><span class="p">,</span>
+                                          <span class="n">data_err</span><span class="o">=</span><span class="n">err</span><span class="p">,</span>
+                                          <span class="n">var_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span>
+                                          <span class="n">altitude_unit</span><span class="o">=</span><span class="n">alt_unit</span><span class="p">)</span>   
+                <span class="c1"># Write everything into profile</span>
                 <span class="n">data_out</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">profile</span>
-
+                
+            
             <span class="n">contains_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">unit_ok</span><span class="o">=</span><span class="n">unit_ok</span><span class="p">,</span> 
+                                             <span class="n">err_read</span><span class="o">=</span><span class="n">err_read</span><span class="p">,</span>
+                                             <span class="n">outliers_removed</span><span class="o">=</span><span class="n">outliers_removed</span><span class="p">)</span>
             
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;contains_vars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">contains_vars</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">data_out</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="ReadEarlinet.read"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.read_earlinet.ReadEarlinet.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">first_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-             <span class="n">last_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_errs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+             <span class="n">last_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method that reads list of files as instance of :class:`UngriddedData`</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -519,7 +585,7 @@
 <span class="sd">        last_file : :obj:`int`, optional</span>
 <span class="sd">            index of last file in list to read. If None, the very last file </span>
 <span class="sd">            in the list is used</span>
-<span class="sd">        read_errs : bool</span>
+<span class="sd">        read_err : bool</span>
 <span class="sd">            if True, uncertainty data is also read (where available). If </span>
 <span class="sd">            unspecified (None), then the default is used (cf. :att:`READ_ERR`)</span>
 <span class="sd">            </span>
@@ -532,12 +598,12 @@
             <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_VARS</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_to_retrieve</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">read_errs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">read_errs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">READ_ERR</span>
+        <span class="k">if</span> <span class="n">read_err</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">read_err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">READ_ERR</span>
             
         <span class="k">if</span> <span class="n">files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_file_list</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_file_list</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">)</span>
             <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span>
     
         <span class="k">if</span> <span class="n">first_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -570,9 +636,10 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading file </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> 
                                  <span class="n">num_files</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">_file</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span>
-                                              <span class="n">vars_to_retrieve</span><span class="p">,</span>
-                                              <span class="n">read_errs</span><span class="o">=</span><span class="n">read_errs</span><span class="p">)</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">_file</span><span class="p">,</span> 
+                                      <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">vars_to_retrieve</span><span class="p">,</span>
+                                      <span class="n">read_err</span><span class="o">=</span><span class="n">read_err</span><span class="p">,</span> 
+                                      <span class="n">remove_outliers</span><span class="o">=</span><span class="n">remove_outliers</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">var</span> <span class="ow">in</span> <span class="n">stat</span><span class="o">.</span><span class="n">contains_vars</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> 
                             <span class="n">vars_to_retrieve</span><span class="p">]):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Station </span><span class="si">{}</span><span class="s2"> contains none of the desired &quot;</span>
@@ -609,19 +676,19 @@
                         <span class="n">data</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">data</span>
                         <span class="n">add</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
                         <span class="n">err</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">data_err</span>
-                        <span class="n">metadata</span><span class="p">[</span><span class="n">meta_key</span><span class="p">][</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">via</span> <span class="o">=</span><span class="n">od</span><span class="p">()</span>
+                        <span class="n">metadata</span><span class="p">[</span><span class="n">meta_key</span><span class="p">][</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="s1">&#39;altitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">via</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
                         
-                        <span class="n">vi</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
-                        <span class="n">via</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
+                        <span class="n">vi</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
+                        <span class="n">via</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">])</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">add</span> <span class="o">=</span> <span class="mi">1</span>
                         <span class="n">altitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                         <span class="n">data</span> <span class="o">=</span> <span class="n">val</span>
                         <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">stat</span><span class="o">.</span><span class="n">data_err</span><span class="p">:</span>
-                            <span class="n">err</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">errs</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                            <span class="n">err</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">err</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                        
+                    <span class="n">vi</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>   
                     <span class="n">stop</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="n">add</span>
                     <span class="c1">#check if size of data object needs to be extended</span>
                     <span class="k">if</span> <span class="n">stop</span> <span class="o">&gt;=</span> <span class="n">data_obj</span><span class="o">.</span><span class="n">_ROWNO</span><span class="p">:</span>
@@ -645,7 +712,7 @@
                     <span class="n">data_obj</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">stop</span><span class="p">,</span> <span class="n">col_idx</span><span class="p">[</span><span class="s1">&#39;dataaltitude&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">altitude</span>
                     <span class="n">data_obj</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">stop</span><span class="p">,</span> <span class="n">col_idx</span><span class="p">[</span><span class="s1">&#39;varidx&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">var_idx</span>
                     
-                    <span class="k">if</span> <span class="n">read_errs</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">read_err</span><span class="p">:</span>
                         <span class="n">data_obj</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">stop</span><span class="p">,</span> <span class="n">col_idx</span><span class="p">[</span><span class="s1">&#39;dataerr&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">err</span>
                     
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">meta_idx</span><span class="p">[</span><span class="n">meta_key</span><span class="p">]:</span>
@@ -693,7 +760,8 @@
                 <span class="k">raise</span> <span class="ne">Exception</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exclude_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">exclude</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_files</span>
-        
+    
+    <span class="c1">#TODO: check performance (it is usually slow...)</span>
 <div class="viewcode-block" id="ReadEarlinet.get_file_list"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.read_earlinet.ReadEarlinet.get_file_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform recusive file search for all input variables</span>
 <span class="sd">        </span>
@@ -717,8 +785,16 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_to_retrieve</span><span class="p">]</span>
         <span class="n">exclude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_exclude_filelist</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetching data files. This might take a while...&#39;</span><span class="p">)</span>
-        <span class="n">patterns</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">VAR_PATTERNS_FILE</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span><span class="p">]</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetching EARLINET data files. &#39;</span>
+                             <span class="s1">&#39;This might take a while...&#39;</span><span class="p">)</span>
+        <span class="n">patterns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAR_PATTERNS_FILE</span><span class="p">:</span>                
+                <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="n">VarNotAvailableError</span>
+                <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;Input variable </span><span class="si">{}</span><span class="s1"> is not supported&#39;</span>
+                                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+            <span class="n">patterns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VAR_PATTERNS_FILE</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
+            
         <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirnames</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
@@ -738,52 +814,63 @@
     
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+
     
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
     <span class="n">read</span> <span class="o">=</span> <span class="n">ReadEarlinet</span><span class="p">()</span>
+    <span class="c1">#read.read([&#39;bscatc532aer&#39;,&#39;ec532aer&#39;])</span>
     <span class="n">read</span><span class="o">.</span><span class="n">verbosity_level</span> <span class="o">=</span> <span class="s1">&#39;warning&#39;</span>
     
-    <span class="c1">#lst = read.get_file_list(&#39;ec532aer&#39;)</span>
-    
-    <span class="c1"># to accelerate things for testing (first 20 files)</span>
-    <span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1008192050.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1009162031.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1012131839.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1011221924.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1105122027.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1507232059.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1107072042.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109192000.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1001251402.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1001211841.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1005272143.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev0911091200.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109222000.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1103242017.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109052000.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109152000.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109082000.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1006212036.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1008022112.e532&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1508272229.e532&#39;</span><span class="p">]</span>
-    
-    <span class="n">read</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="n">lst</span>
+    <span class="n">ALL</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">ALL</span><span class="p">:</span>
+        <span class="n">lst</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">get_file_list</span><span class="p">([</span><span class="s1">&#39;bscatc532aer&#39;</span><span class="p">,</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        
+        <span class="c1"># to accelerate things for testing (first 20 files)</span>
+        <span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1008192050.e532&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1009162031.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1012131839.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1011221924.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1105122027.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1507232059.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1107072042.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109192000.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1001251402.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1001211841.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1005272143.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev0911091200.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109222000.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1103242017.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109052000.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109152000.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1109082000.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1006212036.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1008022112.e532&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Export/Earlinet/CAMS/data/ev/ev1508272229.e532&#39;</span><span class="p">]</span>
+        
+        <span class="n">read</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="n">lst</span>
     
     <span class="n">stat</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;ec532aer&#39;</span><span class="p">)</span>
     
     <span class="n">ax</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">ec532aer</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
     
     
-    <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">,</span> <span class="n">last_file</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     
     <span class="n">stat</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     
-    <span class="n">merged</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Evora&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
-                                  <span class="n">insert_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="n">merged0</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Evora&#39;</span><span class="p">)</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Evora&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
     
     <span class="nb">print</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+    
+    <span class="n">merged</span><span class="o">.</span><span class="n">ec532aer</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+    
+    <span class="n">arr0</span> <span class="o">=</span> <span class="n">merged0</span><span class="o">.</span><span class="n">ec532aer</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">ec532aer</span>
+    
     
     
     

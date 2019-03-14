@@ -88,9 +88,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
@@ -170,9 +171,11 @@
 <span class="kn">import</span> <span class="nn">iris</span>
 <span class="kn">from</span> <span class="nn">iris</span> <span class="k">import</span> <span class="n">coord_categorisation</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xray</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">LongitudeConstraintError</span><span class="p">,</span> 
-                                  <span class="n">DataCoverageError</span><span class="p">,</span> <span class="n">MetaDataError</span><span class="p">)</span>
+                                  <span class="n">DataCoverageError</span><span class="p">,</span> <span class="n">MetaDataError</span><span class="p">,</span>
+                                  <span class="n">DataDimensionError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">cf_units</span> <span class="k">import</span> <span class="n">Unit</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">MINYEAR</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span>
@@ -217,8 +220,8 @@
                           <span class="s1">&#39;monthly&#39;</span> <span class="p">:</span>   <span class="s1">&#39;MS&#39;</span><span class="p">,</span> <span class="c1">#Month start !</span>
                           <span class="s1">&#39;yearly&#39;</span>  <span class="p">:</span>   <span class="s1">&#39;AS&#39;</span><span class="p">}</span>
 
-<span class="n">PANDAS_RESAMPLE_OFFSETS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;AS&#39;</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;[M]&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;MS&#39;</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="s1">&#39;[D]&#39;</span><span class="p">)}</span>
+<span class="n">PANDAS_RESAMPLE_OFFSETS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;AS&#39;</span> <span class="p">:</span> <span class="s1">&#39;6M&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;MS&#39;</span> <span class="p">:</span> <span class="s1">&#39;14D&#39;</span><span class="p">}</span>
 
 <span class="n">PANDAS_FREQ_TO_TS_TYPE</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">TS_TYPE_TO_PANDAS_FREQ</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
@@ -286,7 +289,7 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">slice</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">slice</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">slice</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">val</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">val</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="kc">False</span></div>
@@ -405,6 +408,7 @@
             <span class="n">_data_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">vert_grid</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">tidx</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
+            <span class="c1">#print(stat[var_name].values)</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">merged</span> <span class="o">=</span> <span class="n">stat</span>
             <span class="k">else</span><span class="p">:</span>
@@ -429,7 +433,17 @@
     
     <span class="k">if</span> <span class="n">fill_missing_nan</span><span class="p">:</span>
         <span class="n">merged</span><span class="o">.</span><span class="n">insert_nans_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+    <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;stat_merge_pref_attr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pref_attr</span>
     <span class="k">return</span> <span class="n">merged</span></div>
+
+<span class="k">def</span> <span class="nf">_get_pandas_freq_and_loffset</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper to convert resampling info&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">TS_TYPE_TO_PANDAS_FREQ</span><span class="p">:</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">TS_TYPE_TO_PANDAS_FREQ</span><span class="p">[</span><span class="n">freq</span><span class="p">]</span>
+    <span class="n">loffset</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">PANDAS_RESAMPLE_OFFSETS</span><span class="p">:</span>
+        <span class="n">loffset</span> <span class="o">=</span> <span class="n">PANDAS_RESAMPLE_OFFSETS</span><span class="p">[</span><span class="n">freq</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span><span class="p">)</span>
 
 <div class="viewcode-block" id="resample_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.resample_timeseries">[docs]</a><span class="k">def</span> <span class="nf">resample_timeseries</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Resample a timeseries (pandas.Series)</span>
@@ -454,11 +468,7 @@
 <span class="sd">    Series</span>
 <span class="sd">        resampled time series object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">TS_TYPE_TO_PANDAS_FREQ</span><span class="p">:</span>
-        <span class="n">freq</span> <span class="o">=</span> <span class="n">TS_TYPE_TO_PANDAS_FREQ</span><span class="p">[</span><span class="n">freq</span><span class="p">]</span>
-    <span class="n">loffset</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">PANDAS_RESAMPLE_OFFSETS</span><span class="p">:</span>
-        <span class="n">loffset</span> <span class="o">=</span> <span class="n">PANDAS_RESAMPLE_OFFSETS</span><span class="p">[</span><span class="n">freq</span><span class="p">]</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span> <span class="o">=</span> <span class="n">_get_pandas_freq_and_loffset</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>    
     <span class="n">resampler</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">min_num_obs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">resampler</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">how</span><span class="p">)</span>
@@ -467,6 +477,52 @@
         <span class="n">df</span><span class="p">[</span><span class="n">how</span><span class="p">][</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_num_obs</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">how</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="resample_time_dataarray"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.resample_time_dataarray">[docs]</a><span class="k">def</span> <span class="nf">resample_time_dataarray</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Resample the time dimension of a :class:`xarray.DataArray`</span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The dataarray must have a dimension coordinate named &quot;time&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arr : DataArray</span>
+<span class="sd">        data array to be resampled</span>
+<span class="sd">    freq : str</span>
+<span class="sd">        new temporal resolution (can be pandas freq. string, or pyaerocom</span>
+<span class="sd">        ts_type)</span>
+<span class="sd">    how : str</span>
+<span class="sd">        choose from mean or median</span>
+<span class="sd">    min_num_obs : :obj:`int`, optional</span>
+<span class="sd">        minimum number of observations required per period (when downsampling).</span>
+<span class="sd">        E.g. if input is in daily resolution and freq is monthly and </span>
+<span class="sd">        min_num_obs is 10, then all months that have less than 10 days of data</span>
+<span class="sd">        are set to nan.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataArray</span>
+<span class="sd">        resampled data array object</span>
+<span class="sd">    </span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    IOError</span>
+<span class="sd">        if data input `arr` is not an instance of :class:`DataArray`</span>
+<span class="sd">    DataDimensionError</span>
+<span class="sd">        if time dimension is not available in dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">xray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Invalid input for arr: need DataArray, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arr</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Cannot resample time: input DataArray has &#39;</span>
+                                 <span class="s1">&#39;no time dimension&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">min_num_obs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span> <span class="o">=</span> <span class="n">_get_pandas_freq_and_loffset</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>    
+    <span class="k">return</span> <span class="n">arr</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span></div>
+    
 
 <div class="viewcode-block" id="unit_conversion_fac"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.unit_conversion_fac">[docs]</a><span class="k">def</span> <span class="nf">unit_conversion_fac</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns multiplicative unit conversion factor for input units</span>
@@ -1037,6 +1093,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="n">TS_TYPE_TO_NUMPY_FREQ</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">NUMPY_FREQ_TO_TS_TYPE</span><span class="p">)</span>
 
+    <span class="n">isrange</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
 </pre></div>
 
            </div>

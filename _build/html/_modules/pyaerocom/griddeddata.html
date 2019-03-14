@@ -88,9 +88,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
@@ -182,7 +183,7 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">DataExtractionError</span><span class="p">,</span>
                                   <span class="n">TemporalResolutionError</span><span class="p">,</span>
                                   <span class="n">DimensionOrderError</span><span class="p">,</span>
-                                  <span class="n">NDimError</span><span class="p">,</span> <span class="n">DataDimensionError</span><span class="p">,</span>
+                                  <span class="n">DataDimensionError</span><span class="p">,</span>
                                   <span class="n">VariableDefinitionError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_time_rng_constraint</span><span class="p">,</span>
                                <span class="n">get_lon_rng_constraint</span><span class="p">,</span>
@@ -267,13 +268,15 @@
     <span class="c1">#: Req. order of dimension coordinates for time-series computation</span>
     <span class="n">COORDS_ORDER_TSERIES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
     <span class="n">_MAX_SIZE_GB</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1">#maximum file size for in-memory operations</span>
+    
+    <span class="n">SUPPORTED_VERT_SCHEMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;surface&#39;</span><span class="p">,</span> <span class="s1">&#39;altitude&#39;</span><span class="p">,</span> <span class="s1">&#39;profile&#39;</span><span class="p">]</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">convert_unit_on_init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">suppl_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span> <span class="o">=</span> <span class="n">od</span><span class="p">(</span><span class="n">from_files</span>     <span class="o">=</span> <span class="p">[],</span>
-                             <span class="n">name</span>           <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
+                             <span class="n">data_id</span>        <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
                              <span class="n">ts_type</span>        <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
                              <span class="n">regridded</span>      <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                             <span class="n">computed</span>       <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                             <span class="n">computed</span>       <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                              <span class="n">region</span>         <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                              <span class="n">reader</span>         <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
         
@@ -321,10 +324,12 @@
     
     <span class="nd">@reader</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">ReadGridded</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">ReadGridded</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input reader </span><span class="si">{}</span><span class="s1"> is not a support reader class for &#39;</span>
-                             <span class="s1">&#39;gridded data...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#         from pyaerocom.io import ReadGridded</span>
+<span class="c1">#         if not isinstance(val, ReadGridded):</span>
+<span class="c1">#             raise ValueError(&#39;Input reader {} is not a support reader class for &#39;</span>
+<span class="c1">#                              &#39;gridded data...&#39;.format(type(val)))</span>
+<span class="c1"># =============================================================================</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;reader&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         
     <span class="nd">@property</span>
@@ -439,7 +444,7 @@
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;ID of model to which data belongs&quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Deprecated attribute name, please use data_id instead&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s2">&quot;data_id&quot;</span><span class="p">]</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -450,7 +455,7 @@
 <span class="sd">        This attribute was formerly named ``name`` which is alse the </span>
 <span class="sd">        corresponding attribute name in :attr:`suppl_info`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -635,7 +640,7 @@
 <span class="sd">        </span>
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
-<span class="sd">        NDimError</span>
+<span class="sd">        DataDimensionError</span>
 <span class="sd">            if dimension of data is not supported (currently, 3D or 4D data</span>
 <span class="sd">            is supported)</span>
 <span class="sd">        DimensionOrderError</span>
@@ -645,7 +650,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">COORDS_ORDER_TSERIES</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">NDimError</span><span class="p">(</span><span class="s1">&#39;Time series extraction requires at least 3 &#39;</span>
+            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Time series extraction requires at least 3 &#39;</span>
                             <span class="s1">&#39;coordinates in cube&#39;</span><span class="p">)</span>
         <span class="n">check</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimcoord_names</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">check</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
@@ -816,7 +821,7 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> 
                                <span class="n">longitude</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span>
                                <span class="n">data_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            
+            <span class="n">data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
             <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
             <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span>
@@ -895,8 +900,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_dimcoords_tseries</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">NDimError</span><span class="p">(</span><span class="s1">&#39;So far, timeseries can only be extracted &#39;</span>
-                            <span class="s1">&#39;from 3 dimensional data...&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;So far, timeseries can only be extracted &#39;</span>
+                                     <span class="s1">&#39;from 3 dimensional data...&#39;</span><span class="p">)</span>
         <span class="n">lons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">points</span>
         <span class="n">lats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">points</span>
         <span class="n">lon_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lons</span> <span class="o">-</span> <span class="n">longitude</span><span class="p">))</span>
@@ -925,7 +930,11 @@
                 <span class="n">idx</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_neighbour_index</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">idx</span></div>
     
-<div class="viewcode-block" id="GriddedData.isel"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.isel">[docs]</a>    <span class="k">def</span> <span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_neirest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">dimcoord_vals</span><span class="p">):</span>
+<div class="viewcode-block" id="GriddedData.isel"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.isel">[docs]</a>    <span class="k">def</span> <span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Please use method sel for data selection &#39;</span>
+                                  <span class="s1">&#39;based on dimension values&#39;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="GriddedData.sel"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.sel">[docs]</a>    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_neirest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">dimcoord_vals</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Select subset by dimension names</span>
 <span class="sd">        </span>
 <span class="sd">        Note</span>
@@ -1025,14 +1034,27 @@
                 <span class="s1">&#39;temporal resolution from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
                                           <span class="n">to_ts_type</span><span class="p">))</span>
         <span class="n">cube</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">==</span> <span class="n">to_ts_type</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cube</span><span class="o">.</span><span class="n">coords</span><span class="p">()]):</span>
-            <span class="n">IRIS_AGGREGATORS</span><span class="p">[</span><span class="n">to_ts_type</span><span class="p">](</span><span class="n">cube</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">to_ts_type</span><span class="p">)</span>
         
-        <span class="n">aggregated</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">aggregated_by</span><span class="p">(</span><span class="n">to_ts_type</span><span class="p">,</span> <span class="n">MEAN</span><span class="p">)</span>
+        <span class="c1"># Create aggregators</span>
+        <span class="n">aggrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;yearly&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">to_ts_type</span> <span class="ow">in</span> <span class="n">aggrs</span><span class="p">:</span>
+            <span class="n">aggrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">to_ts_type</span><span class="p">)</span>
+            
+        <span class="k">for</span> <span class="n">aggr</span> <span class="ow">in</span> <span class="n">aggrs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">aggr</span> <span class="ow">in</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cube</span><span class="o">.</span><span class="n">aux_coords</span><span class="p">]:</span>
+                <span class="c1"># this adds the corresponding aggregator to the cube</span>
+                <span class="n">IRIS_AGGREGATORS</span><span class="p">[</span><span class="n">aggr</span><span class="p">](</span><span class="n">cube</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">aggr</span><span class="p">)</span>
+            <span class="c1">#IRIS_AGGREGATORS[to_ts_type](cube, &#39;time&#39;, name=to_ts_type)</span>
+        <span class="c1"># not downscale</span>
+        <span class="n">aggregated</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">aggregated_by</span><span class="p">(</span><span class="n">aggrs</span><span class="p">,</span> <span class="n">MEAN</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">aggregated</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">)</span>
         <span class="n">data</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_ts_type</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">check_dimcoords_tseries</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span>     </div>
     
+<div class="viewcode-block" id="GriddedData.add_aggregator"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.add_aggregator">[docs]</a>    <span class="k">def</span> <span class="nf">add_aggregator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggr_name</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+        
 <div class="viewcode-block" id="GriddedData.calc_area_weights"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.calc_area_weights">[docs]</a>    <span class="k">def</span> <span class="nf">calc_area_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate area weights for grid&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_lonlat_bounds</span><span class="p">()</span>
