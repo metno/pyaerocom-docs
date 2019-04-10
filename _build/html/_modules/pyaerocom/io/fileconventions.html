@@ -87,7 +87,8 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">NEWS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#about">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
@@ -443,7 +444,7 @@
         
     
     
-<div class="viewcode-block" id="FileConventionRead.string_mask"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.fileconventions.FileConventionRead.string_mask">[docs]</a>    <span class="k">def</span> <span class="nf">string_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">):</span>
+<div class="viewcode-block" id="FileConventionRead.string_mask"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.fileconventions.FileConventionRead.string_mask">[docs]</a>    <span class="k">def</span> <span class="nf">string_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns mask that can be used to identify files of this convention</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -471,10 +472,19 @@
 <span class="sd">        match_str_aero3 = conf_aero3.string_mask(var, year, ts_type)</span>
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;aerocom2&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">vert_which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FileConventionError</span><span class="p">(</span><span class="s1">&#39;Specification of vert_which (</span><span class="si">{}</span><span class="s1">) is &#39;</span>
+                                          <span class="s1">&#39;not supported for &#39;</span>
+                                          <span class="s1">&#39;aerocom2 naming convention&#39;</span>
+                                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vert_which</span><span class="p">))</span>
+                
             <span class="k">return</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;.*&#39;</span><span class="p">,</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="s1">&#39;nc&#39;</span><span class="p">])</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;aerocom3&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;.*&#39;</span><span class="p">,</span><span class="n">var</span><span class="p">,</span> <span class="s1">&#39;.*&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="n">ts_type</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;.nc&#39;</span>
+            <span class="k">if</span> <span class="n">vert_which</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">vert_which</span> <span class="o">=</span> <span class="s1">&#39;.*&#39;</span>
+            <span class="k">return</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;.*&#39;</span><span class="p">,</span>  <span class="n">var</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="n">ts_type</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;.nc&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;File matching mask for convention </span><span class="si">%s</span><span class="s2"> &quot;</span>
                                       <span class="s2">&quot;not yet defined...&quot;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>

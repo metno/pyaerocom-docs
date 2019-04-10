@@ -1,0 +1,871 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyaerocom.colocation_auto &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="pyaerocom  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">NEWS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#about">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config_files.html">Configuration files</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyaerocom.colocation_auto</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyaerocom.colocation_auto</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">High level module containing analysis classes and methods to perform </span>
+<span class="sd">colocation.</span>
+
+<span class="sd">NOTE</span>
+<span class="sd">----</span>
+
+<span class="sd">This module will be deprecated soon but most of the code will be refactored </span>
+<span class="sd">into colocation.py module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="k">import</span> <span class="n">BrowseDict</span><span class="p">,</span> <span class="n">chk_make_subdir</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">to_pandas_timestamp</span><span class="p">,</span> <span class="n">to_datestring_YYYYMMDD</span><span class="p">,</span>
+                               <span class="n">get_lowest_resolution</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="k">import</span> <span class="n">get_all_supported_ids_ungridded</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.colocation</span> <span class="k">import</span> <span class="p">(</span><span class="n">colocate_gridded_gridded</span><span class="p">,</span>
+                                  <span class="n">colocate_gridded_ungridded</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">ColocatedData</span><span class="p">,</span> <span class="n">print_log</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">ReadUngridded</span><span class="p">,</span> <span class="n">ReadGridded</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">DataCoverageError</span><span class="p">,</span>
+                                  <span class="n">TemporalResolutionError</span><span class="p">)</span>
+                   
+<div class="viewcode-block" id="ColocationSetup"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.ColocationSetup">[docs]</a><span class="k">class</span> <span class="nc">ColocationSetup</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Setup class for model / obs intercomparison</span>
+<span class="sd">    </span>
+<span class="sd">    An instance of this setup class can be used to run a colocation analysis</span>
+<span class="sd">    between a model and an observation network and will create a number of </span>
+<span class="sd">    :class:`pya.ColocatedData` instances and save them as netCDF file.</span>
+<span class="sd">    </span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This is a very first draft and will likely undergo significant changes</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_id : str</span>
+<span class="sd">        ID of model to be used</span>
+<span class="sd">    obs_id : str</span>
+<span class="sd">        ID of observation network to be used</span>
+<span class="sd">    obs_vars : :obj:`str` or :obj:`list`, optional</span>
+<span class="sd">        variables to be analysed. If any of the provided variables to be </span>
+<span class="sd">        analysed in the model data is not available in obsdata, the obsdata </span>
+<span class="sd">        will be checked against potential alternative variables which are</span>
+<span class="sd">        specified in :attr:`model_use_vars` and which can be specified in form of a </span>
+<span class="sd">        dictionary for each . If None, all</span>
+<span class="sd">        variables are analysed that are available both in model and obsdata.</span>
+<span class="sd">    start : :obj:`pandas.Timestamp`, optional</span>
+<span class="sd">        start time. Input can be anything that can be converted into </span>
+<span class="sd">        :class:`pandas.Timestamp` using </span>
+<span class="sd">        :func:`pyaerocom.helpers.to_pandas_timestamp`. If None, than the first</span>
+<span class="sd">        available date in the model data is used.</span>
+<span class="sd">    stop</span>
+<span class="sd">        stop time. Anything that can be converted into </span>
+<span class="sd">        :class:`pandas.Timestamp` using </span>
+<span class="sd">        :func:`pyaerocom.helpers.to_pandas_timestamp` or None. If None and if</span>
+<span class="sd">        ``start`` is on resolution of year (e.g. ``start=2010``) then ``stop``</span>
+<span class="sd">        will be automatically set to the end of that year. Else, it will be </span>
+<span class="sd">        set to the last available timestamp in the model data.</span>
+<span class="sd">    filter_name : str</span>
+<span class="sd">        name of filter to be applied</span>
+<span class="sd">    ts_types_ana : :obj:`list` or similar, optional</span>
+<span class="sd">        names of frequencies to be analysed (for which colocated data objects</span>
+<span class="sd">        are created)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+    
+    <span class="n">REANALYSE_EXISTING</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">RAISE_EXCEPTIONS</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                 <span class="n">filter_name</span><span class="o">=</span><span class="s1">&#39;WORLD-noMOUNTAINS&#39;</span><span class="p">,</span> 
+                 <span class="n">model_use_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_read_aux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">remove_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">regrid_res_deg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">basedir_coldata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_opts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">obs_vert_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_vert_type_alt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonise_units</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">vert_scheme</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_ts_type_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">read_opts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">read_opts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">model_read_aux</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_read_aux</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">var_outlier_ranges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var_outlier_ranges</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">obs_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs_vars</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">model_use_vars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="n">model_use_vars</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for filter_name&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">basedir_coldata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">basedir_coldata</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">COLOCATEDDATADIR</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">basedir_coldata</span><span class="p">):</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating directory: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">basedir_coldata</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">basedir_coldata</span><span class="p">)</span>
+            
+        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output directory for colocated data:</span><span class="se">\n</span><span class="s1"> &#39;</span>
+                             <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">basedir_coldata</span><span class="p">))</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output directory for logfiles:</span><span class="se">\n</span><span class="s1"> &#39;</span>
+                             <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">basedir_coldata</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span> <span class="o">=</span> <span class="n">obs_vars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span> <span class="o">=</span> <span class="n">obs_vert_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type_alt</span> <span class="o">=</span> <span class="n">obs_vert_type_alt</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span> <span class="o">=</span> <span class="n">model_use_vars</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span> <span class="o">=</span> <span class="n">obs_id</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="o">=</span> <span class="n">stop</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="n">ts_type</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span> <span class="o">=</span> <span class="n">filter_name</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span> <span class="o">=</span> <span class="n">remove_outliers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span> <span class="o">=</span> <span class="n">var_outlier_ranges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">harmonise_units</span> <span class="o">=</span> <span class="n">harmonise_units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vert_scheme</span> <span class="o">=</span> <span class="n">vert_scheme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regrid_res_deg</span> <span class="o">=</span> <span class="n">regrid_res_deg</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span> <span class="o">=</span> <span class="n">basedir_coldata</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_opts</span> <span class="o">=</span> <span class="n">read_opts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_ts_type_read</span> <span class="o">=</span> <span class="n">model_ts_type_read</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span> <span class="o">=</span> <span class="n">model_read_aux</span>
+        <span class="c1">#self.read_opts.update(**read_opts)</span>
+     
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">basedir_logfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span><span class="p">,</span> <span class="s1">&#39;logfiles&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">UNGRIDDED_IDS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;ID&#39;s of all supported ungridded datasets&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">get_all_supported_ids_ungridded</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="ColocationSetup.update"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.ColocationSetup.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot update dict </span><span class="si">{}</span><span class="s1"> with non-dict input </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Colocator"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator">[docs]</a><span class="k">class</span> <span class="nc">Colocator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;High level class for running colocation</span>
+
+<span class="sd">    TODO</span>
+<span class="sd">    ----</span>
+<span class="sd">    - write docstring</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">setup</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">setup</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">setup</span> <span class="o">=</span> <span class="n">ColocationSetup</span><span class="p">()</span>
+        <span class="n">setup</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span> <span class="o">=</span> <span class="n">setup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ungridded_reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">()</span>
+     
+<div class="viewcode-block" id="Colocator.run"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run current analysis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">model_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_log</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Model: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_id</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="o">.</span><span class="n">UNGRIDDED_IDS</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_gridded_ungridded</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_gridded_gridded</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to perform analysis: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                   <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()))</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">RAISE_EXCEPTIONS</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span></div>
+            
+<div class="viewcode-block" id="Colocator.get_lowest_resolution"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.get_lowest_resolution">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_lowest_resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="o">*</span><span class="n">ts_types</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="o">*</span><span class="n">ts_types</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Colocator.output_dir"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.output_dir">[docs]</a>    <span class="k">def</span> <span class="nf">output_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Output directory for colocated data&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dirs</span><span class="p">[</span><span class="n">task_name</span><span class="p">]</span></div>
+    
+    <span class="k">def</span> <span class="nf">_run_gridded_ungridded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Analysis method for gridded vs. ungridded data&quot;&quot;&quot;</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span>
+        <span class="n">model_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+        
+        <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span>
+        
+        <span class="n">obs_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span>
+        
+        <span class="n">obs_vars_avail</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span>
+        
+        <span class="k">for</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_vars_avail</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;Variable </span><span class="si">{}</span><span class="s1"> is not supported by </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_var</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
+
+        <span class="n">var_matches</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">for</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span><span class="p">:</span>
+                <span class="n">model_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">model_var</span> <span class="o">=</span> <span class="n">obs_var</span>
+            <span class="k">if</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span><span class="p">:</span>
+                <span class="n">model_reader</span><span class="o">.</span><span class="n">add_aux_compute</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span>
+                                             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span><span class="p">[</span><span class="n">model_var</span><span class="p">])</span>
+                
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">vars_provided</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">var_matches</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_var</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            
+            <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No variable matches between &#39;</span>
+                                    <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> and </span><span class="si">{}</span><span class="s1"> for input vars: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> 
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">))</span>
+        
+        <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">datasets_to_read</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
+                                   <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">obs_vars</span><span class="p">,</span>
+                                   <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">read_opts</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_var_outlier_ranges</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span>
+                            
+        <span class="n">all_ts_types</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span>
+        
+        <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span>
+        
+        <span class="n">data_objs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">obs_var</span><span class="p">,</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> 
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
+                                                             <span class="n">model_var</span><span class="p">,</span> 
+                                                             <span class="n">obs_var</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">model_data</span> <span class="o">=</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">model_var</span><span class="p">,</span> 
+                                                   <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                                   <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                                                   <span class="n">ts_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ts_type_read</span><span class="p">,</span>
+                                                   <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                   <span class="n">vert_which</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">DataCoverageError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;No data files available for model </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">) and vertical &#39;</span>
+                       <span class="s1">&#39;resolution code </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> 
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type_alt</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    
+                <span class="n">model_data</span> <span class="o">=</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">model_var</span><span class="p">,</span> 
+                                                   <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                                   <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                                                   <span class="n">ts_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ts_type_read</span><span class="p">,</span>
+                                                   <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                   <span class="n">vert_which</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type_alt</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to load model data: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">. Reason </span><span class="si">{}</span><span class="s1">&#39;</span>
+                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">RAISE_EXCEPTIONS</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid temporal resolution </span><span class="si">{}</span><span class="s1"> &#39;</span>
+                                              <span class="s1">&#39;in model </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
+                                                                   <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
+                
+            <span class="n">ts_type_src</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span>
+            <span class="k">if</span> <span class="n">all_ts_types</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">all_ts_types</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ts_type_src</span><span class="p">):</span>
+                <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating ts_type from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1"> (highest &#39;</span>
+                               <span class="s1">&#39;available in model </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> 
+                                                               <span class="n">ts_type_src</span><span class="p">,</span>
+                                                               <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
+                <span class="n">ts_type</span> <span class="o">=</span> <span class="n">ts_type_src</span>
+            
+    
+            <span class="n">out_dir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
+            <span class="n">savename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coldata_savename</span><span class="p">(</span><span class="n">model_data</span><span class="p">,</span>
+                                               <span class="n">start</span><span class="p">,</span>
+                                               <span class="n">stop</span><span class="p">,</span>
+                                               <span class="n">ts_type</span><span class="p">)</span>
+            
+            <span class="n">file_exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_coldata_exists</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> 
+                                                     <span class="n">savename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_exists</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">REANALYSE_EXISTING</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SKIP: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                        <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skip </span><span class="si">{}</span><span class="s1"> (file already &#39;</span>
+                                       <span class="s1">&#39;exists)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Deleting and recomputing existing &#39;</span>
+                                   <span class="s1">&#39;colocated data file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                    <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;REMOVE: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">savename</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">coldata</span> <span class="o">=</span> <span class="n">colocate_gridded_ungridded</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">=</span><span class="n">model_data</span><span class="p">,</span> 
+                                                     <span class="n">ungridded_data</span><span class="o">=</span><span class="n">obs_data</span><span class="p">,</span> 
+                                                     <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span> 
+                                                     <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
+                                                     <span class="n">var_ref</span><span class="o">=</span><span class="n">obs_var</span><span class="p">,</span>
+                                                     <span class="n">filter_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span>
+                                                     <span class="n">regrid_res_deg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regrid_res_deg</span><span class="p">,</span>
+                                                     <span class="n">remove_outliers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">,</span>
+                                                     <span class="n">vert_scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vert_scheme</span><span class="p">,</span>
+                                                     <span class="n">harmonise_units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">harmonise_units</span><span class="p">,</span>
+                                                     <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">)</span>
+                <span class="n">coldata</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;WRITE: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                    <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                <span class="n">data_objs</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">coldata</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Colocation between model </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> and obs </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> &#39;</span>
+                       <span class="s1">&#39;failed: Reason </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                                  <span class="n">model_var</span><span class="p">,</span> 
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
+                                                  <span class="n">obs_var</span><span class="p">,</span>
+                                                  <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">RAISE_EXCEPTIONS</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_objs</span>
+         
+    <span class="k">def</span> <span class="nf">_run_gridded_gridded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span>
+        <span class="n">model_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+        <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+    
+        <span class="n">obs_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span>
+        
+        <span class="n">obs_vars_avail</span> <span class="o">=</span>  <span class="n">obs_reader</span><span class="o">.</span><span class="n">vars_provided</span>
+        
+        <span class="k">for</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_vars_avail</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;Variable </span><span class="si">{}</span><span class="s1"> is not supported by </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_var</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
+        <span class="n">var_matches</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">for</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span><span class="p">:</span>
+                <span class="n">model_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">model_var</span> <span class="o">=</span> <span class="n">obs_var</span>
+            <span class="k">if</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span><span class="p">:</span>
+                <span class="n">model_reader</span><span class="o">.</span><span class="n">add_aux_compute</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span>
+                                             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span><span class="p">[</span><span class="n">model_var</span><span class="p">])</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">vars_provided</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">var_matches</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_var</span>
+            
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No variable matches between &#39;</span>
+                                    <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> and </span><span class="si">{}</span><span class="s1"> for input vars: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> 
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_var_outlier_ranges</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span>
+            
+        <span class="n">all_ts_types</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span>
+        
+        <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span>
+        
+        <span class="n">data_objs</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">for</span> <span class="n">obs_var</span><span class="p">,</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> 
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
+                                                             <span class="n">model_var</span><span class="p">,</span> 
+                                                             <span class="n">obs_var</span><span class="p">))</span>
+            
+            <span class="n">model_data</span> <span class="o">=</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">model_var</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                               <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                                               <span class="n">ts_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ts_type_read</span><span class="p">,</span>
+                                               <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid temporal resolution </span><span class="si">{}</span><span class="s1"> &#39;</span>
+                                              <span class="s1">&#39;in model </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
+                                                                   <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
+            <span class="n">obs_data</span>  <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">obs_var</span><span class="p">,</span> 
+                                            <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                            <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
+                                            <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
+                                            <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid temporal resolution </span><span class="si">{}</span><span class="s1"> &#39;</span>
+                                              <span class="s1">&#39;in obs </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
+                                                                 <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
+            
+            <span class="n">lowest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
+                                                <span class="n">obs_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lowest</span> <span class="o">!=</span> <span class="n">ts_type</span><span class="p">:</span>
+                <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating ts_type from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1"> (highest &#39;</span>
+                               <span class="s1">&#39;available in </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> combination)&#39;</span>
+                               <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">lowest</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
+                <span class="n">ts_type</span> <span class="o">=</span> <span class="n">lowest</span>
+                 
+            <span class="n">out_dir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
+                           
+            <span class="n">savename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coldata_savename</span><span class="p">(</span><span class="n">model_data</span><span class="p">,</span>
+                                              <span class="n">start</span><span class="p">,</span>
+                                              <span class="n">stop</span><span class="p">,</span>
+                                              <span class="n">ts_type</span><span class="p">)</span>
+            
+            <span class="n">file_exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_coldata_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                                      <span class="n">savename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_exists</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">REANALYSE_EXISTING</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SKIP: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                        <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skip </span><span class="si">{}</span><span class="s1"> (file already &#39;</span>
+                                       <span class="s1">&#39;exists)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">savename</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>  
+                <span class="n">coldata</span> <span class="o">=</span> <span class="n">colocate_gridded_gridded</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">=</span><span class="n">model_data</span><span class="p">,</span>
+                                                   <span class="n">gridded_data_ref</span><span class="o">=</span><span class="n">obs_data</span><span class="p">,</span> 
+                                                   <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span> 
+                                                   <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                                                   <span class="n">filter_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span>
+                                                   <span class="n">regrid_res_deg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regrid_res_deg</span><span class="p">,</span>
+                                                   <span class="n">remove_outliers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">,</span>
+                                                   <span class="n">vert_scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vert_scheme</span><span class="p">,</span>
+                                                   <span class="n">harmonise_units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">harmonise_units</span><span class="p">,</span>
+                                                   <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">)</span>
+                <span class="n">coldata</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;WRITE: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                    <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                <span class="n">data_objs</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">coldata</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Colocation between model </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> and obs </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> &#39;</span>
+                       <span class="s1">&#39;failed: Reason </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                                  <span class="n">model_var</span><span class="p">,</span> 
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
+                                                  <span class="n">obs_var</span><span class="p">,</span>
+                                                  <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">RAISE_EXCEPTIONS</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_objs</span>
+    
+    <span class="k">def</span> <span class="nf">_init_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logdir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="o">.</span><span class="n">basedir_logfiles</span><span class="p">,</span> 
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
+                                 
+        
+        <span class="n">fname</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.log&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="n">log</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logdir</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="s1">&#39;a+&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">------------------ NEW ----------------</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Timestamp: </span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">-%m-%Y %H:%M&#39;</span><span class="p">)))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Analysis configuration</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+        
+    <span class="k">def</span> <span class="nf">_close_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="kc">None</span>
+        
+    <span class="k">def</span> <span class="nf">_coldata_savename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_data</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                           <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Based on current setup, get savename of colocated data file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">start</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>    
+        <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">stop</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ts_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ts_type</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span>
+        
+        <span class="n">start_str</span> <span class="o">=</span> <span class="n">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">stop_str</span> <span class="o">=</span> <span class="n">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
+        <span class="n">ts_type_src</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span>
+        <span class="n">coll_data_name</span> <span class="o">=</span> <span class="n">ColocatedData</span><span class="o">.</span><span class="n">_aerocom_savename</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">model_data</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span>
+                                                         <span class="n">obs_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
+                                                         <span class="n">model_id</span><span class="o">=</span><span class="n">model_data</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> 
+                                                         <span class="n">ts_type_src</span><span class="o">=</span><span class="n">ts_type_src</span><span class="p">,</span> 
+                                                         <span class="n">start_str</span><span class="o">=</span><span class="n">start_str</span><span class="p">,</span> 
+                                                         <span class="n">stop_str</span><span class="o">=</span><span class="n">stop_str</span><span class="p">,</span> 
+                                                         <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
+                                                         <span class="n">filter_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">coll_data_name</span> <span class="o">+</span> <span class="s1">&#39;.nc&#39;</span>
+    
+    
+    
+    <span class="k">def</span> <span class="nf">_check_coldata_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">coldata_savename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if colocated data file exists&quot;&quot;&quot;</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span><span class="p">,</span>
+                              <span class="n">model_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coldata_savename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    
+    <span class="k">def</span> <span class="nf">_update_var_outlier_ranges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_matches</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ovar</span><span class="p">,</span> <span class="n">mvar</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">oname</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">ovar</span><span class="p">]</span><span class="o">.</span><span class="n">var_name</span>
+            <span class="k">if</span> <span class="n">oname</span> <span class="o">!=</span> <span class="n">ovar</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ovar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">oname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">[</span><span class="n">oname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">[</span><span class="n">ovar</span><span class="p">]</span>
+                    
+            <span class="n">mname</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">mvar</span><span class="p">]</span><span class="o">.</span><span class="n">var_name</span>
+            <span class="k">if</span> <span class="n">mname</span> <span class="o">!=</span> <span class="n">mvar</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mvar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">mname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">[</span><span class="n">mname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">[</span><span class="n">mvar</span><span class="p">]</span>
+                        
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Invalid attr. for ColocationSetup&#39;</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Invalid attr. for ColocationSetup&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            
+            
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+    
+    <span class="n">model_use_vars</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">scatc550dryaer</span>  <span class="o">=</span> <span class="s1">&#39;ec550dryaer&#39;</span><span class="p">,</span>
+                          <span class="n">absc550aer</span>      <span class="o">=</span> <span class="s1">&#39;abs5503Daer&#39;</span><span class="p">)</span>
+    
+    <span class="n">MODEL_ID</span> <span class="o">=</span>  <span class="s1">&#39;CAM5.3-Oslo_AP3-CTRL2016-PD&#39;</span>
+    <span class="n">stp</span> <span class="o">=</span> <span class="n">ColocationSetup</span><span class="p">(</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">MODEL_ID</span><span class="p">,</span>
+                          <span class="n">obs_id</span><span class="o">=</span><span class="s1">&#39;EBASMC&#39;</span><span class="p">,</span>
+                          <span class="n">obs_vars</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">model_use_vars</span><span class="p">),</span> 
+                          <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
+                          <span class="n">filter_name</span><span class="o">=</span><span class="s1">&#39;WORLD-wMOUNTAINS&#39;</span><span class="p">,</span>
+                          <span class="n">model_use_vars</span><span class="o">=</span><span class="n">model_use_vars</span><span class="p">,</span>
+                          <span class="n">vert_scheme</span><span class="o">=</span><span class="s1">&#39;surface&#39;</span><span class="p">,</span>
+                          <span class="n">read_opts</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">station_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Jungfrau*&#39;</span><span class="p">,</span>
+                                                        <span class="s1">&#39;Zeppel*&#39;</span><span class="p">,</span>
+                                                        <span class="s1">&#39;Cape*Point*&#39;</span><span class="p">]))</span>
+    
+    <span class="n">stp</span><span class="o">.</span><span class="n">RAISE_EXCEPTIONS</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">stp</span><span class="o">.</span><span class="n">REANALYSE_EXISTING</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">Colocator</span><span class="p">(</span><span class="n">stp</span><span class="p">)</span>
+    
+    <span class="n">run</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">run</span><span class="p">:</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">vardict</span> <span class="ow">in</span> <span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">vardict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">plot_scatter</span><span class="p">()</span>
+            
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">filterwarnings</span>
+        <span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+        <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+        <span class="n">model_vars</span> <span class="o">=</span> <span class="n">model_use_vars</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        
+        <span class="n">r</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="n">MODEL_ID</span><span class="p">)</span>
+        
+        
+    
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">model_vars</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>        
+            
+        <span class="n">obs</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;EBASMC&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">model_use_vars</span><span class="p">),</span>
+                                          <span class="n">station_names</span><span class="o">=</span><span class="s1">&#39;Jungfrau*&#39;</span><span class="p">)</span>
+        
+                
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, met.no.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

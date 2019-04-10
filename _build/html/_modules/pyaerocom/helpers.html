@@ -87,7 +87,8 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">NEWS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#about">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
@@ -176,7 +177,7 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">LongitudeConstraintError</span><span class="p">,</span> 
                                   <span class="n">DataCoverageError</span><span class="p">,</span> <span class="n">MetaDataError</span><span class="p">,</span>
                                   <span class="n">DataDimensionError</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">cf_units</span> <span class="k">import</span> <span class="n">Unit</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">MINYEAR</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span>
 
@@ -244,6 +245,36 @@
                          <span class="s1">&#39;yearly&#39;</span>   <span class="p">:</span> <span class="s1">&#39;%Y&#39;</span><span class="p">}</span>
 
 <span class="n">NUM_KEYS_META</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;altitude&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="get_lowest_resolution"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_lowest_resolution">[docs]</a><span class="k">def</span> <span class="nf">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="o">*</span><span class="n">ts_types</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the lowest resolution from several ts_type codes</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ts_type : str</span>
+<span class="sd">        first ts_type</span>
+<span class="sd">    *ts_types</span>
+<span class="sd">        one or more additional ts_type codes</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        the ts_type that corresponds to the lowest resolution</span>
+<span class="sd">        </span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        if one of the input ts_type codes is not supported</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_ts_types</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span>
+    <span class="n">lowest</span> <span class="o">=</span> <span class="n">ts_type</span>
+    <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">ts_types</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input, only valid ts_type codes are &#39;</span>
+                             <span class="s1">&#39;supported: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">all_ts_types</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">all_ts_types</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">lowest</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">all_ts_types</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
+            <span class="n">lowest</span> <span class="o">=</span> <span class="n">freq</span>
+    <span class="k">return</span> <span class="n">lowest</span></div>
 
 <div class="viewcode-block" id="isnumeric"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.isnumeric">[docs]</a><span class="k">def</span> <span class="nf">isnumeric</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check if input value is numeric</span>
@@ -550,8 +581,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">from_unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">from_unit</span><span class="p">)</span>
-   
-    <span class="k">return</span> <span class="n">from_unit</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span></div>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">from_unit</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>    
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="n">UnitConversionError</span>
+        <span class="k">raise</span> <span class="n">UnitConversionError</span><span class="p">(</span><span class="s1">&#39;Failed to convert unit from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">))</span></div>
     
 <div class="viewcode-block" id="same_meta_dict"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.same_meta_dict">[docs]</a><span class="k">def</span> <span class="nf">same_meta_dict</span><span class="p">(</span><span class="n">meta1</span><span class="p">,</span> <span class="n">meta2</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">],</span> 
                    <span class="n">num_keys</span><span class="o">=</span><span class="n">NUM_KEYS_META</span><span class="p">,</span> <span class="n">num_rtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
