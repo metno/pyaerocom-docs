@@ -176,7 +176,8 @@
 
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">GEONUM_AVAILABLE</span><span class="p">,</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">CoordinateNameError</span><span class="p">,</span> <span class="n">CoordinateError</span><span class="p">,</span>
-                                  <span class="n">VariableNotFoundError</span><span class="p">)</span>
+                                  <span class="n">VariableNotFoundError</span><span class="p">,</span>
+                                  <span class="n">AltitudeAccessError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="k">import</span> <span class="n">BrowseDict</span>
 
 <div class="viewcode-block" id="atmosphere_sigma_coordinate_to_pressure"><a class="viewcode-back" href="../../api.html#pyaerocom.vert_coords.atmosphere_sigma_coordinate_to_pressure">[docs]</a><span class="k">def</span> <span class="nf">atmosphere_sigma_coordinate_to_pressure</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">ps</span><span class="p">,</span> <span class="n">ptop</span><span class="p">):</span>
@@ -390,21 +391,25 @@
     <span class="c1">#: Additional variable names (in AEROCOM convention) that are used</span>
     <span class="c1">#: to search for additional files that can be used to access or compute </span>
     <span class="c1">#: the altitude levels at each grid point</span>
-    <span class="n">ADD_FILE_VARS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;z3d&#39;</span><span class="p">,</span> <span class="s1">&#39;deltaz3d&#39;</span><span class="p">,</span> <span class="s1">&#39;pres&#39;</span><span class="p">]</span>
+    <span class="n">ADD_FILE_VARS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;z3d&#39;</span><span class="p">,</span> <span class="s1">&#39;deltaz3d&#39;</span><span class="p">,</span> <span class="s1">&#39;pres&#39;</span><span class="p">]</span>
     
     <span class="c1">#: Additional variables that are required to compute altitude levels</span>
     <span class="n">ADD_FILE_REQ</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;deltaz3d&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;ps&#39;</span><span class="p">]}</span>
     
     <span class="n">ADD_FILE_OPT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pres&#39;</span>  <span class="p">:</span>   <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">]}</span>
 
-    <span class="n">ALT_CONV_FUNS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;z3d&#39;</span>  <span class="p">:</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">),</span>
-                     <span class="p">}</span>
+    <span class="n">ALT_CONV_FUNS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;z3d&#39;</span>  <span class="p">:</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)}</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gridded_data</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">GriddedData</span><span class="p">,</span> <span class="n">logger</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gridded_data</span><span class="p">,</span> <span class="n">GriddedData</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input: require instance of GriddedData &#39;</span>
                              <span class="s1">&#39;class&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">has_latlon_dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Altitude access requires latitude and &#39;</span>
+                                      <span class="s1">&#39;longitude dimensions to be available &#39;</span>
+                                      <span class="s1">&#39;in  input GriddedData: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">short_str</span><span class="p">()))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_obj</span> <span class="o">=</span> <span class="n">gridded_data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_data</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>
         
@@ -437,9 +442,12 @@
                                   <span class="n">ts_type</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">VariableNotFoundError</span><span class="p">(</span><span class="s1">&#39;Auxiliary variable </span><span class="si">{}</span><span class="s1"> could not be found&#39;</span>
                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">add_var_name</span><span class="p">))</span>
-        
+       
+    <span class="k">def</span> <span class="nf">_check_altitude_access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">access_dict</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">access_dict</span><span class="p">)</span>
+                
 <div class="viewcode-block" id="AltitudeAccess.find_and_import_auxvars"><a class="viewcode-back" href="../../api.html#pyaerocom.vert_coords.AltitudeAccess.find_and_import_auxvars">[docs]</a>    <span class="k">def</span> <span class="nf">find_and_import_auxvars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Data directory of original data input file</span>
+        <span class="sd">&quot;&quot;&quot;Find and read auxiliary variables for altitude access</span>
 <span class="sd">        </span>
 <span class="sd">        This directory (if available) is used to check if potential files with</span>
 <span class="sd">        altitude information are available</span>
@@ -459,17 +467,22 @@
                             <span class="n">result</span><span class="p">[</span><span class="n">aux_opt</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_and_read_add_var</span><span class="p">(</span><span class="n">aux_opt</span><span class="p">)</span>
                         <span class="k">except</span><span class="p">:</span>
                             <span class="k">pass</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check_altitude_access</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_data</span> <span class="o">=</span> <span class="n">result</span>
                 <span class="k">return</span> <span class="n">result</span>
-            <span class="k">except</span> <span class="n">VariableNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">VariableNotFoundError</span><span class="p">,</span> <span class="n">AltitudeAccessError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="k">raise</span> <span class="n">CoordinateError</span><span class="p">(</span><span class="s1">&#39;Could not find required additional coordinate &#39;</span>
                               <span class="s1">&#39;information for the computation of altitude &#39;</span>
                               <span class="s1">&#39;levels&#39;</span><span class="p">)</span></div>
     
+    
 <div class="viewcode-block" id="AltitudeAccess.get_altitude"><a class="viewcode-back" href="../../api.html#pyaerocom.vert_coords.AltitudeAccess.get_altitude">[docs]</a>    <span class="k">def</span> <span class="nf">get_altitude</span><span class="p">(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span></div></div>
-        
+    
+
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>

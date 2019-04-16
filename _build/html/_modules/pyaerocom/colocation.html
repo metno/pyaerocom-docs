@@ -189,14 +189,67 @@
                              <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                              <span class="n">regrid_res_deg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">vert_scheme</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonise_units</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                             <span class="n">regrid_scheme</span><span class="o">=</span><span class="s1">&#39;areaweighted&#39;</span><span class="p">,</span> <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">regrid_scheme</span><span class="o">=</span><span class="s1">&#39;areaweighted&#39;</span><span class="p">,</span> 
+                             <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Colocate 2 gridded data objects</span>
 <span class="sd">    </span>
 <span class="sd">    Todo</span>
 <span class="sd">    ----</span>
-<span class="sd">    - Complete docstring</span>
 <span class="sd">    - think about vertical dimension (vert_scheme input not used at the moment)</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gridded_data : GriddedData</span>
+<span class="sd">        gridded data (e.g. model results)</span>
+<span class="sd">    gridded_data_ref : GriddedData</span>
+<span class="sd">        reference (ground-truth) dataset that is used to evaluate </span>
+<span class="sd">        :attr:`gridded_data` (e.g. gridded observation data)</span>
+<span class="sd">    ts_type : str</span>
+<span class="sd">        desired temporal resolution of colocated data (must be valid AeroCom</span>
+<span class="sd">        ts_type str such as daily, monthly, yearly..)</span>
+<span class="sd">    start : :obj:`str` or :obj:`datetime64` or similar, optional</span>
+<span class="sd">        start time for colocation, if None, the start time of the input</span>
+<span class="sd">        :class:`GriddedData` object is used</span>
+<span class="sd">    stop : :obj:`str` or :obj:`datetime64` or similar, optional</span>
+<span class="sd">        stop time for colocation, if None, the stop time of the input</span>
+<span class="sd">        :class:`GriddedData` object is used</span>
+<span class="sd">    filter_name : str</span>
+<span class="sd">        string specifying filter used (cf. :class:`pyaerocom.filter.Filter` for</span>
+<span class="sd">        details). If None, then it is set to &#39;WORLD-wMOUNTAINS&#39;, which </span>
+<span class="sd">        corresponds to no filtering (world with mountains). </span>
+<span class="sd">        Use WORLD-noMOUNTAINS to exclude mountain sites.</span>
+<span class="sd">    regrid_res_deg : :obj:`int`, optional</span>
+<span class="sd">        regrid resolution in degrees. If specified, the input gridded data </span>
+<span class="sd">        objects will be regridded in lon / lat dimension to the input </span>
+<span class="sd">        resolution. (BETA feature)</span>
+<span class="sd">    remove_outliers : bool</span>
+<span class="sd">        if True, outliers are removed from model and obs data before colocation, </span>
+<span class="sd">        else not.</span>
+<span class="sd">    vert_scheme : str</span>
+<span class="sd">        string specifying scheme used to reduce the dimensionality in case </span>
+<span class="sd">        input grid data contains vertical dimension. Example schemes are </span>
+<span class="sd">        `mean, surface, altitude`, for details see </span>
+<span class="sd">        :func:`GriddedData.to_time_series`.</span>
+<span class="sd">    harmonise_units : bool</span>
+<span class="sd">        if True, units are attempted to be harmonised (note: raises Exception</span>
+<span class="sd">        if True and units cannot be harmonised).</span>
+<span class="sd">    var_ref : :obj:`str`, optional</span>
+<span class="sd">        variable against which data in :attr:`gridded_data` is supposed to be</span>
+<span class="sd">        compared. If None, then the same variable is used </span>
+<span class="sd">        (i.e. `gridded_data.var_name`).</span>
+<span class="sd">    var_outlier_ranges : :obj:`dict`, optional</span>
+<span class="sd">        dictionary specifying outlier ranges for individual variables. </span>
+<span class="sd">        (e.g. dict(od550aer = [-0.05, 10], ang4487aer=[0,4]))</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        additional keyword args (not used here, but included such that factory </span>
+<span class="sd">        class can handle different methods with different inputs)</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ColocatedData</span>
+<span class="sd">        instance of colocated data</span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">vert_scheme</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Input vert_scheme cannot yet be handled &#39;</span>
@@ -339,12 +392,7 @@
                                <span class="n">vert_scheme</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonise_units</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
                                <span class="n">var_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Colocate gridded with ungridded data of 2D data</span>
-<span class="sd">    </span>
-<span class="sd">    2D means, that the vertical direction is only sampled at one altitude or</span>
-<span class="sd">    the variable is of integrated nature (or averaged) so that the dimensionality</span>
-<span class="sd">    of the grid data is (or can be -&gt; cf. input parameter `vert_scheme`) </span>
-<span class="sd">    reduced to dimensionality time, lat, lon.</span>
+    <span class="sd">&quot;&quot;&quot;Colocate gridded with ungridded data </span>
 <span class="sd">    </span>
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
@@ -370,23 +418,31 @@
 <span class="sd">        :class:`GriddedData` object is used</span>
 <span class="sd">    filter_name : str</span>
 <span class="sd">        string specifying filter used (cf. :class:`pyaerocom.filter.Filter` for</span>
-<span class="sd">        details). Default is &#39;WORLD-wMOUNTAINS&#39;, which corresponds to no </span>
-<span class="sd">        filtering (world with mountains). Use WORLD-noMOUNTAINS to exclude</span>
-<span class="sd">        stations at altitudes exceeding 1000 m.</span>
+<span class="sd">        details). If None, then it is set to &#39;WORLD-wMOUNTAINS&#39;, which </span>
+<span class="sd">        corresponds to no filtering (world with mountains). </span>
+<span class="sd">        Use WORLD-noMOUNTAINS to exclude mountain sites.</span>
 <span class="sd">    regrid_res_deg : :obj:`int`, optional</span>
-<span class="sd">        if specified, the gridded data object to be analysed will be regridded</span>
-<span class="sd">        in lon / lat dimension to the input resolution. (BETA feature)</span>
+<span class="sd">        regrid resolution in degrees. If specified, the input gridded data </span>
+<span class="sd">        object will be regridded in lon / lat dimension to the input </span>
+<span class="sd">        resolution. (BETA feature)</span>
 <span class="sd">    remove_outliers : bool</span>
-<span class="sd">        if True</span>
-<span class="sd">    var_ref : :obj:`str`, optional</span>
-<span class="sd">        variable against which data in :attr:`gridded_data` is supposed to be</span>
-<span class="sd">        compared. If None, then the same variable is used </span>
-<span class="sd">        (i.e. `gridded_data.var_name`).</span>
+<span class="sd">        if True, outliers are removed from model and obs data before colocation, </span>
+<span class="sd">        else not.</span>
 <span class="sd">    vert_scheme : str</span>
 <span class="sd">        string specifying scheme used to reduce the dimensionality in case </span>
 <span class="sd">        input grid data contains vertical dimension. Example schemes are </span>
 <span class="sd">        `mean, surface, altitude`, for details see </span>
 <span class="sd">        :func:`GriddedData.to_time_series`.</span>
+<span class="sd">    harmonise_units : bool</span>
+<span class="sd">        if True, units are attempted to be harmonised (note: raises Exception</span>
+<span class="sd">        if True and units cannot be harmonised).</span>
+<span class="sd">    var_ref : :obj:`str`, optional</span>
+<span class="sd">        variable against which data in :attr:`gridded_data` is supposed to be</span>
+<span class="sd">        compared. If None, then the same variable is used </span>
+<span class="sd">        (i.e. `gridded_data.var_name`).</span>
+<span class="sd">    var_outlier_ranges : :obj:`dict`, optional</span>
+<span class="sd">        dictionary specifying outlier ranges for individual variables. </span>
+<span class="sd">        (e.g. dict(od550aer = [-0.05, 10], ang4487aer=[0,4]))</span>
 <span class="sd">    **kwargs</span>
 <span class="sd">        additional keyword args (not used here, but included such that factory </span>
 <span class="sd">        class can handle different methods with different inputs)</span>
@@ -685,51 +741,6 @@
     
     <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="colocate_gridded_ungridded_2D"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation.colocate_gridded_ungridded_2D">[docs]</a><span class="k">def</span> <span class="nf">colocate_gridded_ungridded_2D</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Old name of function colocate_gridded_ungridded&#39;</span>
-                             <span class="s1">&#39;(still works)&#39;</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">colocate_gridded_ungridded</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-<span class="c1"># =============================================================================</span>
-<span class="c1"># class Colocator(object):</span>
-<span class="c1">#     &quot;&quot;&quot;Helper / factory class for performing colocation of data</span>
-<span class="c1">#     </span>
-<span class="c1">#     Note</span>
-<span class="c1">#     ----</span>
-<span class="c1">#     </span>
-<span class="c1">#     This class is not functional yet</span>
-<span class="c1">#     </span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     SUPPORTED = (GriddedData, UngriddedData)</span>
-<span class="c1">#     </span>
-<span class="c1">#     def __init__(self, data_ref):</span>
-<span class="c1">#         raise NotImplementedError(&#39;Coming soon...&#39;)</span>
-<span class="c1">#         if not isinstance(data_ref, self.SUPPORTED):</span>
-<span class="c1">#             raise ValueError(&#39;Cannot instantiate colocation class. Need &#39;</span>
-<span class="c1">#                              &#39;either of the supported data types {} as &#39;</span>
-<span class="c1">#                              &#39;reference dataset&#39;.format(self.SUPPORTED))</span>
-<span class="c1">#         self.data_ref = data_ref</span>
-<span class="c1">#         </span>
-<span class="c1">#     def run(self, data, ts_type=None, start=None, stop=None, filter_name=None,</span>
-<span class="c1">#             **add_args):</span>
-<span class="c1">#         if not isinstance(data, self.SUPPORTED):</span>
-<span class="c1">#             raise ValueError(&#39;Cannot instantiate colocation class. Need &#39;</span>
-<span class="c1">#                              &#39;either of the supported data types {} as &#39;</span>
-<span class="c1">#                              &#39;reference dataset&#39;.format(self.SUPPORTED))</span>
-<span class="c1">#         if isinstance(self.data_ref, UngriddedData):</span>
-<span class="c1">#             if isinstance(data, GriddedData):</span>
-<span class="c1">#                 return colocate_gridded_ungridded_2D(data, self.data_ref,</span>
-<span class="c1">#                                                       ts_type=ts_type,</span>
-<span class="c1">#                                                       start=start,</span>
-<span class="c1">#                                                       stop=stop,</span>
-<span class="c1">#                                                       filter_name=filter_name,</span>
-<span class="c1">#                                                       **add_args)</span>
-<span class="c1">#         elif isinstance(self.data_ref, GriddedData):</span>
-<span class="c1">#             if isinstance(data, GriddedData):</span>
-<span class="c1">#                 pass</span>
-<span class="c1">#         raise NotImplementedError</span>
-<span class="c1"># =============================================================================</span>
-    
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -746,29 +757,6 @@
                                                                <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
     
     <span class="n">colocated_data</span><span class="o">.</span><span class="n">plot_scatter</span><span class="p">()</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     r = pya.io.ReadGridded(&#39;ECMWF_CAMS_REAN&#39;)</span>
-<span class="c1">#     model = r.read_var(&#39;od550aer&#39;, start=2010)</span>
-<span class="c1">#     </span>
-<span class="c1">#     obs_r1 = pya.io.ReadGridded(&#39;MODIS6.terra&#39;)</span>
-<span class="c1">#     obs1 = obs_r1.read_var(&#39;od550aer&#39;, start=2010)</span>
-<span class="c1">#     </span>
-<span class="c1">#     obs_r2 = pya.io.ReadUngridded(&#39;AeronetSunV3Lev2.daily&#39;)</span>
-<span class="c1">#     obs2 = obs_r2.read(vars_to_retrieve=&#39;od550aer&#39;)</span>
-<span class="c1">#     </span>
-<span class="c1">#     coll_data1 = colocate_gridded_gridded(model, obs1, ts_type=&#39;monthly&#39;)</span>
-<span class="c1">#     </span>
-<span class="c1">#     coll_data1.plot_scatter()</span>
-<span class="c1">#     </span>
-<span class="c1">#     coll_data2 = colocate_gridded_ungridded_2D(model, obs2, ts_type=&#39;monthly&#39;)</span>
-<span class="c1">#     coll_data2.plot_scatter()</span>
-<span class="c1">#     </span>
-<span class="c1">#     print(model)</span>
-<span class="c1">#     print(obs1)</span>
-<span class="c1">#     print(obs2)</span>
-<span class="c1">#     print(coll_data1)</span>
-<span class="c1">#     print(coll_data2)</span>
-<span class="c1"># =============================================================================</span>
 </pre></div>
 
            </div>

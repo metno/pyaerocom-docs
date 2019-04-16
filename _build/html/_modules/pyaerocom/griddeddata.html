@@ -575,13 +575,17 @@
     <span class="nd">@area_weights</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">area_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Area weights cannot be set manually yet...&quot;</span><span class="p">)</span>
-        
-    
-      
-<div class="viewcode-block" id="GriddedData.check_dim_coords"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.check_dim_coords">[docs]</a>    <span class="k">def</span> <span class="nf">check_dim_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check dimension coordinates of grid data&quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
      
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_latlon_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean specifying whether data has latitude and longitude dimensions&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimcoord_names</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> 
+                                                           <span class="s1">&#39;longitude&#39;</span><span class="p">]])</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_time_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean specifying whether data has latitude and longitude dimensions&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimcoord_names</span>
+    
 <div class="viewcode-block" id="GriddedData.init_reader"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.init_reader">[docs]</a>    <span class="k">def</span> <span class="nf">init_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_info</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initiate reader class&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -890,17 +894,16 @@
                                   <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vert_scheme</span><span class="p">))</span>
     
     <span class="k">def</span> <span class="nf">_check_altitude_access</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if altitude levels can be accessed&quot;&quot;&quot;</span>
         <span class="n">coord_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">coord_name</span> <span class="o">==</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="kn">from</span> <span class="nn">pyaerocom.vert_coords</span> <span class="k">import</span> <span class="n">AltitudeAccess</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_altitude_access</span> <span class="o">=</span> <span class="n">acc</span> <span class="o">=</span> <span class="n">AltitudeAccess</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-                
-        <span class="n">acc</span><span class="o">.</span><span class="n">find_and_import_auxvars</span><span class="p">()</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span>
-            
+        <span class="c1"># the following function will </span>
+        <span class="k">return</span> <span class="n">acc</span><span class="o">.</span><span class="n">find_and_import_auxvars</span><span class="p">()</span>
     
-<div class="viewcode-block" id="GriddedData.get_altitude"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.get_altitude">[docs]</a>    <span class="k">def</span> <span class="nf">get_altitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+<div class="viewcode-block" id="GriddedData.get_altitude"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.get_altitude">[docs]</a>    <span class="k">def</span> <span class="nf">get_altitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">coords</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extract (or try to compute) altitude values at input coordinates&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span></div>
         
@@ -1112,6 +1115,10 @@
 <span class="sd">            if input resolution is not provided, or if it is higher temporal </span>
 <span class="sd">            resolution than this object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_time_dim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Require time dimension in GriddedData: &#39;</span>
+                                     <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">short_str</span><span class="p">()))</span>
+            
         <span class="n">ts_types_avail</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span>
         <span class="n">idx_ts_type</span> <span class="o">=</span> <span class="n">ts_types_avail</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to_ts_type</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">==</span> <span class="n">to_ts_type</span><span class="p">:</span>
@@ -1151,9 +1158,15 @@
     
 <div class="viewcode-block" id="GriddedData.add_aggregator"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.add_aggregator">[docs]</a>    <span class="k">def</span> <span class="nf">add_aggregator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggr_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
-        
+    
+    
+
 <div class="viewcode-block" id="GriddedData.calc_area_weights"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.calc_area_weights">[docs]</a>    <span class="k">def</span> <span class="nf">calc_area_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate area weights for grid&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_latlon_dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Data does not have latitude and longitude &#39;</span>
+                                     <span class="s1">&#39;dimensions. This is required for &#39;</span>
+                                     <span class="s1">&#39;computation of area weights.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_lonlat_bounds</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_area_weights</span> <span class="o">=</span> <span class="n">area_weights</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_weights</span></div>
@@ -1638,17 +1651,7 @@
     
 <div class="viewcode-block" id="GriddedData.short_str"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.short_str">[docs]</a>    <span class="k">def</span> <span class="nf">short_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Short string representation&quot;&quot;&quot;</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="s2">&quot;Pyaerocom </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
-             <span class="s2">&quot;Variable: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
-             <span class="s2">&quot;Temporal resolution: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
-             <span class="s2">&quot;Start / Stop: </span><span class="si">{}</span><span class="s2"> - </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span>
-                                            <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span><span class="o">*</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> 
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s2">&quot;ts_type&quot;</span><span class="p">],</span>
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">s</span></div>
+        <span class="k">return</span> <span class="s2">&quot;ID: </span><span class="si">{}</span><span class="s2">, Var: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">)</span></div>
     
     <span class="k">def</span> <span class="nf">_check_lonlat_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if longitude and latitude bounds are set and if not, guess&quot;&quot;&quot;</span>
@@ -1797,19 +1800,26 @@
     <span class="n">reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;ECMWF_CAMS_REAN&#39;</span><span class="p">)</span>
     
     <span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2007</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">2016</span><span class="p">)</span>
-    <span class="n">data</span><span class="o">.</span><span class="n">downscale_time</span><span class="p">(</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2009</span><span class="p">)</span><span class="o">.</span><span class="n">cube</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span><span class="o">.</span><span class="n">cube</span>
     
-    <span class="n">t1</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_time_series</span><span class="p">(</span><span class="n">longitude</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">],</span> <span class="n">latitude</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">],</span>
-                             <span class="n">vert_scheme</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">)</span>
-    
-    <span class="n">t2</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_time_series</span><span class="p">(</span><span class="n">longitude</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">],</span> <span class="n">latitude</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">],</span>
-                             <span class="n">vert_scheme</span><span class="o">=</span><span class="s1">&#39;surface&#39;</span><span class="p">)</span>
-    
-    <span class="n">t3</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_time_series</span><span class="p">(</span><span class="n">longitude</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">],</span> <span class="n">latitude</span><span class="o">=</span><span class="p">[</span><span class="mi">40</span><span class="p">],</span>
-                             <span class="n">vert_scheme</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
-    
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">t1</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">iris</span>
+    <span class="n">c3</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">+</span> <span class="n">c1</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     data.downscale_time(&#39;monthly&#39;)</span>
+<span class="c1">#     </span>
+<span class="c1">#     t1 = data.to_time_series(longitude=[30], latitude=[40],</span>
+<span class="c1">#                              vert_scheme=&#39;max&#39;)</span>
+<span class="c1">#     </span>
+<span class="c1">#     t2 = data.to_time_series(longitude=[30], latitude=[40],</span>
+<span class="c1">#                              vert_scheme=&#39;surface&#39;)</span>
+<span class="c1">#     </span>
+<span class="c1">#     t3 = data.to_time_series(longitude=[30], latitude=[40],</span>
+<span class="c1">#                              vert_scheme=&#39;mean&#39;)</span>
+<span class="c1">#     </span>
+<span class="c1">#     ax = t1.plot_timeseries(&#39;ec532aer&#39;)</span>
+<span class="c1"># </span>
+<span class="c1"># =============================================================================</span>
 </pre></div>
 
            </div>
