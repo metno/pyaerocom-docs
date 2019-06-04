@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config_files.html">Configuration files</a></li>
@@ -261,15 +260,15 @@
     <span class="k">if</span> <span class="n">filter_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">filter_name</span> <span class="o">=</span> <span class="s1">&#39;WORLD-wMOUNTAINS&#39;</span>
     <span class="k">if</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">has_unit</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">harmonise_units</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">harmonise_units</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">convert_unit</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+                <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">convert_unit</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DataUnitError</span><span class="p">(</span><span class="s1">&#39;Failed to merge data unit of reference &#39;</span>
                                     <span class="s1">&#39;gridded data object (</span><span class="si">{}</span><span class="s1">) to data unit &#39;</span>
                                     <span class="s1">&#39;of gridded data object (</span><span class="si">{}</span><span class="s1">)&#39;</span>
-                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> 
-                                            <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> 
+                                            <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">units</span><span class="p">))</span>
     <span class="n">var</span><span class="p">,</span> <span class="n">var_ref</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">var_name</span>
     <span class="k">if</span> <span class="n">remove_outliers</span><span class="p">:</span>
         <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">low_ref</span><span class="p">,</span> <span class="n">high_ref</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>    
@@ -346,8 +345,8 @@
             <span class="s1">&#39;ts_type_src&#39;</span>       <span class="p">:</span>   <span class="p">[</span><span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">grid_ts_type</span><span class="p">],</span>
             <span class="s1">&#39;start_str&#39;</span>         <span class="p">:</span>   <span class="n">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">start</span><span class="p">),</span>
             <span class="s1">&#39;stop_str&#39;</span>          <span class="p">:</span>   <span class="n">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">stop</span><span class="p">),</span>
-            <span class="s1">&#39;unit&#39;</span>              <span class="p">:</span>   <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
-                                     <span class="nb">str</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">unit</span><span class="p">)],</span>
+            <span class="s1">&#39;var_units&#39;</span>         <span class="p">:</span>   <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">units</span><span class="p">),</span>
+                                     <span class="nb">str</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span><span class="p">)],</span>
             <span class="s1">&#39;vert_scheme&#39;</span>       <span class="p">:</span>   <span class="n">vert_scheme</span><span class="p">,</span>
             <span class="s1">&#39;data_level&#39;</span>        <span class="p">:</span>   <span class="mi">3</span><span class="p">,</span>
             <span class="s1">&#39;revision_ref&#39;</span>      <span class="p">:</span>   <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">data_revision</span><span class="p">,</span>
@@ -374,7 +373,7 @@
     <span class="c1"># create coordinates of DataArray</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data_source&#39;</span> <span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">],</span>
               <span class="s1">&#39;var_name&#39;</span>    <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">]),</span>
-              <span class="s1">&#39;unit&#39;</span>        <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]),</span>
+              <span class="s1">&#39;var_units&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_units&#39;</span><span class="p">]),</span>
               <span class="s1">&#39;ts_type_src&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]),</span>
               <span class="s1">&#39;time&#39;</span>        <span class="p">:</span> <span class="n">time</span><span class="p">,</span>
               <span class="s1">&#39;latitude&#39;</span>    <span class="p">:</span> <span class="n">lats</span><span class="p">,</span>
@@ -384,7 +383,7 @@
     <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">ColocatedData</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span>
-                          <span class="n">name</span><span class="o">=</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span></div>
+                         <span class="n">name</span><span class="o">=</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="colocate_gridded_ungridded"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation.colocate_gridded_ungridded">[docs]</a><span class="k">def</span> <span class="nf">colocate_gridded_ungridded</span><span class="p">(</span><span class="n">gridded_data</span><span class="p">,</span> <span class="n">ungridded_data</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                                <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -608,7 +607,7 @@
     <span class="n">ungridded_unit</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ts_type_src_ref</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">harmonise_units</span><span class="p">:</span>
-        <span class="n">gridded_unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">gridded_unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">gridded_unit</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">obs_data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">obs_stat_data</span><span class="p">):</span>
@@ -620,11 +619,11 @@
                                  <span class="s1">&#39;object contains different source frequencies&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ungridded_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">ungridded_unit</span> <span class="o">=</span> <span class="n">obs_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var_ref</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
+                    <span class="n">ungridded_unit</span> <span class="o">=</span> <span class="n">obs_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var_ref</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span> <span class="c1">#variable information or unit is not defined</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">unit</span> <span class="o">=</span> <span class="n">obs_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var_ref</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">obs_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var_ref</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="n">unit</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">unit</span> <span class="o">==</span> <span class="n">ungridded_unit</span><span class="p">:</span>
@@ -646,7 +645,16 @@
                 <span class="k">if</span> <span class="n">gridded_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">gridded_unit</span> <span class="o">=</span> <span class="n">obs_unit</span>
             <span class="k">if</span> <span class="n">remove_outliers</span><span class="p">:</span>
-                <span class="n">grid_stat</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span><span class="p">)</span>
+                <span class="c1"># don&#39;t check if harmonise_units is active, because the </span>
+                <span class="c1"># remove_outliers method checks units based AeroCom default </span>
+                <span class="c1"># variables, and a variable mapping might be active, i.e. </span>
+                <span class="c1"># sometimes models use abs550aer for absorption coefficients </span>
+                <span class="c1"># with units [m-1] and not for AAOD (which is the AeroCom default</span>
+                <span class="c1"># and unitless. Hence, unit check in remove_outliers works only</span>
+                <span class="c1"># if the variable name (and unit) corresonds to AeroCom default)</span>
+                <span class="n">chk_unit</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">harmonise_units</span> 
+                <span class="n">grid_stat</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span><span class="p">,</span>
+                                          <span class="n">check_unit</span><span class="o">=</span><span class="n">chk_unit</span><span class="p">)</span>
                 
             <span class="n">grid_tseries</span> <span class="o">=</span> <span class="n">grid_stat</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>  
             <span class="n">obs_tseries</span> <span class="o">=</span> <span class="n">obs_data</span><span class="p">[</span><span class="n">var_ref</span><span class="p">]</span>
@@ -705,7 +713,7 @@
             <span class="s1">&#39;ts_type_src&#39;</span>       <span class="p">:</span>   <span class="p">[</span><span class="n">ts_type_src_ref</span><span class="p">,</span> <span class="n">grid_ts_type</span><span class="p">],</span>
             <span class="s1">&#39;start_str&#39;</span>         <span class="p">:</span>   <span class="n">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">start</span><span class="p">),</span>
             <span class="s1">&#39;stop_str&#39;</span>          <span class="p">:</span>   <span class="n">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">stop</span><span class="p">),</span>
-            <span class="s1">&#39;unit&#39;</span>              <span class="p">:</span>   <span class="p">[</span><span class="n">ungridded_unit</span><span class="p">,</span>
+            <span class="s1">&#39;var_units&#39;</span>         <span class="p">:</span>   <span class="p">[</span><span class="n">ungridded_unit</span><span class="p">,</span>
                                      <span class="n">gridded_unit</span><span class="p">],</span>
             <span class="s1">&#39;vert_scheme&#39;</span>       <span class="p">:</span>   <span class="n">vert_scheme</span><span class="p">,</span>
             <span class="s1">&#39;data_level&#39;</span>        <span class="p">:</span>   <span class="mi">3</span><span class="p">,</span>
@@ -727,7 +735,7 @@
     <span class="c1"># create coordinates of DataArray</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data_source&#39;</span> <span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">],</span>
               <span class="s1">&#39;var_name&#39;</span>    <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">]),</span>
-              <span class="s1">&#39;unit&#39;</span>        <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]),</span>
+              <span class="s1">&#39;var_units&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_units&#39;</span><span class="p">]),</span>
               <span class="s1">&#39;ts_type_src&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]),</span>
               <span class="s1">&#39;time&#39;</span>        <span class="p">:</span> <span class="n">time_idx</span><span class="p">,</span>
               <span class="s1">&#39;station_name&#39;</span><span class="p">:</span> <span class="n">station_names</span><span class="p">,</span>

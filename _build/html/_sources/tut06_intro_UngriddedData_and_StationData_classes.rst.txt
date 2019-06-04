@@ -1,6 +1,6 @@
 
 Introduction into the UngriddedData class and the StationData class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------
 
 This notebook introduces 2 of the most relevant data objects that exist
 in pyaerocom:
@@ -21,19 +21,19 @@ in pyaerocom:
 -  Arbitrary number of variables supported.
 
 NOTE
-^^^^
+~~~~
 
 This notebook is currently under development and gives only a brief and
 incomplete introduction into the two data objects.
 
 The ``UngriddedData`` object
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first part of the tutorial shows some features of the
 ``UngriddedData`` object.
 
 Import the ``UngriddedData`` object that was created in the previous tutorial
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: ipython3
 
@@ -51,19 +51,19 @@ Import the ``UngriddedData`` object that was created in the previous tutorial
     Checking access to: /lustre/storeA
     Access to lustre database: True
     Init data paths for lustre
-    Expired time: 0.020 s
+    Expired time: 0.018 s
 
 
 
 
 .. parsed-literal::
 
-    UngriddedData <networks: ['AeronetSunV3Lev2.daily']; vars: ['od550aer']; instruments: ['sun_photometer'];No. of stations: 1206
+    UngriddedData <networks: ['AeronetSunV3Lev2.daily']; vars: ['od550aer']; instruments: ['sun_photometer'];No. of stations: 1214
 
 
 
 Create an overview map of all stations
-''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Before digging a little deeper into the ``UngriddedData`` object, let’s
 get an overview of the bigger picture:
@@ -140,7 +140,7 @@ In any case, it is always good to know about the help function:
 
 
 Quicklook plotting of station timeseries
-''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Time series of individual stations can be plotted as follows:
 
@@ -154,7 +154,7 @@ Time series of individual stations can be plotted as follows:
 
 
 Access metadata of the data files that were read
-''''''''''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Look into the metadata of the different files. Metadata can be accessed
 via the ``metadata`` attribute, and there is one metadatadictionary for
@@ -169,7 +169,7 @@ each file that was read:
 
 .. parsed-literal::
 
-    1206
+    1214
 
 
 
@@ -185,7 +185,7 @@ Access metadata of first file (index 0):
 .. parsed-literal::
 
     OrderedDict([('var_info',
-                  OrderedDict([('od550aer', OrderedDict([('unit', '1')]))])),
+                  OrderedDict([('od550aer', OrderedDict([('units', '1')]))])),
                  ('latitude', 45.3139),
                  ('longitude', 12.508299999999998),
                  ('altitude', 10.0),
@@ -199,7 +199,7 @@ Access metadata of first file (index 0):
 
 
 Filtering of the data
-'''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^
 
 So far, you can filter ``UngriddedData`` objects by common metadata
 attributes. For instance:
@@ -218,9 +218,9 @@ attributes. For instance:
     Contains networks: ['AeronetSunV3Lev2.daily']
     Contains variables: ['od550aer']
     Contains instruments: ['sun_photometer']
-    Total no. of meta-blocks: 162
+    Total no. of meta-blocks: 163
     Filters that were applied:
-     Filter time log: 20190410170216
+     Filter time log: 20190604164917
     	latitude: (30, 60)
     	longitude: (0, 45)
     	altitude: (0, 1000)
@@ -236,7 +236,7 @@ attributes. For instance:
 
 
 Other attributes that may be useful
-'''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Access all station names and print the first 4:
 
@@ -268,7 +268,7 @@ metadata-blocks / files that are stored in the data object:
 
 .. parsed-literal::
 
-    1206
+    1214
 
 
 
@@ -321,7 +321,7 @@ altitude arrays for all files.
 
 
 List of unique station names
-''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As mentioned earlier, some databases provide more than one data file per
 station. Since the ungridded reading (see previous) tutorial is done
@@ -344,7 +344,7 @@ can get a list of unique station names using:
 
 
 ``StationData``: Access the data from individual stations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As you could see above the metadata dictionaries in the
 ``UngriddedData`` class for each file do only contain the associated
@@ -394,7 +394,7 @@ Below we will illustrate the several options to access station data (and
 show that they contain the same data):
 
 Option 1. Get station data using the corresponding metadata indices that match the station name
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Find index (or indices) that match the station name:
 
@@ -408,7 +408,7 @@ Find index (or indices) that match the station name:
 
 .. parsed-literal::
 
-    [491.0]
+    [493.0]
 
 
 
@@ -522,7 +522,7 @@ Let’s have a quick look at the ``StationData`` object (it is a
 dictionary-like object and simple to use):
 
 Option 2: Retrieve station data using the station name directly
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: ipython3
 
@@ -532,7 +532,7 @@ Other than option 1, in case of multiple meta-index matches, this method
 automatically merges the individual data objects.
 
 Option 3: Use […] notation
-                          
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This is a wrapper for the method ``to_station_data`` so you may use
 meta-index or station name for access.
@@ -543,7 +543,7 @@ meta-index or station name for access.
     granada_opt3_2 = data['Granada']
 
 Let’s have a look if the data objects are really the same (by plotting the AOD timeseries for the 4 different options):
-                                                                                                                       
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: ipython3
 
@@ -560,7 +560,7 @@ Let’s have a look if the data objects are really the same (by plotting the AOD
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f1fc2e8cbe0>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7fb53f312278>
 
 
 
@@ -585,24 +585,18 @@ can print it and it will get you a nice overview):
     
     Pyaerocom StationData
     ---------------------
-    var_info (BrowseDict([('od550aer', OrderedDict([('unit', '1'), ('overlap', False), ('ts_type', 'daily')]))]))
-       od550aer (<class 'collections.OrderedDict'>)
-        unit: 1
+    var_info (BrowseDict):
+      od550aer (OrderedDict):
+        units: 1
         overlap: False
         ts_type: daily
-    station_coords ({'latitude': 37.163999999999994, 'longitude': -3.605, 'altitude': 680.0})
-       latitude: 37.163999999999994
-       longitude: -3.605
-       altitude: 680.0
-    data_err (BrowseDict([('od550aer', array([nan, nan, nan, ..., nan, nan, nan]))]))
-       od550aer (array, 2980 items)
-       [nan
-        nan
-        ...
-        nan
-        nan]
-    
-    overlap: 
+    station_coords (dict):
+      latitude: 37.163999999999994
+      longitude: -3.6049999999999995
+      altitude: 680.0
+    data_err (BrowseDict):
+      od550aer (ndarray, 3011 items): [nan, nan, ..., nan, nan]
+    overlap (BrowseDict): <empty_dict>
     filename: None
     station_id: None
     station_name: Granada
@@ -611,7 +605,7 @@ can print it and it will get you a nice overview):
     country: None
     ts_type: daily
     latitude: 37.163999999999994
-    longitude: -3.605
+    longitude: -3.6049999999999995
     altitude: 680.0
     data_id: AeronetSunV3Lev2.daily
     dataset_name: None
@@ -621,17 +615,11 @@ can print it and it will get you a nice overview):
     revision_date: None
     ts_type_src: daily
     stat_merge_pref_attr: None
-    data_revision: 20190311
+    data_revision: 20190425
     
     Data arrays
     .................
-    dtime (array, 5088 items)
-       [numpy.datetime64('2004-12-29T00:00:00.000000000')
-        numpy.datetime64('2004-12-30T00:00:00.000000000')
-        ...
-        numpy.datetime64('2018-12-02T00:00:00.000000000')
-        numpy.datetime64('2018-12-03T00:00:00.000000000')]
-    
+    dtime (ndarray, 5088 items): [2004-12-29T00:00:00.000000000, 2004-12-30T00:00:00.000000000, ..., 2018-12-02T00:00:00.000000000, 2018-12-03T00:00:00.000000000]
     Pandas Series
     .................
     od550aer (Series, 5088 items)
@@ -656,7 +644,7 @@ Here some examples:
 
 .. parsed-literal::
 
-    -3.605
+    -3.6049999999999995
 
 
 
@@ -670,7 +658,7 @@ Here some examples:
 
 .. parsed-literal::
 
-    -3.605
+    -3.6049999999999995
 
 
 
@@ -718,7 +706,7 @@ Get station name:
 
 
 Small detour through the ``pandas`` world
-'''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As you can see in the output above, the time-series data in the
 ``StationData`` object is an instance of the ``pandas.Series`` class.
@@ -772,13 +760,13 @@ method:
 
 .. parsed-literal::
 
-    count    2980.000000
-    mean        0.138233
-    std         0.103543
+    count    3011.000000
+    mean        0.137720
+    std         0.103335
     min         0.015534
-    25%         0.071486
-    50%         0.108491
-    75%         0.171623
+    25%         0.070937
+    50%         0.108195
+    75%         0.171250
     max         1.278507
     dtype: float64
 
@@ -800,19 +788,11 @@ Third, you may extract subsets using *fancy indexing*:
 .. code:: ipython3
 
     aod_data_march2010 = aod_data['2010-3-1':'2010-4-1']
-    aod_data_march2010.plot()
+    aod_data_march2010.plot();
 
 
 
-
-.. parsed-literal::
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f1fcb55d828>
-
-
-
-
-.. image:: tut06_intro_UngriddedData_and_StationData_classes/tut06_intro_UngriddedData_and_StationData_classes_58_1.png
+.. image:: tut06_intro_UngriddedData_and_StationData_classes/tut06_intro_UngriddedData_and_StationData_classes_58_0.png
 
 
 Or fourth, resample to another frequency:
@@ -820,19 +800,11 @@ Or fourth, resample to another frequency:
 .. code:: ipython3
 
     aod_data_monthly = aod_data.resample('M', 'mean')
-    aod_data_monthly.plot()
+    aod_data_monthly.plot();
 
 
 
-
-.. parsed-literal::
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f1fcb4cd550>
-
-
-
-
-.. image:: tut06_intro_UngriddedData_and_StationData_classes/tut06_intro_UngriddedData_and_StationData_classes_60_1.png
+.. image:: tut06_intro_UngriddedData_and_StationData_classes/tut06_intro_UngriddedData_and_StationData_classes_60_0.png
 
 
 Or fifth, resample to lower frequency, but require a minimum number of
@@ -960,16 +932,16 @@ You may also be intersted in a climatology:
 
 .. parsed-literal::
 
-    1     0.090553
-    2     0.130528
-    3     0.114070
-    4     0.132565
-    5     0.146914
+    1     0.091885
+    2     0.125760
+    3     0.114174
+    4     0.132566
+    5     0.146915
     6     0.164997
     7     0.174380
     8     0.192138
     9     0.146022
-    10    0.115004
+    10    0.115006
     11    0.091344
     12    0.080672
     dtype: float64
@@ -989,16 +961,16 @@ we created above:
 
 .. parsed-literal::
 
-    1     0.091438
-    2     0.137147
+    1     0.093066
+    2     0.130359
     3     0.119908
-    4     0.136718
-    5     0.145819
+    4     0.136720
+    5     0.145820
     6     0.164751
     7     0.184243
     8     0.183453
     9     0.141699
-    10    0.111529
+    10    0.111532
     11    0.072294
     12    0.089056
     Name: mean, dtype: float64
@@ -1015,7 +987,7 @@ we created above:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f1fc2e35630>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7fb53f2e8c88>
 
 
 
@@ -1028,7 +1000,7 @@ below, some of these pandas features are also provided in the pyaerocom
 data objects (e.g. resampling) and more will follow soon!
 
 Plotting of timeseries data directly from `StationData <https://pyaerocom.met.no/api.html?highlight=stationdata#pyaerocom.stationdata.StationData>`__ class
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Let’s come back to the ``StationData`` object. Below are some more
 examples that show how you can plot the timeseries directly from the

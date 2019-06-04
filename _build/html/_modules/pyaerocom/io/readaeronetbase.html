@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files.html">Configuration files</a></li>
@@ -167,8 +166,10 @@
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.readungriddedbase</span> <span class="k">import</span> <span class="n">ReadUngriddedBase</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="k">import</span> <span class="n">_print_read_info</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.ungriddeddata</span> <span class="k">import</span> <span class="n">UngriddedData</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="k">import</span> <span class="n">numbers_in_str</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="n">MetaDataError</span><span class="p">,</span> <span class="n">VariableNotFoundError</span>
@@ -180,7 +181,7 @@
 <span class="sd">    Extended abstract base class, derived from low-level base class</span>
 <span class="sd">    :class:`ReadUngriddedBase` that contains some more functionality.</span>
 <span class="sd">    &quot;&quot;&quot;</span>    
-    <span class="n">__baseversion__</span> <span class="o">=</span> <span class="s1">&#39;0.06_&#39;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
+    <span class="n">__baseversion__</span> <span class="o">=</span> <span class="s1">&#39;0.07_&#39;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
     
     <span class="c1">#: column delimiter in data block of files</span>
     <span class="n">COL_DELIM</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span>
@@ -193,6 +194,10 @@
     <span class="c1">#: dictionary specifying the file column names (values) for each Aerocom </span>
     <span class="c1">#: variable (keys)</span>
     <span class="n">VAR_NAMES_FILE</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="c1">#: Mappings for identifying variables in file (may be specified in addition</span>
+    <span class="c1">#: to explicit variable names specified in VAR_NAMES_FILE)</span>
+    <span class="n">VAR_PATTERNS_FILE</span> <span class="o">=</span> <span class="p">{}</span>
     
     <span class="c1">#: OPTIONAL: dictionary specifying alternative column names for variables</span>
     <span class="c1">#: defined in :attr:`VAR_NAMES_FILE`</span>
@@ -294,10 +299,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Succesfully extracted wavelength </span><span class="si">{}</span><span class="s1"> nm &#39;</span>
                                  <span class="s1">&#39;from column name </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">colname</span><span class="p">))</span>
                 <span class="k">return</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to extract wavelength from colname </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colname</span><span class="p">))</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to extract wavelength from colname </span><span class="si">{}</span><span class="s1">&#39;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colname</span><span class="p">))</span></div>
         
-    <span class="k">def</span> <span class="nf">_update_col_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_index_str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Update column information for fast access during read_file</span>
+    <span class="k">def</span> <span class="nf">_update_col_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_index_str</span><span class="p">,</span> <span class="n">use_all_possible</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update file column information for fast access during read_file</span>
 <span class="sd">        </span>
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
@@ -308,6 +314,10 @@
 <span class="sd">        ----------</span>
 <span class="sd">        col_index_str : str</span>
 <span class="sd">            header string of data table in files</span>
+<span class="sd">        use_all_possible : bool</span>
+<span class="sd">            if True, than all available variables belonging to either of the </span>
+<span class="sd">            variable families that are specified in :attr:`VAR_PATTERNS_FILE` </span>
+<span class="sd">            are identified from the file header. </span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -324,6 +334,46 @@
         <span class="n">mapping</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">info_str</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cols</span><span class="p">):</span>
             <span class="n">mapping</span><span class="p">[</span><span class="n">info_str</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+        
+        <span class="k">if</span> <span class="n">use_all_possible</span><span class="p">:</span>
+            <span class="n">col_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_vars_pattern_based</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">col_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_vars_name_based</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">cols</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_col_index</span> <span class="o">=</span> <span class="n">col_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_col_index_str</span> <span class="o">=</span> <span class="n">col_index_str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_col_order</span> <span class="o">=</span> <span class="n">cols</span>
+        <span class="k">return</span> <span class="n">col_index</span>
+    
+    <span class="k">def</span> <span class="nf">_find_vars_pattern_based</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="n">col_index</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
+        <span class="c1"># find meta indices</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAMES_FILE</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s2">&quot;Required meta-information string </span><span class="si">{}</span><span class="s2"> could &quot;</span>
+                                    <span class="s2">&quot;not be found in file header&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+            <span class="n">col_index</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAR_PATTERNS_FILE</span>
+        
+        <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">aerocom_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAR_PATTERNS_FILE</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">aerocom_name</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid entry in search pattern for Aerocom &#39;</span>
+                                 <span class="s1">&#39;var pattern </span><span class="si">{}</span><span class="s1"> (search key </span><span class="si">{}</span><span class="s1">): Aerocom var &#39;</span>
+                                 <span class="s1">&#39;pattern must require * (which is used to &#39;</span>
+                                 <span class="s1">&#39;replace identified value from search group &#39;</span>
+                                 <span class="s1">&#39;in file header&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aerocom_name</span><span class="p">,</span> <span class="n">pattern</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">fnmatch</span>
+                
+            <span class="k">for</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">col_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Found more than one match&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">col_index</span>
+        
+    <span class="k">def</span> <span class="nf">_find_vars_name_based</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
         <span class="n">col_index</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
         <span class="c1"># find meta indices</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAMES_FILE</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -349,14 +399,11 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Failed to infer data column of &#39;</span>
                                          <span class="s1">&#39;variable </span><span class="si">{}</span><span class="s1"> within wavelength tolerance &#39;</span>
                                          <span class="s1">&#39;range.Error:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_col_index</span> <span class="o">=</span> <span class="n">col_index</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_col_index_str</span> <span class="o">=</span> <span class="n">col_index_str</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_col_order</span> <span class="o">=</span> <span class="n">cols</span>
         <span class="k">return</span> <span class="n">col_index</span>
     
     <span class="k">def</span> <span class="nf">_search_var_wavelength_tol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find alternative variable within acceptance range&quot;&quot;&quot;</span>
-        <span class="n">var_info</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+        <span class="n">var_info</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
         <span class="n">colname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VAR_NAMES_FILE</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
         
         <span class="n">wvl</span> <span class="o">=</span> <span class="n">var_info</span><span class="o">.</span><span class="n">wavelength_nm</span>
@@ -403,14 +450,14 @@
                             <span class="k">return</span> <span class="n">i</span>
         <span class="k">raise</span> <span class="n">VariableNotFoundError</span><span class="p">(</span><span class="s1">&#39;Did not find an alternative data column &#39;</span>
                                     <span class="s1">&#39;for variable </span><span class="si">{}</span><span class="s1"> within allowed wavelength &#39;</span>
-                                    <span class="s1">&#39;tolerance range of +/- </span><span class="si">{}</span><span class="s1"> nm.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                            <span class="n">var</span><span class="p">,</span> <span class="n">tol</span><span class="p">))</span>
+                                    <span class="s1">&#39;tolerance range of +/- </span><span class="si">{}</span><span class="s1"> nm.&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">tol</span><span class="p">))</span>
 <div class="viewcode-block" id="ReadAeronetBase.print_all_columns"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readaeronetbase.ReadAeronetBase.print_all_columns">[docs]</a>    <span class="k">def</span> <span class="nf">print_all_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_col_order</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">col</span><span class="p">)</span></div>
                 
 <div class="viewcode-block" id="ReadAeronetBase.read"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readaeronetbase.ReadAeronetBase.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">first_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-             <span class="n">last_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+             <span class="n">last_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method that reads list of files as instance of :class:`UngriddedData`</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -423,10 +470,14 @@
 <span class="sd">            is returned on :func:`get_file_list`.</span>
 <span class="sd">        first_file : :obj:`int`, optional</span>
 <span class="sd">            index of first file in file list to read. If None, the very first</span>
-<span class="sd">            file in the list is used</span>
+<span class="sd">            file in the list is used. Note: is ignored if input parameter</span>
+<span class="sd">            `file_pattern` is specified.</span>
 <span class="sd">        last_file : :obj:`int`, optional</span>
 <span class="sd">            index of last file in list to read. If None, the very last file </span>
-<span class="sd">            in the list is used</span>
+<span class="sd">            in the list is used. Note: is ignored if input parameter</span>
+<span class="sd">            `file_pattern` is specified.</span>
+<span class="sd">        file_pattern : str, optional</span>
+<span class="sd">            string pattern for file search (cf :func:`get_file_list`)</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -441,15 +492,16 @@
             
         <span class="k">if</span> <span class="n">files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_file_list</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_file_list</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="n">file_pattern</span><span class="p">)</span>
             <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span>
-    
-        <span class="k">if</span> <span class="n">first_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">first_file</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">last_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">last_file</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
         
-        <span class="n">files</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">first_file</span><span class="p">:</span><span class="n">last_file</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">file_pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">first_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">first_file</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">last_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">last_file</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+            
+            <span class="n">files</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">first_file</span><span class="p">:</span><span class="n">last_file</span><span class="p">]</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">read_failed</span> <span class="o">=</span> <span class="p">[]</span>
         
@@ -466,10 +518,13 @@
         <span class="n">disp_each</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_files</span><span class="o">*</span><span class="mf">0.1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">disp_each</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">disp_each</span> <span class="o">=</span> <span class="mi">1</span>
-            
+        <span class="n">last_t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>   
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
             
             <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="n">disp_each</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">last_t</span> <span class="o">=</span> <span class="n">_print_read_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">disp_each</span><span class="p">,</span> <span class="n">num_files</span><span class="p">,</span> 
+                                          <span class="n">last_t</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                          <span class="n">print_log</span><span class="p">)</span>
                 <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading file </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> 
                                  <span class="n">num_files</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
             <span class="n">station_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">_file</span><span class="p">,</span> 
@@ -531,14 +586,18 @@
                 
                 <span class="n">meta_idx</span><span class="p">[</span><span class="n">meta_key</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
                 
-                <span class="k">if</span> <span class="p">(</span><span class="n">var</span> <span class="ow">in</span> <span class="n">station_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span> 
-                    <span class="ow">and</span> <span class="s1">&#39;unit&#39;</span> <span class="ow">in</span> <span class="n">station_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]):</span>
-                    <span class="n">u</span> <span class="o">=</span> <span class="n">station_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">station_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="s1">&#39;units&#39;</span> <span class="ow">in</span> <span class="n">station_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]:</span>
+                        <span class="n">u</span> <span class="o">=</span> <span class="n">station_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="s1">&#39;unit&#39;</span> <span class="ow">in</span> <span class="n">station_data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]:</span>
+                        <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="n">MetaDataError</span>
+                        <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Metadata attr unit is deprecated, &#39;</span>
+                                            <span class="s1">&#39;please use units&#39;</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNITS</span><span class="p">:</span>
                     <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNITS</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_UNIT</span>
-                <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="p">)</span>
+                <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="n">u</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">data_obj</span><span class="o">.</span><span class="n">var_idx</span><span class="p">:</span>
                     <span class="n">data_obj</span><span class="o">.</span><span class="n">var_idx</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_idx</span>
             

@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files.html">Configuration files</a></li>
@@ -169,6 +168,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">I/O helper methods of the pyaerocom package</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">AerocomBrowser</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="fm">__dir__</span>
@@ -193,6 +193,18 @@
               <span class="s2">&quot;3hourly&quot;</span> <span class="p">:</span>  <span class="s2">&quot;hours&quot;</span><span class="p">,</span>
               <span class="s2">&quot;daily&quot;</span>   <span class="p">:</span>  <span class="s2">&quot;days&quot;</span><span class="p">,</span>
               <span class="s2">&quot;monthly&quot;</span> <span class="p">:</span>  <span class="s2">&quot;days&quot;</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">_print_read_info</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">tot_num</span><span class="p">,</span> <span class="n">last_t</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper for displaying standardised output in reading classes</span>
+<span class="sd">    </span>
+<span class="sd">    Not to be used directly</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading files </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">) | </span><span class="si">{}</span><span class="s2"> (delta = </span><span class="si">{}</span><span class="s2"> s&#39;)&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="n">mod</span><span class="p">,</span> <span class="n">tot_num</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span>
+                        <span class="n">t</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="n">last_t</span><span class="p">)</span><span class="o">.</span><span class="n">seconds</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">t</span>
 
 <div class="viewcode-block" id="read_ebas_flags_file"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.helpers.read_ebas_flags_file">[docs]</a><span class="k">def</span> <span class="nf">read_ebas_flags_file</span><span class="p">(</span><span class="n">ebas_flags_csv</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Reads file ebas_flags.csv</span>
@@ -286,9 +298,9 @@
 <span class="sd">    VariableDefinitionError</span>
 <span class="sd">        if standarad name is not set for variable in *variables.ini* file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;No such variable </span><span class="si">{}</span><span class="s1">. Check variables.ini&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">standard_name</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">standard_name</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">VariableDefinitionError</span><span class="p">(</span><span class="s1">&#39;standard_name not defined for variable&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">name</span></div>

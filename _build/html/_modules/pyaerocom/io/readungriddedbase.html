@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files.html">Configuration files</a></li>
@@ -197,7 +196,7 @@
     <span class="c1">#: code. This version is required for caching and needs to be considered</span>
     <span class="c1">#: in the definition of __version__ in all derived classes, so that</span>
     <span class="c1">#: caching can be done reliably</span>
-    <span class="n">__baseversion__</span> <span class="o">=</span> <span class="s1">&#39;0.05&#39;</span>
+    <span class="n">__baseversion__</span> <span class="o">=</span> <span class="s1">&#39;0.06&#39;</span>
     
     <span class="c1">#: dictionary containing information about additionally required variables</span>
     <span class="c1">#: for each auxiliary variable (i.e. each variable that is not provided</span>
@@ -423,7 +422,8 @@
                 <span class="k">return</span> <span class="n">revision</span>
             <span class="k">raise</span> <span class="ne">Exception</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;n/a&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;n/d&#39;</span>
+        
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">verbosity_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Current level of verbosity of logger&quot;&quot;&quot;</span>
@@ -634,7 +634,7 @@
 <span class="sd">            min / max interval (list or tuple) that specifies valid range </span>
 <span class="sd">            for the variable. For each variable that is not explicitely defined</span>
 <span class="sd">            here, the default minimum / maximum value is used (accessed via</span>
-<span class="sd">            ``pyaerocom.const.VAR_PARAM[var_name]``)</span>
+<span class="sd">            ``pyaerocom.const.VARS[var_name]``)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
@@ -642,7 +642,7 @@
                     <span class="n">rng</span> <span class="o">=</span> <span class="n">valid_rng_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
                     <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span>  <span class="n">rng</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">var_info</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                    <span class="n">var_info</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
                     <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;minimum&#39;</span><span class="p">],</span> <span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;maximum&#39;</span><span class="p">]</span>
                 <span class="n">vals</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
                 <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">vals</span> <span class="o">&lt;</span> <span class="n">low</span><span class="p">,</span> <span class="n">vals</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">)</span>
@@ -678,10 +678,16 @@
                           <span class="s2">&quot;pattern&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">files</span></div>
     
-<div class="viewcode-block" id="ReadUngriddedBase.get_file_list"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.get_file_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ReadUngriddedBase.get_file_list"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.get_file_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search all files to be read</span>
 <span class="sd">        </span>
+<span class="sd">        Uses :attr:`_FILEMASK` (+ optional input search pattern, e.g. </span>
+<span class="sd">        station_name) to find valid files for query.</span>
 <span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pattern : str, optional</span>
+<span class="sd">            file name pattern applied to search</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -693,9 +699,14 @@
 <span class="sd">        IOError</span>
 <span class="sd">            if no files can be found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="p">(</span><span class="n">pattern</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_FILEMASK</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;**&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_FILEMASK</span>
+            
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetching data files. This might take a while...&#39;</span><span class="p">)</span>
         <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">,</span> 
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">_FILEMASK</span><span class="p">)))</span>
+                                              <span class="n">pattern</span><span class="p">)))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">all_str</span> <span class="o">=</span> <span class="n">list_to_shortstr</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">))</span>
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;No files could be detected matching file mask </span><span class="si">{}</span><span class="s2"> &quot;</span>

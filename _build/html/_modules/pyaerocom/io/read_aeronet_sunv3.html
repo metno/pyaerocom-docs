@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files.html">Configuration files</a></li>
@@ -241,6 +240,9 @@
     <span class="c1">#NAN_VAL = -9999.</span>
     <span class="n">NAN_VAL</span> <span class="o">=</span> <span class="o">-</span><span class="mf">999.</span>
     
+    <span class="c1">#: Mappings for identifying variables in file</span>
+    <span class="n">VAR_PATTERNS_FILE</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;AOD_([0-9]*)nm&#39;</span> <span class="p">:</span> <span class="s1">&#39;od*aer&#39;</span><span class="p">}</span>
+    
     <span class="c1">#: dictionary specifying the file column names (values) for each Aerocom </span>
     <span class="c1">#: variable (keys)</span>
     <span class="n">VAR_NAMES_FILE</span> <span class="o">=</span> <span class="p">{}</span>
@@ -285,7 +287,7 @@
     <span class="n">PROVIDES_VARIABLES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">VAR_NAMES_FILE</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 <div class="viewcode-block" id="ReadAeronetSunV3.read_file"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.read_aeronet_sunv3.ReadAeronetSunV3.read_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                  <span class="n">vars_as_series</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                  <span class="n">vars_as_series</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">read_all_possible</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read Aeronet Sun V3 level 1.5 or 2 file </span>
 
 <span class="sd">        Parameters</span>
@@ -298,6 +300,11 @@
 <span class="sd">        vars_as_series : bool</span>
 <span class="sd">            if True, the data columns of all variables in the result dictionary</span>
 <span class="sd">            are converted into pandas Series objects</span>
+<span class="sd">        read_all_possible : bool</span>
+<span class="sd">            if True, than all available variables belonging to either of the </span>
+<span class="sd">            variable families that are specified in :attr:`VAR_PATTERNS_FILE` </span>
+<span class="sd">            are read from the file (in addition to the ones that are specified</span>
+<span class="sd">            via vars_to_retrieve).  </span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -315,11 +322,6 @@
         <span class="c1"># create empty arrays for meta information</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">META_NAMES_FILE</span><span class="p">:</span>
             <span class="n">data_out</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-            
-        <span class="c1"># create empty arrays for all variables that are supposed to be read</span>
-        <span class="c1"># from file</span>
-        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_read</span><span class="p">:</span>
-            <span class="n">data_out</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         
         <span class="c1"># Iterate over the lines of the file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
@@ -345,9 +347,14 @@
             <span class="n">col_index_str</span> <span class="o">=</span> <span class="n">in_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">col_index_str</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_col_index_str</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Header has changed, reloading col_index map&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_update_col_index</span><span class="p">(</span><span class="n">col_index_str</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_col_index</span><span class="p">(</span><span class="n">col_index_str</span><span class="p">,</span> 
+                                       <span class="n">use_all_possible</span><span class="o">=</span><span class="n">read_all_possible</span><span class="p">)</span>
             <span class="n">col_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_index</span>
             
+            <span class="c1"># create empty arrays for all variables that are supposed to be read</span>
+            <span class="c1"># from file</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_read</span><span class="p">:</span>
+                <span class="n">data_out</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="c1"># dependent on the station, some of the required input variables</span>
             <span class="c1"># may not be provided in the data file. These will be ignored</span>
             <span class="c1"># in the following list that iterates over all data rows and will</span>
@@ -422,23 +429,16 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">del</span> <span class="n">data_out</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;The following lines were ignored: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">_lines_ignored</span><span class="p">))</span>
+                          <span class="n">_lines_ignored</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">data_out</span></div></div>
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
     
-    <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">ReadUngridded</span>
-    <span class="n">d1</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span>
-                              <span class="p">[</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">])</span>
-    <span class="n">s1</span> <span class="o">=</span> <span class="n">d1</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Palgrunden&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
-    
-    <span class="n">s1</span><span class="o">.</span><span class="n">od550aer</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-    
     <span class="n">read</span> <span class="o">=</span> <span class="n">ReadAeronetSunV3</span><span class="p">()</span>
-    <span class="n">read</span><span class="o">.</span><span class="n">read_station</span><span class="p">(</span><span class="s1">&#39;Palgrunden&#39;</span><span class="p">)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">get_file_list</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;*Berlin*&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="c1">#, read_all_possible=True)</span>
     <span class="c1">#data = read.read([&#39;od550aer&#39;, &#39;ang4487aer&#39;])</span>
     
     <span class="c1">#stat = data.to_station_data(&#39;Palgrunden&#39;)</span>

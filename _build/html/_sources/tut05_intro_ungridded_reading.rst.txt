@@ -1,9 +1,9 @@
 
 Reading of ungridded observation datasets in pyaerocom
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------
 
 Primer on observation datasets
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  Observation data is often provided ungridded in the form of ASCII
    text files that contain both the data and relevant metadata.
@@ -33,7 +33,7 @@ Primer on observation datasets
    for an example of how complicated it may get).
 
 Data access
-^^^^^^^^^^^
+~~~~~~~~~~~
 
 Both the model and the observation datasets related to the AeroCom
 project are stored on internal servers at the Norwegian Meteorological
@@ -50,25 +50,19 @@ data, using the version 3, level 2 daily data product. The corresponding
 ID for this dataset in pyaerocom is **AeronetSunV3Lev2.daily**.
 
 **NOTE**
-^^^^^^^^
+~~~~~~~~
 
 **This notebook requires access to the AeroCom database and will not
 work if you do not have access to the AeroCom servers at METNO**
 
-More info about pyaerocom
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
--  Website and code documentation (API): https://pyaerocom.met.no/
--  GitHub: https://github.com/metno/pyaerocom
-
 If you run into problems
-^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Please `create an issue <https://github.com/metno/pyaerocom/issues>`__
 if you run into problems or have suggestions for improvements.
 
 Reading of and investigating Aeronet Sun AODs (version 3, level 2 data)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
@@ -82,7 +76,7 @@ Reading of and investigating Aeronet Sun AODs (version 3, level 2 data)
     Checking access to: /lustre/storeA
     Access to lustre database: True
     Init data paths for lustre
-    Expired time: 0.021 s
+    Expired time: 0.014 s
 
 
 Check version of pyaerocom:
@@ -96,12 +90,12 @@ Check version of pyaerocom:
 
 .. parsed-literal::
 
-    '0.8.0.dev19'
+    '0.8.0.dev28'
 
 
 
 Search data ID for Aeronet Sun version 2 level 2, daily data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``browse_database`` method helps you to find model or observation
 datasets.
@@ -117,18 +111,22 @@ datasets.
     Dataset name: AeronetSunV3Lev1.5.daily
     Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev1.5.daily/renamed
     Supported variables: ['od340aer', 'od440aer', 'od500aer', 'od870aer', 'ang4487aer', 'ang4487aer_calc', 'od550aer']
-    Last revision: 20190311
+    Last revision: 20190425
     
     Dataset name: AeronetSunV3Lev1.5.AP
     Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev1.5.AP/renamed
     Supported variables: ['od340aer', 'od440aer', 'od500aer', 'od870aer', 'ang4487aer', 'ang4487aer_calc', 'od550aer']
-    Last revision: 20190402
+    Last revision: 20190511
     
     Dataset name: AeronetSunV3Lev2.daily
     Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev2.0.daily/renamed
     Supported variables: ['od340aer', 'od440aer', 'od500aer', 'od870aer', 'ang4487aer', 'ang4487aer_calc', 'od550aer']
-    Last revision: 20190311
-    Reading failed for AeronetSunV3Lev2.AP. Error: OSError('Data directory /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev2.0.AP/renamed of observation network AeronetSunV3Lev2.AP does not exists',)
+    Last revision: 20190425
+    
+    Dataset name: AeronetSunV3Lev2.AP
+    Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev2.0.AP/renamed
+    Supported variables: ['od340aer', 'od440aer', 'od500aer', 'od870aer', 'ang4487aer', 'ang4487aer_calc', 'od550aer']
+    Last revision: 20190511
 
 
 You can see that there are three matches that can be read. The attribute
@@ -142,7 +140,7 @@ Below, we are interested in the following dataset:
     DATA_ID = 'AeronetSunV3Lev2.daily'
 
 Pick one (or more) variable(s) of interest
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 From the output above, you can also see which variables the individual
 datasets provide. The variable names follow AeroCom conventions and you
@@ -157,7 +155,7 @@ In the following we will import the aerosol optical depth data at 550 nm
     VAR_TO_READ = 'od550aer' # you can also use a list of supported variables if you like, e.g. (od550aer, od440aer)
 
 Read the AODs from the whole database (all available stations / times) using the ReadUngridded class
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since the dataformats are usually specific for each observation dataset
 / network, each supported dataset has it’s own reading routine in
@@ -212,7 +210,7 @@ which is designed to hold a whole dataset of observation records
 (i.e. data from all stations).
 
 Create instance of ReadUngridded class
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
@@ -226,7 +224,7 @@ Create instance of ReadUngridded class
     Dataset name: AeronetSunV3Lev2.daily
     Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev2.0.daily/renamed
     Supported variables: ['od340aer', 'od440aer', 'od500aer', 'od870aer', 'ang4487aer', 'ang4487aer_calc', 'od550aer']
-    Last revision: 20190311
+    Last revision: 20190425
 
 
 You may also check, which other datasets are supported by the
@@ -255,12 +253,14 @@ You may also check, which other datasets are supported by the
      'AeronetSunV3Lev2.daily',
      'AeronetSunV3Lev2.AP',
      'EARLINET',
-     'EBASMC']
+     'EBASMC',
+     'DMS_AMS_CVO',
+     'GAWTADsubsetAasEtAl']
 
 
 
 Read the dataset
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 
 The ``read`` method loops over all files that exist for this dataset and
 reads them into one data object (``data``) which contains the whole
@@ -287,7 +287,7 @@ dataset.
     Contains networks: ['AeronetSunV3Lev2.daily']
     Contains variables: ['od550aer']
     Contains instruments: ['sun_photometer']
-    Total no. of meta-blocks: 1206
+    Total no. of meta-blocks: 1214
 
 
 That’s it! That is all that is required to import an ungridded dataset.
@@ -332,13 +332,3 @@ created:
 
 Finally, store the data object so that it can be used in the next
 tutorial:
-
-.. code:: ipython3
-
-    %store data
-
-
-.. parsed-literal::
-
-    Stored 'data' (UngriddedData)
-

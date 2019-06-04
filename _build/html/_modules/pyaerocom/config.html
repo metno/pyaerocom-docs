@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config_files.html">Configuration files</a></li>
@@ -209,7 +208,7 @@
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">list_to_shortstr</span><span class="p">,</span> <span class="n">dict_to_str</span><span class="p">,</span>
                                          <span class="n">chk_make_subdir</span><span class="p">,</span>
                                          <span class="n">check_fun_timeout_multiproc</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.variable</span> <span class="k">import</span> <span class="n">AllVariables</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.variable</span> <span class="k">import</span> <span class="n">VarCollection</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
 <span class="k">except</span><span class="p">:</span> 
@@ -266,17 +265,23 @@
 
     <span class="c1">#: Earlinet access name;</span>
     <span class="n">EARLINET_NAME</span> <span class="o">=</span> <span class="s1">&#39;EARLINET&#39;</span>
-    
+
+    <span class="c1">#: GAW TAD subset aas et al paper</span>
+    <span class="n">GAWTADSUBSETAASETAL_NAME</span> <span class="o">=</span> <span class="s1">&#39;GAWTADsubsetAasEtAl&#39;</span>
+
+    <span class="c1">#: DMS</span>
+    <span class="n">DMS_AMS_CVO_NAME</span> <span class="o">=</span> <span class="s1">&#39;DMS_AMS_CVO&#39;</span>
+
     <span class="c1">#: Lowest possible year in data</span>
     <span class="n">MIN_YEAR</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1">#: Highest possible year in data</span>
     <span class="n">MAX_YEAR</span> <span class="o">=</span> <span class="mi">20000</span>
-    
+
     <span class="c1">#: standard names for coordinates</span>
-    <span class="n">STANDARD_COORD_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> 
+    <span class="n">STANDARD_COORD_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span>
                             <span class="s1">&#39;longitude&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;altitude&#39;</span><span class="p">]</span>    
-    <span class="c1">#: Information specifying default vertical grid for post processing of </span>
+                            <span class="s1">&#39;altitude&#39;</span><span class="p">]</span>
+    <span class="c1">#: Information specifying default vertical grid for post processing of</span>
     <span class="c1">#: profile data. The values are in units of m.</span>
     <span class="n">DEFAULT_VERT_GRID_DEF</span> <span class="o">=</span> <span class="n">od</span><span class="p">(</span><span class="n">lower</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                                <span class="n">upper</span> <span class="o">=</span> <span class="mi">15000</span><span class="p">,</span>
@@ -309,7 +314,7 @@
     
     <span class="c1">#: timeout to check if one of the supported server locations can be </span>
     <span class="c1">#: accessed</span>
-    <span class="n">SERVER_CHECK_TIMEOUT</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1">#s</span>
+    <span class="n">SERVER_CHECK_TIMEOUT</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1">#0.1 #s</span>
     
     <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="fm">__dir__</span>
     <span class="n">_config_ini</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="fm">__dir__</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;paths.ini&#39;</span><span class="p">)</span>
@@ -320,6 +325,8 @@
                      <span class="s1">&#39;aerocom-users-database&#39;</span> <span class="p">:</span> <span class="n">_config_ini_user_server</span><span class="p">,</span>
                      <span class="s1">&#39;pyaerocom-testdata&#39;</span>     <span class="p">:</span> <span class="n">_config_ini_testdata</span><span class="p">}</span>
     
+    <span class="n">_var_info_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="fm">__dir__</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;variables.ini&#39;</span><span class="p">)</span>
+    <span class="n">_coords_info_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="fm">__dir__</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;coords.ini&#39;</span><span class="p">)</span>
     <span class="n">_outhomename</span> <span class="o">=</span> <span class="s1">&#39;MyPyaerocom&#39;</span>
     
     <span class="n">DONOTCACHEFILE</span> <span class="o">=</span> <span class="kc">None</span>
@@ -359,6 +366,7 @@
         
         
         <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="c1"># Attributes that are used to store search directories</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">OBSCONFIG</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
@@ -549,10 +557,23 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">VAR_PARAM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Instance of class AllVariables (for default variable information)&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Deprecated name, please use :attr:`VARS` instead&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Deprecated (but still functional) name &#39;</span>
+                               <span class="s1">&#39;VARS. Please use VARS&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">VARS</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">VARS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instance of class VarCollection (for default variable information)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">#has not been accessed before</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span> <span class="o">=</span> <span class="n">AllVariables</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span> <span class="o">=</span> <span class="n">VarCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_info_file</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_param</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">COORDINFO</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">VarCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coords_info_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">LOGFILESDIR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1073,7 +1094,7 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
                 <span class="k">pass</span>
-            <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;VAR_PARAM&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;VARS&#39;</span><span class="p">:</span>
                 <span class="n">s</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">list_to_shortstr</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">all_vars</span><span class="p">))</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="si">%s</span><span class="s2"> (dict)&quot;</span> <span class="o">%</span><span class="n">k</span>
@@ -1169,7 +1190,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">FILE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;.nc&#39;</span>
         <span class="c1"># it is important to keep them in the order from highest to lowest</span>
         <span class="c1"># resolution</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">TS_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;3hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;yearly&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TS_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;3hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;weekly&#39;</span><span class="p">,</span> 
+                         <span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;yearly&#39;</span><span class="p">]</span>
         <span class="c1">#delete time bounds if they exist in netCDF files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">DEL_TIME_BOUNDS</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1">#shift longitudes to -180 -&gt; 180 repr (if applicable)</span>
@@ -1246,6 +1268,8 @@
         
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+    
+    <span class="n">pya</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">COORDINFO</span><span class="o">.</span><span class="n">a</span>
 <span class="c1"># =============================================================================</span>
 <span class="c1">#     pya.const.BASEDIR = &#39;/home/jonasg/aerocom-users-database&#39;</span>
 <span class="c1">#     </span>

@@ -1,6 +1,6 @@
 
 Getting started
-~~~~~~~~~~~~~~~
+---------------
 
 This notebook is meant to give a quick introduction into the main
 features and workflows of
@@ -23,50 +23,13 @@ It ends with a colocation of CAM53-Oslo model AODs both all-sky and
 clear-sky with Aeronet Sun V3 level 2 data.
 
 Prerequisites
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 
 -  In order to run this notebook, you need to be connected to the
    AeroCom post processing servers (PPI).
 -  If you have PPI (/lustre/) mounted on your local machine you need to
    update the basic data directory after importing pyaerocom as follows:
    ``import pyaerocom as pya  pya.const.BASEDIR = <path_where_lustre_is_mounted>``
-
-Pyaerocom API flowchart (minimal)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The following flowchart illustrates the minimal workflow to create
-standard output in pyaerocom based on a user query (that typically
-comprises a model ID and observation ID as well as one (or more)
-variable(s) of interest (products indicated in red are not available
-yet, date of latest update: 4-10-2018).
-
-.. code:: ipython3
-
-    from IPython.display import Image
-    flowchart = Image(filename=('../suppl/pyaerocom_basic_flowchart.png'))
-    flowchart
-
-
-
-
-.. image:: tut00_get_started/tut00_get_started_2_0.png
-
-
-
-A user query typically comprises a model (+ experiment -> model run) and
-an observation network, which are supposed to be compared.
-
-**Note**: the flowchart depicts a situation, where the data from the
-observation network is *ungridded*, that is, the data is not available
-in a gridded format such as NetCDF, but, for instance, in the form of
-column seperated text files (as is the case for Aeronet data, which is
-used as an example here and included in the test dataset). For
-``gridded`` observations (e.g. satellite data), the flowchart is
-equivalent but with ``ReadGridded`` class and ``GriddedData`` for the
-observation branch (and without caching).
-
-This notebook illustrates and briefly discusses the individual aspects
-displayed in the flowchart.
 
 .. code:: ipython3
 
@@ -80,11 +43,11 @@ displayed in the flowchart.
     Checking access to: /lustre/storeA
     Access to lustre database: True
     Init data paths for lustre
-    Expired time: 0.018 s
+    Expired time: 0.062 s
 
 
 Check data directory
-''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^
 
 By default, pyaerocom assumes that the AEROCOM database can be accessed
 (cf. top of flowchart), that is, it initiates all data query paths
@@ -109,14 +72,14 @@ pyaerocom testdataset. The latter can be retrieved upon request (please
 contact jonasg@met.no).
 
 Reading of and working with *gridded* model data (``ReadGridded`` and ``GriddedData`` classes)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section illustrates the reading of gridded data as well as some
 features of the ``GriddedData`` class of *pyaerocom*. First, however, we
 have to find a valid model ID for the reading (cf. flow chart).
 
 Find model data
-'''''''''''''''
+^^^^^^^^^^^^^^^
 
 The database contains data from the CAM53-Oslo model, which is used in
 the following. You can use the ``browse_database`` function of pyaerocom
@@ -135,21 +98,23 @@ pattern search.
     ---------------------
     Model ID: CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PI_UNTUNED
     Data directory: /lustre/storeA/project/aerocom/aerocom2/NorESM_SVN_TEST/CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PI_UNTUNED/renamed
-    Available variables: ['abs440aer', 'abs440aercs', 'abs500aer', 'abs5503Daer', 'abs550aer', 'abs550bc', 'abs550dryaer', 'abs550dust', 'abs550oa', 'abs550so4', 'abs550ss', 'abs670aer', 'abs870aer', 'airmass', 'area', 'asy3Daer', 'bc5503Daer', 'cheaqpso4', 'chegpso4', 'chepso2', 'cl3D', 'clt', 'drybc', 'drydms', 'drydust', 'dryoa', 'dryso2', 'dryso4', 'dryss', 'ec5503Daer', 'ec550dryaer', 'emibc', 'emidms', 'emidust', 'emioa', 'emiso2', 'emiso4', 'emiss', 'hus', 'landf', 'loadbc', 'loaddms', 'loaddust', 'loadoa', 'loadso2', 'loadso4', 'loadss', 'mmraerh2o', 'mmrbc', 'mmrdu', 'mmroa', 'mmrso4', 'mmrss', 'od440aer', 'od440csaer', 'od550aer', 'od550aerh2o', 'od550bc', 'od550csaer', 'od550dust', 'od550lt1aer', 'od550lt1dust', 'od550oa', 'od550so4', 'od550ss', 'od670aer', 'od870aer', 'od870csaer', 'orog', 'precip', 'pressure', 'ps', 'rlds', 'rlus', 'rlut', 'rlutcs', 'rsds', 'rsdscs', 'rsdt', 'rsus', 'rsut', 'sconcbc', 'sconcdms', 'sconcdust', 'sconcoa', 'sconcso2', 'sconcso4', 'sconcss', 'temp', 'vmrdms', 'vmrso2', 'wetbc', 'wetdms', 'wetdust', 'wetoa', 'wetso2', 'wetso4', 'wetss']
+    Available experiments: ['CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PI_UNTUNED']
     Available years: [9999]
-    Available time resolutions ['monthly']
+    Available frequencies ['monthly']
+    Available variables: ['abs440aer', 'abs440aercs', 'abs500aer', 'abs5503Daer', 'abs550aer', 'abs550bc', 'abs550dryaer', 'abs550dust', 'abs550oa', 'abs550so4', 'abs550ss', 'abs670aer', 'abs870aer', 'airmass', 'area', 'asy3Daer', 'bc5503Daer', 'cheaqpso4', 'chegpso4', 'chepso2', 'cl3D', 'clt', 'drybc', 'drydms', 'drydust', 'dryoa', 'dryso2', 'dryso4', 'dryss', 'ec5503Daer', 'ec550dryaer', 'emibc', 'emidms', 'emidust', 'emioa', 'emiso2', 'emiso4', 'emiss', 'hus', 'landf', 'loadbc', 'loaddms', 'loaddust', 'loadoa', 'loadso2', 'loadso4', 'loadss', 'mmraerh2o', 'mmrbc', 'mmrdu', 'mmroa', 'mmrso4', 'mmrss', 'od440aer', 'od440csaer', 'od550aer', 'od550aerh2o', 'od550bc', 'od550csaer', 'od550dust', 'od550lt1aer', 'od550lt1dust', 'od550oa', 'od550so4', 'od550ss', 'od670aer', 'od870aer', 'od870csaer', 'orog', 'precip', 'pressure', 'ps', 'rlds', 'rlus', 'rlut', 'rlutcs', 'rsds', 'rsdscs', 'rsdt', 'rsus', 'rsut', 'sconcbc', 'sconcdms', 'sconcdust', 'sconcoa', 'sconcso2', 'sconcso4', 'sconcss', 'temp', 'vmrdms', 'vmrso2', 'wetbc', 'wetdms', 'wetdust', 'wetoa', 'wetso2', 'wetso4', 'wetss']
     
     Pyaerocom ReadGridded
     ---------------------
     Model ID: CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED
     Data directory: /lustre/storeA/project/aerocom/aerocom2/NorESM_SVN_TEST/CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED/renamed
-    Available variables: ['abs440aer', 'abs440aercs', 'abs500aer', 'abs5503Daer', 'abs550aer', 'abs550aercs', 'abs550bc', 'abs550dryaer', 'abs550dust', 'abs550oa', 'abs550so4', 'abs550ss', 'abs670aer', 'abs870aer', 'airmass', 'ang4487aer', 'ang4487csaer', 'area', 'asy3Daer', 'bc5503Daer', 'cheaqpso4', 'chegpso4', 'chepso2', 'cl3D', 'clt', 'drybc', 'drydms', 'drydust', 'dryoa', 'dryso2', 'dryso4', 'dryss', 'ec5503Daer', 'ec550dryaer', 'emibc', 'emidms', 'emidust', 'emioa', 'emiso2', 'emiso4', 'emiss', 'hus', 'landf', 'loadbc', 'loaddms', 'loaddust', 'loadoa', 'loadso2', 'loadso4', 'loadss', 'mmraerh2o', 'mmrbc', 'mmrdu', 'mmroa', 'mmrso4', 'mmrss', 'od440aer', 'od440csaer', 'od550aer', 'od550aerh2o', 'od550bc', 'od550csaer', 'od550dust', 'od550lt1aer', 'od550lt1dust', 'od550oa', 'od550so4', 'od550ss', 'od670aer', 'od870aer', 'od870csaer', 'orog', 'precip', 'pressure', 'ps', 'rlds', 'rlus', 'rlut', 'rlutcs', 'rsds', 'rsdscs', 'rsdt', 'rsus', 'rsut', 'sconcbc', 'sconcdms', 'sconcdust', 'sconcoa', 'sconcso2', 'sconcso4', 'sconcss', 'temp', 'vmrdms', 'vmrso2', 'wetbc', 'wetdms', 'wetdust', 'wetoa', 'wetso2', 'wetso4', 'wetss']
+    Available experiments: ['CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED']
     Available years: [2004, 2005, 2006, 2007, 2008, 2009, 2010, 9999]
-    Available time resolutions ['monthly']
+    Available frequencies ['monthly']
+    Available variables: ['abs440aer', 'abs440aercs', 'abs500aer', 'abs5503Daer', 'abs550aer', 'abs550aercs', 'abs550bc', 'abs550dryaer', 'abs550dust', 'abs550oa', 'abs550so4', 'abs550ss', 'abs670aer', 'abs870aer', 'airmass', 'ang4487aer', 'ang4487csaer', 'area', 'asy3Daer', 'bc5503Daer', 'cheaqpso4', 'chegpso4', 'chepso2', 'cl3D', 'clt', 'drybc', 'drydms', 'drydust', 'dryoa', 'dryso2', 'dryso4', 'dryss', 'ec5503Daer', 'ec550dryaer', 'emibc', 'emidms', 'emidust', 'emioa', 'emiso2', 'emiso4', 'emiss', 'hus', 'landf', 'loadbc', 'loaddms', 'loaddust', 'loadoa', 'loadso2', 'loadso4', 'loadss', 'mmraerh2o', 'mmrbc', 'mmrdu', 'mmroa', 'mmrso4', 'mmrss', 'od440aer', 'od440csaer', 'od550aer', 'od550aerh2o', 'od550bc', 'od550csaer', 'od550dust', 'od550lt1aer', 'od550lt1dust', 'od550oa', 'od550so4', 'od550ss', 'od670aer', 'od870aer', 'od870csaer', 'orog', 'precip', 'pressure', 'ps', 'rlds', 'rlus', 'rlut', 'rlutcs', 'rsds', 'rsdscs', 'rsdt', 'rsus', 'rsut', 'sconcbc', 'sconcdms', 'sconcdust', 'sconcoa', 'sconcso2', 'sconcso4', 'sconcss', 'temp', 'vmrdms', 'vmrso2', 'wetbc', 'wetdms', 'wetdust', 'wetoa', 'wetso2', 'wetso4', 'wetss']
 
 
 Read Aerosol optical depth at 550 nm
-''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Import both clear-sky (*cs* in variable name) and all-sky data.
 
@@ -172,7 +137,7 @@ and features very similar functionality and more.
 Some of these features are introduced below.
 
 Overview of what is in the data
-'''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simply print the object.
 
@@ -241,7 +206,7 @@ Simply print the object.
 
 
 Access time stamps
-''''''''''''''''''
+^^^^^^^^^^^^^^^^^^
 
 Time stamps are represented as numerical values with respect to a
 reference date and frequency, according to the CF conventions. They can
@@ -287,7 +252,7 @@ objects. These can be computed using the ``time_stamps()`` method:
 
 
 Plotting maps
-'''''''''''''
+^^^^^^^^^^^^^
 
 Maps of individual time stamps can be plotted using the quickplot_map
 method.
@@ -299,15 +264,15 @@ method.
 
 
 
-.. image:: tut00_get_started/tut00_get_started_23_0.png
+.. image:: tut00_get_started/tut00_get_started_20_0.png
 
 
 
-.. image:: tut00_get_started/tut00_get_started_23_1.png
+.. image:: tut00_get_started/tut00_get_started_20_1.png
 
 
 Filtering
-'''''''''
+^^^^^^^^^
 
 Regional filtering can be performed using the
 `Filter <http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.filter>`__
@@ -394,15 +359,15 @@ latitude dimension. Let’s plot the two new objects:
 
 
 
-.. image:: tut00_get_started/tut00_get_started_34_0.png
+.. image:: tut00_get_started/tut00_get_started_31_0.png
 
 
 
-.. image:: tut00_get_started/tut00_get_started_34_1.png
+.. image:: tut00_get_started/tut00_get_started_31_1.png
 
 
 Filtering of time
-'''''''''''''''''
+^^^^^^^^^^^^^^^^^
 
 Filtering of time is not yet included in the Filter class but can be
 easily performed from the ``GriddedData`` object directly. If you know
@@ -465,7 +430,7 @@ here):
 
 
 Data aggregation
-''''''''''''''''
+^^^^^^^^^^^^^^^^
 
 Let’s say we want to compute yearly means for each of the 3 years. In
 this case we can simply call the ``downscale_time`` method:
@@ -483,12 +448,12 @@ this case we can simply call the ``downscale_time`` method:
 
 
 
-.. image:: tut00_get_started/tut00_get_started_41_1.png
+.. image:: tut00_get_started/tut00_get_started_38_1.png
 
 
 
 
-.. image:: tut00_get_started/tut00_get_started_41_2.png
+.. image:: tut00_get_started/tut00_get_started_38_2.png
 
 
 **Note**: seasonal aggregation is not yet implemented in pyaerocom but
@@ -500,7 +465,7 @@ dataset contains a randomly picked subset of 100 Aeronet stations.
 Aeronet provides different products,
 
 Reading of and working with ungridded data (``ReadUngridded`` and ``UngriddedData`` classes)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Ungridded data in pyaerocom refers to data that is available in the form
 of *files per station* and that is not sampled in a manner that it would
@@ -523,7 +488,7 @@ Before we can continue with the data import, some things need to be said
 related to the caching of ``UngriddedData`` objects.
 
 Caching of UngriddedData
-''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Reading of ungridded data is often rather time-consuming. Therefore,
 pyaerocom uses a caching strategy that stores loaded instances of the
@@ -556,13 +521,12 @@ You may change this directory if required.
     Caching is active? True
 
 
-**Deactivate caching**
+Deactivate / Activate caching
+'''''''''''''''''''''''''''''
 
 .. code:: ipython3
 
     pya.const.CACHING = False
-
-**Activate caching**
 
 .. code:: ipython3
 
@@ -572,7 +536,7 @@ You may change this directory if required.
 change location where the files are stored.
 
 Read Aeronet Sun v3 level 2 data
-''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As illustrated in the flowchart above, ungridded observation data can be
 imported using the ``ReadUngridded`` class. The reading class requires
@@ -590,13 +554,17 @@ find the right ID for these data:
     Dataset name: AeronetSunV3Lev2.daily
     Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev2.0.daily/renamed
     Supported variables: ['od340aer', 'od440aer', 'od500aer', 'od870aer', 'ang4487aer', 'ang4487aer_calc', 'od550aer']
-    Last revision: 20190311
-    Reading failed for AeronetSunV3Lev2.AP. Error: OSError('Data directory /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev2.0.AP/renamed of observation network AeronetSunV3Lev2.AP does not exists',)
+    Last revision: 20190425
+    
+    Dataset name: AeronetSunV3Lev2.AP
+    Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev2.0.AP/renamed
+    Supported variables: ['od340aer', 'od440aer', 'od500aer', 'od870aer', 'ang4487aer', 'ang4487aer_calc', 'od550aer']
+    Last revision: 20190511
     
     Dataset name: AeronetSDAV3Lev2.daily
     Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/Aeronet.SDA.V3L2.0.daily/renamed
     Supported variables: ['od500gt1aer', 'od500lt1aer', 'od500aer', 'ang4487aer', 'od550aer', 'od550gt1aer', 'od550lt1aer']
-    Last revision: 20190402
+    Last revision: 20190425
     Reading failed for AeronetSDAV3Lev2.AP. Error: NetworkNotImplemented('No reading class available yet for dataset AeronetSDAV3Lev2.AP',)
     
     Dataset name: AeronetInvV3Lev2.daily
@@ -624,7 +592,7 @@ observation networks that are available in the AEROCOM database.
     Dataset name: AeronetSunV3Lev2.daily
     Data directory: /lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/AeronetSunV3Lev2.0.daily/renamed
     Supported variables: ['od340aer', 'od440aer', 'od500aer', 'od870aer', 'ang4487aer', 'ang4487aer_calc', 'od550aer']
-    Last revision: 20190311
+    Last revision: 20190425
 
 
 Let’s read the data (you can read a single or multiple variables at the
@@ -666,11 +634,11 @@ informative string representation (that can be printed):
     Contains networks: ['AeronetSunV3Lev2.daily']
     Contains variables: ['od550aer']
     Contains instruments: ['sun_photometer']
-    Total no. of meta-blocks: 1206
+    Total no. of meta-blocks: 1214
 
 
 Plot all station coordinates
-''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: ipython3
 
@@ -678,11 +646,11 @@ Plot all station coordinates
 
 
 
-.. image:: tut00_get_started/tut00_get_started_64_0.png
+.. image:: tut00_get_started/tut00_get_started_60_0.png
 
 
 Access of individual stations
-'''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Get all station names:
 
@@ -744,24 +712,18 @@ You may print it to see what is in there:
     
     Pyaerocom StationData
     ---------------------
-    var_info (BrowseDict([('od550aer', OrderedDict([('unit', '1'), ('overlap', False), ('ts_type', 'daily')]))]))
-       od550aer (<class 'collections.OrderedDict'>)
-        unit: 1
+    var_info (BrowseDict):
+      od550aer (OrderedDict):
+        units: 1
         overlap: False
         ts_type: daily
-    station_coords ({'latitude': 51.352500000000006, 'longitude': 12.435277999999998, 'altitude': 125.0})
-       latitude: 51.352500000000006
-       longitude: 12.435277999999998
-       altitude: 125.0
-    data_err (BrowseDict([('od550aer', array([nan, nan, nan, ..., nan, nan, nan]))]))
-       od550aer (array, 2894 items)
-       [nan
-        nan
-        ...
-        nan
-        nan]
-    
-    overlap: 
+    station_coords (dict):
+      latitude: 51.352500000000006
+      longitude: 12.435277999999998
+      altitude: 125.0
+    data_err (BrowseDict):
+      od550aer (ndarray, 2894 items): [nan, nan, ..., nan, nan]
+    overlap (BrowseDict): <empty_dict>
     filename: None
     station_id: None
     station_name: Leipzig
@@ -780,17 +742,11 @@ You may print it to see what is in there:
     revision_date: None
     ts_type_src: daily
     stat_merge_pref_attr: None
-    data_revision: 20190311
+    data_revision: 20190425
     
     Data arrays
     .................
-    dtime (array, 6364 items)
-       [numpy.datetime64('2001-05-20T00:00:00.000000000')
-        numpy.datetime64('2001-05-21T00:00:00.000000000')
-        ...
-        numpy.datetime64('2018-10-20T00:00:00.000000000')
-        numpy.datetime64('2018-10-21T00:00:00.000000000')]
-    
+    dtime (ndarray, 6364 items): [2001-05-20T00:00:00.000000000, 2001-05-21T00:00:00.000000000, ..., 2018-10-20T00:00:00.000000000, 2018-10-21T00:00:00.000000000]
     Pandas Series
     .................
     od550aer (Series, 6364 items)
@@ -809,12 +765,12 @@ nm. If you like, you can plot this time-series:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f2d478582e8>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7fb73c7b1d68>
 
 
 
 
-.. image:: tut00_get_started/tut00_get_started_72_1.png
+.. image:: tut00_get_started/tut00_get_started_68_1.png
 
 
 You can also retrieve the ``StationData`` with specifying more
@@ -844,7 +800,7 @@ passing the axes instance returned by the plotting method:
 
 
 
-.. image:: tut00_get_started/tut00_get_started_74_1.png
+.. image:: tut00_get_started/tut00_get_started_70_1.png
 
 
 You can also plot the time-series directly
@@ -873,7 +829,7 @@ bouldering trip, you may call:
                         dtype='datetime64[ns]')),
                  ('var_info',
                   BrowseDict([('od550aer',
-                               OrderedDict([('unit', '1'),
+                               OrderedDict([('units', '1'),
                                             ('overlap', False),
                                             ('ts_type', 'monthly')]))])),
                  ('station_coords',
@@ -917,7 +873,7 @@ bouldering trip, you may call:
                  ('revision_date', None),
                  ('ts_type_src', 'daily'),
                  ('stat_merge_pref_attr', None),
-                 ('data_revision', '20190311'),
+                 ('data_revision', '20190425'),
                  ('od550aer', 2006-01-15    0.176742
                   2006-02-15    0.176013
                   2006-03-15    0.252403
@@ -949,13 +905,13 @@ bouldering trip, you may call:
 
 
 
-.. image:: tut00_get_started/tut00_get_started_77_1.png
+.. image:: tut00_get_started/tut00_get_started_73_1.png
 
 
 Seems like November is a good time (maybe a bit rainy though)
 
 Colocation of model and obsdata
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now that we have different data objects loaded we can continue with
 colocation. In the following, both the all-sky and the clear-sky data
@@ -1030,7 +986,7 @@ Let’s do the same for the clear-sky data.
 
 
 
-.. image:: tut00_get_started/tut00_get_started_84_0.png
+.. image:: tut00_get_started/tut00_get_started_80_0.png
 
 
 .. code:: ipython3
@@ -1040,7 +996,7 @@ Let’s do the same for the clear-sky data.
 
 
 
-.. image:: tut00_get_started/tut00_get_started_85_0.png
+.. image:: tut00_get_started/tut00_get_started_81_0.png
 
 
 … or for EUROPE:
@@ -1063,11 +1019,11 @@ Let’s do the same for the clear-sky data.
 
 
 
-.. image:: tut00_get_started/tut00_get_started_87_1.png
+.. image:: tut00_get_started/tut00_get_started_83_1.png
 
 
 Remark on the ColocatedData object
-''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``ColocatedData`` object has not many features and methods
 implemented yet. But it builds a good basis for further analysis using

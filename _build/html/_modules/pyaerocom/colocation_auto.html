@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config_files.html">Configuration files</a></li>
@@ -283,6 +282,10 @@
 <span class="sd">        Not to be confused with :attr:`ts_type`, which specifies the</span>
 <span class="sd">        frequency used for colocation. Can be specified variable specific in</span>
 <span class="sd">        form of dictionary.</span>
+<span class="sd">    flex_ts_type_gridded : bool</span>
+<span class="sd">        boolean specifying whether reading frequency of gridded data is </span>
+<span class="sd">        allowed to be flexible. This includes all gridded data, whether it is</span>
+<span class="sd">        model or gridded observation (e.g. satellites). Defaults to True.</span>
 <span class="sd">    basedir_coldata : str</span>
 <span class="sd">        base directory for storing of colocated data files</span>
 <span class="sd">    save_coldata : bool</span>
@@ -305,8 +308,8 @@
                  <span class="n">model_use_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_read_aux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                  <span class="n">read_opts_ungridded</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_vert_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                  <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_ts_type_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">obs_ts_type_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">basedir_coldata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">save_coldata</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                 <span class="n">obs_ts_type_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type_gridded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">basedir_coldata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_coldata</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">obs_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs_vars</span><span class="p">]</span>
@@ -350,6 +353,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model_ts_type_read</span> <span class="o">=</span> <span class="n">model_ts_type_read</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span> <span class="o">=</span> <span class="n">model_read_aux</span>
         
+        <span class="bp">self</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1">#: If True, existing colocated data files will be re-computed and overwritten</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reanalyse_existing</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1">#: If True, the colocation routine will raise any Exception that may occur, </span>
@@ -488,11 +492,11 @@
             <span class="n">vert_which</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">ts_type_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_ts_type_read</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
+            <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
                                    <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
                                    <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
                                    <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type_read</span><span class="p">,</span>
-                                   <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">flex_ts_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span><span class="p">,</span>
                                    <span class="n">vert_which</span><span class="o">=</span><span class="n">vert_which</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">DataCoverageError</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;No data files available for dataset </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">)&#39;</span>
@@ -503,21 +507,12 @@
             <span class="c1"># if request refers to model data, try to read alternative dataset</span>
             <span class="c1"># that may be used to extract the data</span>
             <span class="n">obs_vert_type_alt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">OBS_VERT_TYPES_ALT</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span><span class="p">]</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
+            <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
                                    <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
                                    <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
                                    <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type_read</span><span class="p">,</span>
-                                   <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">flex_ts_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span><span class="p">,</span>
                                    <span class="n">vert_which</span><span class="o">=</span><span class="n">obs_vert_type_alt</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to load gridded data: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">. Reason </span><span class="si">{}</span><span class="s1">&#39;</span>
-                   <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span>
     
     <span class="k">def</span> <span class="nf">_run_gridded_ungridded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Analysis method for gridded vs. ungridded data&quot;&quot;&quot;</span>
@@ -559,12 +554,24 @@
                                                              <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
                                                              <span class="n">model_var</span><span class="p">,</span> 
                                                              <span class="n">obs_var</span><span class="p">))</span>
-            
-            <span class="n">model_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">model_reader</span><span class="p">,</span> 
-                                            <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span> 
-                                            <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> 
-                                            <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
-                                            <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">model_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">model_reader</span><span class="p">,</span> 
+                                                <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span> 
+                                                <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> 
+                                                <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                                                <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to load gridded data: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">. Reason </span><span class="si">{}</span><span class="s1">&#39;</span>
+                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
             
             <span class="k">if</span> <span class="ow">not</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid temporal resolution </span><span class="si">{}</span><span class="s1"> &#39;</span>
@@ -663,23 +670,48 @@
                                                              <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
                                                              <span class="n">model_var</span><span class="p">,</span> 
                                                              <span class="n">obs_var</span><span class="p">))</span>
-            
-            <span class="n">model_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">model_reader</span><span class="p">,</span> 
-                                            <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span> 
-                                            <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> 
-                                            <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
-                                            <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">model_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">model_reader</span><span class="p">,</span> 
+                                                <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span> 
+                                                <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> 
+                                                <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                                                <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to load gridded data: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">. Reason </span><span class="si">{}</span><span class="s1">&#39;</span>
+                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
             
             <span class="k">if</span> <span class="ow">not</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid temporal resolution </span><span class="si">{}</span><span class="s1"> &#39;</span>
                                               <span class="s1">&#39;in model </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
                                                                    <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
-            <span class="n">obs_data</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">obs_reader</span><span class="p">,</span> 
-                                           <span class="n">var_name</span><span class="o">=</span><span class="n">obs_var</span><span class="p">,</span> 
-                                           <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
-                                           <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
-                                           <span class="n">is_model</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">obs_data</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">obs_reader</span><span class="p">,</span> 
+                                               <span class="n">var_name</span><span class="o">=</span><span class="n">obs_var</span><span class="p">,</span> 
+                                               <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                               <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
+                                               <span class="n">is_model</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to load gridded data: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">. Reason </span><span class="si">{}</span><span class="s1">&#39;</span>
+                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                
             <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid temporal resolution </span><span class="si">{}</span><span class="s1"> &#39;</span>
                                               <span class="s1">&#39;in obs </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
@@ -810,13 +842,13 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">return</span>
         <span class="k">for</span> <span class="n">ovar</span><span class="p">,</span> <span class="n">mvar</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">oname</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">ovar</span><span class="p">]</span><span class="o">.</span><span class="n">var_name</span>
+            <span class="n">oname</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">ovar</span><span class="p">]</span><span class="o">.</span><span class="n">var_name</span>
             <span class="k">if</span> <span class="n">oname</span> <span class="o">!=</span> <span class="n">ovar</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">ovar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">oname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">[</span><span class="n">oname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">[</span><span class="n">ovar</span><span class="p">]</span>
                     
-            <span class="n">mname</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="n">mvar</span><span class="p">]</span><span class="o">.</span><span class="n">var_name</span>
+            <span class="n">mname</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">mvar</span><span class="p">]</span><span class="o">.</span><span class="n">var_name</span>
             <span class="k">if</span> <span class="n">mname</span> <span class="o">!=</span> <span class="n">mvar</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">mvar</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">mname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">:</span>

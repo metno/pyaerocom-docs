@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files.html">Configuration files</a></li>
@@ -209,6 +208,8 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.io.read_aeronet_sunv3</span> <span class="k">import</span> <span class="n">ReadAeronetSunV3</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.read_earlinet</span> <span class="k">import</span> <span class="n">ReadEarlinet</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.read_ebas</span> <span class="k">import</span> <span class="n">ReadEbas</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.io.read_aasetal</span> <span class="k">import</span> <span class="n">ReadSulphurAasEtAl</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.io.read_gaw</span> <span class="k">import</span> <span class="n">ReadGAW</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom.io.cachehandler_ungridded</span> <span class="k">import</span> <span class="n">CacheHandlerUngridded</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.ungriddeddata</span> <span class="k">import</span> <span class="n">UngriddedData</span>
@@ -226,16 +227,19 @@
                  <span class="n">ReadAeronetSunV2</span><span class="p">,</span>
                  <span class="n">ReadAeronetSunV3</span><span class="p">,</span>
                  <span class="n">ReadEarlinet</span><span class="p">,</span>
-                 <span class="n">ReadEbas</span><span class="p">]</span>
-    
+                 <span class="n">ReadEbas</span><span class="p">,</span>
+                 <span class="n">ReadGAW</span><span class="p">,</span>
+                 <span class="n">ReadSulphurAasEtAl</span><span class="p">]</span>
+
     <span class="c1"># when this file exists, an existing cache file is not read</span>
     <span class="n">_DONOTCACHEFILE</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">):</span>
         <span class="n">_DONOTCACHEFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">,</span> <span class="s1">&#39;DONOTCACHE&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets_to_read</span><span class="o">=</span><span class="n">const</span><span class="o">.</span><span class="n">AERONET_SUN_V3L2_AOD_DAILY_NAME</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        
+        <span class="k">if</span> <span class="n">datasets_to_read</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">datasets_to_read</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">AERONET_SUN_V3L2_AOD_DAILY_NAME</span>
         <span class="c1">#will be assigned in setter method of dataset_to_read</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_datasets_to_read</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1">#: dictionary containing reading classes for each dataset to read (will</span>
@@ -269,6 +273,31 @@
         <span class="k">return</span> <span class="kc">False</span>
     
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dataset_to_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper that returns the dataset to be read</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Only works if a single dataset is assigned in :attr:`datasets_to_read`,</span>
+<span class="sd">        else throws an ValueError.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            if :attr:`datasets_to_read` contains no or more than one entry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dsr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets_to_read</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dsr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not fetch reader class. No dataset &#39;</span>
+                             <span class="s1">&#39;assigned in attr. datasets_to_read&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dsr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not fetch reader class. More than one &#39;</span>
+                             <span class="s1">&#39;dataset is assigned in attr. &#39;</span>
+                             <span class="s1">&#39;datasets_to_read&#39;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">dsr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">datasets_to_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List of datasets supposed to be read&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets_to_read</span>
@@ -284,13 +313,15 @@
             
         <span class="bp">self</span><span class="o">.</span><span class="n">_datasets_to_read</span> <span class="o">=</span> <span class="n">datasets</span>    
     
-<div class="viewcode-block" id="ReadUngridded.dataset_provides_variables"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.dataset_provides_variables">[docs]</a>    <span class="k">def</span> <span class="nf">dataset_provides_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">):</span>
+<div class="viewcode-block" id="ReadUngridded.dataset_provides_variables"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.dataset_provides_variables">[docs]</a>    <span class="k">def</span> <span class="nf">dataset_provides_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List of variables provided by a certain dataset&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dataset_to_read</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset_to_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_to_read</span>
         <span class="k">if</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_read_class</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">)</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span></div>
       
-<div class="viewcode-block" id="ReadUngridded.get_reader"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.get_reader">[docs]</a>    <span class="k">def</span> <span class="nf">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">):</span>
+<div class="viewcode-block" id="ReadUngridded.get_reader"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.get_reader">[docs]</a>    <span class="k">def</span> <span class="nf">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Helper method that returns loaded reader class</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -311,6 +342,12 @@
 <span class="sd">        NetworkNotImplemented</span>
 <span class="sd">            if network is supported but no reading routine is implemented yet</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dataset_to_read</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dataset_to_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_to_read</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_datasets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NetworkNotSupported</span><span class="p">(</span><span class="s1">&#39;Could not fetch reader class: Input &#39;</span>
+                                      <span class="s1">&#39;network </span><span class="si">{}</span><span class="s1"> is not supported by &#39;</span>
+                                      <span class="s1">&#39;ReadUngridded&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">find_read_class</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span></div>

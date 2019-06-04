@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files.html">Configuration files</a></li>
@@ -206,7 +205,6 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">iris</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">const</span> <span class="k">as</span> <span class="n">CONST</span>
@@ -219,7 +217,7 @@
                                   <span class="n">FileConventionError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.fileconventions</span> <span class="k">import</span> <span class="n">FileConventionRead</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">AerocomBrowser</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.io.iris_io</span> <span class="k">import</span> <span class="n">load_cube_custom</span><span class="p">,</span> <span class="n">concatenate_iris_cubes</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.io.iris_io</span> <span class="k">import</span> <span class="n">load_cubes_custom</span><span class="p">,</span> <span class="n">concatenate_iris_cubes</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="k">import</span> <span class="n">add_file_to_log</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.griddeddata</span> <span class="k">import</span> <span class="n">GriddedData</span>
 
@@ -314,6 +312,7 @@
         <span class="c1">#: data_id of gridded dataset        </span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span> <span class="o">=</span> <span class="n">data_id</span>
         
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="c1"># only overwrite if there is input, note that the attributes</span>
         <span class="c1"># start and stop are defined below as @property getter and</span>
@@ -348,6 +347,10 @@
         <span class="c1">#: the filenames in the data directory</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars_2d</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars_3d</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        
+        <span class="c1">#: List of experiments in data directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span> <span class="o">=</span> <span class="p">[]</span>
         
         <span class="c1">#: List of unique years that were </span>
         <span class="c1">#: identified from the filenames in the data directory</span>
@@ -587,6 +590,7 @@
                               <span class="s2">&quot;from files in model directory for model &quot;</span>
                               <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">data_dir: </span><span class="si">%s</span><span class="s2">&quot;</span>
                               <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">))</span>
+        <span class="n">_experiments_temp</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">_vars_temp</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">_vars_temp_3d</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">_years_temp</span> <span class="o">=</span> <span class="p">[]</span>
@@ -615,6 +619,7 @@
                     
                     <span class="n">_years_temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span>
                     <span class="n">_ts_types_temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;ts_type&quot;</span><span class="p">])</span>
+                    <span class="n">_experiments_temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">])</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_file</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Read file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_file</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -636,6 +641,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars_2d</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">od</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">_vars_temp</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars_3d</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">od</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">_vars_temp_3d</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">years</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">od</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">_years_temp</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">od</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">_experiments_temp</span><span class="p">))</span>
         
         <span class="n">_ts_types</span> <span class="o">=</span> <span class="n">od</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">_ts_types_temp</span><span class="p">)</span>
         <span class="c1"># write detected sampling frequencies in the preferred order</span>
@@ -715,7 +721,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Ignoring key </span><span class="si">%s</span><span class="s2"> in ModelImportResult.update()&quot;</span> <span class="o">%</span><span class="n">k</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="ReadGridded.find_var_files_flex_ts_type"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.find_var_files_flex_ts_type">[docs]</a>    <span class="k">def</span> <span class="nf">find_var_files_flex_ts_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type_init</span><span class="p">,</span>
-                                    <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                                    <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find available files for a variable in a time period </span>
 <span class="sd">        </span>
 <span class="sd">        Like :func:`find_var_files_in_timeperiod` but this method also checks</span>
@@ -728,12 +735,14 @@
 <span class="sd">            variable name</span>
 <span class="sd">        ts_type_init : str</span>
 <span class="sd">            desired temporal resolution of data</span>
-<span class="sd">        start : :obj:`Timestamp` or :obj:`str`, optional</span>
+<span class="sd">        start : Timestamp or str, optional</span>
 <span class="sd">            start time of data. If None, then the first available time stamp </span>
 <span class="sd">            in this data object is used (i.e. :attr:`start`)</span>
-<span class="sd">        stop : :obj:`Timestamp` or :obj:`str`, optional</span>
+<span class="sd">        stop : Timestamp or str, optional</span>
 <span class="sd">            stop time of data. If None, then the last available time stamp </span>
 <span class="sd">            in this data object is used (i.e. :attr:`stop`)</span>
+<span class="sd">        experiment : str, optional</span>
+<span class="sd">            name of experiment</span>
 <span class="sd">        vert_which : str</span>
 <span class="sd">            valid AeroCom vertical info string encoded in name (e.g. Column,</span>
 <span class="sd">            ModelLevel)</span>
@@ -754,7 +763,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_var_files_in_timeperiod</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type_init</span><span class="p">,</span>
-                                                      <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">)</span>
+                                                      <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> 
+                                                      <span class="n">experiment</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">ts_type_init</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">DataCoverageError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No file match for ts_type </span><span class="si">{}</span><span class="s1">. Error: </span><span class="si">{}</span><span class="se">\n\n</span><span class="s1"> &#39;</span>
@@ -767,6 +777,7 @@
                                                                   <span class="n">ts_type</span><span class="p">,</span>
                                                                   <span class="n">start</span><span class="p">,</span>
                                                                   <span class="n">stop</span><span class="p">,</span>
+                                                                  <span class="n">experiment</span><span class="p">,</span>
                                                                   <span class="n">vert_which</span><span class="p">)</span>
                         <span class="k">return</span> <span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">)</span>
                     
@@ -778,8 +789,9 @@
                                                                   <span class="n">var_name</span><span class="p">,</span> 
                                                                   <span class="bp">self</span><span class="o">.</span><span class="n">ts_types</span><span class="p">))</span></div>
     <span class="c1"># TODO: review and check vert_which directly from files</span>
-<div class="viewcode-block" id="ReadGridded.find_var_files_in_timeperiod"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.find_var_files_in_timeperiod">[docs]</a>    <span class="k">def</span> <span class="nf">find_var_files_in_timeperiod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span>
-                                     <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReadGridded.find_var_files_in_timeperiod"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.find_var_files_in_timeperiod">[docs]</a>    <span class="k">def</span> <span class="nf">find_var_files_in_timeperiod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                                     <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find all files that match variable, time period and temporal res.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -794,6 +806,8 @@
 <span class="sd">        stop : :obj:`Timestamp` or :obj:`str`, optional</span>
 <span class="sd">            stop time of data. If None, then the last available time stamp </span>
 <span class="sd">            in this data object is used (i.e. :attr:`stop`)</span>
+<span class="sd">        experiment : str, optional</span>
+<span class="sd">            name of experiment for which file are to be searched.</span>
 <span class="sd">        vert_which : str</span>
 <span class="sd">            valid AeroCom vertical info string encoded in name (e.g. Column,</span>
 <span class="sd">            ModelLevel)</span>
@@ -809,19 +823,32 @@
 <span class="sd">        DataCoverageError </span>
 <span class="sd">            if no files could be found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+        <span class="c1">#aux_compute = self._add_aux_compute(aux_compute)</span>
+        <span class="k">if</span> <span class="n">experiment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This dataset contains more than one experiment. &#39;</span>
+                                 <span class="s1">&#39;Please specify from which experiment you wish &#39;</span>
+                                 <span class="s1">&#39;the data to be read. Available expreriments: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">))</span>
+            <span class="n">experiment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">experiment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No such experiment available: </span><span class="si">{}</span><span class="s1">. Please &#39;</span>
+                                    <span class="s1">&#39;choose from: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> 
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">))</span>
         <span class="n">match_files</span> <span class="o">=</span> <span class="p">[]</span>
     
         <span class="n">years_to_load</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_years_to_load</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years_to_load</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">CONST</span><span class="o">.</span><span class="n">MIN_YEAR</span> <span class="o">&lt;=</span> <span class="n">year</span> <span class="o">&lt;=</span> <span class="n">CONST</span><span class="o">.</span><span class="n">MAX_YEAR</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">match_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_convention</span><span class="o">.</span><span class="n">string_mask</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
+                    <span class="n">match_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_convention</span><span class="o">.</span><span class="n">string_mask</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span>
+                                                                  <span class="n">var_name</span><span class="p">,</span>
                                                                   <span class="n">year</span><span class="p">,</span> 
                                                                   <span class="n">ts_type</span><span class="p">,</span>
                                                                   <span class="n">vert_which</span><span class="p">)</span>
                 <span class="k">except</span> <span class="n">FileConventionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="n">match_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_convention</span><span class="o">.</span><span class="n">string_mask</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
+                    <span class="n">match_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_convention</span><span class="o">.</span><span class="n">string_mask</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span>
+                                                                  <span class="n">var_name</span><span class="p">,</span>
                                                                   <span class="n">year</span><span class="p">,</span> 
                                                                   <span class="n">ts_type</span><span class="p">,</span>
                                                                   <span class="kc">None</span><span class="p">)</span>
@@ -869,47 +896,47 @@
 <span class="sd">        Raises </span>
 <span class="sd">        ------</span>
 <span class="sd">        iris.exceptions.ConcatenateError</span>
-<span class="sd">            if concatenation of all cubes failed (catch this error using </span>
-<span class="sd">            :func:`concatenate_possible_cubes` which returns an instance </span>
-<span class="sd">            of :class:`CubeList` with results)</span>
+<span class="sd">            if concatenation of all cubes failed </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         <span class="k">return</span> <span class="n">concatenate_iris_cubes</span><span class="p">(</span><span class="n">cubes</span><span class="p">,</span> <span class="n">error_on_mismatch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="ReadGridded.concatenate_possible_cubes"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.concatenate_possible_cubes">[docs]</a>    <span class="k">def</span> <span class="nf">concatenate_possible_cubes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cubes</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Concatenate list of cubes into one cube</span>
-<span class="sd">        </span>
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-<span class="sd">        Warns, if all input cubes could be merged into single cube (because</span>
-<span class="sd">        in this case, :func:`concatenate_cubes` should be used)</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        CubeList</span>
-<span class="sd">            list of individual cubes</span>
-<span class="sd">        </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        CubeList</span>
-<span class="sd">            list of cubes that could be concatenated</span>
-<span class="sd">        </span>
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        iris.exceptions.ConcatenateError</span>
-<span class="sd">            if call or :func:`iris._concatenate.concatenate` did not return</span>
-<span class="sd">            instance of :class:`iris.cube.CubeList` or of </span>
-<span class="sd">            :class:`iris.cube.Cube`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cubes_concat</span> <span class="o">=</span> <span class="n">concatenate_iris_cubes</span><span class="p">(</span><span class="n">cubes</span><span class="p">,</span> <span class="n">error_on_mismatch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cubes_concat</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">cube</span><span class="o">.</span><span class="n">Cube</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Successfully concatenated all input cubes into &#39;</span>
-                           <span class="s1">&#39;single Cube, returning single cube as CubeList. &#39;</span>
-                           <span class="s1">&#39;Please use method concatenate_cubes&#39;</span><span class="p">)</span>
-            <span class="n">cubes_concat</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">cube</span><span class="o">.</span><span class="n">CubeList</span><span class="p">(</span><span class="n">cubes_concat</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cubes_concat</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">cube</span><span class="o">.</span><span class="n">CubeList</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">iris</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConcatenateError</span><span class="p">(</span><span class="s1">&#39;Unexpected error please &#39;</span>
-                                                   <span class="s1">&#39;debug&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cubes_concat</span></div>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     def concatenate_possible_cubes(self, cubes):</span>
+<span class="c1">#         &quot;&quot;&quot;Concatenate list of cubes into one cube</span>
+<span class="c1">#         </span>
+<span class="c1">#         Note</span>
+<span class="c1">#         ----</span>
+<span class="c1">#         Warns, if all input cubes could be merged into single cube (because</span>
+<span class="c1">#         in this case, :func:`concatenate_cubes` should be used)</span>
+<span class="c1">#         </span>
+<span class="c1">#         Parameters</span>
+<span class="c1">#         ----------</span>
+<span class="c1">#         CubeList</span>
+<span class="c1">#             list of individual cubes</span>
+<span class="c1">#         </span>
+<span class="c1">#         Returns</span>
+<span class="c1">#         -------</span>
+<span class="c1">#         CubeList</span>
+<span class="c1">#             list of cubes that could be concatenated</span>
+<span class="c1">#         </span>
+<span class="c1">#         Raises</span>
+<span class="c1">#         ------</span>
+<span class="c1">#         iris.exceptions.ConcatenateError</span>
+<span class="c1">#             if call or :func:`iris._concatenate.concatenate` did not return</span>
+<span class="c1">#             instance of :class:`iris.cube.CubeList` or of </span>
+<span class="c1">#             :class:`iris.cube.Cube`</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         cubes_concat = concatenate_iris_cubes(cubes, error_on_mismatch=False)</span>
+<span class="c1">#         if isinstance(cubes_concat, iris.cube.Cube):</span>
+<span class="c1">#             self.logger.warning(&#39;Successfully concatenated all input cubes into &#39;</span>
+<span class="c1">#                            &#39;single Cube, returning single cube as CubeList. &#39;</span>
+<span class="c1">#                            &#39;Please use method concatenate_cubes&#39;)</span>
+<span class="c1">#             cubes_concat = iris.cube.CubeList(cubes_concat)</span>
+<span class="c1">#         if not isinstance(cubes_concat, iris.cube.CubeList):</span>
+<span class="c1">#             raise iris.exceptions.ConcatenateError(&#39;Unexpected error please &#39;</span>
+<span class="c1">#                                                    &#39;debug&#39;)</span>
+<span class="c1">#         return cubes_concat</span>
+<span class="c1"># =============================================================================</span>
     
     
     <span class="k">def</span> <span class="nf">_get_aux_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_to_compute</span><span class="p">):</span>
@@ -958,9 +985,10 @@
                                                    <span class="n">var</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">vars_to_read</span>
                 
-<div class="viewcode-block" id="ReadGridded.compute_var"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.compute_var">[docs]</a>    <span class="k">def</span> <span class="nf">compute_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vars_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">aux_fun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReadGridded.compute_var"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.compute_var">[docs]</a>    <span class="k">def</span> <span class="nf">compute_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                    <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vars_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                    <span class="n">aux_fun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute auxiliary variable</span>
 <span class="sd">        </span>
 <span class="sd">        Like :func:`read_var` but for auxiliary variables </span>
@@ -980,6 +1008,9 @@
 <span class="sd">            string specifying temporal resolution (choose from </span>
 <span class="sd">            &quot;hourly&quot;, &quot;3hourly&quot;, &quot;daily&quot;, &quot;monthly&quot;). If None, prioritised </span>
 <span class="sd">            of the available resolutions is used</span>
+<span class="sd">        experiment : str</span>
+<span class="sd">            name of experiment (only relevant if this dataset contains more </span>
+<span class="sd">            than one experiment)</span>
 <span class="sd">        flex_ts_type : bool</span>
 <span class="sd">            if True and if applicable,start=None, stop=None,</span>
 <span class="sd">                 ts_type=None, flex_ts_type=True then another ts_type is used in case </span>
@@ -987,6 +1018,8 @@
 <span class="sd">        vert_which : str</span>
 <span class="sd">            valid AeroCom vertical info string encoded in name (e.g. Column,</span>
 <span class="sd">            ModelLevel)</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            additional keyword args passed to :func:`_load_var`</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1033,10 +1066,12 @@
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># all variables that are required need to be in the same temporal</span>
         <span class="c1"># resolution</span>
-        <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_common_ts_type</span><span class="p">(</span><span class="n">vars_to_read</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> 
-                                           <span class="n">ts_type</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">)</span>  
+        <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_common_ts_type</span><span class="p">(</span><span class="n">vars_to_read</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> 
+                                           <span class="n">experiment</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">)</span>  
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_read</span><span class="p">:</span>
-            <span class="n">aux_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_var</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+            <span class="n">aux_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_var</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span>
+                                      <span class="n">experiment</span><span class="o">=</span><span class="n">experiment</span><span class="p">,</span>
+                                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aux_data</span><span class="p">)</span>
 
         <span class="n">cube</span> <span class="o">=</span> <span class="n">aux_fun</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">)</span>
@@ -1048,7 +1083,8 @@
         <span class="k">return</span> <span class="n">data</span></div>
     
 <div class="viewcode-block" id="ReadGridded.find_common_ts_type"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.find_common_ts_type">[docs]</a>    <span class="k">def</span> <span class="nf">find_common_ts_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_read</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                            <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                            <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find common ts_type for list of variables to be read</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -1065,6 +1101,9 @@
 <span class="sd">            string specifying temporal resolution (choose from </span>
 <span class="sd">            &quot;hourly&quot;, &quot;3hourly&quot;, &quot;daily&quot;, &quot;monthly&quot;). If None, prioritised </span>
 <span class="sd">            of the available resolutions is used</span>
+<span class="sd">        experiment : str</span>
+<span class="sd">            name of experiment (only relevant if this dataset contains more </span>
+<span class="sd">            than one experiment)</span>
 <span class="sd">        flex_ts_type : bool</span>
 <span class="sd">            if True and if applicable,start=None, stop=None,</span>
 <span class="sd">                 ts_type=None, flex_ts_type=True then another ts_type is used in case </span>
@@ -1093,7 +1132,8 @@
                 <span class="c1"># check if ts_type is available</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">find_var_files_in_timeperiod</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> 
-                                                      <span class="n">stop</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">)</span>
+                                                      <span class="n">stop</span><span class="p">,</span> <span class="n">experiment</span><span class="p">,</span>
+                                                      <span class="n">vert_which</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">common_ts_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span>
                 <span class="k">except</span> <span class="n">DataCoverageError</span><span class="p">:</span>
@@ -1138,8 +1178,9 @@
         
     <span class="c1"># TODO: add from_vars input arg for computation and corresponding method</span>
 <div class="viewcode-block" id="ReadGridded.read_var"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.read_var">[docs]</a>    <span class="k">def</span> <span class="nf">read_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">aux_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aux_fun</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                 <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aux_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aux_fun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read model data for a specific variable</span>
 <span class="sd">        </span>
 <span class="sd">        This method searches all valid files for a given variable and for a </span>
@@ -1175,6 +1216,9 @@
 <span class="sd">            string specifying temporal resolution (choose from </span>
 <span class="sd">            &quot;hourly&quot;, &quot;3hourly&quot;, &quot;daily&quot;, &quot;monthly&quot;). If None, prioritised </span>
 <span class="sd">            of the available resolutions is used</span>
+<span class="sd">        experiment : str</span>
+<span class="sd">            name of experiment (only relevant if this dataset contains more </span>
+<span class="sd">            than one experiment)</span>
 <span class="sd">        flex_ts_type : bool</span>
 <span class="sd">            if True and if applicable,start=None, stop=None,</span>
 <span class="sd">                 ts_type=None, flex_ts_type=True then another ts_type is used in case </span>
@@ -1191,6 +1235,8 @@
 <span class="sd">            only relevant if `var_name` is not available for reading but needs</span>
 <span class="sd">            to be computed: custom method for computation (cf. </span>
 <span class="sd">            :func:`add_aux_compute` for details)</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            additional keyword args parsed to :func:`_load_var`</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1206,7 +1252,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">aux_vars</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_aux_compute</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">aux_vars</span><span class="p">,</span> <span class="n">aux_fun</span><span class="p">)</span>
-        <span class="c1">#aux_compute = self._add_aux_compute(aux_compute)</span>
         
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -1241,17 +1286,19 @@
                 <span class="n">vert_which</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">var_to_read</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># variable can be read directly</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_var</span><span class="p">(</span><span class="n">var_to_read</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span>
-                                  <span class="n">flex_ts_type</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">)</span>
+                                  <span class="n">experiment</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">,</span>
+                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aux_requires</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> 
-                                    <span class="n">flex_ts_type</span><span class="p">,</span> 
+                                    <span class="n">experiment</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="p">,</span> 
                                     <span class="n">vars_to_read</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_requires</span><span class="p">[</span><span class="n">var_name</span><span class="p">],</span>
                                     <span class="n">aux_fun</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_funs</span><span class="p">[</span><span class="n">var_name</span><span class="p">],</span>
                                     <span class="n">vert_which</span><span class="o">=</span><span class="n">vert_which</span><span class="p">)</span>
             
         <span class="k">elif</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUX_REQUIRES</span><span class="p">:</span> <span class="c1">#variable can be computed </span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span>
-                                    <span class="n">ts_type</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="n">vert_which</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> 
+                                    <span class="n">experiment</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="p">,</span> 
+                                    <span class="n">vert_which</span><span class="o">=</span><span class="n">vert_which</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s2">&quot;Error: variable </span><span class="si">{}</span><span class="s2"> not available in &quot;</span>
                                        <span class="s2">&quot;files and can also not be computed.&quot;</span>
@@ -1268,7 +1315,7 @@
         
                 
 <div class="viewcode-block" id="ReadGridded.read"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+             <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
              <span class="n">require_all_vars_avail</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read all variables that could be found </span>
 <span class="sd">        </span>
@@ -1288,6 +1335,9 @@
 <span class="sd">            string specifying temporal resolution (choose from </span>
 <span class="sd">            &quot;hourly&quot;, &quot;3hourly&quot;, &quot;daily&quot;, &quot;monthly&quot;). If None, prioritised </span>
 <span class="sd">            of the available resolutions is used</span>
+<span class="sd">        experiment : str</span>
+<span class="sd">            name of experiment (only relevant if this dataset contains more </span>
+<span class="sd">            than one experiment)</span>
 <span class="sd">        flex_ts_type : bool</span>
 <span class="sd">            if True and if applicable, then another ts_type is used in case </span>
 <span class="sd">            the input ts_type is not available for this variable</span>
@@ -1335,85 +1385,76 @@
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_names</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span>
+                                          <span class="n">experiment</span><span class="p">,</span>
                                           <span class="n">flex_ts_type</span><span class="p">))</span>
             <span class="k">except</span> <span class="p">(</span><span class="n">VarNotAvailableError</span><span class="p">,</span> <span class="n">DataCoverageError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
-    
-    <span class="k">def</span> <span class="nf">_load_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">quality_check</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        
+    <span class="k">def</span> <span class="nf">_load_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">perform_checks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load list of files containing variable to read into Cube instances</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        files : list</span>
+<span class="sd">            list of netcdf file</span>
 <span class="sd">        var_name : str</span>
 <span class="sd">            name of variable to read</span>
-<span class="sd">        files : list</span>
-<span class="sd">            list of netcdf files that contain this variable</span>
+<span class="sd">        perform_checks : bool</span>
+<span class="sd">            if True, the loaded data is checked for consistency with </span>
+<span class="sd">            AeroCom default requirements.</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            additional keyword args parsed to :func:`load_cubes_custom`.</span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        CubeList</span>
 <span class="sd">            list of loaded Cube instances</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># read files using iris</span>
-        <span class="n">cubes</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">cube</span><span class="o">.</span><span class="n">CubeList</span><span class="p">()</span>
-        <span class="n">loaded_files</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">_file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">cube</span> <span class="o">=</span> <span class="n">load_cube_custom</span><span class="p">(</span><span class="n">_file</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span>
-                                        <span class="n">file_convention</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_convention</span><span class="p">)</span>
-                <span class="n">cubes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
-                <span class="n">loaded_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_file</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Failed to load </span><span class="si">{}</span><span class="s2"> as Iris cube. Error: </span><span class="si">{}</span><span class="s2">&quot;</span>
-                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_file</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_errors</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()]</span> <span class="o">=</span> <span class="n">msg</span>
-                <span class="k">if</span> <span class="n">CONST</span><span class="o">.</span><span class="n">WRITE_FILEIO_ERR_LOG</span><span class="p">:</span>
-                    <span class="n">add_file_to_log</span><span class="p">(</span><span class="n">_file</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-                    
-                    
-        
+        <span class="n">cubes</span><span class="p">,</span> <span class="n">loaded_files</span> <span class="o">=</span> <span class="n">load_cubes_custom</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span>
+                                                <span class="n">perform_checks</span><span class="o">=</span><span class="n">perform_checks</span><span class="p">,</span>
+                                                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loaded_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">err_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-            <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_errors</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="n">err_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;None of the files found for variable </span><span class="si">{}</span><span class="s2"> &quot;</span>
-                          <span class="s2">&quot;could be loaded. Errors: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span>
-                                                               <span class="n">err_str</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;None of the input files could be loaded in </span><span class="si">{}</span><span class="s2">&quot;</span>
+                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">))</span>
     
         <span class="bp">self</span><span class="o">.</span><span class="n">cubes</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cubes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loaded_files</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">loaded_files</span>
         <span class="k">return</span> <span class="n">cubes</span>
     
     <span class="k">def</span> <span class="nf">_load_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                  <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                  <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find files corresponding to input specs and load into GriddedData</span>
 <span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        var_name : str</span>
-<span class="sd">            variable to load</span>
+<span class="sd">        Note </span>
+<span class="sd">        ----</span>
+<span class="sd">        See :func:`read_var` for I/O info.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="k">if</span> <span class="n">flex_ts_type</span><span class="p">:</span>
-            <span class="n">match_files</span><span class="p">,</span> <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_var_files_flex_ts_type</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
-                                                                    <span class="n">ts_type</span><span class="p">,</span>
-                                                                    <span class="n">start</span><span class="p">,</span>
-                                                                    <span class="n">stop</span><span class="p">,</span> 
-                                                                    <span class="n">vert_which</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">match_files</span><span class="p">,</span> 
+             <span class="n">ts_type</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_var_files_flex_ts_type</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
+                                                         <span class="n">ts_type</span><span class="p">,</span>
+                                                         <span class="n">start</span><span class="p">,</span>
+                                                         <span class="n">stop</span><span class="p">,</span> 
+                                                         <span class="n">experiment</span><span class="p">,</span>
+                                                         <span class="n">vert_which</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">match_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_var_files_in_timeperiod</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
                                                             <span class="n">ts_type</span><span class="p">,</span> 
                                                             <span class="n">start</span><span class="p">,</span>
                                                             <span class="n">stop</span><span class="p">,</span>
+                                                            <span class="n">experiment</span><span class="p">,</span>
                                                             <span class="n">vert_which</span><span class="p">)</span>
         
-        <span class="n">cube_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_files</span><span class="p">(</span><span class="n">match_files</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
-    
+        <span class="n">cube_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_files</span><span class="p">(</span><span class="n">match_files</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">is_concat</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cube_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">cube</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate_cubes</span><span class="p">(</span><span class="n">cube_list</span><span class="p">)</span>
+                <span class="n">is_concat</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">except</span> <span class="n">iris</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConcatenateError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Failed to concatenate cubes: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
                                           <span class="s1">&#39;Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cube_list</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
@@ -1424,7 +1465,8 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">GriddedData</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">cube</span><span class="p">,</span> 
                            <span class="n">from_files</span><span class="o">=</span><span class="n">from_files</span><span class="p">,</span>
                            <span class="n">data_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> 
-                           <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">)</span>
+                           <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
+                           <span class="n">concatenated</span><span class="o">=</span><span class="n">is_concat</span><span class="p">)</span>
         
         <span class="c1"># crop cube in time (if applicable)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_crop_time</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
@@ -1495,7 +1537,7 @@
 <span class="sd">            if results for ``var_name`` are not available</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No data found for variable </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">var_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
     
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1503,15 +1545,17 @@
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
              <span class="s2">&quot;Model ID: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
              <span class="s2">&quot;Data directory: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
-             <span class="s2">&quot;Available variables: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Available experiments: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
              <span class="s2">&quot;Available years: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
-             <span class="s2">&quot;Available time resolutions </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> 
-                                                      <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span><span class="o">*</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
-                                                      <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span>
-                                                      <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span>
-                                                      <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> 
-                                                      <span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">,</span>
-                                                      <span class="bp">self</span><span class="o">.</span><span class="n">ts_types</span><span class="p">))</span>
+             <span class="s2">&quot;Available frequencies </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;Available variables: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> 
+                                                <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span><span class="o">*</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">ts_types</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Loaded GriddedData objects:</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="k">for</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1833,11 +1877,24 @@
         <span class="k">return</span> <span class="n">s</span></div>
     
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># Aerocom 2 convention</span>
+    <span class="n">r0</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;GISS-MATRIX.A2.CTRL&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r0</span><span class="p">)</span>
     
-    <span class="n">r</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;GEOS-Chem-v10-01_INSITU&#39;</span><span class="p">)</span>
-    <span class="c1">#print(r.vars)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">r0</span><span class="p">[</span><span class="s1">&#39;od550aer&#39;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     
-    <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;abs550aer&#39;</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="s1">&#39;Surface&#39;</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     d0 = r0.read_var(&#39;od550aer&#39;, start=2006)</span>
+<span class="c1">#     </span>
+<span class="c1">#     r1 = ReadGridded(&#39;OsloCTM3v1.01&#39;)</span>
+<span class="c1">#     print(r1)</span>
+<span class="c1">#     </span>
+<span class="c1">#     d1 = r1.read_var(&#39;ec550aer&#39;, start=2010, ts_type=&#39;monthly&#39;,</span>
+<span class="c1">#                      vert_which=&#39;ModelLevel&#39;)</span>
+<span class="c1">#     </span>
+<span class="c1">#     </span>
+<span class="c1"># =============================================================================</span>
 </pre></div>
 
            </div>

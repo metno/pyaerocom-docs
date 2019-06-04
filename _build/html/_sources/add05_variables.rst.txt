@@ -1,0 +1,2108 @@
+
+AeroCom variables
+-----------------
+
+All AeroCom default variables are available in the file
+`variables.ini <https://github.com/metno/pyaerocom/blob/master/pyaerocom/data/variables.ini>`__
+which is part of the pyaerocom installation.
+
+Access individual variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default access to these variables is via the instance of the
+``pyaerocom.VarCollection`` class that is available via
+``pyaerocom.const.VARS``:
+
+.. code:: ipython3
+
+    import pyaerocom as pya
+    var_access = pya.const.VARS
+    var_access
+
+
+.. parsed-literal::
+
+    Initating pyaerocom configuration
+    Checking database access...
+    Checking access to: /lustre/storeA
+    Access to lustre database: True
+    Init data paths for lustre
+    Expired time: 0.022 s
+
+
+
+
+.. parsed-literal::
+
+    <pyaerocom.variable.VarCollection at 0x7fd06503bc50>
+
+
+
+.. code:: ipython3
+
+    var_access.od550aer
+
+
+
+
+.. parsed-literal::
+
+    od550aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+
+
+
+.. code:: ipython3
+
+    var_access.wetso4
+
+
+
+
+.. parsed-literal::
+
+    wetso4
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+
+
+
+Search variables using wildcards
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+E.g. using AeroCom variable names
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: ipython3
+
+    var_access.find('od*aer')
+
+
+
+
+.. parsed-literal::
+
+    ['od550aer',
+     'od550lt1aer',
+     'od550gt1aer',
+     'od440aer',
+     'od388aer',
+     'od500aer',
+     'od865aer',
+     'od870aer',
+     'od550aer',
+     'od550aer']
+
+
+
+or using CF standard_names
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: ipython3
+
+    var_access.find('*optical_thickness*')
+
+
+
+
+.. parsed-literal::
+
+    ['od550aer',
+     'abs550aer',
+     'od440aer',
+     'abs440aer',
+     'abs388aer',
+     'abs388bc',
+     'abs388dust',
+     'abs388oa',
+     'abs550bc',
+     'abs550dust',
+     'abs550pm1',
+     'abs550pm10',
+     'abs550pm2p5',
+     'abs870aer',
+     'od388aer',
+     'od388bc',
+     'od388dust',
+     'od388oa',
+     'od500aer',
+     'od500pm10',
+     'od500pm2p5',
+     'od550aerh2o',
+     'od550bc',
+     'od550dust',
+     'od550nh4',
+     'od550no3',
+     'od550oa',
+     'od550pm1',
+     'od550pm1no3',
+     'od550pm10',
+     'od550pm10no3',
+     'od550pm2p5',
+     'od550pm2p5no3',
+     'od550so4',
+     'od550ss',
+     'od865aer',
+     'od870aer',
+     'abs550aerh2o',
+     'abs550nh4',
+     'abs550no3',
+     'abs550oa',
+     'abs550so4',
+     'abs550ss',
+     'od550aer',
+     'od550aer']
+
+
+
+Looping over available variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: ipython3
+
+    for var in var_access:
+        if var.standard_name is not None:
+            print('{}: {}'.format(var.var_name, var.standard_name))
+
+
+.. parsed-literal::
+
+    sconcso4pr: surface_consentration_of_sulphor
+    od550aer: atmosphere_optical_thickness_due_to_ambient_aerosol_particles
+    abs550aer: atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles
+    od440aer: atmosphere_optical_thickness_due_to_ambient_aerosol_particles
+    abs440aer: atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles
+    ec550aer: volume_extinction_coefficient_in_air_due_to_ambient_aerosol_particles
+    ec532aer: volume_extinction_coefficient_in_air_due_to_ambient_aerosol_particles
+    ang4487aer: angstrom_exponent_of_ambient_aerosol_in_air
+    z: altitude
+    time: time
+    time_bnds: time
+    lon: longitude
+    lon_bnds: longitude
+    lat: latitude
+    lat_bnds: latitude
+    growvegbnds: time
+    areacella: cell_area
+    landf: land_area_fraction
+    orog: surface_altitude
+    lai: leaf_area_index
+    mrso: soil_moisture_content
+    snd: thickness_of_snowfall_amount
+    uas: eastward_wind
+    vas: northward_wind
+    was: upward_air_velocity
+    uapbl: eastward_wind_at_mid_atmosphere_boundary_layer_thickness
+    vapbl: northward_wind_at_mid_atmosphere_boundary_layer_thickness
+    ts: surface_temperature
+    ps: surface_air_pressure
+    tasmin: air_temperature
+    tasmax: air_temperature
+    tas: air_temperature
+    prc: convective_precipitation_flux
+    pr: precipitation_flux
+    airmass: atmosphere_mass_of_air_per_unit_area
+    zmlay: atmosphere_boundary_layer_thickness
+    eminox: tendency_of_atmosphere_mass_content_of_nox_expressed_as_nitrogen_due_to_emission
+    emino: tendency_of_atmosphere_mass_content_of_nitrogen_monoxide_due_to_emission
+    emino2: tendency_of_atmosphere_mass_content_of_nitrogen_dioxide_due_to_emission
+    eminosoil: tendency_of_atmosphere_mass_content_of_nox_expressed_as_nitrogen_monoxide_due_to_emission_from_soil
+    emico: tendency_of_atmosphere_mass_content_of_carbon_monoxide_due_to_emission
+    emivoc: tendency_of_atmosphere_mass_content_of_nmvoc_expressed_as_carbon_due_to_emission
+    emivoct: tendency_of_atmosphere_mass_content_of_nmvoc_due_to_emission
+    emic2h6: tendency_of_atmosphere_mass_content_of_ethane_due_to_emission
+    emic3h8: tendency_of_atmosphere_mass_content_of_propane_due_to_emission
+    emic2h2: tendency_of_atmosphere_mass_content_of_ethyne_due_to_emission
+    emic2h4: tendency_of_atmosphere_mass_content_of_ethene_due_to_emission
+    emic3h6: tendency_of_atmosphere_mass_content_of_propene_due_to_emission
+    emialkanes: tendency_of_atmosphere_mass_content_of_alkanes_due_to_emission
+    emialkenes: tendency_of_atmosphere_mass_content_of_alkenes_due_to_emission
+    emihcho: tendency_of_atmosphere_mass_content_of_formaldehyde_due_to_emission
+    emich3cho: tendency_of_atmosphere_mass_content_of_acetaldehyde_due_to_emission
+    emiacetone: tendency_of_atmosphere_mass_content_of_acetone_due_to_emission
+    emimethanol: tendency_of_atmosphere_mass_content_of_methanol_due_to_emission
+    emitolu: tendency_of_atmosphere_mass_content_of_toluene_due_to_emission
+    emiaro: tendency_of_atmosphere_mass_content_of_aromatic_compounds_due_to_emission
+    emiisop: tendency_of_atmosphere_mass_content_of_isoprene_due_to_emission
+    emimntp: tendency_of_atmosphere_mass_content_of_monoterpenes_due_to_emission
+    emisestp: tendency_of_atmosphere_mass_content_of_sesquiterpenes_due_to_emission
+    emibvoc: tendency_of_atmosphere_mass_content_of_biogenic_nmvoc_expressed_as_carbon_due_to_emission
+    eminh3: tendency_of_atmosphere_mass_content_of_ammonia_due_to_emission
+    emiso2: tendency_of_atmosphere_mass_content_of_sulfur_dioxide_due_to_emission
+    emidms: tendency_of_atmosphere_mass_content_of_dimethyl_sulfide_due_to_emission
+    emiso4: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_emission
+    emioa: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_due_to_emission
+    emioc: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_due_to_emission
+    emisoa: tendency_of_atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles_due_to_emission
+    emibc: tendency_of_atmosphere_mass_content_of_elemental_carbon_dry_aerosol_particles_due_to_emission
+    emiss: tendency_of_atmosphere_mass_content_of_seasalt_dry_aerosol_particles_due_to_emission
+    emidust: tendency_of_atmosphere_mass_content_of_dust_dry_aerosol_particles_due_to_emission
+    emipm10: tendency_of_atmosphere_mass_content_of_pm10_dry_aerosol_particles_due_to_emission
+    emipm2p5: tendency_of_atmosphere_mass_content_of_pm2p5_dry_aerosol_particles_due_to_emission
+    emipm10ss: tendency_of_atmosphere_mass_content_of_pm10_seasalt_dry_aerosol_particles_due_to_emission
+    emipm10dust: tendency_of_atmosphere_mass_content_of_pm10_dust_dry_aerosol_particles_due_to_emission
+    emipm2p5ss: tendency_of_atmosphere_mass_content_of_pm2p5_seasalt_dry_aerosol_particles_due_to_emission
+    emipm2p5dust: tendency_of_atmosphere_mass_content_of_pm2p5_dust_dry_aerosol_particles_due_to_emission
+    emipm1ss: tendency_of_atmosphere_mass_content_of_pm1_seasalt_dry_aerosol_particles_due_to_emission
+    emipm1dust: tendency_of_atmosphere_mass_content_of_pm1_dust_dry_aerosol_particles_due_to_emission
+    emipcb153: tendency_of_atmosphere_mass_content_of_hexachlorobiphenyl_due_to_emission
+    emiahch: tendency_of_atmosphere_mass_content_of_alpha_hexachlorocyclohexane_due_to_emission
+    reemipcb153: tendency_of_atmosphere_mass_content_of_hexachlorobiphenyl_due_to_re_emission
+    reemiahch: tendency_of_atmosphere_mass_content_of_alpha_hexachlorocyclohexane_due_to_re_emission
+    emihg0: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_emission
+    emihg2: tendency_of_atmosphere_mass_content_of_gaseous_divalent_mercury_due_to_emission
+    emihgp: tendency_of_atmosphere_mass_content_of_mercury_dry_aerosol_particles_due_to_emission
+    emiahg0: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_anthropogenic_emission
+    emiahg2: tendency_of_atmosphere_mass_content_of_gaseous_divalent_mercury_due_to_anthropogenic_emission
+    emiahgp: tendency_of_atmosphere_mass_content_of_mercury_dry_aerosol_particles_due_to_anthropogenic_emission
+    reemihg0: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_re_emission
+    dryhno3: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_dry_deposition
+    dryno3: atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_dry_deposition
+    dryno2: tendency_of_atmosphere_mass_content_of_nitrogen_dioxide_due_to_dry_deposition
+    dryn2o5: tendency_of_atmosphere_mass_content_of_dinitrogen_pentoxide_due_to_dry_deposition
+    drypan: atmosphere_mass_content_of_peroxyacetyl_nitrate_due_to_dry_deposition
+    dryorgn: tendency_of_atmosphere_mass_content_of_organic_nitrates_due_to_dry_deposition
+    dryhono: tendency_of_atmosphere_mass_content_of_nitrous_acid_due_to_dry_deposition
+    dryhno4: tendency_of_atmosphere_mass_content_of_peroxynitric_acid_due_to_dry_deposition
+    drynoy: tendency_of_atmosphere_mass_content_of_noy_expressed_as_nitrogen_due_to_dry_deposition
+    drynh3: tendency_of_atmosphere_mass_content_of_ammonia_due_to_dry_deposition
+    drynh4: tendency_of_atmosphere_mass_content_of_ammonium_dry_aerosol_particles_due_to_dry_deposition
+    dryso2: tendency_of_atmosphere_mass_content_of_sulfur_dioxide_due_to_dry_deposition
+    dryso4: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_dry_deposition
+    drymsa: tendency_of_atmosphere_mass_content_of_methanesulfonic_acid_due_to_dry_deposition
+    drydms: tendency_of_atmosphere_mass_content_of_dimethyl_sulfide_due_to_dry_deposition
+    dryss: tendency_of_atmosphere_mass_content_of_seasalt_dry_aerosol_particles_due_to_dry_deposition
+    drydust: tendency_of_atmosphere_mass_content_of_dust_dry_aerosol_particles_due_to_dry_deposition
+    drypm1no3: tendency_of_atmosphere_mass_content_of_pm1_nitrate_dry_aerosol_particles_due_to_dry_deposition
+    drypm2p5no3: tendency_of_atmosphere_mass_content_of_pm2p5_nitrate_dry_aerosol_particles_due_to_dry_deposition
+    drypm10no3: tendency_of_atmosphere_mass_content_of_pm10_nitrate_dry_aerosol_particles_due_to_dry_deposition
+    dryo3: tendency_of_atmosphere_mass_content_of_ozone_due_to_dry_deposition
+    stoo3: tendency_of_atmosphere_mass_content_of_ozone_due_to_dry_deposition_into_stomata
+    dryhcho: tendency_of_atmosphere_mass_content_of_formaldehyde_due_to_dry_deposition
+    drych3cho: tendency_of_atmosphere_mass_content_of_acetaldehyde_due_to_dry_deposition
+    dryalde: tendency_of_atmosphere_mass_content_of_aldehydes_due_to_dry_deposition
+    dryhcooh: tendency_of_atmosphere_mass_content_of_formic_acid_due_to_dry_deposition
+    drych3cooh: tendency_of_atmosphere_mass_content_of_acetic_acid_due_to_dry_deposition
+    dryh2o2: tendency_of_atmosphere_mass_content_of_hydrogen_peroxide_due_to_dry_deposition
+    dryroor: tendency_of_atmosphere_mass_content_of_organic_peroxides_due_to_dry_deposition
+    excnh3: surface_net_downward_mass_flux_of_ammonia_due_to_bidirectional_surface_exchange
+    drybc: tendency_of_atmosphere_mass_content_of_elemental_carbon_dry_aerosol_particles_due_to_dry_deposition
+    drypm10: tendency_of_atmosphere_mass_content_of_pm10_dry_aerosol_particles_due_to_dry_deposition
+    drypm10ss: tendency_of_atmosphere_mass_content_of_pm10_seasalt_dry_aerosol_particles_due_to_dry_deposition
+    drypm10dust: tendency_of_atmosphere_mass_content_of_pm10_dust_dry_aerosol_particles_due_to_dry_deposition
+    drypm2p5: tendency_of_atmosphere_mass_content_of_pm2p5_dry_aerosol_particles_due_to_dry_deposition
+    drypm2p5ss: tendency_of_atmosphere_mass_content_of_pm2p5_seasalt_dry_aerosol_particles_due_to_dry_deposition
+    drypm2p5dust: tendency_of_atmosphere_mass_content_of_pm2p5_dust_dry_aerosol_particles_due_to_dry_deposition
+    dryoc: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_due_to_dry_deposition
+    dryoa: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_due_to_dry_deposition
+    drysoa: tendency_of_atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles_due_to_dry_deposition
+    drypcb153: tendency_of_atmosphere_mass_content_of_hexachlorobiphenyl_due_to_dry_deposition
+    dryahch: tendency_of_atmosphere_mass_content_of_alpha_hexachlorocyclohexane_due_to_dry_deposition
+    dryhg0: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_dry_deposition
+    dryhg2: tendency_of_atmosphere_mass_content_of_gaseous_divalent_mercury_due_to_dry_deposition
+    dryhgp: tendency_of_atmosphere_mass_content_of_mercury_dry_aerosol_particles_due_to_dry_deposition
+    wethno3: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_wet_deposition
+    wetn2o5: tendency_of_atmosphere_mass_content_of_dinitrogen_pentoxide_due_to_wet_deposition
+    wetorgn: tendency_of_atmosphere_mass_content_of_organic_nitrates_due_to_wet_deposition
+    wetno3: tendency_of_atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_wet_deposition
+    wethono: tendency_of_atmosphere_mass_content_of_nitrous_acid_due_to_wet_deposition
+    wethno4: tendency_of_atmosphere_mass_content_of_peroxynitric_acid_due_to_wet_deposition
+    wetnoy: tendency_of_atmosphere_mass_content_of_noy_expressed_as_nitrogen_due_to_wet_deposition
+    wetnh3: tendency_of_atmosphere_mass_content_of_ammonia_due_to_wet_deposition
+    wetnh4: tendency_of_atmosphere_mass_content_of_ammonium_dry_aerosol_particles_due_to_wet_deposition
+    wetso2: tendency_of_atmosphere_mass_content_of_sulfur_dioxide_due_to_wet_deposition
+    wetso4: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_wet_deposition
+    wetmsa: tendency_of_atmosphere_mass_content_of_methanesulfonic_acid_dry_aerosol_particles_due_to_wet_deposition
+    wetdms: tendency_of_atmosphere_mass_content_of_dimethyl_sulfide_due_to_wet_deposition
+    wetbc: tendency_of_atmosphere_mass_content_of_elemental_carbon_dry_aerosol_particles_due_to_wet_deposition
+    wetss: tendency_of_atmosphere_mass_content_of_seasalt_dry_aerosol_particles_due_to_wet_deposition
+    wetdust: tendency_of_atmosphere_mass_content_of_dust_dry_aerosol_particles_due_to_wet_deposition
+    wetpm1no3: tendency_of_atmosphere_mass_content_of_pm1_nitrate_dry_aerosol_particles_due_to_wet_deposition
+    wetpm2p5no3: tendency_of_atmosphere_mass_content_of_pm2p5_nitrate_dry_aerosol_particles_due_to_wet_deposition
+    wetpm10no3: tendency_of_atmosphere_mass_content_of_pm10_nitrate_dry_aerosol_particles_due_to_wet_deposition
+    wethcho: tendency_of_atmosphere_mass_content_of_formaldehyde_due_to_wet_deposition
+    wetch3cho: tendency_of_atmosphere_mass_content_of_acetaldehyde_due_to_wet_deposition
+    wetalde: tendency_of_atmosphere_mass_content_of_aldehydes_due_to_wet_deposition
+    wethcooh: tendency_of_atmosphere_mass_content_of_formic_acid_due_to_wet_deposition
+    wetch3cooh: tendency_of_atmosphere_mass_content_of_acetic_acid_due_to_wet_deposition
+    weth2o2: tendency_of_atmosphere_mass_content_of_hydrogen_peroxide_due_to_wet_deposition
+    wetroor: tendency_of_atmosphere_mass_content_of_organic_peroxides_due_to_wet_deposition
+    wetpm10: tendency_of_atmosphere_mass_content_of_pm10_dry_aerosol_particles_due_to_wet_deposition
+    wetpm10ss: tendency_of_atmosphere_mass_content_of_pm10_seasalt_dry_aerosol_particles_due_to_wet_deposition
+    wetpm10dust: tendency_of_atmosphere_mass_content_of_pm10_dust_dry_aerosol_particles_due_to_wet_deposition
+    wetpm2p5: tendency_of_atmosphere_mass_content_of_pm2p5_dry_aerosol_particles_due_to_wet_deposition
+    wetpm2p5ss: tendency_of_atmosphere_mass_content_of_pm2p5_seasalt_dry_aerosol_particles_due_to_wet_deposition
+    wetpm2p5dust: tendency_of_atmosphere_mass_content_of_pm2p5_dust_dry_aerosol_particles_due_to_wet_deposition
+    wetoa: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_due_to_wet_deposition
+    wetoc: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_due_to_wet_deposition
+    wetsoa: tendency_of_atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles_due_to_wet_deposition
+    wetpcb153: tendency_of_atmosphere_mass_content_of_hexachlorobiphenyl_due_to_wet_deposition
+    wetahch: tendency_of_atmosphere_mass_content_of_alpha_hexachlorocyclohexane_due_to_wet_deposition
+    wethg: tendency_of_atmosphere_mass_content_of_mercury_due_to_wet_deposition
+    wethg0: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_wet_deposition
+    wethg2: tendency_of_atmosphere_mass_content_of_gaseous_divalent_mercury_due_to_wet_deposition
+    wethgp: tendency_of_atmosphere_mass_content_of_mercury_dry_aerosol_particles_due_to_wet_deposition
+    vmro3: mole_fraction_of_ozone_in_air
+    vmrno: mole_fraction_of_nitrogen_monoxide_in_air
+    vmrno2: mole_fraction_of_nitrogen_dioxide_in_air
+    vmro32m: mole_fraction_of_ozone_in_air
+    rc: canopy_resistance_to_ozone_dry_deposition
+    ra: aerodynamic_resistance
+    vmrco: mole_fraction_of_carbon_monoxide_in_air
+    vmrhno3: mole_fraction_of_nitric_acid_in_air
+    vmrn2o5: mole_fraction_of_dinitrogen_pentoxide_in_air
+    vmrpan: mole_fraction_of_peroxyacetyl_nitrate_in_air
+    vmrhono: mole_fraction_of_nitrous_acid_in_air
+    vmrhno4: mole_fraction_of_peroxynitric_acid_in_air
+    vmrorgnit: mole_fraction_of_organic_nitrates_in_air
+    vmrnoy: mole_fraction_of_noy_expressed_as_nitrogen_in_air
+    vmrvoc: mole_fraction_of_nmvoc_expressed_as_carbon_in_air
+    vmrc2h6: mole_fraction_of_ethane_in_air
+    vmrc3h8: mole_fraction_of_propane_in_air
+    vmrc2h4: mole_fraction_of_ethene_in_air
+    vmrc3h6: mole_fraction_of_propene_in_air
+    vmralkanes: mole_fraction_of_alkanes_in_air
+    vmralkenes: mole_fraction_of_alkenes_in_air
+    vmrhcho: mole_fraction_of_formaldehyde_in_air
+    vmrch3cho: mole_fraction_of_acetaldehyde_in_air
+    vmracetone: mole_fraction_of_acetone_in_air
+    vmrglyoxal: mole_fraction_of_glyoxal_in_air
+    vmrmethanol: mole_fraction_of_methanol_in_air
+    vmrtolu: mole_fraction_of_toluene_in_air
+    vmraro: mole_fraction_of_aromatic_compounds_in_air
+    vmrisop: mole_fraction_of_isoprene_in_air
+    vmrc10h16: mole_fraction_of_alpha_pinene_in_air
+    vmrtp: mole_fraction_of_terpenes_in_air
+    vmrnh3: mole_fraction_of_ammonia_in_air
+    vmrso2: mole_fraction_of_sulfur_dioxide_in_air
+    vmrdms: mole_fraction_of_dimethyl_sulfide_in_air
+    mmrpm10: mass_fraction_of_pm10_dry_aerosol_particles_in_air
+    mmrpm2p5: mass_fraction_of_pm2p5_dry_aerosol particles_particles_in_air
+    mmrpm1: mass_fraction_of_pm1_dry_aerosol_particles_in_air
+    mmrno3: mass_fraction_of_nitrate_dry_aerosol_particles_in_air
+    mmrso4: mass_fraction_of_sulfate_dry_aerosol_particles_in_air
+    mmrbc: mass_fraction_of_elemental_carbon_dry_aerosol_particles_in_air
+    mmroc: mass_fraction_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_in_air
+    mmroa: mass_fraction_of_particulate_organic_matter_dry_aerosol_particles
+    mmrss: mass_fraction_of_seasalt_dry_aerosol_particles_in_air
+    mmrdust: mass_fraction_of_dust_dry_aerosol_particles_in_air
+    mmrmsa: mass_fraction_of_methanesulfonic_acid_dry_aerosol_particles_in_air
+    mmrnh4: mass_fraction_of_ammonium_dry_aerosol_particles_in_air
+    ncpm2p5: number_concentration_of_pm2p5_aerosol_particles_in_air
+    mmrpm1no3: mass_fraction_of_pm1_nitrate_dry_aerosol_particles_in_air
+    mmrpm1ss: mass_fraction_of_pm1_sea_salt_dry_aerosol_particles_in_air
+    mmrpm1dust: mass_fraction_of_pm1_dust_dry_aerosol_particles_in_air
+    mmrpm2p5no3: mass_fraction_of_pm2p5_nitrate_dry_aerosol_particles_in_air
+    mmrpm2p5so4: mass_fraction_of_pm2p5_sulfate_dry_aerosol_particles_in_air
+    mmrpm2p5bc: mass_fraction_of_pm2p5_elemental_carbon_dry_aerosol_particles_in_air
+    mmrpm2p5oc: mass_fraction_of_pm2p5_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_in_air
+    mmrpm2p5oa: mass_fraction_of_pm2p5_particulate_organic_matter_dry_aerosol_particles_in_air
+    mmrpm2p5ss: mass_fraction_of_pm2p5_sea_salt_dry_aerosol_particles_in_air
+    mmrpm2p5dust: mass_fraction_of_pm2p5_dust_dry_aerosol_particles_in_air
+    mmrpm2p5nh4: mass_fraction_of_pm2p5_ammonium_dry_aerosol_particles_in_air
+    ncpm10: number_concentration_of_pm10_aerosol_particles_in_air
+    mmrpm10no3: mass_fraction_of_pm10_nitrate_dry_aerosol_particles_in_air
+    mmrpm10so4: mass_fraction_of_pm10_sulfate_dry_aerosol_particles_in_air
+    mmrpm10bc: mass_fraction_of_pm10_elemental_carbon_dry_aerosol_particles_in_air
+    mmrpm10oc: mass_fraction_of_pm10_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_in_air
+    mmrpm10oa: mass_fraction_of_pm10_particulate_organic_matter_dry_aerosol_particles_in_air
+    mmrpm10ss: mass_fraction_of_pm10_sea_salt_dry_aerosol_particles_in_air
+    mmrpm10dust: mass_fraction_of_pm10_dust_dry_aerosol_particles_in_air
+    mmrpm10nh4: mass_fraction_of_pm10_ammonium_dry_aerosol_particles_in_air
+    vmrhg0: mole_fraction_of_gaseous_elemental_mercury_in_air
+    vmrhg2: mole_fraction_of_gaseous_divalent_mercury_in_air
+    vmrpcb153: mole_fraction_of_hexachlorobiphenyl_in_air
+    vmrahch: mole_fraction_of_alpha_hexachlorocyclohexane_in_air
+    mmrhgp: mass_fraction_of_mercury_dry_aerosol_particles_in_air
+    jno2: photolysis_rate_of_nitrogen_dioxide
+    jo3o1d: photolysis_rate_of_ozone_to_1D_oxygen_atom
+    rsdt: toa_incoming_shortwave_flux
+    rsut: toa_upwelling_shortwave_flux
+    rsutcs: toa_upwelling_shortwave_flux_assuming_clear_sky
+    rsds: surface_downwelling_shortwave_flux_in_air
+    rsus: surface_upwelling_shortwave_flux_in_air
+    rsdsdir: surface_direct_downwelling_shortwave_flux_in_air
+    rsdsdif: surface_diffuse_downwelling_shortwave_flux_in_air
+    rsdscs: surface_downwelling_shortwave_flux_in_air_assuming_clear_sky
+    rsdscsdir: surface_direct_downwelling_shortwave_flux_in_air_assuming_clear_sky
+    rsdscsdif: surface_diffuse_downwelling_shortwave_flux_in_air_assuming_clear_sky
+    rlut: toa_upwelling_longwave_flux
+    rlutcs: toa_upwelling_longwave_flux_assuming_clear_sky
+    rlds: surface_downwelling_longwave_flux_in_air
+    rlus: surface_upwelling_longwave_flux_in_air
+    rsut0: toa_upwelling_shortwave_flux_assuming_no_aerosol
+    rsuscs0: surface_upwelling_shortwave_flux_in_air_assuming_clear_sky_and_no_aerosol
+    rsds0: surface_downwelling_shortwave_flux_in_air_assuming_no_aerosol
+    rsus0: surface_upwelling_shortwave_flux_in_air_assuming_no_aerosol
+    rsdsdir0: surface_direct_downwelling_shortwave_flux_in_air_assuming_no_aerosol
+    rsdsdif0: surface_diffuse_downwelling_shortwave_flux_in_air_assuming_no_aerosol
+    rsdscs0: surface_downwelling_shortwave_flux_in_air_assuming_clear_sky_and_no_aerosol
+    rsdscsdir0: surface_direct_downwelling_shortwave_flux_in_air_assuming_clear_sky_and_no_aerosol
+    rsdscsdif0: surface_diffuse_downwelling_shortwave_flux_in_air_assuming_clear_sky_and_no_aerosol
+    rlut0: toa_upwelling_longwave_flux_assuming_no_aerosol
+    rlutcs0: toa_upwelling_longwave_flux_assuming_clear_sky_and_no_aerosol
+    rlds0: surface_downwelling_longwave_flux_in_air_assuming_no_aerosol
+    rlus0: surface_upwelling_longwave_flux_in_air_assuming_no_aerosol
+    rsutpm1no3: toa_upwelling_shortwave_flux_assuming_all_sky_fine_nitrate
+    rsutpm10no3: toa_upwelling_shortwave_flux_assuming_all_sky_coarse_nitrate
+    rsutcspm1no3: toa_upwelling_shortwave_flux_assuming_clear_sky_fine_nitrate
+    rsutcsnpm10no3: toa_upwelling_shortwave_flux_assuming_clear_sky_coarse_nitrate
+    longitude: longitude
+    latitude: latitude
+    abs388aer: atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles
+    abs388bc: atmosphere_absorption_optical_thickness_due_to_elemental_carbon_ambient_aerosol_particles
+    abs388dust: atmosphere_absorption_optical_thickness_due_to_dust_ambient_aerosol_particles
+    abs388oa: atmosphere_absorption_optical_thickness_due_to_particulate_organic_matter_ambient_aerosol_particles
+    abs550bc: atmosphere_absorption_optical_thickness_due_to_elemental_carbon_ambient_aerosol_particles
+    abs550dust: atmosphere_absorption_optical_thickness_due_to_dust_ambient_aerosol_particles
+    abs550pm1: atmosphere_absorption_optical_thickness_due_to_pm1_ambient_aerosol_particles
+    abs550pm10: atmosphere_absorption_optical_thickness_due_to_pm10_ambient_aerosol_particles
+    abs550pm2p5: atmosphere_absorption_optical_thickness_due_to_pm2p5_ambient_aerosol_particles
+    abs870aer: atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles
+    od388aer: atmosphere_optical_thickness_due_to_ambient_aerosol_particles
+    od388bc: atmosphere_optical_thickness_due_to_elemental_carbon_ambient_aerosol_particles
+    od388dust: atmosphere_optical_thickness_due_to_dust_ambient_aerosol_particles
+    od388oa: atmosphere_optical_thickness_due_to_particulate_organic_matter_ambient_aerosol_particles
+    od500aer: atmosphere_optical_thickness_due_to_ambient_aerosol_particles
+    od500pm10: atmosphere_optical_thickness_due_to_pm10_ambient_aerosol_particles
+    od500pm2p5: atmosphere_optical_thickness_due_to_pm2p5_ambient_aerosol_particles
+    od550aerh2o: atmosphere_optical_thickness_due_to_water_in_ambient_aerosol_particles
+    od550bc: atmosphere_optical_thickness_due_to_elemental_carbon_ambient_aerosol_particles
+    od550dust: atmosphere_optical_thickness_due_to_dust_ambient_aerosol_particles
+    od550nh4: atmosphere_optical_thickness_due_to_ammonium_ambient_aerosol_particles
+    od550no3: atmosphere_optical_thickness_due_to_nitrate_ambient_aerosol_particles
+    od550oa: atmosphere_optical_thickness_due_to_particulate_organic_matter_ambient_aerosol_particles
+    od550pm1: atmosphere_optical_thickness_due_to_pm1_ambient_aerosol_particles
+    od550pm1no3: atmosphere_optical_thickness_due_to_pm1_nitrate_ambient_aerosol_particles
+    od550pm10: atmosphere_optical_thickness_due_to_pm10_ambient_aerosol_particles
+    od550pm10no3: atmosphere_optical_thickness_due_to_pm10_nitrate_ambient_aerosol_particles
+    od550pm2p5: atmosphere_optical_thickness_due_to_pm2p5_ambient_aerosol_particles
+    od550pm2p5no3: atmosphere_optical_thickness_due_to_pm2p5_nitrate_ambient_aerosol_particles
+    od550so4: atmosphere_optical_thickness_due_to_sulfate_ambient_aerosol_particles
+    od550ss: atmosphere_optical_thickness_due_to_seasalt_ambient_aerosol_particles
+    od865aer: atmosphere_optical_thickness_due_to_ambient_aerosol_particles
+    od870aer: atmosphere_optical_thickness_due_to_ambient_aerosol_particles
+    cldf: cloud_area_fraction
+    abs550aerh2o: atmosphere_absorption_optical_thickness_due_to_water_in_ambient_aerosol_particles
+    abs550nh4: atmosphere_absorption_optical_thickness_due_to_ammonium_ambient_aerosol_particles
+    abs550no3: atmosphere_absorption_optical_thickness_due_to_nitrate_ambient_aerosol_particles
+    abs550oa: atmosphere_absorption_optical_thickness_due_to_particulate_organic_matter_ambient_aerosol_particles
+    abs550so4: atmosphere_absorption_optical_thickness_due_to_sulfate_ambient_aerosol_particles
+    abs550ss: atmosphere_absorption_optical_thickness_due_to_seasalt_ambient_aerosol_particles
+    loadno3: atmosphere_mass_content_of_nitrate_dry_aerosol_particles
+    loadso4: atmosphere_mass_content_of_sulfate_dry_aerosol_particles
+    loadbc: atmosphere_mass_content_of_elemental_carbon_dry_aerosol_particles
+    loadoc: atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon
+    loadoa: atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles
+    loadsoa: atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles
+    loadss: atmosphere_mass_content_of_seasalt_dry_aerosol_particles
+    loaddust: atmosphere_mass_content_of_dust_dry_aerosol_particles
+    loadmsa: atmosphere_mass_content_of_methanesulfonic_acid_dry_aerosol_particles
+    loadnh4: atmosphere_mass_content_of_ammonium_dry_aerosol_particles
+    loadno: atmosphere_mass_content_of_nitrogen_monoxide
+    loadno2: atmosphere_mass_content_of_nitrogen_dioxide
+    loadn2o5: atmosphere_mass_content_of_dinitrogen_pentoxide
+    loadpan: atmosphere_mass_content_of_peroxyacetyl_nitrate
+    loadhono: atmosphere_mass_content_of_nitrous_acid
+    loadhno3: atmosphere_mass_content_of_nitric_acid
+    loadhno4: atmosphere_mass_content_of_peroxynitric_acid
+    loadorgnit: atmosphere_mass_content_of_organic_nitrates
+    loadnoy: atmosphere_mass_content_of_noy_expressed_as_nitrogen
+    loadnh3: atmosphere_mass_content_of_ammonia
+    loaddms: atmosphere_mass_content_of_dimethyl_sulfide
+    loadso2: atmosphere_mass_content_of_sulfur_dioxide
+    loadpm1no3: atmosphere_mass_content_of_pm1_nitrate_dry_aerosol_particles
+    loadpm2p5no3: atmosphere_mass_content_of_pm2p5_nitrate_dry_aerosol_particles
+    loadpm10no3: atmosphere_mass_content_of_pm10_nitrate_dry_aerosol_particles
+    loadpm1ss: atmosphere_mass_content_of_pm1_seasalt_dry_aerosol_particles
+    loadpm2p5ss: atmosphere_mass_content_of_pm2p5_seasalt_dry_aerosol_particles
+    loadpm10ss: atmosphere_mass_content_of_pm10_seasalt_dry_aerosol_particles
+    loadpm1dust: atmosphere_mass_content_of_pm1_dust_dry_aerosol_particles
+    loadpm2p5dust: atmosphere_mass_content_of_pm2p5_dust_dry_aerosol_particles
+    loadpm10dust: atmosphere_mass_content_of_pm10_dust_dry_aerosol_particles
+    loadpm1: atmosphere_mass_content_of_pm1_dry_aerosol_particles
+    loadpm2p5: atmosphere_mass_content_of_pm2p5_dry_aerosol_particles
+    loadpm10: atmosphere_mass_content_of_pm10_dry_aerosol_particles
+    lev: atmosphere_sigma_coordinate
+    lev_bnds: atmosphere_sigma_coordinate
+    ptop: atmosphere_sigma_coordinate
+    a: atmosphere_hybrid_sigma_pressure_coordinate
+    b: atmosphere_hybrid_sigma_pressure_coordinate
+    a_bnds: atmosphere_hybrid_sigma_pressure_coordinate
+    b_bnds: atmosphere_hybrid_sigma_pressure_coordinate
+    p0: model_reference_air_pressure
+    ap: atmosphere_hybrid_sigma_pressure_coordinate
+    ap_bnds: atmosphere_hybrid_sigma_pressure_coordinate
+    ta: air_temperature
+    rho: air_density
+    dh: atmosphere_layer_thickness
+    hus: specific_humidity
+    mcu: atmosphere_upward_convective_mass_flux
+    hur: relative_humidy
+    emilnox: tendency_of_atmosphere_mass_concentration_of_nox_expressed_as_nitrogen_due_to_emission_from_lightning
+    eminoaircraft: tendency_of_atmosphere_mass_concentration_of_nitrogen_monoxide_due_to_emission_from_aircraft
+    vmroh: mole_fraction_of_hydroxyl_radical_in_air
+    vmrh2o2: mole_fraction_of_hydrogen_peroxide_in_air
+    vmrho2: mole_fraction_of_hydroperoxyl_radical_in_air
+    vmrcl: mole_fraction_of_chlorine_in_air
+    vmrbr: mole_fraction_of_bromine_in_air
+    vmrbro: mole_fraction_of_bromine_monoxide_in_air
+    prodo3: tendency_of_atmosphere_mole_concentration_of_ozone_due_to_chemical_production
+    losso3: tendency_of_atmosphere_mole_concentration_of_ozone_due_to_chemical_destruction
+    lossch4: tendency_of_atmosphere_mole_concentration_of_methane_due_to_chemical_destruction
+    lossco: tendency_of_atmosphere_mole_concentration_of_carbon_monoxide_due_to_chemical_destruction
+    reacvoc: rate_of_hydroxyl_radical_destruction_due_to_reaction_with_nmvoc
+    chepsoa: tendency_of_atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles_due_to_net_chemical_production
+    chepmsa: tendency_of_atmosphere_mass_content_of_methanesulfonic_acid_dry_aerosol_particles_due_to_net_chemical_production
+    chegpso4: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_gaseous_phase_net_chemical_production
+    cheaqpso4: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_aqueous_phase_net_chemical_production
+    chegphno3: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_gaseous_phase_net_chemical_production
+    cheglhno3: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_gaseous_phase_net_chemical_destruction
+    cheaphno3: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_net_chemical_production_on_ambient_aerosol_particles
+    chealhno3: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_net_chemical_destruction_on_ambient_aerosol_particles
+    chepno3: tendency_of_atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_net_chemical_production
+    chedustpno3: tendency_of_atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_net_chemical_production_on_dust_ambient_aerosol_particles
+    chesspno3: tendency_of_atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_net_chemical_production_on_seasalt_ambient_aerosol_particles
+    cheppm10no3: tendency_of_atmosphere_mass_content_of_pm10_nitrate_dry_aerosol_particles_due_to_net_chemical_production
+    cheppm2p5no3: tendency_of_atmosphere_mass_content_of_pm2p5_nitrate_dry_aerosol_particles_due_to_net_chemical_production
+    cheppm1no3: tendency_of_atmosphere_mass_content_of_pm1_nitrate_dry_aerosol_particles_due_to_net_chemical_production
+    chegpnh3: tendency_of_atmosphere_mass_content of ammonia_due_to_gaseous_phase_net_chemical_production
+    chealnh3: tendency_of_atmosphere_mass_content_of_ammonia_due_to_chemical_destruction_on_ambient_aerosol_particles
+    chepnh4: tendency_of_atmosphere_mass_content_of_ammonium_due_to net_chemical_production
+    mmrsoa: mass_fraction_of_secondary_particulate_organic_matter_dry_aerosol_particles_in_air
+    mmraerh2o: mass_fraction_of_water_in_ambient_aerosol_particles_in_air
+    mmrpm10h2o: mass_fraction_of_water_in_pm10_ambient_aerosol_particles_in_air
+    mmrpm2p5h2o: mass_fraction_of_water_in_pm2p5_ambient_aerosol_particles_in_air
+    rh: relative_humidy
+    vmrcodirect50d: mole_fraction_of_artificial_tracer_with_fixed_lifetime_in_air
+    vmrcodirect25d: mole_fraction_of_artificial_tracer_with_fixed_lifetime_in_air
+    station: station
+    network_stationid: platform_id
+    networkid: platform_name
+    stationid: platform_id
+    station_elevation: surface_altitude
+    td: dew_point_temperature
+    hurs: relative_humidity
+    huss: specific_humidity
+    mmrpm10poa: mass_fraction_of_pm10_primary_particulate_organic_matter_dry_aerosol_particles_in_air
+    mmrpm2p5poa: mass_fraction_of_pm2p5_primary_particulate_organic_matter_dry_aerosol_particles_in_air
+    vmr5mo3: mole_fraction_of_ozone_in_air
+    vmr10mo3: mole_fraction_of_ozone_in_air
+    tcwv: atmosphere_mass_content_of_water_vapor
+    tcno2: atmosphere_mass_content_of_nitrogen_dioxide
+    pres: air_pressure
+    ua: eastward_wind
+    va: northward_wind
+    wa: upward_air_velocity
+    od550aer: atmosphere_optical_thickness_due_to_ambient_aerosol_particles
+    od550aer: atmosphere_optical_thickness_due_to_ambient_aerosol_particles
+    ang4487aer: angstrom_exponent_of_ambient_aerosol_in_air
+    rh: relative_humidy
+    rh: relative_humidy
+    z: altitude
+    z: altitude
+    longitude: longitude
+    latitude: latitude
+    pres: air_pressure
+    pres: air_pressure
+    ta: air_temperature
+
+
+List of all variables
+~~~~~~~~~~~~~~~~~~~~~
+
+The following list prints all available variables from the
+`variables.ini <https://github.com/metno/pyaerocom/blob/master/pyaerocom/data/variables.ini>`__
+file.
+
+.. code:: ipython3
+
+    for var in var_access:
+        print(repr(var))
+        print()
+
+
+.. parsed-literal::
+
+    default
+    standard_name: None; Unit: 1
+    
+    sconcso4pr
+    standard_name: surface_consentration_of_sulphor; Unit: mgS/L
+    
+    od550aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    od550lt1aer
+    standard_name: None; Unit: 1
+    
+    od550gt1aer
+    standard_name: None; Unit: 1
+    
+    abs550aer
+    standard_name: atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    od440aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    abs440aer
+    standard_name: atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    ec550aer
+    standard_name: volume_extinction_coefficient_in_air_due_to_ambient_aerosol_particles; Unit: 1/Mm
+    
+    ec532aer
+    standard_name: volume_extinction_coefficient_in_air_due_to_ambient_aerosol_particles; Unit: 1/Mm
+    
+    scatc550aer
+    standard_name: None; Unit: 1/Mm
+    
+    scatc550lt1aer
+    standard_name: None; Unit: 1/Mm
+    
+    scatc550gt1aer
+    standard_name: None; Unit: 1/Mm
+    
+    bscatc550aer
+    standard_name: None; Unit: Mm-1 sr-1
+    
+    bscatc532aer
+    standard_name: None; Unit: Mm-1 sr-1
+    
+    bscatc355aer
+    standard_name: None; Unit: Mm-1 sr-1
+    
+    bscatc1064aer
+    standard_name: None; Unit: Mm-1 sr-1
+    
+    absc550aer
+    standard_name: None; Unit: 1/Mm
+    
+    absc550lt1aer
+    standard_name: None; Unit: 1/Mm
+    
+    ssa440aer
+    standard_name: None; Unit: 1
+    
+    ssa675aer
+    standard_name: None; Unit: 1
+    
+    ssa870aer
+    standard_name: None; Unit: 1
+    
+    ssa1020aer
+    standard_name: None; Unit: 1
+    
+    ang4487aer
+    standard_name: angstrom_exponent_of_ambient_aerosol_in_air; Unit: 1
+    
+    angabs4487aer
+    standard_name: None; Unit: 1
+    
+    zdust
+    standard_name: None; Unit: m
+    
+    z
+    standard_name: altitude; Unit: m
+    
+    deltaz
+    standard_name: None; Unit: m
+    
+    time
+    standard_name: time; Unit: days since  2001-01-01 00:00:00
+    
+    time_bnds
+    standard_name: time; Unit: days since  2001-01-01 00:00:00
+    
+    lon
+    standard_name: longitude; Unit: degrees_east
+    
+    lon_bnds
+    standard_name: longitude; Unit: degrees_east
+    
+    lat
+    standard_name: latitude; Unit: degrees_north
+    
+    lat_bnds
+    standard_name: latitude; Unit: degrees_north
+    
+    growvegbnds
+    standard_name: time; Unit: days since  2001-01-01 00:00:00
+    
+    areacella
+    standard_name: cell_area; Unit: m2
+    
+    landf
+    standard_name: land_area_fraction; Unit: m2 m-2
+    
+    orog
+    standard_name: surface_altitude; Unit: m
+    
+    landcbf
+    standard_name: None; Unit: 1
+    
+    landcnf
+    standard_name: None; Unit: 1
+    
+    landccp
+    standard_name: None; Unit: 1
+    
+    landcsa
+    standard_name: None; Unit: 1
+    
+    landcgs
+    standard_name: None; Unit: 1
+    
+    landcst
+    standard_name: None; Unit: 1
+    
+    landcbs
+    standard_name: None; Unit: 1
+    
+    landcw
+    standard_name: None; Unit: 1
+    
+    landco
+    standard_name: None; Unit: 1
+    
+    landccpc3
+    standard_name: None; Unit: 1
+    
+    landccpc4
+    standard_name: None; Unit: 1
+    
+    landcsac3
+    standard_name: None; Unit: 1
+    
+    landcsac4
+    standard_name: None; Unit: 1
+    
+    landcgsc3
+    standard_name: None; Unit: 1
+    
+    landcgsc4
+    standard_name: None; Unit: 1
+    
+    lai
+    standard_name: leaf_area_index; Unit: m2 m-2
+    
+    mrso
+    standard_name: soil_moisture_content; Unit: kg m-2
+    
+    snd
+    standard_name: thickness_of_snowfall_amount; Unit: m
+    
+    uas
+    standard_name: eastward_wind; Unit: m s-1
+    
+    vas
+    standard_name: northward_wind; Unit: m s-1
+    
+    was
+    standard_name: upward_air_velocity; Unit: m s-1
+    
+    uapbl
+    standard_name: eastward_wind_at_mid_atmosphere_boundary_layer_thickness; Unit: m s-1
+    
+    vapbl
+    standard_name: northward_wind_at_mid_atmosphere_boundary_layer_thickness; Unit: m s-1
+    
+    ts
+    standard_name: surface_temperature; Unit: K
+    
+    ps
+    standard_name: surface_air_pressure; Unit: Pa
+    
+    tasmin
+    standard_name: air_temperature; Unit: K
+    
+    tasmax
+    standard_name: air_temperature; Unit: K
+    
+    tas
+    standard_name: air_temperature; Unit: K
+    
+    prc
+    standard_name: convective_precipitation_flux; Unit: kg m-2 s-1
+    
+    pr
+    standard_name: precipitation_flux; Unit: kg m-2 s-1
+    
+    airmass
+    standard_name: atmosphere_mass_of_air_per_unit_area; Unit: kg m-2
+    
+    zmlay
+    standard_name: atmosphere_boundary_layer_thickness; Unit: m
+    
+    eminox
+    standard_name: tendency_of_atmosphere_mass_content_of_nox_expressed_as_nitrogen_due_to_emission; Unit: kg m-2 s-1
+    
+    emino
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrogen_monoxide_due_to_emission; Unit: kg m-2 s-1
+    
+    emino2
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrogen_dioxide_due_to_emission; Unit: kg m-2 s-1
+    
+    eminosoil
+    standard_name: tendency_of_atmosphere_mass_content_of_nox_expressed_as_nitrogen_monoxide_due_to_emission_from_soil; Unit: kg m-2 s-1
+    
+    emico
+    standard_name: tendency_of_atmosphere_mass_content_of_carbon_monoxide_due_to_emission; Unit: kg m-2 s-1
+    
+    emivoc
+    standard_name: tendency_of_atmosphere_mass_content_of_nmvoc_expressed_as_carbon_due_to_emission; Unit: kg m-2 s-1
+    
+    emivoct
+    standard_name: tendency_of_atmosphere_mass_content_of_nmvoc_due_to_emission; Unit: kg m-2 s-1
+    
+    emic2h6
+    standard_name: tendency_of_atmosphere_mass_content_of_ethane_due_to_emission; Unit: kg m-2 s-1
+    
+    emic3h8
+    standard_name: tendency_of_atmosphere_mass_content_of_propane_due_to_emission; Unit: kg m-2 s-1
+    
+    emic2h2
+    standard_name: tendency_of_atmosphere_mass_content_of_ethyne_due_to_emission; Unit: kg m-2 s-1
+    
+    emic2h4
+    standard_name: tendency_of_atmosphere_mass_content_of_ethene_due_to_emission; Unit: kg m-2 s-1
+    
+    emic3h6
+    standard_name: tendency_of_atmosphere_mass_content_of_propene_due_to_emission; Unit: kg m-2 s-1
+    
+    emialkanes
+    standard_name: tendency_of_atmosphere_mass_content_of_alkanes_due_to_emission; Unit: kg m-2 s-1
+    
+    emialkenes
+    standard_name: tendency_of_atmosphere_mass_content_of_alkenes_due_to_emission; Unit: kg m-2 s-1
+    
+    emihcho
+    standard_name: tendency_of_atmosphere_mass_content_of_formaldehyde_due_to_emission; Unit: kg m-2 s-1
+    
+    emich3cho
+    standard_name: tendency_of_atmosphere_mass_content_of_acetaldehyde_due_to_emission; Unit: kg m-2 s-1
+    
+    emiacetone
+    standard_name: tendency_of_atmosphere_mass_content_of_acetone_due_to_emission; Unit: kg m-2 s-1
+    
+    emimethanol
+    standard_name: tendency_of_atmosphere_mass_content_of_methanol_due_to_emission; Unit: kg m-2 s-1
+    
+    emitolu
+    standard_name: tendency_of_atmosphere_mass_content_of_toluene_due_to_emission; Unit: kg m-2 s-1
+    
+    emiaro
+    standard_name: tendency_of_atmosphere_mass_content_of_aromatic_compounds_due_to_emission; Unit: kg m-2 s-1
+    
+    emiisop
+    standard_name: tendency_of_atmosphere_mass_content_of_isoprene_due_to_emission; Unit: kg m-2 s-1
+    
+    emimntp
+    standard_name: tendency_of_atmosphere_mass_content_of_monoterpenes_due_to_emission; Unit: kg m-2 s-1
+    
+    emisestp
+    standard_name: tendency_of_atmosphere_mass_content_of_sesquiterpenes_due_to_emission; Unit: kg m-2 s-1
+    
+    emibvoc
+    standard_name: tendency_of_atmosphere_mass_content_of_biogenic_nmvoc_expressed_as_carbon_due_to_emission; Unit: kg m-2 s-1
+    
+    eminh3
+    standard_name: tendency_of_atmosphere_mass_content_of_ammonia_due_to_emission; Unit: kg m-2 s-1
+    
+    emiso2
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfur_dioxide_due_to_emission; Unit: kg m-2 s-1
+    
+    emidms
+    standard_name: tendency_of_atmosphere_mass_content_of_dimethyl_sulfide_due_to_emission; Unit: kg m-2 s-1
+    
+    emiso4
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emioa
+    standard_name: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emioc
+    standard_name: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_due_to_emission; Unit: kg m-2 s-1
+    
+    emisoa
+    standard_name: tendency_of_atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emibc
+    standard_name: tendency_of_atmosphere_mass_content_of_elemental_carbon_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emiss
+    standard_name: tendency_of_atmosphere_mass_content_of_seasalt_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emidust
+    standard_name: tendency_of_atmosphere_mass_content_of_dust_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipm10
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipm2p5
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipm10ss
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_seasalt_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipm10dust
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_dust_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipm2p5ss
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_seasalt_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipm2p5dust
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_dust_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipm1ss
+    standard_name: tendency_of_atmosphere_mass_content_of_pm1_seasalt_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipm1dust
+    standard_name: tendency_of_atmosphere_mass_content_of_pm1_dust_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emipcb153
+    standard_name: tendency_of_atmosphere_mass_content_of_hexachlorobiphenyl_due_to_emission; Unit: kg m-2 s-1
+    
+    emiahch
+    standard_name: tendency_of_atmosphere_mass_content_of_alpha_hexachlorocyclohexane_due_to_emission; Unit: kg m-2 s-1
+    
+    reemipcb153
+    standard_name: tendency_of_atmosphere_mass_content_of_hexachlorobiphenyl_due_to_re_emission; Unit: kg m-2 s-1
+    
+    reemiahch
+    standard_name: tendency_of_atmosphere_mass_content_of_alpha_hexachlorocyclohexane_due_to_re_emission; Unit: kg m-2 s-1
+    
+    emihg0
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_emission; Unit: kg m-2 s-1
+    
+    emihg2
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_divalent_mercury_due_to_emission; Unit: kg m-2 s-1
+    
+    emihgp
+    standard_name: tendency_of_atmosphere_mass_content_of_mercury_dry_aerosol_particles_due_to_emission; Unit: kg m-2 s-1
+    
+    emiahg0
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_anthropogenic_emission; Unit: kg m-2 s-1
+    
+    emiahg2
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_divalent_mercury_due_to_anthropogenic_emission; Unit: kg m-2 s-1
+    
+    emiahgp
+    standard_name: tendency_of_atmosphere_mass_content_of_mercury_dry_aerosol_particles_due_to_anthropogenic_emission; Unit: kg m-2 s-1
+    
+    reemihg0
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_re_emission; Unit: kg m-2 s-1
+    
+    dryhno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryno3
+    standard_name: atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryno2
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrogen_dioxide_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryn2o5
+    standard_name: tendency_of_atmosphere_mass_content_of_dinitrogen_pentoxide_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypan
+    standard_name: atmosphere_mass_content_of_peroxyacetyl_nitrate_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryorgn
+    standard_name: tendency_of_atmosphere_mass_content_of_organic_nitrates_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryhono
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrous_acid_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryhno4
+    standard_name: tendency_of_atmosphere_mass_content_of_peroxynitric_acid_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drynoy
+    standard_name: tendency_of_atmosphere_mass_content_of_noy_expressed_as_nitrogen_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drynh3
+    standard_name: tendency_of_atmosphere_mass_content_of_ammonia_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drynh4
+    standard_name: tendency_of_atmosphere_mass_content_of_ammonium_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryso2
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfur_dioxide_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryso4
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drymsa
+    standard_name: tendency_of_atmosphere_mass_content_of_methanesulfonic_acid_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drydms
+    standard_name: tendency_of_atmosphere_mass_content_of_dimethyl_sulfide_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryss
+    standard_name: tendency_of_atmosphere_mass_content_of_seasalt_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drydust
+    standard_name: tendency_of_atmosphere_mass_content_of_dust_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm1no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm1_nitrate_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm2p5no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_nitrate_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm10no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_nitrate_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryo3
+    standard_name: tendency_of_atmosphere_mass_content_of_ozone_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    stoo3
+    standard_name: tendency_of_atmosphere_mass_content_of_ozone_due_to_dry_deposition_into_stomata; Unit: kg m-2 s-1
+    
+    dryhcho
+    standard_name: tendency_of_atmosphere_mass_content_of_formaldehyde_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drych3cho
+    standard_name: tendency_of_atmosphere_mass_content_of_acetaldehyde_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryalde
+    standard_name: tendency_of_atmosphere_mass_content_of_aldehydes_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryhcooh
+    standard_name: tendency_of_atmosphere_mass_content_of_formic_acid_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drych3cooh
+    standard_name: tendency_of_atmosphere_mass_content_of_acetic_acid_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryh2o2
+    standard_name: tendency_of_atmosphere_mass_content_of_hydrogen_peroxide_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryroor
+    standard_name: tendency_of_atmosphere_mass_content_of_organic_peroxides_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    excnh3
+    standard_name: surface_net_downward_mass_flux_of_ammonia_due_to_bidirectional_surface_exchange; Unit: kg m-2 s-1
+    
+    drybc
+    standard_name: tendency_of_atmosphere_mass_content_of_elemental_carbon_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm10
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm10ss
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_seasalt_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm10dust
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_dust_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm2p5
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm2p5ss
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_seasalt_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypm2p5dust
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_dust_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryoc
+    standard_name: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryoa
+    standard_name: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drysoa
+    standard_name: tendency_of_atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    drypcb153
+    standard_name: tendency_of_atmosphere_mass_content_of_hexachlorobiphenyl_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryahch
+    standard_name: tendency_of_atmosphere_mass_content_of_alpha_hexachlorocyclohexane_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryhg0
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryhg2
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_divalent_mercury_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    dryhgp
+    standard_name: tendency_of_atmosphere_mass_content_of_mercury_dry_aerosol_particles_due_to_dry_deposition; Unit: kg m-2 s-1
+    
+    wethno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetn2o5
+    standard_name: tendency_of_atmosphere_mass_content_of_dinitrogen_pentoxide_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetorgn
+    standard_name: tendency_of_atmosphere_mass_content_of_organic_nitrates_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wethono
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrous_acid_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wethno4
+    standard_name: tendency_of_atmosphere_mass_content_of_peroxynitric_acid_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetnoy
+    standard_name: tendency_of_atmosphere_mass_content_of_noy_expressed_as_nitrogen_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetnh3
+    standard_name: tendency_of_atmosphere_mass_content_of_ammonia_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetnh4
+    standard_name: tendency_of_atmosphere_mass_content_of_ammonium_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetso2
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfur_dioxide_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetso4
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetmsa
+    standard_name: tendency_of_atmosphere_mass_content_of_methanesulfonic_acid_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetdms
+    standard_name: tendency_of_atmosphere_mass_content_of_dimethyl_sulfide_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetbc
+    standard_name: tendency_of_atmosphere_mass_content_of_elemental_carbon_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetss
+    standard_name: tendency_of_atmosphere_mass_content_of_seasalt_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetdust
+    standard_name: tendency_of_atmosphere_mass_content_of_dust_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm1no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm1_nitrate_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm2p5no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_nitrate_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm10no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_nitrate_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wethcho
+    standard_name: tendency_of_atmosphere_mass_content_of_formaldehyde_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetch3cho
+    standard_name: tendency_of_atmosphere_mass_content_of_acetaldehyde_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetalde
+    standard_name: tendency_of_atmosphere_mass_content_of_aldehydes_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wethcooh
+    standard_name: tendency_of_atmosphere_mass_content_of_formic_acid_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetch3cooh
+    standard_name: tendency_of_atmosphere_mass_content_of_acetic_acid_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    weth2o2
+    standard_name: tendency_of_atmosphere_mass_content_of_hydrogen_peroxide_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetroor
+    standard_name: tendency_of_atmosphere_mass_content_of_organic_peroxides_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm10
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm10ss
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_seasalt_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm10dust
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_dust_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm2p5
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm2p5ss
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_seasalt_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpm2p5dust
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_dust_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetoa
+    standard_name: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetoc
+    standard_name: tendency_of_atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetsoa
+    standard_name: tendency_of_atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetpcb153
+    standard_name: tendency_of_atmosphere_mass_content_of_hexachlorobiphenyl_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wetahch
+    standard_name: tendency_of_atmosphere_mass_content_of_alpha_hexachlorocyclohexane_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wethg
+    standard_name: tendency_of_atmosphere_mass_content_of_mercury_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wethg0
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_elemental_mercury_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wethg2
+    standard_name: tendency_of_atmosphere_mass_content_of_gaseous_divalent_mercury_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    wethgp
+    standard_name: tendency_of_atmosphere_mass_content_of_mercury_dry_aerosol_particles_due_to_wet_deposition; Unit: kg m-2 s-1
+    
+    sconcso4
+    standard_name: None; Unit: ug m-3
+    
+    sconcso2
+    standard_name: None; Unit: ug m-3
+    
+    sconcpm10
+    standard_name: None; Unit: ug m-3
+    
+    sconcpm25
+    standard_name: None; Unit: ug m-3
+    
+    sconcso4t
+    standard_name: None; Unit: ug m-3
+    
+    sconcso4c
+    standard_name: None; Unit: ug m-3
+    
+    sconcbc
+    standard_name: None; Unit: ug m-3
+    
+    sconcss
+    standard_name: None; Unit: ug m-3
+    
+    sconcpom
+    standard_name: None; Unit: ug m-3
+    
+    sconcnh3
+    standard_name: None; Unit: ug m-3
+    
+    sconcno3
+    standard_name: None; Unit: ug m-3
+    
+    sconcnh4
+    standard_name: None; Unit: ug m-3
+    
+    sconchno3
+    standard_name: None; Unit: ug m-3
+    
+    sconctno3
+    standard_name: None; Unit: ug m-3
+    
+    sconcno2
+    standard_name: None; Unit: ug m-3
+    
+    sconceqbc
+    standard_name: None; Unit: ug m-3
+    
+    sconcoa
+    standard_name: None; Unit: ug m-3
+    
+    sconco3
+    standard_name: None; Unit: ug m-3
+    
+    vmro3
+    standard_name: mole_fraction_of_ozone_in_air; Unit: mole mole-1
+    
+    vmrno
+    standard_name: mole_fraction_of_nitrogen_monoxide_in_air; Unit: mole mole-1
+    
+    vmrno2
+    standard_name: mole_fraction_of_nitrogen_dioxide_in_air; Unit: mole mole-1
+    
+    vmro32m
+    standard_name: mole_fraction_of_ozone_in_air; Unit: mole mole-1
+    
+    rc
+    standard_name: canopy_resistance_to_ozone_dry_deposition; Unit: m-1 s
+    
+    ra
+    standard_name: aerodynamic_resistance; Unit: m-1 s
+    
+    vmrco
+    standard_name: mole_fraction_of_carbon_monoxide_in_air; Unit: mole mole-1
+    
+    vmrhno3
+    standard_name: mole_fraction_of_nitric_acid_in_air; Unit: mole mole-1
+    
+    vmrn2o5
+    standard_name: mole_fraction_of_dinitrogen_pentoxide_in_air; Unit: mole mole-1
+    
+    vmrpan
+    standard_name: mole_fraction_of_peroxyacetyl_nitrate_in_air; Unit: mole mole-1
+    
+    vmrhono
+    standard_name: mole_fraction_of_nitrous_acid_in_air; Unit: mole mole-1
+    
+    vmrhno4
+    standard_name: mole_fraction_of_peroxynitric_acid_in_air; Unit: mole mole-1
+    
+    vmrorgnit
+    standard_name: mole_fraction_of_organic_nitrates_in_air; Unit: mole mole-1
+    
+    vmrnoy
+    standard_name: mole_fraction_of_noy_expressed_as_nitrogen_in_air; Unit: mole mole-1
+    
+    vmrvoc
+    standard_name: mole_fraction_of_nmvoc_expressed_as_carbon_in_air; Unit: mole mole-1
+    
+    vmrc2h6
+    standard_name: mole_fraction_of_ethane_in_air; Unit: mole mole-1
+    
+    vmrc3h8
+    standard_name: mole_fraction_of_propane_in_air; Unit: mole mole-1
+    
+    vmrc2h4
+    standard_name: mole_fraction_of_ethene_in_air; Unit: mole mole-1
+    
+    vmrc3h6
+    standard_name: mole_fraction_of_propene_in_air; Unit: mole mole-1
+    
+    vmralkanes
+    standard_name: mole_fraction_of_alkanes_in_air; Unit: mole mole-1
+    
+    vmralkenes
+    standard_name: mole_fraction_of_alkenes_in_air; Unit: mole mole-1
+    
+    vmrhcho
+    standard_name: mole_fraction_of_formaldehyde_in_air; Unit: mole mole-1
+    
+    vmrch3cho
+    standard_name: mole_fraction_of_acetaldehyde_in_air; Unit: mole mole-1
+    
+    vmracetone
+    standard_name: mole_fraction_of_acetone_in_air; Unit: mole mole-1
+    
+    vmrglyoxal
+    standard_name: mole_fraction_of_glyoxal_in_air; Unit: mole mole-1
+    
+    vmrmethanol
+    standard_name: mole_fraction_of_methanol_in_air; Unit: mole mole-1
+    
+    vmrtolu
+    standard_name: mole_fraction_of_toluene_in_air; Unit: mole mole-1
+    
+    vmraro
+    standard_name: mole_fraction_of_aromatic_compounds_in_air; Unit: mole mole-1
+    
+    vmrisop
+    standard_name: mole_fraction_of_isoprene_in_air; Unit: mole mole-1
+    
+    vmrc10h16
+    standard_name: mole_fraction_of_alpha_pinene_in_air; Unit: mole mole-1
+    
+    vmrtp
+    standard_name: mole_fraction_of_terpenes_in_air; Unit: mole mole-1
+    
+    vmrnh3
+    standard_name: mole_fraction_of_ammonia_in_air; Unit: mole mole-1
+    
+    vmrso2
+    standard_name: mole_fraction_of_sulfur_dioxide_in_air; Unit: mole mole-1
+    
+    vmrdms
+    standard_name: mole_fraction_of_dimethyl_sulfide_in_air; Unit: mole mole-1
+    
+    mmrpm10
+    standard_name: mass_fraction_of_pm10_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5
+    standard_name: mass_fraction_of_pm2p5_dry_aerosol particles_particles_in_air; Unit: kg kg-1
+    
+    mmrpm1
+    standard_name: mass_fraction_of_pm1_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrno3
+    standard_name: mass_fraction_of_nitrate_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrso4
+    standard_name: mass_fraction_of_sulfate_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrbc
+    standard_name: mass_fraction_of_elemental_carbon_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmroc
+    standard_name: mass_fraction_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_in_air; Unit: kg kg-1
+    
+    mmroa
+    standard_name: mass_fraction_of_particulate_organic_matter_dry_aerosol_particles; Unit: kg kg-1
+    
+    mmrss
+    standard_name: mass_fraction_of_seasalt_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrdust
+    standard_name: mass_fraction_of_dust_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrmsa
+    standard_name: mass_fraction_of_methanesulfonic_acid_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrnh4
+    standard_name: mass_fraction_of_ammonium_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    ncpm2p5
+    standard_name: number_concentration_of_pm2p5_aerosol_particles_in_air; Unit: m-3
+    
+    mmrpm1no3
+    standard_name: mass_fraction_of_pm1_nitrate_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm1ss
+    standard_name: mass_fraction_of_pm1_sea_salt_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm1dust
+    standard_name: mass_fraction_of_pm1_dust_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5no3
+    standard_name: mass_fraction_of_pm2p5_nitrate_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5so4
+    standard_name: mass_fraction_of_pm2p5_sulfate_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5bc
+    standard_name: mass_fraction_of_pm2p5_elemental_carbon_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5oc
+    standard_name: mass_fraction_of_pm2p5_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_in_air; Unit: kg kg-1
+    
+    mmrpm2p5oa
+    standard_name: mass_fraction_of_pm2p5_particulate_organic_matter_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5ss
+    standard_name: mass_fraction_of_pm2p5_sea_salt_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5dust
+    standard_name: mass_fraction_of_pm2p5_dust_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5nh4
+    standard_name: mass_fraction_of_pm2p5_ammonium_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    ncpm10
+    standard_name: number_concentration_of_pm10_aerosol_particles_in_air; Unit: m-3
+    
+    mmrpm10no3
+    standard_name: mass_fraction_of_pm10_nitrate_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm10so4
+    standard_name: mass_fraction_of_pm10_sulfate_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm10bc
+    standard_name: mass_fraction_of_pm10_elemental_carbon_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm10oc
+    standard_name: mass_fraction_of_pm10_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon_in_air; Unit: kg kg-1
+    
+    mmrpm10oa
+    standard_name: mass_fraction_of_pm10_particulate_organic_matter_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm10ss
+    standard_name: mass_fraction_of_pm10_sea_salt_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm10dust
+    standard_name: mass_fraction_of_pm10_dust_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm10nh4
+    standard_name: mass_fraction_of_pm10_ammonium_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    vmrhg0
+    standard_name: mole_fraction_of_gaseous_elemental_mercury_in_air; Unit: mole mole-1
+    
+    vmrhg2
+    standard_name: mole_fraction_of_gaseous_divalent_mercury_in_air; Unit: mole mole-1
+    
+    vmrpcb153
+    standard_name: mole_fraction_of_hexachlorobiphenyl_in_air; Unit: mole mole-1
+    
+    vmrahch
+    standard_name: mole_fraction_of_alpha_hexachlorocyclohexane_in_air; Unit: mole mole-1
+    
+    mmrhgp
+    standard_name: mass_fraction_of_mercury_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    jno2
+    standard_name: photolysis_rate_of_nitrogen_dioxide; Unit: s-1
+    
+    jo3o1d
+    standard_name: photolysis_rate_of_ozone_to_1D_oxygen_atom; Unit: s-1
+    
+    rsdt
+    standard_name: toa_incoming_shortwave_flux; Unit: W m-2
+    
+    rsut
+    standard_name: toa_upwelling_shortwave_flux; Unit: W m-2
+    
+    rsutcs
+    standard_name: toa_upwelling_shortwave_flux_assuming_clear_sky; Unit: W m-2
+    
+    rsds
+    standard_name: surface_downwelling_shortwave_flux_in_air; Unit: W m-2
+    
+    rsus
+    standard_name: surface_upwelling_shortwave_flux_in_air; Unit: W m-2
+    
+    rsdsdir
+    standard_name: surface_direct_downwelling_shortwave_flux_in_air; Unit: W m-2
+    
+    rsdsdif
+    standard_name: surface_diffuse_downwelling_shortwave_flux_in_air; Unit: W m-2
+    
+    rsdscs
+    standard_name: surface_downwelling_shortwave_flux_in_air_assuming_clear_sky; Unit: W m-2
+    
+    rsdscsdir
+    standard_name: surface_direct_downwelling_shortwave_flux_in_air_assuming_clear_sky; Unit: W m-2
+    
+    rsdscsdif
+    standard_name: surface_diffuse_downwelling_shortwave_flux_in_air_assuming_clear_sky; Unit: W m-2
+    
+    rlut
+    standard_name: toa_upwelling_longwave_flux; Unit: W m-2
+    
+    rlutcs
+    standard_name: toa_upwelling_longwave_flux_assuming_clear_sky; Unit: W m-2
+    
+    rlds
+    standard_name: surface_downwelling_longwave_flux_in_air; Unit: W m-2
+    
+    rlus
+    standard_name: surface_upwelling_longwave_flux_in_air; Unit: W m-2
+    
+    rsut0
+    standard_name: toa_upwelling_shortwave_flux_assuming_no_aerosol; Unit: W m-2
+    
+    rsuscs0
+    standard_name: surface_upwelling_shortwave_flux_in_air_assuming_clear_sky_and_no_aerosol; Unit: W m-2
+    
+    rsds0
+    standard_name: surface_downwelling_shortwave_flux_in_air_assuming_no_aerosol; Unit: W m-2
+    
+    rsus0
+    standard_name: surface_upwelling_shortwave_flux_in_air_assuming_no_aerosol; Unit: W m-2
+    
+    rsdsdir0
+    standard_name: surface_direct_downwelling_shortwave_flux_in_air_assuming_no_aerosol; Unit: W m-2
+    
+    rsdsdif0
+    standard_name: surface_diffuse_downwelling_shortwave_flux_in_air_assuming_no_aerosol; Unit: W m-2
+    
+    rsdscs0
+    standard_name: surface_downwelling_shortwave_flux_in_air_assuming_clear_sky_and_no_aerosol; Unit: W m-2
+    
+    rsdscsdir0
+    standard_name: surface_direct_downwelling_shortwave_flux_in_air_assuming_clear_sky_and_no_aerosol; Unit: W m-2
+    
+    rsdscsdif0
+    standard_name: surface_diffuse_downwelling_shortwave_flux_in_air_assuming_clear_sky_and_no_aerosol; Unit: W m-2
+    
+    rlut0
+    standard_name: toa_upwelling_longwave_flux_assuming_no_aerosol; Unit: W m-2
+    
+    rlutcs0
+    standard_name: toa_upwelling_longwave_flux_assuming_clear_sky_and_no_aerosol; Unit: W m-2
+    
+    rlds0
+    standard_name: surface_downwelling_longwave_flux_in_air_assuming_no_aerosol; Unit: W m-2
+    
+    rlus0
+    standard_name: surface_upwelling_longwave_flux_in_air_assuming_no_aerosol; Unit: W m-2
+    
+    rsutpm1no3
+    standard_name: toa_upwelling_shortwave_flux_assuming_all_sky_fine_nitrate; Unit: W m-2
+    
+    rsutpm10no3
+    standard_name: toa_upwelling_shortwave_flux_assuming_all_sky_coarse_nitrate; Unit: W m-2
+    
+    rsutcspm1no3
+    standard_name: toa_upwelling_shortwave_flux_assuming_clear_sky_fine_nitrate; Unit: W m-2
+    
+    rsutcsnpm10no3
+    standard_name: toa_upwelling_shortwave_flux_assuming_clear_sky_coarse_nitrate; Unit: W m-2
+    
+    longitude
+    standard_name: longitude; Unit: degrees_east
+    
+    latitude
+    standard_name: latitude; Unit: degrees_north
+    
+    abs388aer
+    standard_name: atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    abs388bc
+    standard_name: atmosphere_absorption_optical_thickness_due_to_elemental_carbon_ambient_aerosol_particles; Unit: 1
+    
+    abs388dust
+    standard_name: atmosphere_absorption_optical_thickness_due_to_dust_ambient_aerosol_particles; Unit: 1
+    
+    abs388oa
+    standard_name: atmosphere_absorption_optical_thickness_due_to_particulate_organic_matter_ambient_aerosol_particles; Unit: 1
+    
+    abs550bc
+    standard_name: atmosphere_absorption_optical_thickness_due_to_elemental_carbon_ambient_aerosol_particles; Unit: 1
+    
+    abs550dust
+    standard_name: atmosphere_absorption_optical_thickness_due_to_dust_ambient_aerosol_particles; Unit: 1
+    
+    abs550pm1
+    standard_name: atmosphere_absorption_optical_thickness_due_to_pm1_ambient_aerosol_particles; Unit: 1
+    
+    abs550pm10
+    standard_name: atmosphere_absorption_optical_thickness_due_to_pm10_ambient_aerosol_particles; Unit: 1
+    
+    abs550pm2p5
+    standard_name: atmosphere_absorption_optical_thickness_due_to_pm2p5_ambient_aerosol_particles; Unit: 1
+    
+    abs870aer
+    standard_name: atmosphere_absorption_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    od388aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    od388bc
+    standard_name: atmosphere_optical_thickness_due_to_elemental_carbon_ambient_aerosol_particles; Unit: 1
+    
+    od388dust
+    standard_name: atmosphere_optical_thickness_due_to_dust_ambient_aerosol_particles; Unit: 1
+    
+    od388oa
+    standard_name: atmosphere_optical_thickness_due_to_particulate_organic_matter_ambient_aerosol_particles; Unit: 1
+    
+    od500aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    od500pm10
+    standard_name: atmosphere_optical_thickness_due_to_pm10_ambient_aerosol_particles; Unit: 1
+    
+    od500pm2p5
+    standard_name: atmosphere_optical_thickness_due_to_pm2p5_ambient_aerosol_particles; Unit: 1
+    
+    od550aerh2o
+    standard_name: atmosphere_optical_thickness_due_to_water_in_ambient_aerosol_particles; Unit: 1
+    
+    od550bc
+    standard_name: atmosphere_optical_thickness_due_to_elemental_carbon_ambient_aerosol_particles; Unit: 1
+    
+    od550dust
+    standard_name: atmosphere_optical_thickness_due_to_dust_ambient_aerosol_particles; Unit: 1
+    
+    od550nh4
+    standard_name: atmosphere_optical_thickness_due_to_ammonium_ambient_aerosol_particles; Unit: 1
+    
+    od550no3
+    standard_name: atmosphere_optical_thickness_due_to_nitrate_ambient_aerosol_particles; Unit: 1
+    
+    od550oa
+    standard_name: atmosphere_optical_thickness_due_to_particulate_organic_matter_ambient_aerosol_particles; Unit: 1
+    
+    od550pm1
+    standard_name: atmosphere_optical_thickness_due_to_pm1_ambient_aerosol_particles; Unit: 1
+    
+    od550pm1no3
+    standard_name: atmosphere_optical_thickness_due_to_pm1_nitrate_ambient_aerosol_particles; Unit: 1
+    
+    od550pm10
+    standard_name: atmosphere_optical_thickness_due_to_pm10_ambient_aerosol_particles; Unit: 1
+    
+    od550pm10no3
+    standard_name: atmosphere_optical_thickness_due_to_pm10_nitrate_ambient_aerosol_particles; Unit: 1
+    
+    od550pm2p5
+    standard_name: atmosphere_optical_thickness_due_to_pm2p5_ambient_aerosol_particles; Unit: 1
+    
+    od550pm2p5no3
+    standard_name: atmosphere_optical_thickness_due_to_pm2p5_nitrate_ambient_aerosol_particles; Unit: 1
+    
+    od550so4
+    standard_name: atmosphere_optical_thickness_due_to_sulfate_ambient_aerosol_particles; Unit: 1
+    
+    od550ss
+    standard_name: atmosphere_optical_thickness_due_to_seasalt_ambient_aerosol_particles; Unit: 1
+    
+    od865aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    od870aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    cldf
+    standard_name: cloud_area_fraction; Unit: 1
+    
+    abs550aerh2o
+    standard_name: atmosphere_absorption_optical_thickness_due_to_water_in_ambient_aerosol_particles; Unit: 1
+    
+    abs550nh4
+    standard_name: atmosphere_absorption_optical_thickness_due_to_ammonium_ambient_aerosol_particles; Unit: 1
+    
+    abs550no3
+    standard_name: atmosphere_absorption_optical_thickness_due_to_nitrate_ambient_aerosol_particles; Unit: 1
+    
+    abs550oa
+    standard_name: atmosphere_absorption_optical_thickness_due_to_particulate_organic_matter_ambient_aerosol_particles; Unit: 1
+    
+    abs550so4
+    standard_name: atmosphere_absorption_optical_thickness_due_to_sulfate_ambient_aerosol_particles; Unit: 1
+    
+    abs550ss
+    standard_name: atmosphere_absorption_optical_thickness_due_to_seasalt_ambient_aerosol_particles; Unit: 1
+    
+    loadno3
+    standard_name: atmosphere_mass_content_of_nitrate_dry_aerosol_particles; Unit: kg m-2
+    
+    loadso4
+    standard_name: atmosphere_mass_content_of_sulfate_dry_aerosol_particles; Unit: kg m-2
+    
+    loadbc
+    standard_name: atmosphere_mass_content_of_elemental_carbon_dry_aerosol_particles; Unit: kg m-2
+    
+    loadoc
+    standard_name: atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles_expressed_as_carbon; Unit: kg m-2
+    
+    loadoa
+    standard_name: atmosphere_mass_content_of_particulate_organic_matter_dry_aerosol_particles; Unit: kg m-2
+    
+    loadsoa
+    standard_name: atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles; Unit: kg m-2
+    
+    loadss
+    standard_name: atmosphere_mass_content_of_seasalt_dry_aerosol_particles; Unit: kg m-2
+    
+    loaddust
+    standard_name: atmosphere_mass_content_of_dust_dry_aerosol_particles; Unit: kg m-2
+    
+    loadmsa
+    standard_name: atmosphere_mass_content_of_methanesulfonic_acid_dry_aerosol_particles; Unit: kg m-2
+    
+    loadnh4
+    standard_name: atmosphere_mass_content_of_ammonium_dry_aerosol_particles; Unit: kg m-2
+    
+    loadno
+    standard_name: atmosphere_mass_content_of_nitrogen_monoxide; Unit: kg m-2
+    
+    loadno2
+    standard_name: atmosphere_mass_content_of_nitrogen_dioxide; Unit: kg m-2
+    
+    loadn2o5
+    standard_name: atmosphere_mass_content_of_dinitrogen_pentoxide; Unit: kg m-2
+    
+    loadpan
+    standard_name: atmosphere_mass_content_of_peroxyacetyl_nitrate; Unit: kg m-2
+    
+    loadhono
+    standard_name: atmosphere_mass_content_of_nitrous_acid; Unit: kg m-2
+    
+    loadhno3
+    standard_name: atmosphere_mass_content_of_nitric_acid; Unit: kg m-2
+    
+    loadhno4
+    standard_name: atmosphere_mass_content_of_peroxynitric_acid; Unit: kg m-2
+    
+    loadorgnit
+    standard_name: atmosphere_mass_content_of_organic_nitrates; Unit: kg m-2
+    
+    loadnoy
+    standard_name: atmosphere_mass_content_of_noy_expressed_as_nitrogen; Unit: kg m-2
+    
+    loadnh3
+    standard_name: atmosphere_mass_content_of_ammonia; Unit: kg m-2
+    
+    loaddms
+    standard_name: atmosphere_mass_content_of_dimethyl_sulfide; Unit: kg m-2
+    
+    loadso2
+    standard_name: atmosphere_mass_content_of_sulfur_dioxide; Unit: kg m-2
+    
+    loadpm1no3
+    standard_name: atmosphere_mass_content_of_pm1_nitrate_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm2p5no3
+    standard_name: atmosphere_mass_content_of_pm2p5_nitrate_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm10no3
+    standard_name: atmosphere_mass_content_of_pm10_nitrate_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm1ss
+    standard_name: atmosphere_mass_content_of_pm1_seasalt_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm2p5ss
+    standard_name: atmosphere_mass_content_of_pm2p5_seasalt_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm10ss
+    standard_name: atmosphere_mass_content_of_pm10_seasalt_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm1dust
+    standard_name: atmosphere_mass_content_of_pm1_dust_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm2p5dust
+    standard_name: atmosphere_mass_content_of_pm2p5_dust_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm10dust
+    standard_name: atmosphere_mass_content_of_pm10_dust_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm1
+    standard_name: atmosphere_mass_content_of_pm1_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm2p5
+    standard_name: atmosphere_mass_content_of_pm2p5_dry_aerosol_particles; Unit: kg m-2
+    
+    loadpm10
+    standard_name: atmosphere_mass_content_of_pm10_dry_aerosol_particles; Unit: kg m-2
+    
+    lev
+    standard_name: atmosphere_sigma_coordinate; Unit: 1
+    
+    lev_bnds
+    standard_name: atmosphere_sigma_coordinate; Unit: 1
+    
+    ptop
+    standard_name: atmosphere_sigma_coordinate; Unit: Pa
+    
+    a
+    standard_name: atmosphere_hybrid_sigma_pressure_coordinate; Unit: 1
+    
+    b
+    standard_name: atmosphere_hybrid_sigma_pressure_coordinate; Unit: 1
+    
+    a_bnds
+    standard_name: atmosphere_hybrid_sigma_pressure_coordinate; Unit: 1
+    
+    b_bnds
+    standard_name: atmosphere_hybrid_sigma_pressure_coordinate; Unit: 1
+    
+    p0
+    standard_name: model_reference_air_pressure; Unit: Pa
+    
+    ap
+    standard_name: atmosphere_hybrid_sigma_pressure_coordinate; Unit: Pa
+    
+    ap_bnds
+    standard_name: atmosphere_hybrid_sigma_pressure_coordinate; Unit: Pa
+    
+    ta
+    standard_name: air_temperature; Unit: K
+    
+    rho
+    standard_name: air_density; Unit: kg m-3
+    
+    dh
+    standard_name: atmosphere_layer_thickness; Unit: m
+    
+    hus
+    standard_name: specific_humidity; Unit: kg kg-1
+    
+    mcu
+    standard_name: atmosphere_upward_convective_mass_flux; Unit: kg m-2 s-1
+    
+    hur
+    standard_name: relative_humidy; Unit: 1
+    
+    emilnox
+    standard_name: tendency_of_atmosphere_mass_concentration_of_nox_expressed_as_nitrogen_due_to_emission_from_lightning; Unit: kg m-2 s-1
+    
+    eminoaircraft
+    standard_name: tendency_of_atmosphere_mass_concentration_of_nitrogen_monoxide_due_to_emission_from_aircraft; Unit: kg m-2 s-1
+    
+    vmroh
+    standard_name: mole_fraction_of_hydroxyl_radical_in_air; Unit: mole mole-1
+    
+    vmrh2o2
+    standard_name: mole_fraction_of_hydrogen_peroxide_in_air; Unit: mole mole-1
+    
+    vmrho2
+    standard_name: mole_fraction_of_hydroperoxyl_radical_in_air; Unit: mole mole-1
+    
+    vmrcl
+    standard_name: mole_fraction_of_chlorine_in_air; Unit: mole mole-1
+    
+    vmrbr
+    standard_name: mole_fraction_of_bromine_in_air; Unit: mole mole-1
+    
+    vmrbro
+    standard_name: mole_fraction_of_bromine_monoxide_in_air; Unit: mole mole-1
+    
+    prodo3
+    standard_name: tendency_of_atmosphere_mole_concentration_of_ozone_due_to_chemical_production; Unit: mole m-3 s-1
+    
+    losso3
+    standard_name: tendency_of_atmosphere_mole_concentration_of_ozone_due_to_chemical_destruction; Unit: mole m-3 s-1
+    
+    lossch4
+    standard_name: tendency_of_atmosphere_mole_concentration_of_methane_due_to_chemical_destruction; Unit: mole m-3 s-1
+    
+    lossco
+    standard_name: tendency_of_atmosphere_mole_concentration_of_carbon_monoxide_due_to_chemical_destruction; Unit: mole m-3 s-1
+    
+    reacvoc
+    standard_name: rate_of_hydroxyl_radical_destruction_due_to_reaction_with_nmvoc; Unit: s-1
+    
+    chepsoa
+    standard_name: tendency_of_atmosphere_mass_content_of_secondary_particulate_organic_matter_dry_aerosol_particles_due_to_net_chemical_production; Unit: kg m-2 s-1
+    
+    chepmsa
+    standard_name: tendency_of_atmosphere_mass_content_of_methanesulfonic_acid_dry_aerosol_particles_due_to_net_chemical_production; Unit: kg m-2 s-1
+    
+    chegpso4
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_gaseous_phase_net_chemical_production; Unit: kg m-2 s-1
+    
+    cheaqpso4
+    standard_name: tendency_of_atmosphere_mass_content_of_sulfate_dry_aerosol_particles_due_to_aqueous_phase_net_chemical_production; Unit: kg m-2 s-1
+    
+    chegphno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_gaseous_phase_net_chemical_production; Unit: kg m-2 s-1
+    
+    cheglhno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_gaseous_phase_net_chemical_destruction; Unit: kg m-2 s-1
+    
+    cheaphno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_net_chemical_production_on_ambient_aerosol_particles; Unit: kg m-2 s-1
+    
+    chealhno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitric_acid_due_to_net_chemical_destruction_on_ambient_aerosol_particles; Unit: kg m-2 s-1
+    
+    chepno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_net_chemical_production; Unit: kg m-2 s-1
+    
+    chedustpno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_net_chemical_production_on_dust_ambient_aerosol_particles; Unit: kg m-2 s-1
+    
+    chesspno3
+    standard_name: tendency_of_atmosphere_mass_content_of_nitrate_dry_aerosol_particles_due_to_net_chemical_production_on_seasalt_ambient_aerosol_particles; Unit: kg m-2 s-1
+    
+    cheppm10no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm10_nitrate_dry_aerosol_particles_due_to_net_chemical_production; Unit: kg m-2 s-1
+    
+    cheppm2p5no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm2p5_nitrate_dry_aerosol_particles_due_to_net_chemical_production; Unit: kg m-2 s-1
+    
+    cheppm1no3
+    standard_name: tendency_of_atmosphere_mass_content_of_pm1_nitrate_dry_aerosol_particles_due_to_net_chemical_production; Unit: kg m-2 s-1
+    
+    chegpnh3
+    standard_name: tendency_of_atmosphere_mass_content of ammonia_due_to_gaseous_phase_net_chemical_production; Unit: kg m-2 s-1
+    
+    chealnh3
+    standard_name: tendency_of_atmosphere_mass_content_of_ammonia_due_to_chemical_destruction_on_ambient_aerosol_particles; Unit: kg m-2 s-1
+    
+    chepnh4
+    standard_name: tendency_of_atmosphere_mass_content_of_ammonium_due_to net_chemical_production; Unit: kg m-2 s-1
+    
+    mmrsoa
+    standard_name: mass_fraction_of_secondary_particulate_organic_matter_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmraerh2o
+    standard_name: mass_fraction_of_water_in_ambient_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm10h2o
+    standard_name: mass_fraction_of_water_in_pm10_ambient_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5h2o
+    standard_name: mass_fraction_of_water_in_pm2p5_ambient_aerosol_particles_in_air; Unit: kg kg-1
+    
+    rh
+    standard_name: relative_humidy; Unit: 1
+    
+    vmrcodirect50d
+    standard_name: mole_fraction_of_artificial_tracer_with_fixed_lifetime_in_air; Unit: mole mole-1
+    
+    vmrcodirect25d
+    standard_name: mole_fraction_of_artificial_tracer_with_fixed_lifetime_in_air; Unit: mole mole-1
+    
+    station
+    standard_name: station; Unit: 1
+    
+    network_stationid
+    standard_name: platform_id; Unit: 1
+    
+    networkid
+    standard_name: platform_name; Unit: 1
+    
+    stationid
+    standard_name: platform_id; Unit: 1
+    
+    station_elevation
+    standard_name: surface_altitude; Unit: m asl
+    
+    td
+    standard_name: dew_point_temperature; Unit: K
+    
+    hurs
+    standard_name: relative_humidity; Unit: 1
+    
+    huss
+    standard_name: specific_humidity; Unit: kg/kg
+    
+    mmrpm10poa
+    standard_name: mass_fraction_of_pm10_primary_particulate_organic_matter_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    mmrpm2p5poa
+    standard_name: mass_fraction_of_pm2p5_primary_particulate_organic_matter_dry_aerosol_particles_in_air; Unit: kg kg-1
+    
+    vmr5mo3
+    standard_name: mole_fraction_of_ozone_in_air; Unit: mole mole-1
+    
+    vmr10mo3
+    standard_name: mole_fraction_of_ozone_in_air; Unit: mole mole-1
+    
+    tcwv
+    standard_name: atmosphere_mass_content_of_water_vapor; Unit: kg m-2
+    
+    tcno2
+    standard_name: atmosphere_mass_content_of_nitrogen_dioxide; Unit: kg m-2
+    
+    pres
+    standard_name: air_pressure; Unit: Pa
+    
+    ua
+    standard_name: eastward_wind; Unit: m s-1
+    
+    va
+    standard_name: northward_wind; Unit: m s-1
+    
+    wa
+    standard_name: upward_air_velocity; Unit: m s-1
+    
+    od550aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    od550aer
+    standard_name: atmosphere_optical_thickness_due_to_ambient_aerosol_particles; Unit: 1
+    
+    ang4487aer
+    standard_name: angstrom_exponent_of_ambient_aerosol_in_air; Unit: 1
+    
+    absc550aer
+    standard_name: None; Unit: 1/Mm
+    
+    rh
+    standard_name: relative_humidy; Unit: 1
+    
+    rh
+    standard_name: relative_humidy; Unit: 1
+    
+    z
+    standard_name: altitude; Unit: m
+    
+    z
+    standard_name: altitude; Unit: m
+    
+    deltaz
+    standard_name: None; Unit: m
+    
+    longitude
+    standard_name: longitude; Unit: degrees_east
+    
+    latitude
+    standard_name: latitude; Unit: degrees_north
+    
+    pres
+    standard_name: air_pressure; Unit: Pa
+    
+    pres
+    standard_name: air_pressure; Unit: Pa
+    
+    bscatc550aer
+    standard_name: None; Unit: Mm-1 sr-1
+    
+    ta
+    standard_name: air_temperature; Unit: K
+    
+

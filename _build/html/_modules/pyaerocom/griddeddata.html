@@ -95,8 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials (Jupyter Notebooks)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html#further-tutorials-in-depth">Further tutorials (in-depth)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config_files.html">Configuration files</a></li>
@@ -175,16 +174,19 @@
 <span class="kn">import</span> <span class="nn">iris</span>
 <span class="kn">from</span> <span class="nn">iris.analysis.cartography</span> <span class="k">import</span> <span class="n">area_weights</span>
 <span class="kn">from</span> <span class="nn">iris.analysis</span> <span class="k">import</span> <span class="n">MEAN</span>
+<span class="kn">from</span> <span class="nn">iris.exceptions</span> <span class="k">import</span> <span class="n">UnitConversionError</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="n">Series</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">const</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">print_log</span>
 
-<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">DataExtractionError</span><span class="p">,</span>
-                                  <span class="n">TemporalResolutionError</span><span class="p">,</span>
-                                  <span class="n">DimensionOrderError</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">CoordinateError</span><span class="p">,</span>
                                   <span class="n">DataDimensionError</span><span class="p">,</span>
-                                  <span class="n">VariableDefinitionError</span><span class="p">)</span>
+                                  <span class="n">DataExtractionError</span><span class="p">,</span>
+                                  <span class="n">DimensionOrderError</span><span class="p">,</span>
+                                  <span class="n">TemporalResolutionError</span><span class="p">,</span>
+                                  <span class="n">VariableDefinitionError</span><span class="p">,</span>
+                                  <span class="n">VariableNotFoundError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_time_rng_constraint</span><span class="p">,</span>
                                <span class="n">get_lon_rng_constraint</span><span class="p">,</span>
                                <span class="n">get_lat_rng_constraint</span><span class="p">,</span>
@@ -194,10 +196,11 @@
                                <span class="n">to_pandas_timestamp</span><span class="p">,</span>
                                <span class="n">TS_TYPE_TO_NUMPY_FREQ</span><span class="p">,</span>
                                <span class="n">datetime2str</span><span class="p">,</span>
-                               <span class="n">isrange</span><span class="p">)</span>
+                               <span class="n">isrange</span><span class="p">,</span> <span class="n">isnumeric</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="k">import</span> <span class="n">closest_index</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.stationdata</span> <span class="k">import</span> <span class="n">StationData</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.region</span> <span class="k">import</span> <span class="n">Region</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.vert_coords</span> <span class="k">import</span> <span class="n">AltitudeAccess</span>
 
 
 <div class="viewcode-block" id="GriddedData"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData">[docs]</a><span class="k">class</span> <span class="nc">GriddedData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -268,8 +271,9 @@
     <span class="c1">#: Req. order of dimension coordinates for time-series computation</span>
     <span class="n">COORDS_ORDER_TSERIES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
     <span class="n">_MAX_SIZE_GB</span> <span class="o">=</span> <span class="mi">64</span> <span class="c1">#maximum file size for in-memory operations</span>
-    
-    <span class="n">SUPPORTED_VERT_SCHEMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;surface&#39;</span><span class="p">,</span> <span class="s1">&#39;altitude&#39;</span><span class="p">,</span> <span class="s1">&#39;profile&#39;</span><span class="p">]</span>
+
+    <span class="n">SUPPORTED_VERT_SCHEMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;surface&#39;</span><span class="p">,</span> <span class="s1">&#39;altitude&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;profile&#39;</span><span class="p">]</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">convert_unit_on_init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">suppl_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span> <span class="o">=</span> <span class="n">od</span><span class="p">(</span><span class="n">from_files</span>         <span class="o">=</span> <span class="p">[],</span>
@@ -279,6 +283,7 @@
                              <span class="n">regridded</span>          <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                              <span class="n">outliers_removed</span>   <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                              <span class="n">computed</span>           <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                             <span class="n">concatenated</span>       <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                              <span class="n">region</span>             <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                              <span class="n">reader</span>             <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
         
@@ -288,21 +293,34 @@
         <span class="c1">#area_weights)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_area_weights</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_altitude_access</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="c1"># list of coordinate names as returned by name() method of iris coordinate</span>
+        <span class="c1"># will be filled upon access of coord_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_names</span> <span class="o">=</span> <span class="kc">None</span> 
+        <span class="c1"># list of containing var_name attributes of all coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_var_names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_standard_names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_long_names</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">input</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_input</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">suppl_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Ignoring input </span><span class="si">{}</span><span class="s1">=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
                 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span>
-            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">has_unit</span> <span class="ow">and</span> <span class="n">var</span><span class="o">.</span><span class="n">unit</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Converting unit of data&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">has_unit</span> <span class="ow">and</span> <span class="n">var</span><span class="o">.</span><span class="n">units</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;unit_ok&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">if</span> <span class="n">convert_unit_on_init</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">convert_unit</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Attempting unit conversion from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="n">var</span><span class="o">.</span><span class="n">units</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">convert_unit</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;unit_ok&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">except</span> <span class="p">(</span><span class="n">VariableDefinitionError</span><span class="p">,</span> <span class="ne">MemoryError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">VariableDefinitionError</span><span class="p">,</span> <span class="n">UnitConversionError</span><span class="p">,</span>
+                <span class="ne">MemoryError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Failed to convert unit. Reason: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;unit_ok&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
@@ -323,22 +341,52 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">reader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Instance of reader class from which this object was created&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;reader&#39;</span><span class="p">]</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;reader&#39;</span><span class="p">]</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">ReadGridded</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">ReadGridded</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">r</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span>
+
+<div class="viewcode-block" id="GriddedData.search_other"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.search_other">[docs]</a>    <span class="k">def</span> <span class="nf">search_other</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">require_same_shape</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Searches data for another variable&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">require_same_shape</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenated</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">computed</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_files</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">pyaerocom.io.iris_io</span> <span class="k">import</span> <span class="n">load_cube_custom</span>
+                <span class="n">cube</span> <span class="o">=</span> <span class="n">load_cube_custom</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="n">var_name</span><span class="p">,</span>
+                                        <span class="n">perform_checks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">from_files</span><span class="o">=</span><span class="n">file</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">vars_provided</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
+                                        <span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                                        <span class="n">stop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span>
+                                        <span class="n">ts_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
+                                        <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">VariableNotFoundError</span><span class="p">(</span><span class="s1">&#39;Could not find variable </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">concatenated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;concatenated&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">computed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;computed&#39;</span><span class="p">]</span>
     
     <span class="nd">@reader</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#         from pyaerocom.io import ReadGridded</span>
-<span class="c1">#         if not isinstance(val, ReadGridded):</span>
-<span class="c1">#             raise ValueError(&#39;Input reader {} is not a support reader class for &#39;</span>
-<span class="c1">#                              &#39;gridded data...&#39;.format(type(val)))</span>
-<span class="c1"># =============================================================================</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;reader&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-        
+
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Unit of data&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">units</span>
+    
+    <span class="nd">@units</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">val</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -346,8 +394,8 @@
 <span class="sd">        </span>
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        This is a pointer to the data object of the underlying iris.Cube </span>
-<span class="sd">        instance and will load the data into memory. Thus, in case of large </span>
+<span class="sd">        This is a pointer to the data object of the underlying iris.Cube</span>
+<span class="sd">        instance and will load the data into memory. Thus, in case of large</span>
 <span class="sd">        datasets, this may lead to a memory error</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span>
@@ -361,7 +409,13 @@
                                      <span class="s1">&#39;Got: </span><span class="si">{}</span><span class="s1">, Need: </span><span class="si">{}</span><span class="s1">&#39;</span>
                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">array</span>
-        
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">altitude_access</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_altitude_access</span><span class="p">,</span> <span class="n">AltitudeAccess</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_altitude_access</span> <span class="o">=</span> <span class="n">AltitudeAccess</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>    
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_altitude_access</span>
+    
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cube</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
@@ -369,13 +423,47 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">var_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Print information about variable&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">]</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ts_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Temporal resolution&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;n/d&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">infer_ts_type</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
     
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">delta_t</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Array containing timedelta values for each time stamp&quot;&quot;&quot;</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Need at least 2 timestamps in GriddedData in &#39;</span>
+                                 <span class="s1">&#39;order to compute delta-t&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+<div class="viewcode-block" id="GriddedData.check_frequency"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.check_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">check_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if all datapoints are sampled at the same time frequency&quot;&quot;&quot;</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_t</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Irregular time-frequency&#39;</span><span class="p">)</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">TS_TYPE_TO_NUMPY_FREQ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;timedelta64[</span><span class="si">{}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">)))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Mismatch between sampling freq and &#39;</span>
+                                 <span class="s1">&#39;actual frequency of values in time dimension &#39;</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="GriddedData.infer_ts_type"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.infer_ts_type">[docs]</a>    <span class="k">def</span> <span class="nf">infer_ts_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_t</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not identify unique frequency&#39;</span><span class="p">)</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">TS_TYPE_TO_NUMPY_FREQ</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;timedelta64[</span><span class="si">{}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts_type</span>
+                <span class="k">return</span> <span class="n">ts_type</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Failed to infer ts_type from data&#39;</span><span class="p">)</span></div>
+        
+        
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">TS_TYPES</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List with valid filename encryptions specifying temporal resolution</span>
@@ -386,7 +474,7 @@
     <span class="k">def</span> <span class="nf">from_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List of file paths from which this data object was created&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;from_files&#39;</span><span class="p">]</span>
-        
+    
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_masked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Flag specifying whether data is masked or not</span>
@@ -450,10 +538,24 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">var_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Name of variable in grid&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Name of variable&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cube</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;n/a&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">var_name</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">standard_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Standard name of variable&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">standard_name</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">long_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Long name of variable&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">long_name</span>
+    
+    <span class="nd">@long_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">long_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">long_name</span> <span class="o">=</span> <span class="n">val</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">plot_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -467,7 +569,7 @@
 <span class="sd">        will be initiated with ``None``, in which case the Aerocom plot method</span>
 <span class="sd">        uses</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">VAR_PARAM</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">]</span>
             
     <span class="nd">@property</span> 
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -556,7 +658,9 @@
         <span class="sd">&quot;&quot;&quot;List containing coordinate names&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_data</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">coords</span><span class="p">()]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coord_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_coord_info</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coord_names</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dimcoord_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -565,6 +669,18 @@
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">dim_coords</span><span class="p">]</span>
     
+    <span class="k">def</span> <span class="nf">_update_coord_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">vn</span><span class="p">,</span> <span class="n">sn</span><span class="p">,</span> <span class="n">ln</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">coords</span><span class="p">():</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+            <span class="n">vn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">var_name</span><span class="p">)</span>
+            <span class="n">sn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">standard_name</span><span class="p">)</span>
+            <span class="n">ln</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">long_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_names</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_var_names</span> <span class="o">=</span> <span class="n">vn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_standard_names</span> <span class="o">=</span> <span class="n">sn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coord_long_names</span> <span class="o">=</span> <span class="n">ln</span>
+        
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">area_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Area weights of lat / lon grid&quot;&quot;&quot;</span>
@@ -579,28 +695,13 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">has_latlon_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Boolean specifying whether data has latitude and longitude dimensions&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimcoord_names</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> 
+        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimcoord_names</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span>
                                                            <span class="s1">&#39;longitude&#39;</span><span class="p">]])</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">has_time_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Boolean specifying whether data has latitude and longitude dimensions&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimcoord_names</span>
     
-<div class="viewcode-block" id="GriddedData.init_reader"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.init_reader">[docs]</a>    <span class="k">def</span> <span class="nf">init_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_info</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initiate reader class&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Existing reader class will be overwritten&#39;</span><span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">ReadGridded</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">print_info</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">----Initiated reader class----</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">print_log</span>
-            <span class="n">print_log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Failed to initiate reader class: </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
-            
 <div class="viewcode-block" id="GriddedData.load_input"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.load_input">[docs]</a>    <span class="k">def</span> <span class="nf">load_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Import input as cube</span>
 <span class="sd">        </span>
@@ -617,15 +718,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="nb">input</span> <span class="c1">#instance of Cube</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
             <span class="kn">from</span> <span class="nn">pyaerocom.io.iris_io</span> <span class="k">import</span> <span class="n">load_cube_custom</span>
-            <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">FileConventionRead</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">load_cube_custom</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
-            
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="n">FileConventionRead</span><span class="p">()</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">f</span><span class="o">.</span><span class="n">get_info_from_file</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">pass</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s2">&quot;from_files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
             
         <span class="k">else</span><span class="p">:</span>
@@ -639,6 +732,16 @@
                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">))</span></div>
         
      
+    <span class="k">def</span> <span class="nf">_get_info_from_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Try access AeroCom meta info from filenames assigned to this object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="k">import</span> <span class="n">FileConventionRead</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">FileConventionRead</span><span class="p">(</span><span class="n">from_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">from_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_info_from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">from_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_files</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">add_info</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            
+        
 <div class="viewcode-block" id="GriddedData.convert_unit"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.convert_unit">[docs]</a>    <span class="k">def</span> <span class="nf">convert_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_unit</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert unit of data to new unit&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size_GB</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_SIZE_GB</span><span class="p">:</span>
@@ -786,9 +889,13 @@
         <span class="c1"># and the first 3 dimensions are time, latitude, longitude.</span>
         
         <span class="c1"># init input for sample points</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sample_points</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sample_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sample_points</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">sample_points</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+            <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                    <span class="n">v</span><span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
+                <span class="n">sample_points</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">c</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+
         <span class="n">lens</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sample_points</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">lens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lens</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Arrays for sample coordinates must have the &quot;</span>
@@ -843,7 +950,7 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> 
                                <span class="n">longitude</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span>
                                <span class="n">data_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">}</span>
             <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
             <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span>
@@ -872,7 +979,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;altitude&#39;</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">sample_points</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Require altitude specification in sample &#39;</span>
                                  <span class="s1">&#39;points for vert_scheme altitude&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_altitude_access</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_altitude_access</span><span class="p">():</span>
                 <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Cannot access altitude &#39;</span>
                                          <span class="s1">&#39;information&#39;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Cannot yet retrieve timeseries at &#39;</span>
@@ -893,18 +1000,22 @@
                                   <span class="s1">&#39;from 4D data for vert_scheme </span><span class="si">{}</span><span class="s1"> &#39;</span>
                                   <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vert_scheme</span><span class="p">))</span>
     
-    <span class="k">def</span> <span class="nf">_check_altitude_access</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check if altitude levels can be accessed&quot;&quot;&quot;</span>
-        <span class="n">coord_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">coord_name</span> <span class="o">==</span> <span class="s1">&#39;altitude&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="kn">from</span> <span class="nn">pyaerocom.vert_coords</span> <span class="k">import</span> <span class="n">AltitudeAccess</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_altitude_access</span> <span class="o">=</span> <span class="n">acc</span> <span class="o">=</span> <span class="n">AltitudeAccess</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="c1"># the following function will </span>
-        <span class="k">return</span> <span class="n">acc</span><span class="o">.</span><span class="n">find_and_import_auxvars</span><span class="p">()</span>
+<div class="viewcode-block" id="GriddedData.check_altitude_access"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.check_altitude_access">[docs]</a>    <span class="k">def</span> <span class="nf">check_altitude_access</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if altitude levels can be accessed</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True, if altitude access is provided, else False</span>
+<span class="sd">         </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">altitude_access</span><span class="o">.</span><span class="n">check_altitude_access</span><span class="p">()</span></div>
     
 <div class="viewcode-block" id="GriddedData.get_altitude"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.get_altitude">[docs]</a>    <span class="k">def</span> <span class="nf">get_altitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">coords</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Extract (or try to compute) altitude values at input coordinates&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_altitude_access</span><span class="p">,</span> <span class="n">AltitudeAccess</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_altitude_access</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_altitude_access</span><span class="o">.</span><span class="n">get_altitude</span><span class="p">(</span><span class="o">**</span><span class="n">coords</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span></div>
         
     <span class="k">def</span> <span class="nf">_infer_index_surface_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -963,20 +1074,24 @@
 <span class="sd">        dict</span>
 <span class="sd">            dictionary containing results</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_dimcoords_tseries</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;So far, timeseries can only be extracted &#39;</span>
-                                     <span class="s1">&#39;from 3 dimensional data...&#39;</span><span class="p">)</span>
-        <span class="n">lons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">points</span>
-        <span class="n">lats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">points</span>
-        <span class="n">lon_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lons</span> <span class="o">-</span> <span class="n">longitude</span><span class="p">))</span>
-        <span class="n">lat_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lats</span> <span class="o">-</span> <span class="n">latitude</span><span class="p">))</span>
-        <span class="n">times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">lat_idx</span><span class="p">,</span> <span class="n">lon_idx</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;latitude&#39;</span>      <span class="p">:</span> <span class="n">latitude</span><span class="p">,</span> 
-                <span class="s1">&#39;longitude&#39;</span>     <span class="p">:</span> <span class="n">longitude</span><span class="p">,</span>
-                <span class="s1">&#39;name&#39;</span>          <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span>   <span class="p">:</span> <span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">)}</span></div>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;This method is deprecated since &#39;</span>
+                                           <span class="s1">&#39;version 0.8.0&#39;</span><span class="p">))</span></div>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#         self.check_dimcoords_tseries()</span>
+<span class="c1">#         if not self.ndim == 3:</span>
+<span class="c1">#             raise DataDimensionError(&#39;So far, timeseries can only be extracted &#39;</span>
+<span class="c1">#                                      &#39;from 3 dimensional data...&#39;)</span>
+<span class="c1">#         lons = self.longitude.points</span>
+<span class="c1">#         lats = self.latitude.points</span>
+<span class="c1">#         lon_idx = np.argmin(np.abs(lons - longitude))</span>
+<span class="c1">#         lat_idx = np.argmin(np.abs(lats - latitude))</span>
+<span class="c1">#         times = self.time_stamps()</span>
+<span class="c1">#         data = self.grid.data[:, lat_idx, lon_idx]</span>
+<span class="c1">#         return {&#39;latitude&#39;      : latitude,</span>
+<span class="c1">#                 &#39;longitude&#39;     : longitude,</span>
+<span class="c1">#                 &#39;name&#39;          : self.name,</span>
+<span class="c1">#                 self.var_name   : Series(data, times)}</span>
+<span class="c1"># =============================================================================</span>
         
     <span class="k">def</span> <span class="nf">_closest_time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find closest index to input in time dimension&quot;&quot;&quot;</span>
@@ -1029,8 +1144,12 @@
                 <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;time&#39;</span><span class="p">:</span>
-                    <span class="n">_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closest_time_idx</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-                    <span class="n">_cval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">_idx</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">:</span>
+                        <span class="n">_tval</span> <span class="o">=</span> <span class="n">val</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closest_time_idx</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                        <span class="n">_tval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">_idx</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">_cval</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span><span class="n">_tval</span><span class="p">)</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">use_neirest</span> <span class="ow">and</span> <span class="n">_cval</span> <span class="o">!=</span> <span class="n">val</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">DataExtractionError</span><span class="p">(</span><span class="s1">&#39;No such value </span><span class="si">{}</span><span class="s1"> in dim </span><span class="si">{}</span><span class="s1">. &#39;</span>
                                                   <span class="s1">&#39;Use option use_neirest to &#39;</span>
@@ -1064,18 +1183,18 @@
     <span class="c1"># TODO: Test, confirm and remove beta flag in docstring</span>
 <div class="viewcode-block" id="GriddedData.remove_outliers"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.remove_outliers">[docs]</a>    <span class="k">def</span> <span class="nf">remove_outliers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove outliers from data</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        low : float</span>
-<span class="sd">            lower end of valid range for input variable. If None, then the </span>
-<span class="sd">            corresponding value from the default settings for this variable </span>
-<span class="sd">            are used (cf. minimum attribute of `available variables </span>
+<span class="sd">            lower end of valid range for input variable. If None, then the</span>
+<span class="sd">            corresponding value from the default settings for this variable</span>
+<span class="sd">            are used (cf. minimum attribute of `available variables</span>
 <span class="sd">            &lt;https://pyaerocom.met.no/config_files.html#variables&gt;`__)</span>
 <span class="sd">        high : float</span>
-<span class="sd">            upper end of valid range for input variable. If None, then the </span>
-<span class="sd">            corresponding value from the default settings for this variable </span>
-<span class="sd">            are used (cf. maximum attribute of `available variables </span>
+<span class="sd">            upper end of valid range for input variable. If None, then the</span>
+<span class="sd">            corresponding value from the default settings for this variable</span>
+<span class="sd">            are used (cf. maximum attribute of `available variables</span>
 <span class="sd">            &lt;https://pyaerocom.met.no/config_files.html#variables&gt;`__)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">low</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1086,7 +1205,7 @@
             <span class="n">high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">maximum</span>
             <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Setting </span><span class="si">{}</span><span class="s1"> outlier upper lim: </span><span class="si">{:.2f}</span><span class="s1">&#39;</span>
                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">high</span><span class="p">))</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span> <span class="o">&lt;</span> <span class="n">low</span><span class="p">,</span> 
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span> <span class="o">&lt;</span> <span class="n">low</span><span class="p">,</span>
                              <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">[</span><span class="s1">&#39;outliers_removed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
@@ -1267,11 +1386,44 @@
                               <span class="n">aggregator</span><span class="o">=</span><span class="n">MEAN</span><span class="p">,</span> 
                               <span class="n">weights</span><span class="o">=</span><span class="n">ws</span><span class="p">)</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span></div>
         
+<div class="viewcode-block" id="GriddedData.get_area_weighted_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.get_area_weighted_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">get_area_weighted_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper method to extract area weighted mean timeseries</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        region</span>
+<span class="sd">            optional, name of AeroCom default region for which the mean is to </span>
+<span class="sd">            be calculated (e.g. EUROPE)</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        StationData</span>
+<span class="sd">            station data containing area weighted mean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_dimcoords_tseries</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">DimensionOrderError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reorder_dimensions_tseries</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Area weighted mean can only computed &#39;</span>
+                                      <span class="s1">&#39;for data containing latitude and &#39;</span>
+                                      <span class="s1">&#39;longitude data&#39;</span><span class="p">)</span>
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
+        <span class="n">stat</span><span class="o">.</span><span class="n">station_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span>
+        <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">)</span>
+            <span class="n">stat</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">area_weighted_mean</span><span class="p">()</span>
+         
+        <span class="n">stat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">stat</span></div>
+        
     <span class="c1"># redefined methods from iris.Cube class. This includes all Cube </span>
     <span class="c1"># processing methods that exist in the Cube class and that work on the </span>
     <span class="c1"># Cube and return a Cube instance. These may be expanded (e.g. for </span>
     <span class="c1"># instance what they accept as input</span>
-    
 <div class="viewcode-block" id="GriddedData.aerocom_filename"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.aerocom_filename">[docs]</a>    <span class="k">def</span> <span class="nf">aerocom_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">at_stations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Filename of data following Aerocom 3 conventions</span>
 <span class="sd">        </span>
@@ -1597,7 +1749,7 @@
         
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_griddeddata_on_map</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">lons</span><span class="o">=</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="o">=</span><span class="n">lats</span><span class="p">,</span> 
                                       <span class="n">var_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> 
-                                      <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
+                                      <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
                                       <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span> 
                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         
@@ -1607,7 +1759,7 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="n">tstr</span> <span class="o">=</span> <span class="n">datetime2str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()[</span><span class="n">time_idx</span><span class="p">],</span> 
                                 <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> 
+        <span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> 
                               <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">tstr</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">fig</span></div>
     
@@ -1678,17 +1830,32 @@
     <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
         
-    
+    <span class="k">def</span> <span class="nf">_check_coordinate_access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coord_standard_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_coord_info</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coord_standard_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;standard_name&#39;</span> <span class="p">:</span> <span class="n">val</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coord_var_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;var_name&#39;</span> <span class="p">:</span> <span class="n">val</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coord_long_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span> <span class="p">:</span> <span class="n">val</span><span class="p">}</span>
+        <span class="k">raise</span> <span class="n">CoordinateError</span><span class="p">(</span><span class="s1">&#39;Could not associate one of the coordinates with &#39;</span>
+                              <span class="s1">&#39;input string </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices_or_attr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;x.__getitem__(y) &lt;==&gt; x[y]&quot;&quot;&quot;</span>
    
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices_or_attr</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">indices_or_attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">indices_or_attr</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">indices_or_attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_names</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;&#39;pyaerocom.GriddedData&#39; object has no &quot;</span>
-                                     <span class="s2">&quot;attribute &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">indices_or_attr</span><span class="p">))</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">coord</span><span class="p">(</span><span class="n">indices_or_attr</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">which</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_coordinate_access</span><span class="p">(</span><span class="n">indices_or_attr</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">coord</span><span class="p">(</span><span class="o">**</span><span class="n">which</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;GriddedData object has no &quot;</span>
+                                     <span class="s2">&quot;attribute </span><span class="si">{}</span><span class="s2">&quot;</span>
+                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">indices_or_attr</span><span class="p">))</span>
+            
         <span class="n">sub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">indices_or_attr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">suppl_info</span><span class="p">)</span>
     
@@ -1788,9 +1955,22 @@
                            <span class="s1">&#39;longitude&#39;</span>  <span class="p">:</span>   <span class="n">lon</span><span class="p">,</span>
                            <span class="s1">&#39;name&#39;</span>       <span class="p">:</span>   <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> 
                             <span class="n">var</span>         <span class="p">:</span>   <span class="n">data</span><span class="p">})</span>
-        <span class="k">return</span> <span class="n">result</span></div>
+        <span class="k">return</span> <span class="n">result</span>
 
-                
+    <span class="c1">### Deprecated (but still supported) stuff</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unit of data&quot;&quot;&quot;</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Attr. unit is deprecated, &#39;</span>
+                                                <span class="s1">&#39;please use units instead&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">units</span>
+
+    <span class="nd">@unit</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;Attr. unit is deprecated, &#39;</span>
+                                                <span class="s1">&#39;please use units instead&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">val</span></div>
+
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
@@ -1799,12 +1979,7 @@
     
     <span class="n">reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;ECMWF_CAMS_REAN&#39;</span><span class="p">)</span>
     
-    <span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
-    <span class="n">c1</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2009</span><span class="p">)</span><span class="o">.</span><span class="n">cube</span>
-    <span class="n">c2</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;ec532aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span><span class="o">.</span><span class="n">cube</span>
-    
-    <span class="kn">import</span> <span class="nn">iris</span>
-    <span class="n">c3</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">+</span> <span class="n">c1</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span>    
 <span class="c1"># =============================================================================</span>
 <span class="c1">#     data.downscale_time(&#39;monthly&#39;)</span>
 <span class="c1">#     </span>

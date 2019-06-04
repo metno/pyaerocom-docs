@@ -1,6 +1,6 @@
 
-Colocating gridded data with discrete observations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Colocation of model data with observations
+------------------------------------------
 
 This notebook gives an introduction into collocation of gridded data
 with observations. Here, the 550 nm AODs of the ECMWF CAMS reanalysis
@@ -12,7 +12,7 @@ online interface (see e.g.
 `here <http://aerocom.met.no/cgi-bin/aerocom/surfobs_annualrs.pl>`__).
 
 Import setup and imports
-^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
@@ -33,11 +33,11 @@ Import setup and imports
     Checking access to: /lustre/storeA
     Access to lustre database: True
     Init data paths for lustre
-    Expired time: 0.023 s
+    Expired time: 0.014 s
 
 
 Import of model data
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 Create reader instance for model data and print overview of what is in
 there.
@@ -55,9 +55,10 @@ there.
     ---------------------
     Model ID: ECMWF_CAMS_REAN
     Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed
-    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'ec532dryaer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcpm10', 'sconcpm25', 'time', 'z']
+    Available experiments: ['']
     Available years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 9999]
-    Available time resolutions ['daily', 'monthly']
+    Available frequencies ['daily', 'monthly']
+    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'ec532dryaer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcpm10', 'sconcpm25', 'time', 'z']
 
 
 Since we are only interested in a single year we can use the method
@@ -97,7 +98,7 @@ Since we are only interested in a single year we can use the method
 
 
 Import of AeroNet Sun V3 data (Level 2)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Import Aeronet data and apply filter that selects only stations that are
 located at altitudes between 0 and 1000 m.
@@ -122,14 +123,14 @@ located at altitudes between 0 and 1000 m.
     Contains networks: ['AeronetSunV3Lev2.daily']
     Contains variables: ['ang4487aer', 'od550aer']
     Contains instruments: ['sun_photometer']
-    Total no. of meta-blocks: 1020
+    Total no. of meta-blocks: 1025
     Filters that were applied:
-     Filter time log: 20190410170224
+     Filter time log: 20190604164933
     	altitude: [0, 1000]
 
 
 Plot station coordinates
-^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 First, plot all stations that are available at all times (as red dots),
 then (on top of that in green), plot all stations that provide AODs in
@@ -151,10 +152,10 @@ then (on top of that in green), plot all stations that provide AODs in
 
 
 Now perform collocation and plot corresponding scatter plots with statistical values
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 2010 monthly World no mountains
-'''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Colocate 2010 data in monthly resolution using (cf. green dots in
 station plot above).
@@ -168,7 +169,7 @@ station plot above).
 
 .. parsed-literal::
 
-    UngriddedData <networks: ['AeronetSunV3Lev2.daily']; vars: ['ang4487aer', 'od550aer']; instruments: ['sun_photometer'];No. of stations: 1020
+    UngriddedData <networks: ['AeronetSunV3Lev2.daily']; vars: ['ang4487aer', 'od550aer']; instruments: ['sun_photometer'];No. of stations: 1025
 
 
 
@@ -207,7 +208,7 @@ station plot above).
     Coordinates:
       * data_source   (data_source) <U22 'AeronetSunV3Lev2.daily' 'ECMWF_CAMS_REAN'
         var_name      (data_source) <U8 'od550aer' 'od550aer'
-        unit          (data_source) <U1 '1' '1'
+        var_units     (data_source) <U1 '1' '1'
         ts_type_src   (data_source) <U5 'daily' 'daily'
       * time          (time) datetime64[ns] 2010-01-15 2010-02-15 ... 2010-12-15
       * station_name  (station_name) <U19 'ARM_Darwin' ... 'Zinder_Airport'
@@ -222,10 +223,10 @@ station plot above).
         ts_type_src:     ['daily', 'daily']
         start_str:       20100101
         stop_str:        20101231
-        unit:            ['1', '1']
+        var_units:       ['1', '1']
         vert_scheme:     None
         data_level:      3
-        revision_ref:    20190311
+        revision_ref:    20190425
         from_files:      ['ECMWF_CAMS_REAN.daily.od550aer.2010.nc']
         from_files_ref:  None
         region:          WORLD
@@ -244,7 +245,7 @@ station plot above).
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f09fa8c1400>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f4e8409b2e8>
 
 
 
@@ -253,7 +254,7 @@ station plot above).
 
 
 2010 daily Europe no mountains
-''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Now perform colocation only over Europe. Starting with a station plot.
 
@@ -269,7 +270,7 @@ Now perform colocation only over Europe. Starting with a station plot.
 
 .. parsed-literal::
 
-    <cartopy.mpl.geoaxes.GeoAxes at 0x7f09faa11550>
+    <cartopy.mpl.geoaxes.GeoAxes at 0x7f4e70f90a90>
 
 
 
@@ -312,7 +313,7 @@ Now perform colocation only over Europe. Starting with a station plot.
     Coordinates:
       * data_source   (data_source) <U22 'AeronetSunV3Lev2.daily' 'ECMWF_CAMS_REAN'
         var_name      (data_source) <U8 'od550aer' 'od550aer'
-        unit          (data_source) <U1 '1' '1'
+        var_units     (data_source) <U1 '1' '1'
         ts_type_src   (data_source) <U5 'daily' 'daily'
       * time          (time) datetime64[ns] 2010-01-01 2010-01-02 ... 2010-12-31
       * station_name  (station_name) <U19 'ATHENS-NOA' 'Andenes' ... 'Yekaterinburg'
@@ -327,10 +328,10 @@ Now perform colocation only over Europe. Starting with a station plot.
         ts_type_src:     ['daily', 'daily']
         start_str:       20100101
         stop_str:        20101231
-        unit:            ['1', '1']
+        var_units:       ['1', '1']
         vert_scheme:     None
         data_level:      3
-        revision_ref:    20190311
+        revision_ref:    20190425
         from_files:      ['ECMWF_CAMS_REAN.daily.od550aer.2010.nc']
         from_files_ref:  None
         region:          EUROPE
@@ -349,7 +350,7 @@ Now perform colocation only over Europe. Starting with a station plot.
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f09fab505c0>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f4e70f70400>
 
 
 
