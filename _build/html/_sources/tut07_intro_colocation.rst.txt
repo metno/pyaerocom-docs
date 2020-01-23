@@ -1,4 +1,3 @@
-
 Colocation of model data with observations
 ------------------------------------------
 
@@ -8,8 +7,8 @@ model are compared with global daily AeroNet Sun V2 (Level 2) data for
 the year 2010. The collocated data will be analysed and visualised in
 monthly resolution. The analysis results will be plotted in the form of
 the well known Aerocom loglog scatter plots as can be found in the
-online interface (see e.g.
-`here <http://aerocom.met.no/cgi-bin/aerocom/surfobs_annualrs.pl>`__).
+online interface (see
+e.g. \ `here <http://aerocom.met.no/cgi-bin/aerocom/surfobs_annualrs.pl>`__).
 
 Import setup and imports
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,7 +32,7 @@ Import setup and imports
     Checking access to: /lustre/storeA
     Access to lustre database: True
     Init data paths for lustre
-    Expired time: 0.014 s
+    Expired time: 0.029 s
 
 
 Import of model data
@@ -53,12 +52,12 @@ there.
     
     Pyaerocom ReadGridded
     ---------------------
-    Model ID: ECMWF_CAMS_REAN
+    Data ID: ECMWF_CAMS_REAN
     Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed
-    Available experiments: ['']
-    Available years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 9999]
-    Available frequencies ['daily', 'monthly']
-    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'ec532dryaer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcpm10', 'sconcpm25', 'time', 'z']
+    Available experiments: ['', 'REAN']
+    Available years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 9999]
+    Available frequencies ['daily' 'monthly']
+    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'ec532dryaer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcbc', 'sconcdust', 'sconcoa', 'sconcpm10', 'sconcpm25', 'sconcso4', 'sconcss', 'time', 'z']
 
 
 Since we are only interested in a single year we can use the method
@@ -81,8 +80,18 @@ Since we are only interested in a single year we can use the method
          Attributes:
               Conventions: CF-1.6
               NCO: "4.5.4"
+              computed: False
+              concatenated: False
+              data_id: ECMWF_CAMS_REAN
+              from_files: ['/lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CA...
               history: Sat May 26 21:08:48 2018: ncecat -O -u time -n 365,3,1 CAMS_REAN_001.nc...
               nco_openmp_thread_number: 1
+              outliers_removed: False
+              reader: None
+              region: None
+              regridded: False
+              ts_type: daily
+              var_name_read: n/d
          Cell methods:
               mean: step
               mean: time
@@ -112,25 +121,20 @@ located at altitudes between 0 and 1000 m.
 
 .. parsed-literal::
 
-    Found Cache match for AeronetSunV3Lev2.daily
-
-
-.. parsed-literal::
-
     
     Pyaerocom UngriddedData
     -----------------------
     Contains networks: ['AeronetSunV3Lev2.daily']
-    Contains variables: ['ang4487aer', 'od550aer']
+    Contains variables: ['od550aer', 'ang4487aer']
     Contains instruments: ['sun_photometer']
-    Total no. of meta-blocks: 1025
+    Total no. of meta-blocks: 2068
     Filters that were applied:
-     Filter time log: 20190604164933
+     Filter time log: 20191012154650
     	altitude: [0, 1000]
 
 
 Plot station coordinates
-~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 First, plot all stations that are available at all times (as red dots),
 then (on top of that in green), plot all stations that provide AODs in
@@ -147,12 +151,17 @@ then (on top of that in green), plot all stations that provide AODs in
                                            ax=ax) #just pass the GeoAxes instance that was created in the first call
 
 
+.. parsed-literal::
 
-.. image:: tut07_intro_colocation/tut07_intro_colocation_11_0.png
+    Input filters {'longitude': [-180, 180], 'latitude': [-90, 90], 'altitude': [-1000000.0, 1000.0]} result in unchanged data object
 
 
-Now perform collocation and plot corresponding scatter plots with statistical values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: tut07_intro_colocation/tut07_intro_colocation_11_1.png
+
+
+Perform colocation and plot corresponding scatter plots with statistical values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 2010 monthly World no mountains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -169,7 +178,7 @@ station plot above).
 
 .. parsed-literal::
 
-    UngriddedData <networks: ['AeronetSunV3Lev2.daily']; vars: ['ang4487aer', 'od550aer']; instruments: ['sun_photometer'];No. of stations: 1025
+    UngriddedData <networks: ['AeronetSunV3Lev2.daily']; vars: ['od550aer', 'ang4487aer']; instruments: ['sun_photometer'];No. of stations: 2068
 
 
 
@@ -182,7 +191,7 @@ station plot above).
 
 .. parsed-literal::
 
-    This method is deprecated. Please use new name resample_time
+    Input filters {'longitude': [-180, 180], 'latitude': [-90, 90], 'altitude': [-1000000.0, 1000.0]} result in unchanged data object
     Setting od550aer outlier lower lim: -1.00
     Setting od550aer outlier upper lim: 10.00
     Interpolating data of shape (12, 161, 320). This may take a while.
@@ -193,65 +202,112 @@ station plot above).
 
 .. parsed-literal::
 
-    <xarray.DataArray 'od550aer' (data_source: 2, time: 12, station_name: 278)>
+    <xarray.DataArray 'od550aer' (data_source: 2, time: 12, station_name: 252)>
     array([[[     nan, 0.117588, ...,      nan, 0.222138],
             [     nan, 0.132128, ...,      nan, 0.429762],
             ...,
             [0.132236, 0.195057, ...,      nan, 0.261765],
-            [     nan, 0.098409, ...,      nan, 0.37905 ]],
+            [     nan,      nan, ...,      nan, 0.37905 ]],
     
-           [[0.189948, 0.140062, ..., 0.079353, 0.204337],
-            [0.150408, 0.190089, ..., 0.10622 , 0.257806],
+           [[0.189948, 0.140062, ..., 0.016372, 0.204337],
+            [0.150408, 0.190089, ..., 0.035838, 0.257806],
             ...,
-            [0.159844, 0.178564, ..., 0.054091, 0.239393],
-            [0.147172, 0.138039, ..., 0.077916, 0.19986 ]]])
+            [0.159844, 0.178564, ..., 0.022606, 0.239393],
+            [0.147172, 0.138039, ..., 0.015231, 0.19986 ]]])
     Coordinates:
       * data_source   (data_source) <U22 'AeronetSunV3Lev2.daily' 'ECMWF_CAMS_REAN'
         var_name      (data_source) <U8 'od550aer' 'od550aer'
         var_units     (data_source) <U1 '1' '1'
         ts_type_src   (data_source) <U5 'daily' 'daily'
-      * time          (time) datetime64[ns] 2010-01-15 2010-02-15 ... 2010-12-15
+      * time          (time) datetime64[ns] 2010-01-01 2010-02-01 ... 2010-12-01
       * station_name  (station_name) <U19 'ARM_Darwin' ... 'Zinder_Airport'
-        latitude      (station_name) float64 -12.43 37.97 15.35 ... 32.64 13.78
-        longitude     (station_name) float64 130.9 23.72 -1.479 ... -114.6 8.99
-        altitude      (station_name) float64 29.9 130.0 305.0 ... 20.0 63.0 456.0
+        latitude      (station_name) float64 -12.43 37.97 15.35 ... 62.45 13.78
+        longitude     (station_name) float64 130.9 23.72 -1.479 ... -114.4 8.99
+        altitude      (station_name) float64 29.9 130.0 305.0 ... 300.0 220.8 456.0
     Attributes:
-        data_source:     ['AeronetSunV3Lev2.daily', 'ECMWF_CAMS_REAN']
-        var_name:        ['od550aer', 'od550aer']
-        ts_type:         monthly
-        filter_name:     WORLD-noMOUNTAINS
-        ts_type_src:     ['daily', 'daily']
-        start_str:       20100101
-        stop_str:        20101231
-        var_units:       ['1', '1']
-        vert_scheme:     None
-        data_level:      3
-        revision_ref:    20190425
-        from_files:      ['ECMWF_CAMS_REAN.daily.od550aer.2010.nc']
-        from_files_ref:  None
-        region:          WORLD
-        lon_range:       [-180, 180]
-        lat_range:       [-90, 90]
-        alt_range:       [-1000000.0, 1000.0]
+        data_source:        ['AeronetSunV3Lev2.daily', 'ECMWF_CAMS_REAN']
+        var_name:           ['od550aer', 'od550aer']
+        ts_type:            monthly
+        filter_name:        WORLD-noMOUNTAINS
+        ts_type_src:        ['daily', 'daily']
+        start_str:          20100101
+        stop_str:           20101231
+        var_units:          ['1', '1']
+        vert_scheme:        None
+        data_level:         3
+        revision_ref:       20190920
+        from_files:         ['aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc']
+        from_files_ref:     None
+        stations_ignored:   None
+        colocate_time:      False
+        apply_constraints:  True
+        min_num_obs:        {'yearly': {'monthly': 3}, 'monthly': {'daily': 7}, '...
+        outliers_removed:   True
+        region:             WORLD
+        lon_range:          [-180, 180]
+        lat_range:          [-90, 90]
+        alt_range:          [-1000000.0, 1000.0]
 
 
 
 .. code:: ipython3
 
-    data_coloc.plot_scatter()
+    data_coloc.plot_scatter(marker='o', mec='none', color='b', alpha=0.05);
 
 
+
+.. image:: tut07_intro_colocation/tut07_intro_colocation_16_0.png
+
+
+Time colocation
+^^^^^^^^^^^^^^^
+
+The above colocation was performed based on monthly means, both from
+model and obs, at each station. However, if you look closely in the
+output you can see that both datasets are provided in daily resolution.
+You may colocate on a daily basis using the input argument
+``colocate_time``, in which case the model monthly means correspond to
+the mean value from the days where there were observations. This can
+(and most likely will) give you different results, since the
+observations may miss some days in the month, which is disregarded in
+the above monthly colocation routine:
+
+.. code:: ipython3
+
+    data_coloc_alt = pya.colocation.colocate_gridded_ungridded(model_data, obs_data, ts_type='monthly',
+                                                               filter_name='WORLD-noMOUNTAINS',
+                                                               colocate_time=True)
 
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f4e8409b2e8>
+    Input filters {'longitude': [-180, 180], 'latitude': [-90, 90], 'altitude': [-1000000.0, 1000.0]} result in unchanged data object
+    Setting od550aer outlier lower lim: -1.00
+    Setting od550aer outlier upper lim: 10.00
+    Interpolating data of shape (365, 161, 320). This may take a while.
+    Successfully interpolated cube
+
+
+.. code:: ipython3
+
+    data_coloc_alt.plot_scatter(marker='o', mec='none', color='b', alpha=0.05);
 
 
 
+.. image:: tut07_intro_colocation/tut07_intro_colocation_19_0.png
 
-.. image:: tut07_intro_colocation/tut07_intro_colocation_16_1.png
 
+The result shows, that time colocation yields better results, with lower
+biases (NMB and MNMB) and higher correlation, etc.
+
+However, in reality and in particular in large model intercomparison
+studies (involving many variables and model outputs) the model
+diagnostics output files are submitted in monthly resolution, which does
+not allow to perform these time colocation on a daily basis.
+
+Note also, that the model data used here is the CAMS reanalysis dataset
+which assimilates AERONET AODs. It is therefore not surprising, that the
+results look so shiny.
 
 2010 daily Europe no mountains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -263,31 +319,22 @@ Now perform colocation only over Europe. Starting with a station plot.
     obs_data.plot_station_coordinates(var_name='od550aer', start=2010, 
                                       filter_name='EUROPE-noMOUNTAINS',
                                       color='lime', markersize=20, legend=True,
-                                      title='Aeronet V3 stations')
+                                      title='Aeronet V3 stations');
 
 
 
-
-.. parsed-literal::
-
-    <cartopy.mpl.geoaxes.GeoAxes at 0x7f4e70f90a90>
-
-
-
-
-.. image:: tut07_intro_colocation/tut07_intro_colocation_18_1.png
+.. image:: tut07_intro_colocation/tut07_intro_colocation_22_0.png
 
 
 .. code:: ipython3
 
-    data_coloc = pya.colocation.colocate_gridded_ungridded(model_data, obs_data, ts_type='daily',
+    data_coloc_eur = pya.colocation.colocate_gridded_ungridded(model_data, obs_data, ts_type='daily',
                                                            filter_name='EUROPE-noMOUNTAINS')
-    data_coloc
+    data_coloc_eur
 
 
 .. parsed-literal::
 
-    This method is deprecated. Please use new name resample_time
     Setting od550aer outlier lower lim: -1.00
     Setting od550aer outlier upper lim: 10.00
     Interpolating data of shape (365, 161, 320). This may take a while.
@@ -298,8 +345,8 @@ Now perform colocation only over Europe. Starting with a station plot.
 
 .. parsed-literal::
 
-    <xarray.DataArray 'od550aer' (data_source: 2, time: 365, station_name: 89)>
-    array([[[0.163447,      nan, ...,      nan,      nan],
+    <xarray.DataArray 'od550aer' (data_source: 2, time: 365, station_name: 83)>
+    array([[[     nan,      nan, ...,      nan,      nan],
             [0.078648,      nan, ...,      nan,      nan],
             ...,
             [     nan,      nan, ...,      nan,      nan],
@@ -321,39 +368,153 @@ Now perform colocation only over Europe. Starting with a station plot.
         longitude     (station_name) float64 23.72 16.01 -1.163 ... 24.92 59.54
         altitude      (station_name) float64 130.0 379.0 11.0 ... 160.0 54.0 300.0
     Attributes:
-        data_source:     ['AeronetSunV3Lev2.daily', 'ECMWF_CAMS_REAN']
-        var_name:        ['od550aer', 'od550aer']
-        ts_type:         daily
-        filter_name:     EUROPE-noMOUNTAINS
-        ts_type_src:     ['daily', 'daily']
-        start_str:       20100101
-        stop_str:        20101231
-        var_units:       ['1', '1']
-        vert_scheme:     None
-        data_level:      3
-        revision_ref:    20190425
-        from_files:      ['ECMWF_CAMS_REAN.daily.od550aer.2010.nc']
-        from_files_ref:  None
-        region:          EUROPE
-        lon_range:       [-20, 70]
-        lat_range:       [30, 80]
-        alt_range:       [-1000000.0, 1000.0]
+        data_source:        ['AeronetSunV3Lev2.daily', 'ECMWF_CAMS_REAN']
+        var_name:           ['od550aer', 'od550aer']
+        ts_type:            daily
+        filter_name:        EUROPE-noMOUNTAINS
+        ts_type_src:        ['daily', 'daily']
+        start_str:          20100101
+        stop_str:           20101231
+        var_units:          ['1', '1']
+        vert_scheme:        None
+        data_level:         3
+        revision_ref:       20190920
+        from_files:         ['aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc']
+        from_files_ref:     None
+        stations_ignored:   None
+        colocate_time:      False
+        apply_constraints:  False
+        min_num_obs:        None
+        outliers_removed:   True
+        region:             EUROPE
+        lon_range:          [-20, 70]
+        lat_range:          [30, 80]
+        alt_range:          [-1000000.0, 1000.0]
 
 
 
 .. code:: ipython3
 
-    data_coloc.plot_scatter()
+    data_coloc_eur.plot_scatter(marker='o', mec='none', color='b', alpha=0.05);
+
+
+
+.. image:: tut07_intro_colocation/tut07_intro_colocation_24_0.png
+
+
+Satellite colocation
+~~~~~~~~~~~~~~~~~~~~
+
+Below, the same is done for satellite colocation using AODs from the
+MODIS instrument onboard the Aqua satellite (Collection 6).
+
+.. code:: ipython3
+
+    pya.browse_database('MODIS6*aqua')
+
+
+.. parsed-literal::
+
+    
+    Pyaerocom ReadGridded
+    ---------------------
+    Data ID: MODIS6.1aqua
+    Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/SATELLITE-DATA/MODIS6.1aqua/renamed
+    Available experiments: ['MODIS6.1aqua']
+    Available years: [2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013, 2014]
+    Available frequencies ['daily']
+    Available variables: ['od550aer']
+    
+    Pyaerocom ReadGridded
+    ---------------------
+    Data ID: MODIS6.aqua
+    Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/SATELLITE-DATA/MODIS6.aqua/renamed
+    Available experiments: ['MODIS6.aqua']
+    Available years: [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014]
+    Available frequencies ['daily']
+    Available variables: ['od550aer']
+
+
+.. code:: ipython3
+
+    modis_aods = pya.io.ReadGridded('MODIS6.aqua').read_var('od550aer', start=2010)
+    modis_aods
+
+
+.. parsed-literal::
+
+    Overwriting unit unknown in cube od550aer with value "1"
 
 
 
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f4e70f70400>
+    pyaerocom.GriddedData
+    Grid data: <iris 'Cube' of Aerosol Optical Thickness at 0.55 microns for both Ocean (best) and Land (corrected): Mean / (1) (time: 365; latitude: 180; longitude: 360)>
 
 
 
+Now the satellite data comes gridded, like the model data. Thus, we use
+the gridded / gridded colocation routine rather than the gridded /
+ungridded that we used above when using AERONET station data.
 
-.. image:: tut07_intro_colocation/tut07_intro_colocation_20_1.png
+No (daily) time colocation
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: ipython3
+
+    coldata_modis =  pya.colocation.colocate_gridded_gridded(model_data,
+                                                             modis_aods, 
+                                                             ts_type='monthly',
+                                                             regrid_res_deg=5,
+                                                             remove_outliers=True,
+                                                             colocate_time=False)
+
+
+.. parsed-literal::
+
+    Interpolating data of shape (365, 180, 360). This may take a while.
+    Successfully interpolated cube
+    Setting od550aer outlier lower lim: -1.00
+    Setting od550aer outlier upper lim: 10.00
+
+
+.. code:: ipython3
+
+    coldata_modis.plot_scatter(marker='o', mec='none', color='b', alpha=0.01);
+
+
+
+.. image:: tut07_intro_colocation/tut07_intro_colocation_31_0.png
+
+
+With (daily) time colocation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: ipython3
+
+    coldata_modis_alt =  pya.colocation.colocate_gridded_gridded(model_data,
+                                                             modis_aods, 
+                                                             ts_type='monthly',
+                                                             regrid_res_deg=5,
+                                                             remove_outliers=True,
+                                                             colocate_time=True)
+
+
+.. parsed-literal::
+
+    Interpolating data of shape (365, 180, 360). This may take a while.
+    Successfully interpolated cube
+    Setting od550aer outlier lower lim: -1.00
+    Setting od550aer outlier upper lim: 10.00
+
+
+.. code:: ipython3
+
+    coldata_modis_alt.plot_scatter(marker='o', mec='none', color='b', alpha=0.01);
+
+
+
+.. image:: tut07_intro_colocation/tut07_intro_colocation_34_0.png
 

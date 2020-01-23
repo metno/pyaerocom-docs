@@ -17,40 +17,37 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pyaerocom  documentation" href="index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -86,8 +83,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="readme.html">NEWS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="readme.html#about">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#requirements">Requirements</a></li>
@@ -97,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_testsuite.html">Tests (for developers)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">Configuration files</a></li>
 </ul>
 
             
@@ -109,7 +104,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pyaerocom</a>
@@ -117,9 +112,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -166,18 +162,23 @@
 /* CSS overrides for sphinx_rtd_theme */
 
 /* 24px margin */
-.nbinput.nblast,
-.nboutput.nblast {
+.nbinput.nblast.container,
+.nboutput.nblast.container {
     margin-bottom: 19px;  /* padding has already 5px */
 }
 
 /* ... except between code cells! */
-.nblast + .nbinput {
+.nblast.container + .nbinput.container {
     margin-top: -19px;
 }
 
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
 }
 </style>
 <div class="section" id="handling-of-time-in-pyaerocom">
@@ -188,13 +189,13 @@ using <em>pyaerocom</em>. It The
 class of <em>pyaerocom</em> was introduced in a previous tutorial.</p>
 <p>Here, we illustrate how <em>pyaerocom</em> handles time. In particular, how
 <em>pyaerocom</em> performs the conversion of CF conform numerical time stamps
-with a defined unit (i.e.&nbsp;basedate and calendar, see e.g.
-<a class="reference external" href="http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#time-coordinate">here</a>
+with a defined unit (i.e. basedate and calendar, see
+e.g. <a class="reference external" href="http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#time-coordinate">here</a>
 for details) into datetime-like objects that can be interpreted by tools
 such as <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>.</p>
 <p>The easiest way to work with time stamps in model data is, to simply
 work on the internal numerical indices, avoiding the necessity to
-convert them into actual datetime objects. However, sometimes (e.g.&nbsp;if
+convert them into actual datetime objects. However, sometimes (e.g. if
 we want to extract and analyse a time-series of global average Aerosol
 optical densities), we wish to use third party libraries such as Pandas,
 which require the timestamps to be datetime-like objects.</p>
@@ -224,25 +225,14 @@ datatype of <code class="docutils literal notranslate"><span class="pre">Gridded
 <span class="n">Checking</span> <span class="n">access</span> <span class="n">to</span><span class="p">:</span> <span class="o">/</span><span class="n">lustre</span><span class="o">/</span><span class="n">storeA</span>
 <span class="n">Access</span> <span class="n">to</span> <span class="n">lustre</span> <span class="n">database</span><span class="p">:</span> <span class="kc">True</span>
 <span class="n">Init</span> <span class="n">data</span> <span class="n">paths</span> <span class="k">for</span> <span class="n">lustre</span>
-<span class="n">Expired</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.017</span> <span class="n">s</span>
+<span class="n">Expired</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.023</span> <span class="n">s</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_ecmwf</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">GriddedData</span><span class="p">(</span><span class="n">fpath_ecmwf</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;od550aer&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ECMWF_OSUITE&quot;</span><span class="p">)</span>
 <span class="n">data_aatsr</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">GriddedData</span><span class="p">(</span><span class="n">fpath_aatsr</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;od550aer&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;AATSR&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">_pyke_rules</span><span class="o">/</span><span class="n">compiled_krb</span><span class="o">/</span><span class="n">fc_rules_cf_fc</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1932</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Ignoring</span> <span class="n">netCDF</span> <span class="n">variable</span> <span class="s1">&#39;od550bc&#39;</span> <span class="n">invalid</span> <span class="n">units</span> <span class="s1">&#39;~&#39;</span>
-  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">_pyke_rules</span><span class="o">/</span><span class="n">compiled_krb</span><span class="o">/</span><span class="n">fc_rules_cf_fc</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1932</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Ignoring</span> <span class="n">netCDF</span> <span class="n">variable</span> <span class="s1">&#39;od550so4&#39;</span> <span class="n">invalid</span> <span class="n">units</span> <span class="s1">&#39;~&#39;</span>
-  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">_pyke_rules</span><span class="o">/</span><span class="n">compiled_krb</span><span class="o">/</span><span class="n">fc_rules_cf_fc</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1932</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Ignoring</span> <span class="n">netCDF</span> <span class="n">variable</span> <span class="s1">&#39;od550aer&#39;</span> <span class="n">invalid</span> <span class="n">units</span> <span class="s1">&#39;~&#39;</span>
-  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">_pyke_rules</span><span class="o">/</span><span class="n">compiled_krb</span><span class="o">/</span><span class="n">fc_rules_cf_fc</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1932</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Ignoring</span> <span class="n">netCDF</span> <span class="n">variable</span> <span class="s1">&#39;od550oa&#39;</span> <span class="n">invalid</span> <span class="n">units</span> <span class="s1">&#39;~&#39;</span>
-  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">_pyke_rules</span><span class="o">/</span><span class="n">compiled_krb</span><span class="o">/</span><span class="n">fc_rules_cf_fc</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1932</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Ignoring</span> <span class="n">netCDF</span> <span class="n">variable</span> <span class="s1">&#39;od550dust&#39;</span> <span class="n">invalid</span> <span class="n">units</span> <span class="s1">&#39;~&#39;</span>
-  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="n">Ignoring</span> <span class="nb">input</span> <span class="n">name</span><span class="o">=</span><span class="n">ECMWF_OSUITE</span>
-<span class="n">Ignoring</span> <span class="nb">input</span> <span class="n">name</span><span class="o">=</span><span class="n">AATSR</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">unit</span> <span class="n">unknown</span> <span class="ow">in</span> <span class="n">cube</span> <span class="n">od550aer</span> <span class="k">with</span> <span class="n">value</span> <span class="s2">&quot;1&quot;</span>
 </pre></div>
 </div>
 <p>Note that, if the longitudes are defined on a 0 -&gt; 360 degree grid, they
@@ -301,7 +291,7 @@ conversion for us, that is, using the <code class="docutils literal notranslate"
 corresponding <code class="docutils literal notranslate"><span class="pre">index</span></code>) of the <code class="docutils literal notranslate"><span class="pre">DimCoord</span></code> class in combination with
 the <code class="docutils literal notranslate"><span class="pre">cells()</span></code> iterator method. However, as we shall see below, this is
 not only the slowest solution but it is also prone to errors in case the
-calendar is not standard (e.g.&nbsp;Julian).</p>
+calendar is not standard (e.g. Julian).</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t0_ecmwf</span> <span class="o">=</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">point</span>
 <span class="n">t0_aatsr</span> <span class="o">=</span> <span class="n">times_aatsr</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">point</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First time stamp ECMWF </span><span class="si">%s</span><span class="s2"> (data type: </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">t0_ecmwf</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">t0_ecmwf</span><span class="p">)))</span>
@@ -327,7 +317,7 @@ while the latter is not.</p>
     <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot convert input [2008-01-01 00:00:00] of type &lt;class &#39;cftime._cftime.DatetimeJulian&#39;&gt; to Timestamp&quot;</span><span class="p">,)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot convert input [2008-01-01 00:00:00] of type &lt;class &#39;cftime._cftime.DatetimeJulian&#39;&gt; to Timestamp&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Nontheless, numpy is easier in that sense, since it understands both
@@ -370,14 +360,14 @@ be done using the <code class="docutils literal notranslate"><span class="pre">c
 <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">point</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">cells</span><span class="p">()]</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>85.6 ms ± 1.57 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>204 ms ± 29.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
 <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">point</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_aatsr</span><span class="o">.</span><span class="n">cells</span><span class="p">()]</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>85.7 ms ± 587 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>154 ms ± 10.4 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre></div>
 </div>
 <p>The answer is: No, it is not fast, and furthermore, the latter datatype
@@ -388,14 +378,14 @@ conversion (if we want).</p>
 <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">cells</span><span class="p">()]</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>85.6 ms ± 1.18 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>151 ms ± 5.57 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
 <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_aatsr</span><span class="o">.</span><span class="n">cells</span><span class="p">()]</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>87.6 ms ± 1 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>157 ms ± 9.68 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre></div>
 </div>
 <p>That looks okay, since it does not lead to a notable decrease in the
@@ -414,7 +404,7 @@ and the <code class="docutils literal notranslate"><span class="pre">cells()</sp
 <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span><span class="n">times_ecmwf</span><span class="o">.</span><span class="n">points</span><span class="p">)]</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>4.53 ms ± 129 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>8.27 ms ± 1.63 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
 </pre></div>
 </div>
 <p>This is quite an improvement. But if we dig a little deeper, we can
@@ -433,16 +423,15 @@ to convert the stuff. For this, we have to test if the first sub string
 (here <em>day</em>) is valid according to the CF standard, which we do using
 some features from the <code class="docutils literal notranslate"><span class="pre">netCDF4</span></code> package and by defining a function,
 that translates the numerical timestamps into <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> objects
-based on the information encoded in the units string(e.g. <em>day since
-2018-01-01 00:00:00.00000000 UTC</em>) and the corresponding calendar (e.g.
-“gregorian”). THis function is included in <strong>pyaerocom</strong> and can be
-accessed via:</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="n">cftime_to_datetime64</span> <span class="k">as</span> <span class="n">pya_tconversion</span>
+based on the information encoded in the units string(e.g. <em>day since
+2018-01-01 00:00:00.00000000 UTC</em>) and the corresponding calendar
+(e.g. “gregorian”). THis function is included in <strong>pyaerocom</strong> and can
+be accessed via:</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">cftime_to_datetime64</span> <span class="k">as</span> <span class="n">pya_tconversion</span>
 <span class="n">help</span><span class="p">(</span><span class="n">pya_tconversion</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="literal-block">
-Help on function cftime_to_datetime64 in module pyaerocom.helpers:
+<pre class="literal-block">Help on function cftime_to_datetime64 in module pyaerocom.helpers:
 
 cftime_to_datetime64(times, cfunit=None, calendar=None)
     Convert numerical timestamps with epoch to numpy datetime64
@@ -455,14 +444,14 @@ cftime_to_datetime64(times, cfunit=None, calendar=None)
 
     Parameters
     ----------
-    times : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">iris.coords.DimCoord</span></code>
+    times : <code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">iris.coords.DimCoord</span></code>
         array containing numerical time stamps (relative to basedate of
         <code class="docutils literal notranslate"><span class="pre">cfunit</span></code>). Can also be a single number.
-    cfunit : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Unit</span></code>, optional
+    cfunit : <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">Unit</span></code>, optional
         CF unit string (e.g. day since 2018-01-01 00:00:00.00000000 UTC) or
         unit. Required if <cite>times</cite> is not an instance of
         <code class="xref py py-class docutils literal notranslate"><span class="pre">iris.coords.DimCoord</span></code>
-    calendar : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional
+    calendar : <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional
         string specifying calendar (only required if <code class="docutils literal notranslate"><span class="pre">cfunit</span></code> is of type
         <code class="docutils literal notranslate"><span class="pre">str</span></code>).
 
@@ -482,13 +471,12 @@ cftime_to_datetime64(times, cfunit=None, calendar=None)
 
     &gt;&gt;&gt; cfunit_str = 'day since 2018-01-01 00:00:00.00000000 UTC'
     &gt;&gt;&gt; cftime_to_datetime64(10, cfunit_str, &quot;gregorian&quot;)
-    array(['2018-01-11T00:00:00.000000'], dtype='datetime64[us]')
-</pre>
+    array(['2018-01-11T00:00:00.000000'], dtype='datetime64[us]')</pre>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
 <span class="n">pya_tconversion</span><span class="p">(</span><span class="n">times_ecmwf</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">times_ecmwf</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>232 µs ± 4.83 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>410 µs ± 9 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre></div>
 </div>
 <p>For the AATSR data, the method is slower, since here, the slower
@@ -497,11 +485,11 @@ cftime_to_datetime64(times, cfunit=None, calendar=None)
 <span class="n">pya_tconversion</span><span class="p">(</span><span class="n">times_aatsr</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">times_aatsr</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>6.28 ms ± 81.9 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>9.06 ms ± 2.02 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
 </pre></div>
 </div>
 <p>Now this is an improvement. Starting with around 100ms when using the
-iris interface (i.e.&nbsp;iterating over <code class="docutils literal notranslate"><span class="pre">cells</span></code> of the <code class="docutils literal notranslate"><span class="pre">DimCoord</span></code>), for
+iris interface (i.e. iterating over <code class="docutils literal notranslate"><span class="pre">cells</span></code> of the <code class="docutils literal notranslate"><span class="pre">DimCoord</span></code>), for
 conversion of 365 time stamps, we ended up with the order of 10
 microseconds. And at the same time the new method ensures that we have
 them in a format that also pandas understands.</p>
@@ -511,14 +499,14 @@ them in a format that also pandas understands.</p>
 <span class="n">data_ecmwf</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>281 µs ± 31.9 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>459 µs ± 16.2 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
 <span class="n">data_aatsr</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>6.25 ms ± 81.6 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>7.99 ms ± 53.3 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 </pre></div>
 </div>
 </div>
@@ -527,9 +515,7 @@ them in a format that also pandas understands.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -538,11 +524,11 @@ them in a format that also pandas understands.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, met.no.
+        &copy; Copyright 2018, MET Norway
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -555,38 +541,15 @@ them in a format that also pandas understands.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/language_data.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

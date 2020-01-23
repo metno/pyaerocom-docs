@@ -17,40 +17,37 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pyaerocom  documentation" href="index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -86,8 +83,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="readme.html">NEWS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="readme.html#about">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readme.html#requirements">Requirements</a></li>
@@ -97,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_testsuite.html">Tests (for developers)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">Configuration files</a></li>
 </ul>
 
             
@@ -109,7 +104,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pyaerocom</a>
@@ -117,9 +112,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -166,18 +162,23 @@
 /* CSS overrides for sphinx_rtd_theme */
 
 /* 24px margin */
-.nbinput.nblast,
-.nboutput.nblast {
+.nbinput.nblast.container,
+.nboutput.nblast.container {
     margin-bottom: 19px;  /* padding has already 5px */
 }
 
 /* ... except between code cells! */
-.nblast + .nbinput {
+.nblast.container + .nbinput.container {
     margin-top: -19px;
 }
 
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
 }
 </style>
 <div class="section" id="gridded-model-profile-data-how-aerocom-modellevel-files-should-be-prepared">
@@ -186,6 +187,7 @@
 aerosol extinction coefficients and how such files should be prepared,
 such that pyaerocom can convert the model levels to altitude levels.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+<span class="n">pya</span><span class="o">.</span><span class="n">change_verbosity</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Initating</span> <span class="n">pyaerocom</span> <span class="n">configuration</span>
@@ -193,20 +195,28 @@ such that pyaerocom can convert the model levels to altitude levels.</p>
 <span class="n">Checking</span> <span class="n">access</span> <span class="n">to</span><span class="p">:</span> <span class="o">/</span><span class="n">lustre</span><span class="o">/</span><span class="n">storeA</span>
 <span class="n">Access</span> <span class="n">to</span> <span class="n">lustre</span> <span class="n">database</span><span class="p">:</span> <span class="kc">True</span>
 <span class="n">Init</span> <span class="n">data</span> <span class="n">paths</span> <span class="k">for</span> <span class="n">lustre</span>
-<span class="n">Expired</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.020</span> <span class="n">s</span>
+<span class="n">Expired</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.018</span> <span class="n">s</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;GISS-MATRIX_GLOFIR0p5&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">model_reader</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span><span class="mi">925</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Searching</span> <span class="n">database</span> <span class="k">for</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">100</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="o">/</span><span class="n">lustre</span><span class="o">/</span><span class="n">storeA</span><span class="o">/</span><span class="n">project</span><span class="o">/</span><span class="n">aerocom</span><span class="o">/</span><span class="n">aerocom</span><span class="o">-</span><span class="n">users</span><span class="o">-</span><span class="n">database</span><span class="o">/</span><span class="n">AEROCOM</span><span class="o">-</span><span class="n">PHASE</span><span class="o">-</span><span class="n">III</span><span class="o">/</span><span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span> <span class="n">has</span> <span class="n">subdir</span> <span class="n">renamed</span><span class="o">.</span> <span class="n">Using</span> <span class="n">that</span> <span class="n">one</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">43</span><span class="p">,</span><span class="mi">100</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Found</span> <span class="n">match</span> <span class="k">for</span> <span class="n">ID</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span>
+</pre></div>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pyaerocom</span> <span class="n">ReadGridded</span>
 <span class="o">---------------------</span>
-<span class="n">Model</span> <span class="n">ID</span><span class="p">:</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span>
+<span class="n">Data</span> <span class="n">ID</span><span class="p">:</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span>
 <span class="n">Data</span> <span class="n">directory</span><span class="p">:</span> <span class="o">/</span><span class="n">lustre</span><span class="o">/</span><span class="n">storeA</span><span class="o">/</span><span class="n">project</span><span class="o">/</span><span class="n">aerocom</span><span class="o">/</span><span class="n">aerocom</span><span class="o">-</span><span class="n">users</span><span class="o">-</span><span class="n">database</span><span class="o">/</span><span class="n">AEROCOM</span><span class="o">-</span><span class="n">PHASE</span><span class="o">-</span><span class="n">III</span><span class="o">/</span><span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span><span class="o">/</span><span class="n">renamed</span>
-<span class="n">Available</span> <span class="n">experiments</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;GISS-MATRIX_GLOFIR0p5&#39;</span><span class="p">]</span>
+<span class="n">Available</span> <span class="n">experiments</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;GLOFIR0p5&#39;</span><span class="p">]</span>
 <span class="n">Available</span> <span class="n">years</span><span class="p">:</span> <span class="p">[</span><span class="mi">2008</span><span class="p">]</span>
-<span class="n">Available</span> <span class="n">frequencies</span> <span class="p">[</span><span class="s1">&#39;3hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">]</span>
+<span class="n">Available</span> <span class="n">frequencies</span> <span class="p">[</span><span class="s1">&#39;3hourly&#39;</span> <span class="s1">&#39;daily&#39;</span> <span class="s1">&#39;monthly&#39;</span><span class="p">]</span>
 <span class="n">Available</span> <span class="n">variables</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;abs550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;abs550aercs&#39;</span><span class="p">,</span> <span class="s1">&#39;dh&#39;</span><span class="p">,</span> <span class="s1">&#39;drybc&#39;</span><span class="p">,</span> <span class="s1">&#39;drydust&#39;</span><span class="p">,</span> <span class="s1">&#39;drynh4&#39;</span><span class="p">,</span> <span class="s1">&#39;dryno3&#39;</span><span class="p">,</span> <span class="s1">&#39;dryoa&#39;</span><span class="p">,</span> <span class="s1">&#39;dryso2&#39;</span><span class="p">,</span> <span class="s1">&#39;dryss&#39;</span><span class="p">,</span> <span class="s1">&#39;ec550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;emibc&#39;</span><span class="p">,</span> <span class="s1">&#39;emidms&#39;</span><span class="p">,</span> <span class="s1">&#39;emidust&#39;</span><span class="p">,</span> <span class="s1">&#39;emioa&#39;</span><span class="p">,</span> <span class="s1">&#39;emiso2&#39;</span><span class="p">,</span> <span class="s1">&#39;emiso4&#39;</span><span class="p">,</span> <span class="s1">&#39;emisoa&#39;</span><span class="p">,</span> <span class="s1">&#39;emiss&#39;</span><span class="p">,</span> <span class="s1">&#39;hus&#39;</span><span class="p">,</span> <span class="s1">&#39;mmrbc&#39;</span><span class="p">,</span> <span class="s1">&#39;mmrdust&#39;</span><span class="p">,</span> <span class="s1">&#39;mmrnh4&#39;</span><span class="p">,</span> <span class="s1">&#39;mmrno3&#39;</span><span class="p">,</span> <span class="s1">&#39;mmroa&#39;</span><span class="p">,</span> <span class="s1">&#39;mmrso4&#39;</span><span class="p">,</span> <span class="s1">&#39;mmrss&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aercs&#39;</span><span class="p">,</span> <span class="s1">&#39;ps&#39;</span><span class="p">,</span> <span class="s1">&#39;rh&#39;</span><span class="p">,</span> <span class="s1">&#39;ta&#39;</span><span class="p">,</span> <span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;uas&#39;</span><span class="p">,</span> <span class="s1">&#39;vas&#39;</span><span class="p">,</span> <span class="s1">&#39;was&#39;</span><span class="p">,</span> <span class="s1">&#39;wetbc&#39;</span><span class="p">,</span> <span class="s1">&#39;wetdust&#39;</span><span class="p">,</span> <span class="s1">&#39;wetnh4&#39;</span><span class="p">,</span> <span class="s1">&#39;wetno3&#39;</span><span class="p">,</span> <span class="s1">&#39;wetoa&#39;</span><span class="p">,</span> <span class="s1">&#39;wetso2&#39;</span><span class="p">,</span> <span class="s1">&#39;wetso4&#39;</span><span class="p">,</span> <span class="s1">&#39;wetss&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -214,18 +224,40 @@ such that pyaerocom can convert the model levels to altitude levels.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">cf</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1069</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Ignoring</span> <span class="n">formula</span> <span class="n">terms</span> <span class="n">variable</span> <span class="s1">&#39;ps&#39;</span> <span class="n">referenced</span> <span class="n">by</span> <span class="n">data</span> <span class="n">variable</span> <span class="s1">&#39;b_bnds&#39;</span> <span class="n">via</span> <span class="n">variable</span> <span class="s1">&#39;lev&#39;</span><span class="p">:</span> <span class="n">Dimensions</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">)</span> <span class="n">do</span> <span class="ow">not</span> <span class="n">span</span> <span class="p">(</span><span class="s1">&#39;lev&#39;</span><span class="p">,</span> <span class="s1">&#39;bnds&#39;</span><span class="p">)</span>
-  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">cf</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1069</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Ignoring</span> <span class="n">formula</span> <span class="n">terms</span> <span class="n">variable</span> <span class="s1">&#39;ps&#39;</span> <span class="n">referenced</span> <span class="n">by</span> <span class="n">data</span> <span class="n">variable</span> <span class="s1">&#39;a_bnds&#39;</span> <span class="n">via</span> <span class="n">variable</span> <span class="s1">&#39;lev&#39;</span><span class="p">:</span> <span class="n">Dimensions</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">)</span> <span class="n">do</span> <span class="ow">not</span> <span class="n">span</span> <span class="p">(</span><span class="s1">&#39;lev&#39;</span><span class="p">,</span> <span class="s1">&#39;bnds&#39;</span><span class="p">)</span>
-  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">netcdf</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">599</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">coordinate</span> <span class="k">for</span> <span class="n">variable</span> <span class="s1">&#39;ps&#39;</span>
-  <span class="s1">&#39;</span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jonasg</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">iris</span><span class="o">/</span><span class="n">fileformats</span><span class="o">/</span><span class="n">netcdf</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">599</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">coordinate</span> <span class="k">for</span> <span class="n">variable</span> <span class="s1">&#39;ps&#39;</span>
-  <span class="s1">&#39;</span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">286</span><span class="p">:</span><span class="n">WARNING</span><span class="p">:</span>
+<span class="n">File</span> <span class="o">/</span><span class="n">lustre</span><span class="o">/</span><span class="n">storeA</span><span class="o">/</span><span class="n">project</span><span class="o">/</span><span class="n">aerocom</span><span class="o">/</span><span class="n">aerocom</span><span class="o">-</span><span class="n">users</span><span class="o">-</span><span class="n">database</span><span class="o">/</span><span class="n">AEROCOM</span><span class="o">-</span><span class="n">PHASE</span><span class="o">-</span><span class="n">III</span><span class="o">/</span><span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span><span class="o">/</span><span class="n">renamed</span><span class="o">/</span><span class="n">aerocom3_GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5_ec550aer_ModelLevel_2008_daily</span><span class="o">.</span><span class="n">nc</span> <span class="n">contains</span> <span class="n">more</span> <span class="n">than</span> <span class="n">one</span> <span class="n">variable</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">318</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Importing</span> <span class="n">variable</span> <span class="n">aliases</span> <span class="n">info</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">320</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Found</span> <span class="n">default</span> <span class="n">configuration</span> <span class="k">for</span> <span class="n">variable</span> <span class="n">ec550aer</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">326</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Importing</span> <span class="n">variable</span> <span class="n">aliases</span> <span class="n">info</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">328</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Found</span> <span class="n">default</span> <span class="n">configuration</span> <span class="k">for</span> <span class="n">variable</span> <span class="n">lon</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">329</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Found</span> <span class="n">default</span> <span class="n">configuration</span> <span class="k">for</span> <span class="n">variable</span> <span class="n">lat</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">329</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Found</span> <span class="n">default</span> <span class="n">configuration</span> <span class="k">for</span> <span class="n">variable</span> <span class="n">time</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">330</span><span class="p">:</span><span class="n">WARNING</span><span class="p">:</span>
+<span class="n">Invalid</span> <span class="n">long_name</span> <span class="n">time</span> <span class="k">for</span> <span class="n">coord</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">cube</span><span class="o">.</span> <span class="n">Overwriting</span> <span class="k">with</span> <span class="n">Time</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">330</span><span class="p">:</span><span class="n">WARNING</span><span class="p">:</span>
+<span class="n">Invalid</span> <span class="n">long_name</span> <span class="n">latitude</span> <span class="k">for</span> <span class="n">coord</span> <span class="n">lat</span> <span class="ow">in</span> <span class="n">cube</span><span class="o">.</span> <span class="n">Overwriting</span> <span class="k">with</span> <span class="n">Center</span> <span class="n">coordinates</span> <span class="k">for</span> <span class="n">latitudes</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">331</span><span class="p">:</span><span class="n">WARNING</span><span class="p">:</span>
+<span class="n">Invalid</span> <span class="n">long_name</span> <span class="n">longitude</span> <span class="k">for</span> <span class="n">coord</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">cube</span><span class="o">.</span> <span class="n">Overwriting</span> <span class="k">with</span> <span class="n">Center</span> <span class="n">coordinates</span> <span class="k">for</span> <span class="n">longitudes</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">331</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Rolling</span> <span class="n">longitudes</span> <span class="n">to</span> <span class="o">-</span><span class="mi">180</span> <span class="o">-&gt;</span> <span class="mi">180</span> <span class="n">definition</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">55</span><span class="p">,</span><span class="mi">283</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Found</span> <span class="n">default</span> <span class="n">configuration</span> <span class="k">for</span> <span class="n">variable</span> <span class="n">ec550aer</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">55</span><span class="p">,</span><span class="mi">284</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Found</span> <span class="n">default</span> <span class="n">configuration</span> <span class="k">for</span> <span class="n">variable</span> <span class="n">ec550aer</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">55</span><span class="p">,</span><span class="mi">285</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span>
+<span class="n">Attempting</span> <span class="n">unit</span> <span class="n">conversion</span> <span class="kn">from</span> <span class="nn">m</span><span class="o">-</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">1</span><span class="o">/</span><span class="n">Mm</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">12</span> <span class="mi">15</span><span class="p">:</span><span class="mi">55</span><span class="p">:</span><span class="mi">55</span><span class="p">,</span><span class="mi">299</span><span class="p">:</span><span class="n">WARNING</span><span class="p">:</span>
+<span class="n">Deprecated</span> <span class="n">attribute</span> <span class="n">name</span><span class="p">,</span> <span class="n">please</span> <span class="n">use</span> <span class="n">data_id</span> <span class="n">instead</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyaerocom</span><span class="o">.</span><span class="n">GriddedData</span><span class="p">:</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span>
-<span class="n">Grid</span> <span class="n">data</span><span class="p">:</span> <span class="n">Aerosol</span> <span class="n">Extinction</span> <span class="nd">@550nm</span>                                <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">365</span><span class="p">;</span> <span class="n">atmosphere_hybrid_sigma_pressure_coordinate</span><span class="p">:</span> <span class="mi">40</span><span class="p">;</span> <span class="n">latitude</span><span class="p">:</span> <span class="mi">90</span><span class="p">;</span> <span class="n">longitude</span><span class="p">:</span> <span class="mi">144</span><span class="p">)</span>
+<span class="n">Grid</span> <span class="n">data</span><span class="p">:</span> <span class="n">Aerosol</span> <span class="n">Extinction</span> <span class="o">@</span><span class="mi">550</span><span class="n">nm</span>                                <span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="mi">365</span><span class="p">;</span> <span class="n">atmosphere_hybrid_sigma_pressure_coordinate</span><span class="p">:</span> <span class="mi">40</span><span class="p">;</span> <span class="n">latitude</span><span class="p">:</span> <span class="mi">90</span><span class="p">;</span> <span class="n">longitude</span><span class="p">:</span> <span class="mi">144</span><span class="p">)</span>
      <span class="n">Dimension</span> <span class="n">coordinates</span><span class="p">:</span>
           <span class="n">time</span>                                                <span class="n">x</span>                                                 <span class="o">-</span>             <span class="o">-</span>              <span class="o">-</span>
           <span class="n">atmosphere_hybrid_sigma_pressure_coordinate</span>         <span class="o">-</span>                                                 <span class="n">x</span>             <span class="o">-</span>              <span class="o">-</span>
@@ -245,12 +277,16 @@ such that pyaerocom can convert the model levels to altitude levels.</p>
           <span class="n">associated_files</span><span class="p">:</span> <span class="n">gridspecFile</span><span class="p">:</span> <span class="n">gridspec_REALM_fx_GISS</span><span class="o">-</span><span class="n">MATRIX</span><span class="o">-</span><span class="n">GLOFIR0p5_r0i0p0</span><span class="o">.</span><span class="n">nc</span>
           <span class="n">branch_time</span><span class="p">:</span> <span class="mf">0.0</span>
           <span class="n">cmor_version</span><span class="p">:</span> <span class="mf">2.5</span><span class="o">.</span><span class="mi">7</span>
+          <span class="n">computed</span><span class="p">:</span> <span class="kc">False</span>
+          <span class="n">concatenated</span><span class="p">:</span> <span class="kc">False</span>
           <span class="n">contact</span><span class="p">:</span> <span class="n">Kenneth</span> <span class="n">Lo</span> <span class="p">(</span><span class="n">cdkkl</span><span class="nd">@giss</span><span class="o">.</span><span class="n">nasa</span><span class="o">.</span><span class="n">gov</span><span class="p">)</span>
           <span class="n">creation_date</span><span class="p">:</span> <span class="mi">2017</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">09</span><span class="n">T23</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">42</span><span class="n">Z</span>
+          <span class="n">data_id</span><span class="p">:</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX_GLOFIR0p5</span>
           <span class="n">experiment</span><span class="p">:</span> <span class="n">GLOFIR0p5</span>
           <span class="n">experiment_id</span><span class="p">:</span> <span class="n">GLOFIR0p5</span>
           <span class="n">forcing</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span>
           <span class="n">frequency</span><span class="p">:</span> <span class="n">day</span>
+          <span class="n">from_files</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom-users-database/AEROCOM-PHASE-...</span>
           <span class="n">history</span><span class="p">:</span> <span class="mi">2017</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">09</span><span class="n">T23</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">42</span><span class="n">Z</span> <span class="n">altered</span> <span class="n">by</span> <span class="n">CMOR</span><span class="p">:</span> <span class="n">replaced</span> <span class="n">missing</span> <span class="n">value</span> <span class="n">flag</span> <span class="p">(</span><span class="o">-</span><span class="mf">1e+30</span><span class="p">)</span><span class="o">...</span>
           <span class="n">initialization_method</span><span class="p">:</span> <span class="mi">1</span>
           <span class="n">institute_id</span><span class="p">:</span> <span class="n">NASA</span><span class="o">-</span><span class="n">GISS</span>
@@ -259,18 +295,24 @@ such that pyaerocom can convert the model levels to altitude levels.</p>
           <span class="n">model_id</span><span class="p">:</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX</span><span class="o">-</span><span class="n">GLOFIR0p5</span>
           <span class="n">modeling_realm</span><span class="p">:</span> <span class="n">REALM</span>
           <span class="n">original_name</span><span class="p">:</span> <span class="n">ec550aer</span>
+          <span class="n">outliers_removed</span><span class="p">:</span> <span class="kc">False</span>
           <span class="n">parent_experiment</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span>
           <span class="n">parent_experiment_id</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span>
           <span class="n">parent_experiment_rip</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span>
           <span class="n">physics_version</span><span class="p">:</span> <span class="mi">1</span>
           <span class="n">product</span><span class="p">:</span> <span class="n">output</span>
           <span class="n">project_id</span><span class="p">:</span> <span class="n">AEROCOM</span><span class="o">-</span><span class="n">ACC</span>
+          <span class="n">reader</span><span class="p">:</span> <span class="kc">None</span>
           <span class="n">realization</span><span class="p">:</span> <span class="mi">1</span>
           <span class="n">references</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">giss</span><span class="o">.</span><span class="n">nasa</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">modelE</span><span class="o">/</span><span class="n">ar5</span>
+          <span class="n">region</span><span class="p">:</span> <span class="kc">None</span>
+          <span class="n">regridded</span><span class="p">:</span> <span class="kc">False</span>
           <span class="n">source</span><span class="p">:</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX</span><span class="o">-</span><span class="n">GLOFIR0p5</span><span class="o">-</span><span class="n">MATRIXEQSAM_AEROBB2s</span> <span class="n">Atmosphere</span><span class="p">:</span> <span class="n">GISS</span><span class="o">-</span><span class="n">E2</span><span class="p">;</span> <span class="n">Ocean</span><span class="p">:</span><span class="o">...</span>
           <span class="n">table_id</span><span class="p">:</span> <span class="n">Table</span> <span class="mi">3</span><span class="n">D</span><span class="o">-</span><span class="n">D</span> <span class="p">(</span><span class="n">July</span> <span class="mi">2009</span><span class="p">)</span> <span class="mi">6053</span><span class="n">da228d695447dc6f66720d2bf9f8</span>
           <span class="n">title</span><span class="p">:</span> <span class="n">GISS</span><span class="o">-</span><span class="n">MATRIX</span><span class="o">-</span><span class="n">GLOFIR0p5</span> <span class="n">model</span> <span class="n">output</span> <span class="n">prepared</span> <span class="k">for</span> <span class="n">AEROCOM</span><span class="o">-</span><span class="n">ACC</span> <span class="n">GLOFIR0p5</span>
           <span class="n">tracking_id</span><span class="p">:</span> <span class="mi">10</span><span class="n">b022b3</span><span class="o">-</span><span class="mi">0597</span><span class="o">-</span><span class="mi">490</span><span class="n">f</span><span class="o">-</span><span class="mi">8</span><span class="n">d97</span><span class="o">-</span><span class="mi">24</span><span class="n">c074853a57</span>
+          <span class="n">ts_type</span><span class="p">:</span> <span class="n">daily</span>
+          <span class="n">var_name_read</span><span class="p">:</span> <span class="n">n</span><span class="o">/</span><span class="n">d</span>
      <span class="n">Cell</span> <span class="n">methods</span><span class="p">:</span>
           <span class="n">mean</span><span class="p">:</span> <span class="n">time</span>
 </pre></div>
@@ -279,9 +321,7 @@ such that pyaerocom can convert the model levels to altitude levels.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -290,11 +330,11 @@ such that pyaerocom can convert the model levels to altitude levels.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, met.no.
+        &copy; Copyright 2018, MET Norway
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -307,38 +347,15 @@ such that pyaerocom can convert the model levels to altitude levels.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="_static/language_data.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

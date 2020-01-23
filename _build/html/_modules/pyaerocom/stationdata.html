@@ -17,41 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="pyaerocom  documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -87,8 +83,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">NEWS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#about">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
@@ -98,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../config_files.html">Configuration files</a></li>
 </ul>
 
             
@@ -110,7 +104,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">pyaerocom</a>
@@ -118,9 +112,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -150,8 +145,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -165,19 +158,26 @@
   <h1>Source code for pyaerocom.stationdata</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xray</span>
-<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">VerticalProfile</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">VerticalProfile</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span>
 
-<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">MetaDataError</span><span class="p">,</span> <span class="n">VarNotAvailableError</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MetaDataError</span><span class="p">,</span> <span class="n">VarNotAvailableError</span><span class="p">,</span>
                                   <span class="n">DataExtractionError</span><span class="p">,</span> <span class="n">DataDimensionError</span><span class="p">,</span>
-                                  <span class="n">UnitConversionError</span><span class="p">,</span> <span class="n">DataUnitError</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="k">import</span> <span class="n">dict_to_str</span><span class="p">,</span> <span class="n">list_to_shortstr</span><span class="p">,</span> <span class="n">BrowseDict</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="k">import</span> <span class="n">StationMetaData</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="p">(</span><span class="n">resample_timeseries</span><span class="p">,</span> <span class="n">isnumeric</span><span class="p">,</span> <span class="n">isrange</span><span class="p">,</span>
-                               <span class="n">resample_time_dataarray</span><span class="p">,</span>
-                               <span class="n">unit_conversion_fac</span><span class="p">)</span>
+                                  <span class="n">UnitConversionError</span><span class="p">,</span> <span class="n">DataUnitError</span><span class="p">,</span>
+                                  <span class="n">TemporalResolutionError</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">dict_to_str</span><span class="p">,</span> <span class="n">list_to_shortstr</span><span class="p">,</span> 
+                                         <span class="n">BrowseDict</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="kn">import</span> <span class="n">StationMetaData</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.time_resampler</span> <span class="kn">import</span> <span class="n">TimeResampler</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">isnumeric</span><span class="p">,</span> <span class="n">isrange</span><span class="p">,</span> <span class="n">calc_climatology</span>
+
+<span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">convert_unit</span><span class="p">,</span> <span class="n">unit_conversion_fac</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.time_config</span> <span class="kn">import</span> <span class="n">PANDAS_FREQ_TO_TS_TYPE</span>
 
 <div class="viewcode-block" id="StationData"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData">[docs]</a><span class="k">class</span> <span class="nc">StationData</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Dict-like base class for single station data</span>
@@ -215,7 +215,10 @@
     <span class="c1">#: station</span>
     <span class="n">_COORD_MAX_VAR</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1">#km</span>
     <span class="n">STANDARD_META_KEYS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">meta_info</span><span class="p">):</span>
+    
+    <span class="n">VALID_TS_TYPES</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">meta_info</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="p">[]</span>
     
@@ -225,6 +228,9 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">data_err</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">overlap</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numobs</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_flagged</span> <span class="o">=</span> <span class="n">BrowseDict</span><span class="p">()</span>
+        
         <span class="nb">super</span><span class="p">(</span><span class="n">StationData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">meta_info</span><span class="p">)</span>
     
     <span class="nd">@property</span>
@@ -239,7 +245,7 @@
 <span class="sd">            numpy array specifying default coordinates</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">make_default_vert_grid</span><span class="p">()</span>
-
+    
 <div class="viewcode-block" id="StationData.has_var"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.has_var">[docs]</a>    <span class="k">def</span> <span class="nf">has_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Checks if input variable is available in data object</span>
 
@@ -301,7 +307,15 @@
             <span class="n">ud</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ud</span>
 
-
+<div class="viewcode-block" id="StationData.compute_trend"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.compute_trend">[docs]</a>    <span class="k">def</span> <span class="nf">compute_trend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">start_year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">season</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slope_confidence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">alt_range</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;No such variables </span><span class="si">{}</span><span class="s1"> in StationData&#39;</span>
+                                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.trends_helpers</span> <span class="kn">import</span> <span class="n">compute_trends_station</span>
+        <span class="k">return</span> <span class="n">compute_trends_station</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">start_year</span><span class="p">,</span> <span class="n">stop_year</span><span class="p">,</span> 
+                                      <span class="n">season</span><span class="p">,</span> <span class="n">slope_confidence</span><span class="p">,</span> <span class="o">**</span><span class="n">alt_range</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="StationData.check_var_unit_aerocom"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.check_var_unit_aerocom">[docs]</a>    <span class="k">def</span> <span class="nf">check_var_unit_aerocom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if unit of input variable is AeroCom default, if not, convert</span>
 
@@ -386,9 +400,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
         
-        <span class="n">conv_fac</span> <span class="o">=</span> <span class="n">unit_conversion_fac</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
-        <span class="n">data</span> <span class="o">*=</span> <span class="n">conv_fac</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">convert_unit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">from_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="o">=</span><span class="n">to_unit</span><span class="p">,</span> 
+                            <span class="n">var_name</span><span class="o">=</span><span class="n">var_name</span><span class="p">)</span>
+        <span class="c1">#conv_fac = unit_conversion_fac(unit, to_unit)</span>
+        
+        <span class="c1">#data *= conv_fac</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_unit</span>
         <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Successfully converted unit of variable </span><span class="si">{}</span><span class="s1"> in </span><span class="si">{}</span><span class="s1"> &#39;</span>
@@ -409,7 +426,7 @@
 <span class="sd">        float</span>
 <span class="sd">            distance between this and other station in km</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pyaerocom.geodesy</span> <span class="k">import</span> <span class="n">calc_distance</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.geodesy</span> <span class="kn">import</span> <span class="n">calc_distance</span>
         
         <span class="n">cthis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_station_coords</span><span class="p">()</span>
         <span class="n">cother</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">get_station_coords</span><span class="p">()</span>
@@ -486,7 +503,8 @@
                 <span class="n">stds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">or</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> information is not available in data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> information is not available in data&#39;</span>
+                                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
                 <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                 <span class="n">std</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="c1"># TODO: review the quality check and make shorter</span>
@@ -531,7 +549,8 @@
 <span class="c1"># =============================================================================</span>
         <span class="k">return</span> <span class="n">vals</span></div>
     
-<div class="viewcode-block" id="StationData.get_meta"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.get_meta">[docs]</a>    <span class="k">def</span> <span class="nf">get_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_single_value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quality_check</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="StationData.get_meta"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.get_meta">[docs]</a>    <span class="k">def</span> <span class="nf">get_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_single_value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quality_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">add_none_vals</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return meta-data as dictionary</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -544,6 +563,8 @@
 <span class="sd">            standarad deviation in the values is compared to the upper limits</span>
 <span class="sd">            allowed in the local variation. The upper limits are specified</span>
 <span class="sd">            in attr. ``COORD_MAX_VAR``. </span>
+<span class="sd">        add_none_vals : bool</span>
+<span class="sd">            </span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -562,7 +583,7 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_META_KEYS</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_COORD_KEYS</span><span class="p">:</span> <span class="c1"># this has been handled above</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">add_none_vals</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No metadata available for key </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
                 <span class="k">continue</span>
             
@@ -643,7 +664,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Can only merged metadata from same station&#39;</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+            <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span>
@@ -792,8 +813,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_var_timeinfo</span><span class="p">()</span>
             <span class="n">other</span><span class="o">.</span><span class="n">_update_var_timeinfo</span><span class="p">()</span>
 
-            <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="n">get_lowest_resolution</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">get_lowest_resolution</span>
             <span class="n">ts_type</span> <span class="o">=</span> <span class="n">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">ts_type1</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
+        <span class="n">_tt</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_tt</span><span class="o">.</span><span class="n">mulfac</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ts_type</span> <span class="o">=</span> <span class="n">_tt</span><span class="o">.</span><span class="n">next_lower</span><span class="o">.</span><span class="n">val</span>
         <span class="k">return</span> <span class="n">ts_type</span>
 
     <span class="k">def</span> <span class="nf">_update_var_timeinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -816,11 +841,11 @@
     <span class="k">def</span> <span class="nf">_merge_vardata_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Merge 2D variable data (for details see :func:`merge_vardata`)&quot;&quot;&quot;</span>
         <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_same_var_ts_type_other</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
-
-        <span class="n">s0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
-                                      <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-        <span class="n">s1</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">resample_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                       <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        
+        <span class="n">s0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
+                                <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">)[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 
         <span class="n">info</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
         <span class="n">removed</span> <span class="o">=</span> <span class="kc">None</span>
@@ -895,9 +920,10 @@
             <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;For merging of </span><span class="si">{}</span><span class="s1"> data, variable specific meta &#39;</span>
                                 <span class="s1">&#39;data needs to be available in var_info dict &#39;</span>
                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_var_unit_aerocom</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
-        <span class="n">other</span><span class="o">.</span><span class="n">check_var_unit_aerocom</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_var_unit_aerocom</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">check_var_unit_aerocom</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_if_3d</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Coming soon...&#39;</span><span class="p">)</span>
@@ -981,15 +1007,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data_columns</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtime</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="StationData.get_var_ts_type"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.get_var_ts_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_var_ts_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
+<div class="viewcode-block" id="StationData.get_var_ts_type"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.get_var_ts_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_var_ts_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">try_infer</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get ts_type for a certain variable</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Converts to ts_type string if assigned ts_type is in pandas format</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        var_name : str</span>
 <span class="sd">            data variable name for which the ts_type is supposed to be</span>
 <span class="sd">            retrieved</span>
-<span class="sd">        </span>
+<span class="sd">        try_infer : bool</span>
+<span class="sd">            if ts_type is not available, try inferring it from data</span>
+<span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
@@ -999,23 +1031,33 @@
 <span class="sd">        ------</span>
 <span class="sd">        MetaDataError</span>
 <span class="sd">            if no metadata is available for this variable (e.g. if ``var_name``</span>
-<span class="sd">            cannot be found in :attr:`var_info`) or if the </span>
+<span class="sd">            cannot be found in :attr:`var_info`)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># make sure there exists a var_info dict for this variable</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;No variable specific metadata available &#39;</span>
-                                <span class="s1">&#39;for </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         
+        <span class="c1"># use variable specific entry if available</span>
         <span class="k">if</span> <span class="s1">&#39;ts_type&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">]:</span>
-            <span class="n">tp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">tp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tp</span>
-        <span class="k">if</span> <span class="n">tp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;ts_type is not defined...&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">tp</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Invalid ts_type </span><span class="si">{}</span><span class="s1">: need AEROCOM default </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">tp</span></div>
+            <span class="k">return</span> <span class="n">TsType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># ensures validity and corrects for pandas strings</span>
+            <span class="n">ts_type</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span><span class="o">.</span><span class="n">val</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts_type</span>
+            <span class="k">return</span> <span class="n">ts_type</span>
+        
+        <span class="k">if</span> <span class="n">try_infer</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Trying to infer ts_type in StationData </span><span class="si">{}</span><span class="s1"> &#39;</span>
+                            <span class="s1">&#39;for variable </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station_name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">))</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">infer_time_resolution</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_ts_helper</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+                <span class="n">ts_type</span> <span class="o">=</span> <span class="n">infer_time_resolution</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts_type</span>
+                <span class="k">return</span> <span class="n">ts_type</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span> <span class="c1">#Raise standard error</span>
+        <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Could not access ts_type for </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span></div>
         
 <div class="viewcode-block" id="StationData.remove_outliers"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.remove_outliers">[docs]</a>    <span class="k">def</span> <span class="nf">remove_outliers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">check_unit</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -1066,11 +1108,12 @@
 <span class="sd">        </span>
 <span class="sd">        ToDo: complete docstring</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Needs review...&#39;</span><span class="p">)</span>
         <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> 
-                                  <span class="n">resample_how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+                                 <span class="n">resample_how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
         <span class="n">coverage</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">new</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">coverage</span> <span class="o">&lt;</span> <span class="n">min_coverage_interp</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="n">DataCoverageError</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">DataCoverageError</span>
             <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> data of station </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">) in &#39;</span>
                                     <span class="s1">&#39;time interval </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1"> contains &#39;</span>
                                     <span class="s1">&#39;too many invalid measurements &#39;</span>
@@ -1082,7 +1125,6 @@
                                             <span class="bp">self</span><span class="o">.</span><span class="n">dtime</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
         <span class="n">new</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="n">PANDAS_FREQ_TO_TS_TYPE</span>
             <span class="n">ts_type</span> <span class="o">=</span> <span class="n">PANDAS_FREQ_TO_TS_TYPE</span><span class="p">[</span><span class="n">new</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">freqstr</span><span class="p">]</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span>
             
@@ -1092,9 +1134,128 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="n">ts_type</span>
         <span class="k">return</span> <span class="n">new</span></div>
+        
+<div class="viewcode-block" id="StationData.calc_climatology"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.calc_climatology">[docs]</a>    <span class="k">def</span> <span class="nf">calc_climatology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                         <span class="n">apply_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                         <span class="n">clim_mincount</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clim_freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                         <span class="n">set_year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resample_how</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate climatological timeseries for input variable</span>
+<span class="sd">        </span>
+<span class="sd">        The computation is done as follows:</span>
+<span class="sd">            </span>
+<span class="sd">        1. retrieve monthly timesereries for climatological interval (if data</span>
+<span class="sd">        is not already monthly). This is done by applying input resampling </span>
+<span class="sd">        constraints via `apply_constraints` and `min_num_obs` and if these</span>
+<span class="sd">        are unspecified, pyaerocom default is used (which is usually applying</span>
+<span class="sd">        a hierarchical resampling)</span>
+<span class="sd">        2. Climatological timeseries is then computed from that monthly </span>
+<span class="sd">        timeseries, and if `apply_constraints` is True a further sampling </span>
+<span class="sd">        coverage criterium is applied to compute the climatology, which can</span>
+<span class="sd">        be specified via `mincount_month`, or, if unspecified, pyaerocom </span>
+<span class="sd">        default is used (cf. :attr:`pyaerocom.const.CLIM_MIN_COUNT`)</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        var_name : str</span>
+<span class="sd">            name of data variable</span>
+<span class="sd">        start </span>
+<span class="sd">            start time of data used to compute climatology</span>
+<span class="sd">        stop</span>
+<span class="sd">            start time of data used to compute climatology</span>
+<span class="sd">        apply_constraints : bool, optional</span>
+<span class="sd">            if True, then hierarchical resampling constraints are applied</span>
+<span class="sd">            (for details see </span>
+<span class="sd">            :func:`pyaerocom.time_resampler.TimeResampler.resample`)</span>
+<span class="sd">        min_num_obs : dict or int, optional</span>
+<span class="sd">            minimum number of observations required per period (when </span>
+<span class="sd">            downsampling). For details see </span>
+<span class="sd">            :func:`pyaerocom.time_resampler.TimeResampler.resample`)</span>
+<span class="sd">        clim_micount : int, optional</span>
+<span class="sd">            minimum number of of monthly values required per month of </span>
+<span class="sd">            climatology</span>
+<span class="sd">        set_year : int, optional</span>
+<span class="sd">            if specified, the output data will be assigned the input year. Else</span>
+<span class="sd">            the middle year of the climatological interval is used.</span>
+<span class="sd">        resample_how : str</span>
+<span class="sd">            how should the resampled data be averaged (e.g. mean, median)</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Additional keyword args passed to </span>
+<span class="sd">            :func:`pyaerocom.time_resampler.TimeResampler.resample`</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        StationData</span>
+<span class="sd">            new instance of StationData containing climatological data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">clim_freq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">clim_freq</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">CLIM_FREQ</span>
+        
+        <span class="k">if</span> <span class="n">resample_how</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">resample_how</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">CLIM_RESAMPLE_HOW</span>
+            
+        <span class="n">ts_type</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_var_ts_type</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+        
+        <span class="n">monthly</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ts_type</span> <span class="o">&lt;</span> <span class="n">monthly</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Cannot compute climatology, </span><span class="si">{}</span><span class="s1"> data &#39;</span>
+                                          <span class="s1">&#39;needs to be in monthly resolution &#39;</span>
+                                          <span class="s1">&#39;or higher (is: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                           <span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ts_type</span> <span class="o">&lt;</span> <span class="n">TsType</span><span class="p">(</span><span class="n">clim_freq</span><span class="p">):</span> <span class="c1">#current resolution is lower than input climatological freq</span>
+            <span class="n">supported</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">CLIM_MIN_COUNT</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span> <span class="ow">in</span> <span class="n">supported</span><span class="p">:</span>
+                <span class="n">clim_freq</span> <span class="o">=</span> <span class="n">ts_type</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1"># use monthly</span>
+                <span class="n">clim_freq</span> <span class="o">=</span> <span class="s1">&#39;monthly&#39;</span>
+        
+        <span class="n">ts</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">clim_freq</span><span class="p">,</span> 
+                               <span class="n">resample_how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span> 
+                               <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_constraints</span><span class="p">,</span> 
+                               <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">)</span>
+                
+        <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">CLIM_START</span>
+        <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">CLIM_STOP</span>
+        <span class="k">if</span> <span class="n">apply_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">apply_constraints</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_APPLY_TIME_RESAMPLE_CONSTRAINTS</span>
+        <span class="k">if</span> <span class="n">apply_constraints</span> <span class="ow">and</span> <span class="n">clim_mincount</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">clim_mincount</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">CLIM_MIN_COUNT</span><span class="p">[</span><span class="n">clim_freq</span><span class="p">]</span>
+        
+        
+        <span class="n">clim</span> <span class="o">=</span> <span class="n">calc_climatology</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> 
+                                <span class="n">min_count</span><span class="o">=</span><span class="n">clim_mincount</span><span class="p">,</span>
+                                <span class="n">set_year</span><span class="o">=</span><span class="n">set_year</span><span class="p">,</span> 
+                                <span class="n">resample_how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">)</span>
+        
+        <span class="n">new</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_meta</span><span class="p">())</span>
+        <span class="k">except</span> <span class="n">MetaDataError</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Failed to retrieve metadata in &#39;</span>
+                                    <span class="s1">&#39;StationData&#39;</span><span class="p">)</span>
+
+        <span class="n">new</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">clim</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+        <span class="n">vi</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">:</span>
+            <span class="n">vi</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">])</span>
+            
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">vi</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;monthly&#39;</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts_type</span><span class="o">.</span><span class="n">base</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;is_climatology&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;clim_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;clim_stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stop</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;clim_freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clim_freq</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;clim_how&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resample_how</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;clim_mincount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clim_mincount</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">data_err</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">clim</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">numobs</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">clim</span><span class="p">[</span><span class="s1">&#39;numobs&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">new</span></div>
     
-<div class="viewcode-block" id="StationData.resample_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.resample_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">resample_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
-                            <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="StationData.resample_time"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.resample_time">[docs]</a>    <span class="k">def</span> <span class="nf">resample_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                      <span class="n">apply_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                      <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Resample one of the time-series in this object</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -1106,56 +1267,119 @@
 <span class="sd">            frequency string)</span>
 <span class="sd">        how : str</span>
 <span class="sd">            how should the resampled data be averaged (e.g. mean, median)</span>
+<span class="sd">        apply_constraints : bool, optional</span>
+<span class="sd">            if True, then hierarchical resampling constraints are applied</span>
+<span class="sd">            (for details see </span>
+<span class="sd">            :func:`pyaerocom.time_resampler.TimeResampler.resample`)</span>
+<span class="sd">        min_num_obs : dict or int, optional</span>
+<span class="sd">            minimum number of observations required per period (when </span>
+<span class="sd">            downsampling). For details see </span>
+<span class="sd">            :func:`pyaerocom.time_resampler.TimeResampler.resample`)</span>
 <span class="sd">        inplace : bool</span>
 <span class="sd">            if True, then the current data object stored in self, will be </span>
 <span class="sd">            overwritten with the resampled time-series</span>
-<span class="sd">        min_num_obs : :obj:`int`, optional</span>
-<span class="sd">            minimum number of observations required per period (when downsampling).</span>
-<span class="sd">            E.g. if input is in daily resolution and freq is monthly and </span>
-<span class="sd">            min_num_obs is 10, then all months that have less than 10 days of data</span>
-<span class="sd">            are set to nan.</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Additional keyword args passed to </span>
+<span class="sd">            :func:`pyaerocom.time_resampler.TimeResampler.resample`</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        pandas.Series</span>
-<span class="sd">            resampled time-series</span>
+<span class="sd">        StationData</span>
+<span class="sd">            with resampled variable timeseries</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">outdata</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">outdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">outdata</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
+        
+        <span class="n">to_ts_type</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span> <span class="c1"># make sure to use AeroCom ts_type</span>
+        
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">from_ts_type</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">outdata</span><span class="o">.</span><span class="n">get_var_ts_type</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">MetaDataError</span><span class="p">,</span> <span class="n">TemporalResolutionError</span><span class="p">):</span>
+            <span class="n">from_ts_type</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Failed to access current temporal &#39;</span>
+                                    <span class="s1">&#39;resolution of </span><span class="si">{}</span><span class="s1"> data in StationData </span><span class="si">{}</span><span class="s1">. &#39;</span>
+                                    <span class="s1">&#39;No resampling constraints will be applied&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">outdata</span><span class="o">.</span><span class="n">station_name</span><span class="p">))</span>
+    
+        <span class="n">data</span> <span class="o">=</span> <span class="n">outdata</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
     
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">xray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">outdata</span><span class="o">.</span><span class="n">to_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> data must be stored as pandas Series &#39;</span>
                                  <span class="s1">&#39;instance or as xarray.DataArray. Failed to &#39;</span>
                                  <span class="s1">&#39;convert to pandas Series.&#39;</span>
                                  <span class="s1">&#39;Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-        
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-            <span class="n">new</span> <span class="o">=</span> <span class="n">resample_timeseries</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">,</span>
-                                      <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">resampler</span> <span class="o">=</span> <span class="n">TimeResampler</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">resampler</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">to_ts_type</span><span class="o">=</span><span class="n">to_ts_type</span><span class="p">,</span>
+                                 <span class="n">from_ts_type</span><span class="o">=</span><span class="n">from_ts_type</span><span class="p">,</span>
+                                 <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">,</span>
+                                 <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_constraints</span><span class="p">,</span>
+                                 <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span> 
+                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             
-            <span class="n">new</span> <span class="o">=</span> <span class="n">resample_time_dataarray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">,</span> 
-                                          <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">)</span>
-            
         
-        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts_type</span>        
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>     
-                <span class="n">_tt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="o">==</span> <span class="n">var_name</span><span class="p">:</span>
-                        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_tt</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="n">ts_type</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
-        <span class="k">return</span> <span class="n">new</span></div>
+        <span class="n">outdata</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span>
+        <span class="n">outdata</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_ts_type</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">outdata</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">resampler</span><span class="o">.</span><span class="n">last_setup</span><span class="p">)</span>
+        <span class="c1"># there is other variables that are not resampled</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outdata</span><span class="o">.</span><span class="n">var_info</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">outdata</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>     
+            <span class="n">_tt</span> <span class="o">=</span> <span class="n">outdata</span><span class="o">.</span><span class="n">ts_type</span>
+            <span class="n">outdata</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">outdata</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">outdata</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="o">==</span> <span class="n">var_name</span><span class="p">:</span>
+                    <span class="n">info</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_tt</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#no other variables, update global class attributes</span>
+            <span class="n">outdata</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="n">to_ts_type</span><span class="o">.</span><span class="n">val</span>
+            <span class="n">outdata</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+            
+        <span class="k">return</span> <span class="n">outdata</span></div>
+    
+<div class="viewcode-block" id="StationData.resample_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.resample_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">resample_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wrapper for :func:`resample_time` (for backwards compatibility)</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        For backwards compatibility, this method will return a pandas Series</span>
+<span class="sd">        instead of the actual StationData object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;This method was renamed &#39;</span>
+                                                   <span class="s1">&#39;to resample_time as a means &#39;</span>
+                                                   <span class="s1">&#39;of harmonisation with GriddedData &#39;</span>
+                                                   <span class="s1">&#39;and ColocatedData&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="n">var_name</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="StationData.remove_variable"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.remove_variable">[docs]</a>    <span class="k">def</span> <span class="nf">remove_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove variable data</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        var_name : str</span>
+<span class="sd">            name of variable that is to be removed</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        StationData</span>
+<span class="sd">            current instance of this object, with data removed</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        VarNotAvailableError</span>
+<span class="sd">            if the input variable is not available in this object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;No such variable in StationData: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
     
 <div class="viewcode-block" id="StationData.insert_nans_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.insert_nans_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">insert_nans_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fill up missing values with NaNs in an existing time series</span>
@@ -1182,7 +1406,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_var_ts_type</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">resample_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -1201,7 +1425,10 @@
 <span class="sd">            data as timeseries</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">data</span>
+        
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Multi-dimensional data columns &#39;</span>
                                       <span class="s1">&#39;cannot be converted to time-series&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_dtime</span><span class="p">()</span>
@@ -1227,9 +1454,9 @@
                                           <span class="s1">&#39;contain 2 dimensions altitude and &#39;</span>
                                           <span class="s1">&#39;time&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">isrange</span><span class="p">(</span><span class="n">altitudes</span><span class="p">):</span>
-                                
-                <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">altitude</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">altitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
-                                               <span class="n">altitudes</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">altitudes</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                    <span class="n">altitudes</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">altitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">altitudes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">altitude</span><span class="o">=</span><span class="n">altitudes</span><span class="p">)</span>
             
             <span class="k">raise</span> <span class="n">DataExtractionError</span><span class="p">(</span><span class="s1">&#39;Cannot intepret input for &#39;</span>
                                           <span class="s1">&#39;altitude...&#39;</span><span class="p">)</span>
@@ -1255,7 +1482,7 @@
         
         
 <div class="viewcode-block" id="StationData.to_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.to_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">to_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resample_how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> 
-                      <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                      <span class="n">apply_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get pandas.Series object for one of the data columns</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -1268,6 +1495,14 @@
 <span class="sd">        resample_how : str</span>
 <span class="sd">            choose from mean or median (only relevant if input parameter freq </span>
 <span class="sd">            is provided, i.e. if resampling is applied)</span>
+<span class="sd">        apply_constraints : bool, optional</span>
+<span class="sd">            if True, then hierarchical resampling constraints are applied</span>
+<span class="sd">            (for details see </span>
+<span class="sd">            :func:`pyaerocom.time_resampler.TimeResampler.resample`)</span>
+<span class="sd">        min_num_obs : dict or int, optional</span>
+<span class="sd">            minimum number of observations required per period (when </span>
+<span class="sd">            downsampling). For details see </span>
+<span class="sd">            :func:`pyaerocom.time_resampler.TimeResampler.resample`)</span>
 <span class="sd">        **kwargs</span>
 <span class="sd">            optional keyword args passed to :func:`resample_timeseries`</span>
 <span class="sd">            </span>
@@ -1293,6 +1528,10 @@
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_altitude</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">alt_info</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;ts_type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">freq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Both freq and ts_type are provided as input&#39;</span><span class="p">)</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ts_type&#39;</span><span class="p">)</span>
             
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
@@ -1308,8 +1547,21 @@
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_ts_helper</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">freq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">resample_timeseries</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span>
-                                           <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">resampler</span> <span class="o">=</span> <span class="n">TimeResampler</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">from_ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_var_ts_type</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">MetaDataError</span><span class="p">:</span>
+                <span class="n">from_ts_type</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">resampler</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">to_ts_type</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> 
+                                      <span class="n">from_ts_type</span><span class="o">=</span><span class="n">from_ts_type</span><span class="p">,</span> 
+                                      <span class="n">how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span> 
+                                      <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_constraints</span><span class="p">,</span>
+                                      <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
+                                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#             data = resample_timeseries(data, freq, how=resample_how,</span>
+<span class="c1">#                                        **kwargs)</span>
+<span class="c1"># =============================================================================</span>
 
         <span class="k">return</span> <span class="n">data</span></div>
     
@@ -1358,6 +1610,8 @@
 <span class="sd">            if length of data array does not equal the length of the time array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="k">if</span> <span class="s1">&#39;ts_type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ts_type&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;label&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">lbl</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1386,7 +1640,7 @@
         <span class="k">if</span> <span class="n">tit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">tit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_meta</span><span class="p">(</span><span class="n">force_single_value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-                                      <span class="n">quality_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span>    
+                                    <span class="n">quality_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span>    
             <span class="k">except</span><span class="p">:</span>
                 <span class="n">tit</span> <span class="o">=</span> <span class="s1">&#39;Failed to retrieve station_name&#39;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">resample_how</span><span class="p">)</span>
@@ -1395,6 +1649,7 @@
         <span class="k">if</span> <span class="n">add_overlaps</span> <span class="ow">and</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">overlap</span><span class="p">:</span>
             <span class="n">so</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
             <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">resample_timeseries</span>
                 <span class="n">so</span> <span class="o">=</span> <span class="n">resample_timeseries</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
@@ -1418,8 +1673,16 @@
         <span class="k">if</span> <span class="n">legend</span><span class="p">:</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">ax</span></div>
-
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="StationData.copy"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">cpv</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpv</span>
+            
+        <span class="k">return</span> <span class="n">new</span></div>
+    
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;String representation&quot;&quot;&quot;</span>
         <span class="n">head</span> <span class="o">=</span> <span class="s2">&quot;Pyaerocom </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span><span class="o">*</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
@@ -1459,22 +1722,25 @@
         <span class="k">return</span> <span class="n">s</span></div>
     
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
     
-    <span class="n">s</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">(</span><span class="n">station_name</span><span class="o">=</span><span class="s1">&#39;Bla&#39;</span><span class="p">,</span> <span class="n">revision_date</span><span class="o">=</span><span class="s1">&#39;20, 21&#39;</span><span class="p">)</span>
-    <span class="n">s2</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">(</span><span class="n">station_name</span><span class="o">=</span><span class="s1">&#39;Bla&#39;</span><span class="p">,</span> <span class="n">revision_date</span><span class="o">=</span><span class="s1">&#39;21, 22, 23&#39;</span><span class="p">,</span>
-                     <span class="n">latitude</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">altitude</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+    <span class="n">empty</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
     
-    <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">s</span><span class="o">.</span><span class="n">merge_meta_same_station</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">empty</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;bla&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">blub</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+    
+    <span class="n">empty_copy</span> <span class="o">=</span> <span class="n">empty</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">empty_copy</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;bla&#39;</span><span class="p">][</span><span class="s1">&#39;blub&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="n">empty</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;bla&#39;</span><span class="p">][</span><span class="s1">&#39;blub&#39;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">empty_copy</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;bla&#39;</span><span class="p">][</span><span class="s1">&#39;blub&#39;</span><span class="p">])</span>
+    
     
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1483,11 +1749,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, met.no.
+        &copy; Copyright 2018, MET Norway
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1500,38 +1766,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="../../_static/language_data.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

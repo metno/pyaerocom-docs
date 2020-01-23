@@ -17,41 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="pyaerocom  documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -87,8 +83,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">NEWS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#about">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
@@ -98,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../config_files.html">Configuration files</a></li>
 </ul>
 
             
@@ -110,7 +104,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">pyaerocom</a>
@@ -118,9 +112,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -150,8 +145,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -165,12 +158,18 @@
   <h1>Source code for pyaerocom.colocateddata</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="k">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="k">import</span> <span class="n">calc_statistics</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="k">import</span> <span class="n">to_pandas_timestamp</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="k">import</span> <span class="n">DataDimensionError</span><span class="p">,</span> <span class="n">NetcdfError</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.plot.plotscatter</span> <span class="k">import</span> <span class="n">plot_scatter</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.variable</span> <span class="k">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="kn">import</span> <span class="n">calc_statistics</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">to_pandas_timestamp</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">CoordinateError</span><span class="p">,</span> <span class="n">DataDimensionError</span><span class="p">,</span> 
+                                  <span class="n">DataSourceError</span><span class="p">,</span> 
+                                  <span class="n">NetcdfError</span><span class="p">,</span> <span class="n">VarNotAvailableError</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.plot.plotscatter</span> <span class="kn">import</span> <span class="n">plot_scatter</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.region</span> <span class="kn">import</span> <span class="n">valid_region</span><span class="p">,</span> <span class="n">Region</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.land_sea_mask</span> <span class="kn">import</span> <span class="p">(</span><span class="n">load_region_mask_xr</span><span class="p">,</span> <span class="n">get_mask_value</span><span class="p">,</span> 
+                                     <span class="n">available_region_mask</span><span class="p">)</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -198,11 +197,13 @@
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data : :obj:`xarray.DataArray` or :obj:`numpy.ndarray` or :obj:`str`, optional</span>
+<span class="sd">    data : xarray.DataArray or numpy.ndarray or str, optional</span>
 <span class="sd">        Colocated data. If str, then it is attempted to be loaded from file.</span>
 <span class="sd">        Else, it is assumed that data is numpy array and that all further </span>
 <span class="sd">        supplementary inputs (e.g. coords, dims) for the </span>
-<span class="sd">        instantiation of :class:`DataArray` is provided via **kwargs. I</span>
+<span class="sd">        instantiation of :class:`DataArray` is provided via **kwargs. </span>
+<span class="sd">    ref_data_id : str, optional</span>
+<span class="sd">        ID of reference data </span>
 <span class="sd">    **kwargs</span>
 <span class="sd">        Additional keyword args that are passed to init of :class:`DataArray` </span>
 <span class="sd">        in case input :arg:`data` is numpy array.</span>
@@ -212,9 +213,10 @@
 <span class="sd">    IOError</span>
 <span class="sd">        if init fails</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.06&#39;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.10&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="kc">None</span>
+        
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># check if input is DataArray and if not, try to create instance</span>
             <span class="c1"># of DataArray. If this fails, raise Exception</span>
@@ -264,6 +266,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span>
     
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Coordinates of data array&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">coords</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Names of dimensions&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dims</span>
+    
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Shape of data array&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
@@ -281,7 +293,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Array of longitude coordinates&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;longitude&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;longitude&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;ColocatedData does not include longitude &#39;</span>
                                  <span class="s1">&#39;coordinate&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">longitude</span>
@@ -289,10 +301,11 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Array of latitude coordinates&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;latitude&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;latitude&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;ColocatedData does not include latitude &#39;</span>
                                  <span class="s1">&#39;coordinate&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">latitude</span>
+    
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -350,10 +363,16 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_grid_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Number of lon / lat grid points that contain data&quot;&quot;&quot;</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s1">&#39;OLD NAME: please use num_coords&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_coords</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Total number of lat/lon coordinates&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_dimensions</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Invalid dimensionality...&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;station_name&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">station_name</span><span class="p">)</span>
         
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">)]):</span>
@@ -361,12 +380,57 @@
                                      <span class="s1">&#39;longitude or latitude are not contained &#39;</span>
                                      <span class="s1">&#39;in 4D data object, which contains the &#39;</span>
                                      <span class="s1">&#39;following dimensions: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
-            <span class="c1"># get all grid points that contain at least one valid data point </span>
-            <span class="c1"># along time dimension</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
-     
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Could not infer number of coordinates&#39;</span><span class="p">)</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_coords_with_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of lat/lon coordinates that contain at least one datapoint</span>
+<span class="sd">        </span>
+<span class="sd">        Todo</span>
+<span class="sd">        ----</span>
+<span class="sd">        check 4D data </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_dimensions</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Invalid dimensionality...&#39;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_latlon_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean specifying whether data has latitude and longitude dimensions&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">]])</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_area_weights</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="ColocatedData.calc_area_weights"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.calc_area_weights">[docs]</a>    <span class="k">def</span> <span class="nf">calc_area_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate area weights</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Only applies to colocated data that has latitude and longitude </span>
+<span class="sd">        dimension.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            array containing weights for each datapoint (same shape as</span>
+<span class="sd">            `self.data[0]`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_latlon_dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Can only compute area weights for data &#39;</span>
+                                     <span class="s1">&#39;with latitude and longitude dimension&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;units&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;degrees&#39;</span>    
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;units&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;degrees&#39;</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">GriddedData</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">to_iris</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">obs</span><span class="o">.</span><span class="n">calc_area_weights</span><span class="p">()</span></div>
+    
 <div class="viewcode-block" id="ColocatedData.min"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span></div>
     
@@ -385,9 +449,171 @@
             <span class="k">raise</span> <span class="ne">Exception</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
+    
+<div class="viewcode-block" id="ColocatedData.resample_time"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.resample_time">[docs]</a>    <span class="k">def</span> <span class="nf">resample_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_ts_type</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                      <span class="n">apply_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                      <span class="n">colocate_time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resample time dimension</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        to_ts_type : str</span>
+<span class="sd">            new temporal resolution (must be lower than current resolution)</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ColocatedData</span>
+<span class="sd">            new data object containing resampled data</span>
+<span class="sd">            </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TemporalResolutionError</span>
+<span class="sd">            if input resolution is higher than current resolution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            
+        <span class="c1"># if colocate time is activated, remove datapoints from model, where</span>
+        <span class="c1"># there is no observation</span>
+        <span class="k">if</span> <span class="n">colocate_time</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="kn">from</span> <span class="nn">pyaerocom.time_resampler</span> <span class="kn">import</span> <span class="n">TimeResampler</span>
         
-<div class="viewcode-block" id="ColocatedData.calc_statistics"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.calc_statistics">[docs]</a>    <span class="k">def</span> <span class="nf">calc_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constrain_val_range</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate statistics from data ensemble</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">TimeResampler</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">data_arr</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">to_ts_type</span><span class="o">=</span><span class="n">to_ts_type</span><span class="p">,</span>
+                                <span class="n">from_ts_type</span><span class="o">=</span><span class="n">col</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
+                                <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">,</span>
+                                <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_constraints</span><span class="p">,</span>
+                                <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="n">data_arr</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="n">data_arr</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_ts_type</span>
+        
+        <span class="n">col</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data_arr</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;colocate_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">colocate_time</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">last_setup</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">col</span></div>
+    
+<div class="viewcode-block" id="ColocatedData.flatten_latlondim_station_name"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.flatten_latlondim_station_name">[docs]</a>    <span class="k">def</span> <span class="nf">flatten_latlondim_station_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stack (flatten) lat / lon dimension into new dimension station_name</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ColocatedData</span>
+<span class="sd">            new colocated data object with dimension station_name and lat lon</span>
+<span class="sd">            arrays as additional coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;latitude&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="ow">or</span> <span class="ow">not</span> <span class="s1">&#39;longitude&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Need latitude and longitude dimension&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;station_name&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Cannot stack lat lon dimensions to new dim &#39;</span>
+                                 <span class="s1">&#39;station_name as it already exists in data&#39;</span><span class="p">)</span>
+        
+        <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">station_name</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">],</span> 
+                         <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="n">lats</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">lons</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">stridx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">station_name</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">nparr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">data</span>
+        
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;data_source&#39;</span> <span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;time&#39;</span>        <span class="p">:</span> <span class="n">time</span><span class="p">,</span>
+                    <span class="s1">&#39;station_name&#39;</span><span class="p">:</span> <span class="n">stridx</span><span class="p">,</span>
+                    <span class="s1">&#39;latitude&#39;</span>    <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="n">lats</span><span class="p">),</span>
+                    <span class="s1">&#39;longitude&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="n">lons</span><span class="p">)</span>
+        <span class="p">}</span>
+    
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;station_name&#39;</span><span class="p">]</span>
+        
+        <span class="n">output</span> <span class="o">=</span> <span class="n">ColocatedData</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">nparr</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span>
+                               <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+    
+<div class="viewcode-block" id="ColocatedData.stack"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.stack">[docs]</a>    <span class="k">def</span> <span class="nf">stack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stack one or more dimensions</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            input arguments passed to :func:`DataArray.stack`</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ColocatedData</span>
+<span class="sd">            stacked data object</span>
+<span class="sd">            </span>
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        coldata = coldata.stack(latlon=[&#39;latitude&#39;, &#39;longitude&#39;])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+    
+<div class="viewcode-block" id="ColocatedData.unstack"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.unstack">[docs]</a>    <span class="k">def</span> <span class="nf">unstack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unstack one or more dimensions</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            input arguments passed to :func:`DataArray.unstack`</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ColocatedData</span>
+<span class="sd">            unstacked data object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="ColocatedData.get_coords_valid_obs"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.get_coords_valid_obs">[docs]</a>    <span class="k">def</span> <span class="nf">get_coords_valid_obs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">stacked</span> <span class="o">=</span> <span class="n">obs</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">])</span>
+            <span class="n">invalid</span> <span class="o">=</span> <span class="n">stacked</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">stacked</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">invalid</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">coords</span><span class="p">)))</span>
+        
+        <span class="n">invalid</span> <span class="o">=</span> <span class="n">obs</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">latitude</span><span class="p">[</span><span class="o">~</span><span class="n">invalid</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> 
+                <span class="nb">list</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">longitude</span><span class="p">[</span><span class="o">~</span><span class="n">invalid</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_iter_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;station_name&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;ColocatedData object has no dimension &#39;</span>
+                                 <span class="s1">&#39;station_name. Consider stacking...&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;latitude&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="ow">and</span> <span class="s1">&#39;longitude&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Cannot init station iter index since &#39;</span>
+                                 <span class="s1">&#39;latitude and longitude are othorgonal&#39;</span><span class="p">)</span>
+        <span class="n">lats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">lons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">station_name</span><span class="o">.</span><span class="n">values</span>
+        
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">stats</span><span class="p">))</span>
+    
+<div class="viewcode-block" id="ColocatedData.copy"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Copy this object&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ColocatedData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span></div>
+    
+<div class="viewcode-block" id="ColocatedData.calc_statistics"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.calc_statistics">[docs]</a>    <span class="k">def</span> <span class="nf">calc_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constrain_val_range</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                        <span class="n">use_area_weights</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate statistics from model and obs data</span>
 <span class="sd">        </span>
 <span class="sd">        Wrapper for function :func:`pyaerocom.mathutils.calc_statistics` </span>
 <span class="sd">        </span>
@@ -400,13 +626,20 @@
             <span class="n">var</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;lowlim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">lower_limit</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;highlim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">upper_limit</span>
-            
-            
-        <span class="k">return</span> <span class="n">calc_statistics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
-                               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
+        <span class="k">if</span> <span class="n">use_area_weights</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_latlon_dims</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">calc_statistics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                                <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;num_coords_with_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_coords_with_data</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;num_coords_tot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_coords</span>
+        <span class="k">return</span> <span class="n">stats</span></div>
+        
 <div class="viewcode-block" id="ColocatedData.plot_scatter"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.plot_scatter">[docs]</a>    <span class="k">def</span> <span class="nf">plot_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constrain_val_range</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create scatter plot of data</span>
 <span class="sd">        </span>
@@ -421,11 +654,11 @@
 <span class="sd">            matplotlib axes instance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span>
-        <span class="n">num_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_grid_points</span>
+        <span class="n">num_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_coords_with_data</span>
         <span class="n">vars_</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">]</span>
         
         <span class="k">if</span> <span class="n">constrain_val_range</span><span class="p">:</span>
-            <span class="n">var</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;lowlim_stats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">lower_limit</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;highlim_stats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">upper_limit</span>
             
@@ -433,6 +666,8 @@
             <span class="n">var_ref</span> <span class="o">=</span> <span class="n">vars_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">var_ref</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># ToDo: include option to use area weighted stats in plotting </span>
+        <span class="c1"># routine...</span>
         <span class="k">return</span> <span class="n">plot_scatter</span><span class="p">(</span><span class="n">x_vals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
                             <span class="n">y_vals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
                             <span class="n">var_name</span><span class="o">=</span><span class="n">vars_</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
@@ -446,7 +681,7 @@
                             <span class="n">stations_ok</span><span class="o">=</span><span class="n">num_points</span><span class="p">,</span>
                             <span class="n">filter_name</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;filter_name&#39;</span><span class="p">],</span> 
                             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-    
+        
     <span class="k">def</span> <span class="nf">_load_fake_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_stations</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num_tstamps</span><span class="o">=</span><span class="mi">365</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Currently not working&#39;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_tstamps</span><span class="p">,</span> <span class="n">num_stations</span><span class="p">))</span>
@@ -483,17 +718,62 @@
                                 <span class="n">attrs</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">arr</span>
     
+<div class="viewcode-block" id="ColocatedData.rename_variable"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.rename_variable">[docs]</a>    <span class="k">def</span> <span class="nf">rename_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">new_var_name</span><span class="p">,</span> <span class="n">data_source</span><span class="p">,</span> 
+                        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rename a variable in this object</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        var_name : str</span>
+<span class="sd">            current variable name</span>
+<span class="sd">        new_var_name : str</span>
+<span class="sd">            new variable name</span>
+<span class="sd">        data_source : str</span>
+<span class="sd">            name of data source (along data_source dimension)</span>
+<span class="sd">        inplace : bool</span>
+<span class="sd">            replace here or create new instance</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ColocatedData</span>
+<span class="sd">            instance with renamed variable</span>
+<span class="sd">            </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        VarNotAvailableError</span>
+<span class="sd">            if input variable is not available in this object</span>
+<span class="sd">        DataSourceError</span>
+<span class="sd">            if input data_source is not available in this object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data_source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">DataSourceError</span><span class="p">(</span><span class="s1">&#39;No such data source </span><span class="si">{}</span><span class="s1"> in ColocatedData&#39;</span>
+                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_source</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;No such variable </span><span class="si">{}</span><span class="s1"> in ColocatedData&#39;</span>
+                                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+    
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">data_source</span><span class="p">)</span>
+        <span class="n">arr</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_var_name</span>
+        <span class="k">if</span> <span class="n">var_name</span> <span class="o">==</span> <span class="n">arr</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">new_var_name</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">arr</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+        
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_aerocom_savename</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">obs_id</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">ts_type_src</span><span class="p">,</span> <span class="n">start_str</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">_aerocom_savename</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">obs_id</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">start_str</span><span class="p">,</span> 
                           <span class="n">stop_str</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_REF-</span><span class="si">{}</span><span class="s1">_MOD-</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
-                                                         <span class="n">obs_id</span><span class="p">,</span> 
-                                                         <span class="n">model_id</span><span class="p">,</span> 
-                                                         <span class="n">ts_type_src</span><span class="p">,</span> 
-                                                         <span class="n">start_str</span><span class="p">,</span> 
-                                                         <span class="n">stop_str</span><span class="p">,</span>
-                                                         <span class="n">ts_type</span><span class="p">,</span>
-                                                         <span class="n">filter_name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_REF-</span><span class="si">{}</span><span class="s1">_MOD-</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
+                                                      <span class="n">obs_id</span><span class="p">,</span> 
+                                                      <span class="n">model_id</span><span class="p">,</span> 
+                                                      <span class="n">start_str</span><span class="p">,</span> 
+                                                      <span class="n">stop_str</span><span class="p">,</span>
+                                                      <span class="n">ts_type</span><span class="p">,</span>
+                                                      <span class="n">filter_name</span><span class="p">))</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">savename_aerocom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Default save name for data object following AeroCom convention&quot;&quot;&quot;</span>
@@ -501,7 +781,6 @@
         <span class="n">stop_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;stop_str&#39;</span><span class="p">]</span>
         
         <span class="n">source_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">]</span>
-        <span class="n">ts_type_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#model</span>
         <span class="n">data_ref_id</span> <span class="o">=</span> <span class="n">source_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_info</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">model_id</span> <span class="o">=</span> <span class="s1">&#39;MultiModels&#39;</span>
@@ -510,7 +789,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aerocom_savename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                                       <span class="n">data_ref_id</span><span class="p">,</span>
                                       <span class="n">model_id</span><span class="p">,</span>
-                                      <span class="n">ts_type_src</span><span class="p">,</span>
                                       <span class="n">start_str</span><span class="p">,</span>
                                       <span class="n">stop_str</span><span class="p">,</span>
                                       <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
@@ -531,7 +809,7 @@
 <span class="sd">        dict</span>
 <span class="sd">            dicitonary with meta information</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">spl</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_COLL&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">spl</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.nc&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
         
         <span class="n">start</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">spl</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">spl</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
@@ -555,11 +833,11 @@
                 <span class="n">mod_base</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;MOD-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">in_mod</span><span class="p">:</span>
                 <span class="n">ref_base</span> <span class="o">+=</span> <span class="n">item</span>
-        <span class="n">model</span><span class="p">,</span> <span class="n">ts_type_src</span> <span class="o">=</span> <span class="n">mod_base</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ref_base</span><span class="p">,</span> <span class="n">model</span><span class="p">]</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts_type_src</span>
+        <span class="c1">#model, ts_type_src = mod_base.rsplit(&#39;-&#39;,1)</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ref_base</span><span class="p">,</span> <span class="n">mod_base</span><span class="p">]</span>
+        <span class="c1">#meta[&#39;ts_type_src&#39;] = ts_type_src</span>
         <span class="k">return</span> <span class="n">meta</span></div>
-            
+      
 <div class="viewcode-block" id="ColocatedData.to_netcdf"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.to_netcdf">[docs]</a>    <span class="k">def</span> <span class="nf">to_netcdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">savename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Save data object as .nc file</span>
 <span class="sd">        </span>
@@ -583,9 +861,21 @@
             <span class="n">savename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">savename_aerocom</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">savename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.nc&#39;</span><span class="p">):</span>
             <span class="n">savename</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.nc&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;min_num_obs&#39;</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">for</span> <span class="n">to</span><span class="p">,</span> <span class="n">how</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">fr</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">how</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="s1">;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+                
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;_min_num_obs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;min_num_obs&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">savename</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
       
 <div class="viewcode-block" id="ColocatedData.read_netcdf"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.read_netcdf">[docs]</a>    <span class="k">def</span> <span class="nf">read_netcdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
@@ -602,7 +892,18 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NetcdfError</span><span class="p">(</span><span class="s1">&#39;Invlid file name for ColocatedData: </span><span class="si">{}</span><span class="s1">.Error: </span><span class="si">{}</span><span class="s1">&#39;</span>
                               <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataarray</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataarray</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;_min_num_obs&#39;</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;_min_num_obs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">to</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">to</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+                    <span class="n">info</span><span class="p">[</span><span class="n">to</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">fr</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="n">to</span><span class="p">]:</span>
+                    <span class="n">info</span><span class="p">[</span><span class="n">to</span><span class="p">][</span><span class="n">fr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">info</span><span class="p">[</span><span class="n">to</span><span class="p">][</span><span class="n">fr</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;min_num_obs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">arr</span>
         <span class="k">return</span> <span class="bp">self</span></div>
     
 <div class="viewcode-block" id="ColocatedData.to_dataframe"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -684,13 +985,201 @@
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Failed to import file </span><span class="si">{}</span><span class="s1">. File type is not supported &#39;</span>
                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)))</span></div>
     
-    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+    
+        
+    <span class="k">def</span> <span class="nf">_check_latlon_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_check</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_check</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="n">CoordinateError</span><span class="p">(</span><span class="s1">&#39;Missing latitude or longitude coordinate &#39;</span>
+                                  <span class="s1">&#39;(or both)&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">([</span><span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_check</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_check</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="n">CoordinateError</span><span class="p">(</span><span class="s1">&#39;Only one of latitude / longitude is &#39;</span>
+                                      <span class="s1">&#39;dimension (require None or both)&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+        
+        
+    <span class="k">def</span> <span class="nf">_filter_latlon_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_range</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;station_name&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Cannot filter region, require dimension &#39;</span>
+                                      <span class="s1">&#39;station_name&#39;</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;station_name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;station_name must be 3. dimensional index&#39;</span><span class="p">)</span>
+            
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">longitude</span> <span class="o">&gt;</span> <span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                               <span class="n">arr</span><span class="o">.</span><span class="n">longitude</span> <span class="o">&lt;</span> <span class="n">lon_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> 
+                <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">latitude</span> <span class="o">&gt;</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                               <span class="n">arr</span><span class="o">.</span><span class="n">latitude</span> <span class="o">&lt;</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        
+        <span class="k">return</span> <span class="n">arr</span><span class="p">[:,:,</span><span class="n">mask</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="nf">_filter_latlon_3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_range</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lat_range</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">lat_range</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lon_range</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">lon_range</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lon_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat_range</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">lon_range</span><span class="p">))</span>
+    
+<div class="viewcode-block" id="ColocatedData.calc_nmb_array"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.calc_nmb_array">[docs]</a>    <span class="k">def</span> <span class="nf">calc_nmb_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate data array with normalised bias (NMB) values</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataArray</span>
+<span class="sd">            NMBs at each coordinate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">mod</span><span class="p">,</span> <span class="n">obs</span> <span class="o">=</span> <span class="n">_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">mod</span> <span class="o">-</span> <span class="n">obs</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">obs</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span> </div>
+        
+<div class="viewcode-block" id="ColocatedData.apply_latlon_filter"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.apply_latlon_filter">[docs]</a>    <span class="k">def</span> <span class="nf">apply_latlon_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                            <span class="n">region_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply regional filter </span>
+<span class="sd">        </span>
+<span class="sd">        Returns new object filtered for input coordinate range</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lat_range : list, optional</span>
+<span class="sd">            latitude range that is supposed to be applied. If specified, then</span>
+<span class="sd">            also lon_range need to be specified, else, region_id is checked </span>
+<span class="sd">            against AeroCom default regions (and used if applicable)</span>
+<span class="sd">        lon_range : list, optional</span>
+<span class="sd">            longitude range that is supposed to be applied. If specified, then</span>
+<span class="sd">            also lat_range need to be specified, else, region_id is checked </span>
+<span class="sd">            against AeroCom default regions (and used if applicable)</span>
+<span class="sd">        region_id : str</span>
+<span class="sd">            name of region to be applied </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ColocatedData</span>
+<span class="sd">            filtered data object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">is_2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_latlon_coords</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">valid_region</span><span class="p">(</span><span class="n">region_id</span><span class="p">):</span>
+            <span class="n">reg</span> <span class="o">=</span> <span class="n">Region</span><span class="p">(</span><span class="n">region_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lon_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lon_range</span> <span class="o">!=</span> <span class="n">reg</span><span class="o">.</span><span class="n">lon_range</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Conflict: receieved region ID </span><span class="si">{}</span><span class="s1">, which has &#39;</span>
+                                 <span class="s1">&#39;a different longitude range (</span><span class="si">{}</span><span class="s1">) than input &#39;</span>
+                                 <span class="s1">&#39;lon_range </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">region_id</span><span class="p">,</span> <span class="n">reg</span><span class="o">.</span><span class="n">lon_range</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">lat_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lat_range</span> <span class="o">!=</span> <span class="n">reg</span><span class="o">.</span><span class="n">lat_range</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Conflict: receieved region ID </span><span class="si">{}</span><span class="s1">, which has &#39;</span>
+                                 <span class="s1">&#39;a different longitude range (</span><span class="si">{}</span><span class="s1">) than input &#39;</span>
+                                 <span class="s1">&#39;lat_range </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">region_id</span><span class="p">,</span> <span class="n">reg</span><span class="o">.</span><span class="n">lat_range</span><span class="p">,</span> <span class="n">lat_range</span><span class="p">))</span>
+            <span class="n">lon_range</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">lon_range</span>
+            <span class="n">lat_range</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">lat_range</span>
+            <span class="n">region_id</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">name</span>
+            
+        <span class="k">if</span> <span class="n">lon_range</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lat_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Need either lon_range or lat_range or valid &#39;</span>
+                             <span class="s1">&#39;region_id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lon_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lon_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lat_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lat_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span>
+        
+        <span class="n">latr</span><span class="p">,</span> <span class="n">lonr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;lat_range&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;lon_range&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">latr</span><span class="p">,</span> <span class="n">lat_range</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">lonr</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Filtering of lat_range=</span><span class="si">{}</span><span class="s1"> and lon_range=</span><span class="si">{}</span><span class="s1"> &#39;</span>
+                                 <span class="s1">&#39;results in unchanged object, returning self&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lon_range</span><span class="p">,</span> <span class="n">lat_range</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        
+        <span class="k">if</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">latr</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">latr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">latr</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">latr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">lonr</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lonr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lon_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">lonr</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">lon_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lonr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            
+        <span class="k">if</span> <span class="n">is_2d</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_latlon_2d</span><span class="p">(</span><span class="n">lat_range</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_latlon_3d</span><span class="p">(</span><span class="n">lat_range</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">region_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">region_id</span> <span class="o">=</span> <span class="s1">&#39;CUSTOM&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">alt_info</span> <span class="o">=</span> <span class="n">filtered</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;filter_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">alt_info</span> <span class="o">=</span> <span class="s1">&#39;CUSTOM&#39;</span>
+        
+        <span class="n">filtered</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;filter_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">region_id</span><span class="p">,</span> <span class="n">alt_info</span><span class="p">)</span>
+        <span class="n">filtered</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">region_id</span>
+        <span class="n">filtered</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;lon_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_range</span>
+        <span class="n">filtered</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;lat_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_range</span>
+    
+        <span class="k">return</span> <span class="n">ColocatedData</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="ColocatedData.filter_region"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.filter_region">[docs]</a>    <span class="k">def</span> <span class="nf">filter_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_id</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Filter object by region</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        region_id : str</span>
+<span class="sd">            valid ID of region</span>
+<span class="sd">        inplace : bool</span>
+<span class="sd">            if True, the filtering is done directly in this instance, else </span>
+<span class="sd">            a new instance is returned</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ColocatedData</span>
+<span class="sd">            filtered data object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">load_region_mask_xr</span><span class="p">(</span><span class="n">region_id</span><span class="o">=</span><span class="n">region_id</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">flatten_latlondim_station_name</span><span class="p">()</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">drop_idx</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">stat</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">_iter_stats</span><span class="p">():</span>
+            
+            <span class="k">if</span> <span class="n">get_mask_value</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">drop_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#                 data = data.drop(dim=&#39;station_name&#39;, </span>
+<span class="c1">#                                  labels=str(station.station_name.values))</span>
+<span class="c1"># =============================================================================</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">drop_idx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">drop_idx</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">arr</span>  
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+        
+<div class="viewcode-block" id="ColocatedData.plot_coordinates"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.plot_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">plot_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontsize_base</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
+                         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        <span class="kn">from</span> <span class="nn">pyaerocom.plot.plotcoordinates</span> <span class="kn">import</span> <span class="n">plot_coordinates</span>
+        
+        <span class="n">lats</span><span class="p">,</span> <span class="n">lons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coords_valid_obs</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">plot_coordinates</span><span class="p">(</span><span class="n">lons</span><span class="o">=</span><span class="n">lons</span><span class="p">,</span> 
+                                <span class="n">lats</span><span class="o">=</span><span class="n">lats</span><span class="p">,</span> 
+                                <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span>
+                                <span class="n">fontsize_base</span><span class="o">=</span><span class="n">fontsize_base</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">head</span> <span class="o">=</span> <span class="s2">&quot;Pyaerocom </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span><span class="o">*</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -708,28 +1197,78 @@
                                                 <span class="s1">&#39;please use units instead&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span></div>
 
-
-    
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     
-    <span class="n">testdir</span> <span class="o">=</span> <span class="s1">&#39;~/github/aerocom_evaluation/coldata/OsloCTM3v1.01/&#39;</span>
-    <span class="n">testfile</span> <span class="o">=</span> <span class="s1">&#39;abs550aer_REF-EBASMC_MOD-OsloCTM3v1.01-daily_20100101_20101231_daily_WORLD-noMOUNTAINS.nc&#39;</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">ColocatedData</span><span class="p">()</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
     
-    <span class="n">d</span><span class="o">.</span><span class="n">read_netcdf</span><span class="p">(</span><span class="n">testdir</span> <span class="o">+</span> <span class="n">testfile</span><span class="p">)</span>
-    <span class="c1">#fp = os.path.join(OUT_DIR, d.savename_aerocom + &#39;.nc&#39;)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-    <span class="c1">#d1 = ColocatedData(fp)</span>
-    <span class="c1">#print(d1)</span>
+    <span class="n">col_filename</span> <span class="o">=</span> <span class="s1">&#39;absc550aer_REF-EBAS-Lev3_MOD-CAM5-ATRAS_20100101_20101231_daily_WORLD-noMOUNTAINS.nc&#39;</span>
+    
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">ColocatedData</span><span class="o">.</span><span class="n">get_meta_from_filename</span><span class="p">(</span><span class="n">col_filename</span><span class="p">)</span>
+    
+    <span class="n">obsdata</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
+    <span class="n">modeldata</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;ECMWF_CAMS_REAN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span>
+
+    <span class="n">coldata1</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">colocation</span><span class="o">.</span><span class="n">colocate_gridded_ungridded</span><span class="p">(</span><span class="n">modeldata</span><span class="p">,</span> <span class="n">obsdata</span><span class="p">,</span> 
+                                                         <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                                                         <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
+                                                         <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;od550aer&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">]},</span>
+                                                         <span class="n">filter_name</span><span class="o">=</span><span class="s1">&#39;WORLD-noMOUNTAINS&#39;</span><span class="p">,</span>
+                                                         <span class="n">remove_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                                                         <span class="n">colocate_time</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">coldata1</span><span class="o">.</span><span class="n">plot_coordinates</span><span class="p">()</span>
+    <span class="c1">#coldata1.filter_region(region_id = &#39;SEA&#39;)</span>
+    <span class="c1">#coldata1.plot_coordinates()</span>
+    <span class="c1">#coldata1 = coldata1.resample_time(&#39;yearly&#39;, colocate_time=True)</span>
+    <span class="c1">#coldata1.plot_coordinates()</span>
+    <span class="c1">#print()</span>
+    
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sat = pya.io.ReadGridded(&#39;MODIS6.aqua&#39;).read_var(&#39;od550aer&#39;, start=2010)</span>
+<span class="sd">    </span>
+<span class="sd">    coldata2 = pya.colocation.colocate_gridded_gridded(modeldata, sat, </span>
+<span class="sd">                                                       ts_type=&#39;monthly&#39;,</span>
+<span class="sd">                                                       regrid_res_deg=10)</span>
+<span class="sd">    </span>
+<span class="sd">   </span>
+<span class="sd">    coldata2.plot_coordinates()</span>
+<span class="sd">    </span>
+<span class="sd">    sat_namerica = coldata2.apply_latlon_filter(region_id=&#39;NAMERICA&#39;)</span>
+<span class="sd">    sat_namerica.plot_scatter()</span>
+<span class="sd">    sat_namerica.plot_coordinates()</span>
+<span class="sd">    </span>
+<span class="sd">    coldata1.plot_scatter()</span>
+<span class="sd">    </span>
+<span class="sd">    stats = {}</span>
+<span class="sd">    for region_id in pya.region.get_all_default_region_ids():</span>
+<span class="sd">        filtered = coldata1.apply_latlon_filter(region_id=region_id)</span>
+<span class="sd">        stats[region_id] = filtered.calc_statistics()</span>
+<span class="sd">    print(&#39;AERONET&#39;)    </span>
+<span class="sd">    for r, s in stats.items():</span>
+<span class="sd">        if s[&#39;num_valid&#39;] == 0:</span>
+<span class="sd">            print(&#39;No data in region {}&#39;.format(r))</span>
+<span class="sd">        else:</span>
+<span class="sd">            print(&#39;{}: NMB={:.3f} (R={:.2f})&#39;.format(r, s[&#39;nmb&#39;]*100, s[&#39;R&#39;]))</span>
+
+<span class="sd">    stats = {}</span>
+<span class="sd">    for region_id in pya.region.get_all_default_region_ids():</span>
+<span class="sd">        filtered = coldata2.apply_latlon_filter(region_id=region_id)</span>
+<span class="sd">        stats[region_id] = filtered.calc_statistics()</span>
+<span class="sd">    print(&#39;MODIS&#39;)    </span>
+<span class="sd">    for r, s in stats.items():</span>
+<span class="sd">        if s[&#39;num_valid&#39;] == 0:</span>
+<span class="sd">            print(&#39;No data in region {}&#39;.format(r))</span>
+<span class="sd">        else:</span>
+<span class="sd">            print(&#39;{}: NMB={:.3f} (R={:.2f})&#39;.format(r, s[&#39;nmb&#39;]*100, s[&#39;R&#39;]))    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
     
         
     
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -738,11 +1277,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, met.no.
+        &copy; Copyright 2018, MET Norway
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -755,38 +1294,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="../../_static/language_data.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

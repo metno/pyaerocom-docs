@@ -1,13 +1,12 @@
-
 Reading of gridded data - the *ReadGridded* class
 -------------------------------------------------
 
 This notebook introduces the
 `ReadGridded <http://aerocom.met.no/pyaerocom/api.html#pyaerocom.io.readgridded.ReadGridded>`__
 class of pyaerocom, a flexible interface for importing model results
-from a single model, based on variable name (e.g. *od550aer*,
-*od550bc*), start / stop time stamps and temporal resolution (e.g.
-*hourly, 3hourly, daily, monthly*).
+from a single model, based on variable name (e.g. *od550aer*,
+*od550bc*), start / stop time stamps and temporal resolution
+(e.g. *hourly, 3hourly, daily, monthly*).
 
 The class is part of the
 `readgridded <http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.io.readgridded>`__
@@ -86,7 +85,7 @@ Or the same in hourly resolution:
     Checking access to: /lustre/storeA
     Access to lustre database: True
     Init data paths for lustre
-    Expired time: 0.016 s
+    Expired time: 0.103 s
 
 
 Create instance of ``ReadGridded`` class
@@ -94,9 +93,7 @@ Create instance of ``ReadGridded`` class
 
 .. code:: ipython3
 
-    reader = pya.io.ReadGridded(data_id="ECMWF_CAMS_REAN",
-                                start="1-1-2003",
-                                stop="31-12-2007")
+    reader = pya.io.ReadGridded(data_id="ECMWF_CAMS_REAN")
     print(reader)
 
 
@@ -105,12 +102,12 @@ Create instance of ``ReadGridded`` class
     
     Pyaerocom ReadGridded
     ---------------------
-    Model ID: ECMWF_CAMS_REAN
+    Data ID: ECMWF_CAMS_REAN
     Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed
-    Available experiments: ['']
-    Available years: [2003, 2004, 2005, 2006, 2007, 2008]
-    Available frequencies ['daily', 'monthly']
-    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcpm10', 'sconcpm25', 'z']
+    Available experiments: ['', 'REAN']
+    Available years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 9999]
+    Available frequencies ['daily' 'monthly']
+    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'ec532dryaer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcbc', 'sconcdust', 'sconcoa', 'sconcpm10', 'sconcpm25', 'sconcso4', 'sconcss', 'time', 'z']
 
 
 The output contains information about all variables that were found and
@@ -136,6 +133,7 @@ by printing the string representation, as shown in the cell above).
      'bscatc532aerboa',
      'bscatc532aertoa',
      'ec532aer',
+     'ec532dryaer',
      'od440aer',
      'od550aer',
      'od550bc',
@@ -144,15 +142,21 @@ by printing the string representation, as shown in the cell above).
      'od550so4',
      'od550ss',
      'od865aer',
+     'sconcbc',
+     'sconcdust',
+     'sconcoa',
      'sconcpm10',
      'sconcpm25',
+     'sconcso4',
+     'sconcss',
+     'time',
      'z']
 
 
 
 .. code:: ipython3
 
-    data = reader.read_var(var_name="od550aer", ts_type="daily")
+    data = reader.read_var(var_name="od550aer", ts_type="daily", start="1-1-2003", stop="31-12-2007")
     data
 
 
@@ -194,18 +198,26 @@ or multiple variables on the run.
     reader.read(['od550bc', 'od550dust', 'od550oa', 'od550so4'])
 
 
+.. parsed-literal::
+
+    ECMWF_CAMS_REAN.daily.od550bc.2019.nc
+    ECMWF_CAMS_REAN.daily.od550dust.2019.nc
+    ECMWF_CAMS_REAN.daily.od550oa.2019.nc
+    ECMWF_CAMS_REAN.daily.od550so4.2019.nc
+
+
 
 
 .. parsed-literal::
 
     (pyaerocom.GriddedData
-     Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 1826; latitude: 161; longitude: 320)>,
+     Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 6209; latitude: 161; longitude: 320)>,
      pyaerocom.GriddedData
-     Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 1826; latitude: 161; longitude: 320)>,
+     Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 6209; latitude: 161; longitude: 320)>,
      pyaerocom.GriddedData
-     Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 1826; latitude: 161; longitude: 320)>,
+     Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 6209; latitude: 161; longitude: 320)>,
      pyaerocom.GriddedData
-     Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 1826; latitude: 161; longitude: 320)>)
+     Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 6209; latitude: 161; longitude: 320)>)
 
 
 
@@ -221,12 +233,12 @@ Now let’s double check if all variables have been imported.
     
     Pyaerocom ReadGridded
     ---------------------
-    Model ID: ECMWF_CAMS_REAN
+    Data ID: ECMWF_CAMS_REAN
     Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed
-    Available experiments: ['']
-    Available years: [2003, 2004, 2005, 2006, 2007, 2008]
-    Available frequencies ['daily', 'monthly']
-    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcpm10', 'sconcpm25', 'z']
+    Available experiments: ['', 'REAN']
+    Available years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 9999]
+    Available frequencies ['daily' 'monthly']
+    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'ec532dryaer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcbc', 'sconcdust', 'sconcoa', 'sconcpm10', 'sconcpm25', 'sconcso4', 'sconcss', 'time', 'z']
     
     Loaded GriddedData objects:
     ID: ECMWF_CAMS_REAN, Var: od550aer
@@ -266,25 +278,857 @@ each day of the five years?
     True
 
 
+Other options for reading
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The reading query can be further customised with respect to the temporal
+resolution that is requested. Let’s have a look at the available AOD
+data at 550 nm:
+
+.. code:: ipython3
+
+    reader.filter_files(var_name='od550aer')
+
+
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>var_name</th>
+          <th>year</th>
+          <th>ts_type</th>
+          <th>vert_code</th>
+          <th>data_id</th>
+          <th>name</th>
+          <th>meteo</th>
+          <th>experiment</th>
+          <th>is_at_stations</th>
+          <th>3D</th>
+          <th>filename</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>15</td>
+          <td>od550aer</td>
+          <td>2003</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2003.nc</td>
+        </tr>
+        <tr>
+          <td>144</td>
+          <td>od550aer</td>
+          <td>2003</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2003.nc</td>
+        </tr>
+        <tr>
+          <td>85</td>
+          <td>od550aer</td>
+          <td>2004</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2004.nc</td>
+        </tr>
+        <tr>
+          <td>110</td>
+          <td>od550aer</td>
+          <td>2004</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2004.nc</td>
+        </tr>
+        <tr>
+          <td>236</td>
+          <td>od550aer</td>
+          <td>2005</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2005.nc</td>
+        </tr>
+        <tr>
+          <td>82</td>
+          <td>od550aer</td>
+          <td>2005</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2005.nc</td>
+        </tr>
+        <tr>
+          <td>215</td>
+          <td>od550aer</td>
+          <td>2006</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2006.nc</td>
+        </tr>
+        <tr>
+          <td>179</td>
+          <td>od550aer</td>
+          <td>2006</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2006.nc</td>
+        </tr>
+        <tr>
+          <td>157</td>
+          <td>od550aer</td>
+          <td>2007</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2007.nc</td>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>od550aer</td>
+          <td>2007</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2007.nc</td>
+        </tr>
+        <tr>
+          <td>191</td>
+          <td>od550aer</td>
+          <td>2008</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2008.nc</td>
+        </tr>
+        <tr>
+          <td>72</td>
+          <td>od550aer</td>
+          <td>2009</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2009.nc</td>
+        </tr>
+        <tr>
+          <td>201</td>
+          <td>od550aer</td>
+          <td>2010</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td>od550aer</td>
+          <td>2011</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2011.nc</td>
+        </tr>
+        <tr>
+          <td>152</td>
+          <td>od550aer</td>
+          <td>2012</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2012.nc</td>
+        </tr>
+        <tr>
+          <td>200</td>
+          <td>od550aer</td>
+          <td>2013</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2013.nc</td>
+        </tr>
+        <tr>
+          <td>138</td>
+          <td>od550aer</td>
+          <td>2014</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2014.nc</td>
+        </tr>
+        <tr>
+          <td>145</td>
+          <td>od550aer</td>
+          <td>2015</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2015.nc</td>
+        </tr>
+        <tr>
+          <td>243</td>
+          <td>od550aer</td>
+          <td>2016</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2016.nc</td>
+        </tr>
+        <tr>
+          <td>93</td>
+          <td>od550aer</td>
+          <td>2017</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2017.nc</td>
+        </tr>
+        <tr>
+          <td>104</td>
+          <td>od550aer</td>
+          <td>2018</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2018.nc</td>
+        </tr>
+        <tr>
+          <td>187</td>
+          <td>od550aer</td>
+          <td>2019</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>False</td>
+          <td>False</td>
+          <td>ECMWF_CAMS_REAN.daily.od550aer.2019.nc</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+As you can see, there are both daily and monthly files. The monthly,
+however only covers the years 2003-2007, while the daily has data until
+2018:
+
+.. code:: ipython3
+
+    reader.filter_files(var_name='od550aer', ts_type='monthly')
+
+
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>var_name</th>
+          <th>year</th>
+          <th>ts_type</th>
+          <th>vert_code</th>
+          <th>data_id</th>
+          <th>name</th>
+          <th>meteo</th>
+          <th>experiment</th>
+          <th>is_at_stations</th>
+          <th>3D</th>
+          <th>filename</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>144</td>
+          <td>od550aer</td>
+          <td>2003</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2003.nc</td>
+        </tr>
+        <tr>
+          <td>110</td>
+          <td>od550aer</td>
+          <td>2004</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2004.nc</td>
+        </tr>
+        <tr>
+          <td>82</td>
+          <td>od550aer</td>
+          <td>2005</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2005.nc</td>
+        </tr>
+        <tr>
+          <td>179</td>
+          <td>od550aer</td>
+          <td>2006</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2006.nc</td>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>od550aer</td>
+          <td>2007</td>
+          <td>monthly</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2007.nc</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: ipython3
+
+    reader.filter_files(var_name='od550aer', ts_type='daily')
+
+
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>var_name</th>
+          <th>year</th>
+          <th>ts_type</th>
+          <th>vert_code</th>
+          <th>data_id</th>
+          <th>name</th>
+          <th>meteo</th>
+          <th>experiment</th>
+          <th>is_at_stations</th>
+          <th>3D</th>
+          <th>filename</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>15</td>
+          <td>od550aer</td>
+          <td>2003</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2003.nc</td>
+        </tr>
+        <tr>
+          <td>85</td>
+          <td>od550aer</td>
+          <td>2004</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2004.nc</td>
+        </tr>
+        <tr>
+          <td>236</td>
+          <td>od550aer</td>
+          <td>2005</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2005.nc</td>
+        </tr>
+        <tr>
+          <td>215</td>
+          <td>od550aer</td>
+          <td>2006</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2006.nc</td>
+        </tr>
+        <tr>
+          <td>157</td>
+          <td>od550aer</td>
+          <td>2007</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2007.nc</td>
+        </tr>
+        <tr>
+          <td>191</td>
+          <td>od550aer</td>
+          <td>2008</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2008.nc</td>
+        </tr>
+        <tr>
+          <td>72</td>
+          <td>od550aer</td>
+          <td>2009</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2009.nc</td>
+        </tr>
+        <tr>
+          <td>201</td>
+          <td>od550aer</td>
+          <td>2010</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td>od550aer</td>
+          <td>2011</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2011.nc</td>
+        </tr>
+        <tr>
+          <td>152</td>
+          <td>od550aer</td>
+          <td>2012</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2012.nc</td>
+        </tr>
+        <tr>
+          <td>200</td>
+          <td>od550aer</td>
+          <td>2013</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2013.nc</td>
+        </tr>
+        <tr>
+          <td>138</td>
+          <td>od550aer</td>
+          <td>2014</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2014.nc</td>
+        </tr>
+        <tr>
+          <td>145</td>
+          <td>od550aer</td>
+          <td>2015</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2015.nc</td>
+        </tr>
+        <tr>
+          <td>243</td>
+          <td>od550aer</td>
+          <td>2016</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2016.nc</td>
+        </tr>
+        <tr>
+          <td>93</td>
+          <td>od550aer</td>
+          <td>2017</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2017.nc</td>
+        </tr>
+        <tr>
+          <td>104</td>
+          <td>od550aer</td>
+          <td>2018</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td>REAN</td>
+          <td>False</td>
+          <td>False</td>
+          <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2018.nc</td>
+        </tr>
+        <tr>
+          <td>187</td>
+          <td>od550aer</td>
+          <td>2019</td>
+          <td>daily</td>
+          <td></td>
+          <td>ECMWF_CAMS_REAN</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>False</td>
+          <td>False</td>
+          <td>ECMWF_CAMS_REAN.daily.od550aer.2019.nc</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Now, when it comes to reading a data object, these information can be
+specified as input:
+
+.. code:: ipython3
+
+    aod_monthly = reader.read_var('od550aer', ts_type='monthly')
+    print(aod_monthly.start, aod_monthly.stop, aod_monthly.ts_type)
+
+
+.. parsed-literal::
+
+    2003-01-01T00:00:00.000000 2007-12-31T23:59:59.999999 monthly
+
+
+.. code:: ipython3
+
+    aod_daily = reader.read_var('od550aer', ts_type='daily')
+    print(aod_daily.start, aod_daily.stop, aod_daily.ts_type)
+
+
+.. parsed-literal::
+
+    ECMWF_CAMS_REAN.daily.od550aer.2019.nc
+
+
+.. parsed-literal::
+
+    2003-01-01T00:00:00.000000 2019-12-31T23:59:59.999999 daily
+
+
+However, what about a situation where you write a script that processes
+many models and you don’t really know, in what resolution the model data
+comes, but 1. you prefer monthly where available (keyword
+``flex_ts_type``), and 2. you want to have the longest available
+timeseries (keyword ``prefer_longer``).
+
+.. code:: ipython3
+
+    aod_inferred = reader.read_var('od550aer', ts_type='monthly', flex_ts_type=True, prefer_longer=True)
+    print(aod_inferred.start, aod_inferred.stop, aod_inferred.ts_type)
+
+
+.. parsed-literal::
+
+    ECMWF_CAMS_REAN.daily.od550aer.2019.nc
+
+
+.. parsed-literal::
+
+    2003-01-01T00:00:00.000000 2019-12-31T23:59:59.999999 daily
+
+
+As you can see, the reading routine has automatically identified, that
+the daily dataset has a better time coverage and has thus, preferred
+that one over the specified ts_type of monthly.
+
+.. code:: ipython3
+
+    aod_inferred_monthly = aod_inferred.resample_time('monthly')
+    aod_inferred_monthly
+
+
+
+
+.. parsed-literal::
+
+    pyaerocom.GriddedData
+    Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 204; latitude: 161; longitude: 320)>
+
+
+
 Remark on time definition
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you run this notebook with ``verbose=True`` in the reading object,
-you will receive the output
-
-``Error message: AttributeError('Cube does not contain time dimension',)  Invalid time axis in file ECMWF_CAMS_REAN.daily.od550aer.2007.nc. Attempting to correct.``
-
-several times when reading the data. This warning indicates, that the
-corresponding data in the netCDF files has some issue with the time
-dimension. Here, the time variable is not properly defined in the NetCDF
-file. Pyaerocom can correct for this on data import by
+If the time dimension is not properly defined in a NetCDF data file,
+Pyaerocom can correct for this on data import by:
 
 1. First checking if the time dimension in the NetCDF file is correct
    according to CF convention (`see here for details on the
    implementation <http://aerocom.met.no/pyaerocom/api.html#pyaerocom.io.helpers.check_time_coord>`__
    and if a problem is detected, then …
 2. the time axis is redefined based on the year and time resolution
-   (*ts_type*) that is encrypted in the filename. The latter requires
+   (*ts_type*) that is provided in the filename. The latter requires
    that the file follows one of the `pyaerocom file
    conventions <http://aerocom.met.no/pyaerocom/config_files.html#file-conventions>`__.
 
@@ -314,12 +1158,6 @@ series at the coordinates in the city of Leipzig, Germany.
 
     Interpolating data of shape (1826, 161, 320). This may take a while.
     Successfully interpolated cube
-    /home/jonasg/anaconda3/lib/python3.6/site-packages/iris/analysis/cartography.py:394: UserWarning: Using DEFAULT_SPHERICAL_EARTH_RADIUS.
-      warnings.warn("Using DEFAULT_SPHERICAL_EARTH_RADIUS.")
-    /home/jonasg/anaconda3/lib/python3.6/site-packages/iris/analysis/cartography.py:394: UserWarning: Using DEFAULT_SPHERICAL_EARTH_RADIUS.
-      warnings.warn("Using DEFAULT_SPHERICAL_EARTH_RADIUS.")
-    /home/jonasg/anaconda3/lib/python3.6/site-packages/iris/analysis/cartography.py:394: UserWarning: Using DEFAULT_SPHERICAL_EARTH_RADIUS.
-      warnings.warn("Using DEFAULT_SPHERICAL_EARTH_RADIUS.")
 
 
 Plot timeseries
@@ -335,6 +1173,13 @@ Plot timeseries
     tit = ax.set_title("ECMWF Reanalysis (monthly averages)")
 
 
+.. parsed-literal::
 
-.. image:: tut02_intro_class_ReadGridded/tut02_intro_class_ReadGridded_25_0.png
+    Trying to infer ts_type in StationData ECMWF_CAMS_REAN for variable od550aer
+    Trying to infer ts_type in StationData ECMWF_CAMS_REAN for variable od550aer
+    Trying to infer ts_type in StationData ECMWF_CAMS_REAN for variable od550aer
+
+
+
+.. image:: tut02_intro_class_ReadGridded/tut02_intro_class_ReadGridded_37_1.png
 

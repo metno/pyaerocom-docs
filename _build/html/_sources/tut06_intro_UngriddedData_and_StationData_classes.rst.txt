@@ -1,4 +1,3 @@
-
 Introduction into the UngriddedData class and the StationData class
 -------------------------------------------------------------------
 
@@ -51,14 +50,14 @@ Import the ``UngriddedData`` object that was created in the previous tutorial
     Checking access to: /lustre/storeA
     Access to lustre database: True
     Init data paths for lustre
-    Expired time: 0.018 s
+    Expired time: 0.027 s
 
 
 
 
 .. parsed-literal::
 
-    UngriddedData <networks: ['AeronetSunV3Lev2.daily']; vars: ['od550aer']; instruments: ['sun_photometer'];No. of stations: 1214
+    UngriddedData <networks: ['AeronetSunV3Lev2.daily']; vars: ['od550aer']; instruments: ['sun_photometer'];No. of stations: 1230
 
 
 
@@ -169,7 +168,7 @@ each file that was read:
 
 .. parsed-literal::
 
-    1214
+    1230
 
 
 
@@ -194,7 +193,8 @@ Access metadata of first file (index 0):
                  ('ts_type', 'daily'),
                  ('data_id', 'AeronetSunV3Lev2.daily'),
                  ('variables', ['od550aer']),
-                 ('instrument_name', 'sun_photometer')])
+                 ('instrument_name', 'sun_photometer'),
+                 ('data_revision', '20190920')])
 
 
 
@@ -218,9 +218,9 @@ attributes. For instance:
     Contains networks: ['AeronetSunV3Lev2.daily']
     Contains variables: ['od550aer']
     Contains instruments: ['sun_photometer']
-    Total no. of meta-blocks: 163
+    Total no. of meta-blocks: 164
     Filters that were applied:
-     Filter time log: 20190604164917
+     Filter time log: 20191012154631
     	latitude: (30, 60)
     	longitude: (0, 45)
     	altitude: (0, 1000)
@@ -268,7 +268,7 @@ metadata-blocks / files that are stored in the data object:
 
 .. parsed-literal::
 
-    1214
+    1230
 
 
 
@@ -408,7 +408,7 @@ Find index (or indices) that match the station name:
 
 .. parsed-literal::
 
-    [493.0]
+    [497.0]
 
 
 
@@ -428,7 +428,7 @@ to have a look into the options of this method:
 
     Help on method to_station_data in module pyaerocom.ungriddeddata:
     
-    to_station_data(meta_idx, vars_to_convert=None, start=None, stop=None, freq=None, merge_if_multi=True, merge_pref_attr=None, merge_sort_by_largest=True, insert_nans=False) method of pyaerocom.ungriddeddata.UngriddedData instance
+    to_station_data(meta_idx, vars_to_convert=None, start=None, stop=None, freq=None, merge_if_multi=True, merge_pref_attr=None, merge_sort_by_largest=True, insert_nans=False, **kwargs) method of pyaerocom.ungriddeddata.UngriddedData instance
         Convert data from one station to :class:`StationData`
         
         Todo
@@ -451,12 +451,6 @@ to have a look into the options of this method:
         freq : str
             pandas frequency string (e.g. 'D' for daily, 'M' for month end) or
             valid pyaerocom ts_type
-        interp_nans : bool
-            if True, all NaN values in the time series for each 
-            variable are interpolated using linear interpolation
-        min_coverage_interp : float
-            required coverage fraction for interpolation (default is 0.68, i.e.
-            roughly corresponding to 1 sigma)
         merge_if_multi : bool
             if True and if data request results in multiple instances of 
             StationData objects, then these are attempted to be merged into one 
@@ -510,13 +504,13 @@ The returned data type is an instance of the
 `pyaerocom.StationData <https://pyaerocom.met.no/api.html?highlight=stationdata#pyaerocom.stationdata.StationData>`__
 class.
 
-**NOTE:** if there is more than one index match for one station (i.e.
-``data.find_station_meta_indices('Granada')`` returns more than one
-match), then, using Option 1, you would need to call ``to_station_data``
-for each of the index matches. Alternatively you could use either of the
-following methods, which automatically merge the individual
-``StationData`` objects into one, in case of multiple matches for that
-station name.
+**NOTE:** if there is more than one index match for one station
+(i.e. ``data.find_station_meta_indices('Granada')`` returns more than
+one match), then, using Option 1, you would need to call
+``to_station_data`` for each of the index matches. Alternatively you
+could use either of the following methods, which automatically merge the
+individual ``StationData`` objects into one, in case of multiple matches
+for that station name.
 
 Let’s have a quick look at the ``StationData`` object (it is a
 dictionary-like object and simple to use):
@@ -560,7 +554,7 @@ Let’s have a look if the data objects are really the same (by plotting the AOD
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7fb53f312278>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f26edf9d898>
 
 
 
@@ -590,13 +584,15 @@ can print it and it will get you a nice overview):
         units: 1
         overlap: False
         ts_type: daily
+        apply_constraints: False
+        min_num_obs: None
     station_coords (dict):
       latitude: 37.163999999999994
       longitude: -3.6049999999999995
       altitude: 680.0
-    data_err (BrowseDict):
-      od550aer (ndarray, 3011 items): [nan, nan, ..., nan, nan]
+    data_err (BrowseDict): <empty_dict>
     overlap (BrowseDict): <empty_dict>
+    data_flagged (BrowseDict): <empty_dict>
     filename: None
     station_id: None
     station_name: Granada
@@ -613,24 +609,25 @@ can print it and it will get you a nice overview):
     data_version: None
     data_level: None
     revision_date: None
+    website: None
     ts_type_src: daily
     stat_merge_pref_attr: None
-    data_revision: 20190425
+    data_revision: 20190920
     
     Data arrays
     .................
-    dtime (ndarray, 5088 items): [2004-12-29T00:00:00.000000000, 2004-12-30T00:00:00.000000000, ..., 2018-12-02T00:00:00.000000000, 2018-12-03T00:00:00.000000000]
+    dtime (ndarray, 5087 items): [2004-12-30T00:00:00.000000000, 2004-12-31T00:00:00.000000000, ..., 2018-12-02T00:00:00.000000000, 2018-12-03T00:00:00.000000000]
     Pandas Series
     .................
-    od550aer (Series, 5088 items)
+    od550aer (Series, 5087 items)
 
 
-You can see that the ``StationData`` object contains both metadata (e.g.
-``PI``) and data vectors which can be either 1D numpy arrays or python
-lists (e.g. ``dtime``) or ``pandas.Series`` objects (e.g. variable
-``od550aer``). All attributes can be accessed and manipulated either
-using dictionary style access (i.e. ``[]`` notation), or using the ``.``
-operator.
+You can see that the ``StationData`` object contains both metadata
+(e.g. ``PI``) and data vectors which can be either 1D numpy arrays or
+python lists (e.g. ``dtime``) or ``pandas.Series`` objects
+(e.g. variable ``od550aer``). All attributes can be accessed and
+manipulated either using dictionary style access (i.e. ``[]`` notation),
+or using the ``.`` operator.
 
 Here some examples:
 
@@ -760,13 +757,13 @@ method:
 
 .. parsed-literal::
 
-    count    3011.000000
-    mean        0.137720
-    std         0.103335
+    count    3010.000000
+    mean        0.137759
+    std         0.103330
     min         0.015534
-    25%         0.070937
-    50%         0.108195
-    75%         0.171250
+    25%         0.070969
+    50%         0.108200
+    75%         0.171291
     max         1.278507
     dtype: float64
 
@@ -844,27 +841,27 @@ observations per period:
       </thead>
       <tbody>
         <tr>
-          <th>2004-12-31</th>
-          <td>0.038038</td>
-          <td>2</td>
+          <td>2004-12-31</td>
+          <td>0.056462</td>
+          <td>1</td>
         </tr>
         <tr>
-          <th>2005-01-31</th>
+          <td>2005-01-31</td>
           <td>0.081300</td>
           <td>28</td>
         </tr>
         <tr>
-          <th>2005-02-28</th>
+          <td>2005-02-28</td>
           <td>0.111567</td>
           <td>24</td>
         </tr>
         <tr>
-          <th>2005-03-31</th>
+          <td>2005-03-31</td>
           <td>0.156312</td>
           <td>17</td>
         </tr>
         <tr>
-          <th>2005-04-30</th>
+          <td>2005-04-30</td>
           <td>0.154527</td>
           <td>26</td>
         </tr>
@@ -943,7 +940,7 @@ You may also be intersted in a climatology:
     9     0.146022
     10    0.115006
     11    0.091344
-    12    0.080672
+    12    0.082346
     dtype: float64
 
 
@@ -987,7 +984,7 @@ we created above:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7fb53f2e8c88>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f26f70c0f28>
 
 
 
@@ -1050,4 +1047,53 @@ Compare the result with the yearly product plotted above:
 
 
 .. image:: tut06_intro_UngriddedData_and_StationData_classes/tut06_intro_UngriddedData_and_StationData_classes_79_0.png
+
+
+Computing trends from station data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: ipython3
+
+    granada_opt1.compute_trend(var_name='od550aer', start_year=2005, stop_year=2020)
+
+
+
+
+.. parsed-literal::
+
+    {'pval': 0.005380307706696595,
+     'm': -0.0019984909545023464,
+     'm_err': 0.0006859706833670536,
+     'n': 12,
+     'y_mean': 0.13274217888172632,
+     'y_min': 0.11068644396371304,
+     'y_max': 0.15450395909117362,
+     'coverage': None,
+     'slp': -1.3972849007872112,
+     'slp_err': 0.48509627152652673,
+     'reg0': 0.14302673373028105,
+     't0': None,
+     'slp_2005': -1.3972849007872112,
+     'slp_2005_err': 0.48509627152652673,
+     'reg0_2005': 0.14302673373028105,
+     'yoffs': 0.21297391713786318,
+     'period': '2005-2020'}
+
+
+
+.. code:: ipython3
+
+    granada_opt1.trends['od550aer'].plot()
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f26f45f7080>
+
+
+
+
+.. image:: tut06_intro_UngriddedData_and_StationData_classes/tut06_intro_UngriddedData_and_StationData_classes_82_1.png
 
