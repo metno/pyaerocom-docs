@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -161,22 +161,33 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Tests for _lowlevel_helpers.py module of pyaerocom</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
+<span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">import</span> <span class="nn">pyaerocom.mathutils</span> <span class="k">as</span> <span class="nn">utils</span>
+<span class="kn">import</span> <span class="nn">pyaerocom.mathutils</span> <span class="k">as</span> <span class="nn">mu</span>
 
-<div class="viewcode-block" id="test_exponent"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_mathutils.test_exponent">[docs]</a><span class="k">def</span> <span class="nf">test_exponent</span><span class="p">():</span>
+<div class="viewcode-block" id="test_exponent"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_mathutils.test_exponent">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;inputval, desired&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">234</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_exponent</span><span class="p">(</span><span class="n">inputval</span><span class="p">,</span> <span class="n">desired</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Test method :func:`exponent` of :mod:`pyaerocom.utils`&quot;&quot;&quot;</span>
-    <span class="n">nominal</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
-    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">utils</span><span class="o">.</span><span class="n">exponent</span><span class="p">(</span><span class="o">.</span><span class="mi">01</span><span class="p">),</span>
-            <span class="n">utils</span><span class="o">.</span><span class="n">exponent</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
-            <span class="n">utils</span><span class="o">.</span><span class="n">exponent</span><span class="p">(</span><span class="mi">234</span><span class="p">)]</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">nominal</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span></div>
-    
+    <span class="k">assert</span> <span class="n">mu</span><span class="o">.</span><span class="n">exponent</span><span class="p">(</span><span class="n">inputval</span><span class="p">)</span> <span class="o">==</span> <span class="n">desired</span></div>
+
+<div class="viewcode-block" id="test_vmrx_to_concx"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_mathutils.test_vmrx_to_concx">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;inputval, p, T, vmr_unit, mmol_var, mmol_air, to_unit, desired&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">101300</span><span class="p">,</span><span class="mi">293</span><span class="p">,</span><span class="s1">&#39;nmol mol-1&#39;</span><span class="p">,</span><span class="mi">48</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="mf">1.9959</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">101300</span><span class="p">,</span><span class="mi">273</span><span class="p">,</span><span class="s1">&#39;nmol mol-1&#39;</span><span class="p">,</span><span class="mi">48</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="mf">2.1421</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">101300</span><span class="p">,</span><span class="mi">273</span><span class="p">,</span><span class="s1">&#39;nmol mol-1&#39;</span><span class="p">,</span><span class="mi">48</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="s1">&#39;kg m-3&#39;</span><span class="p">,</span> <span class="mf">2.1421e-9</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">101300</span><span class="p">,</span><span class="mi">273</span><span class="p">,</span><span class="s1">&#39;mol mol-1&#39;</span><span class="p">,</span><span class="mi">48</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="s1">&#39;kg m-3&#39;</span><span class="p">,</span> <span class="mf">2.1421</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">98000</span><span class="p">,</span><span class="mi">273</span><span class="p">,</span><span class="s1">&#39;mol mol-1&#39;</span><span class="p">,</span><span class="mi">48</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="s1">&#39;kg m-3&#39;</span><span class="p">,</span> <span class="mf">2.0724</span><span class="p">),</span>
+    <span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_vmrx_to_concx</span><span class="p">(</span><span class="n">inputval</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">vmr_unit</span><span class="p">,</span> <span class="n">mmol_var</span><span class="p">,</span>
+                       <span class="n">mmol_air</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">,</span> <span class="n">desired</span><span class="p">):</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">vmrx_to_concx</span><span class="p">(</span><span class="n">inputval</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">vmr_unit</span><span class="p">,</span> <span class="n">mmol_var</span><span class="p">,</span> <span class="n">mmol_air</span><span class="p">,</span>
+                           <span class="n">to_unit</span><span class="p">)</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">desired</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span></div>
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">test_exponent</span><span class="p">()</span>
-    
-    
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
 </pre></div>
 
            </div>

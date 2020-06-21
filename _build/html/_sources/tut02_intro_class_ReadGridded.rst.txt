@@ -4,9 +4,9 @@ Reading of gridded data - the *ReadGridded* class
 This notebook introduces the
 `ReadGridded <http://aerocom.met.no/pyaerocom/api.html#pyaerocom.io.readgridded.ReadGridded>`__
 class of pyaerocom, a flexible interface for importing model results
-from a single model, based on variable name (e.g. *od550aer*,
-*od550bc*), start / stop time stamps and temporal resolution
-(e.g. *hourly, 3hourly, daily, monthly*).
+from a single model, based on variable name (e.g. *od550aer*,
+*od550bc*), start / stop time stamps and temporal resolution (e.g.
+*hourly, 3hourly, daily, monthly*).
 
 The class is part of the
 `readgridded <http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.io.readgridded>`__
@@ -76,17 +76,6 @@ Or the same in hourly resolution:
 
     import pyaerocom as pya
     pya.change_verbosity('critical')
-
-
-.. parsed-literal::
-
-    Initating pyaerocom configuration
-    Checking database access...
-    Checking access to: /lustre/storeA
-    Access to lustre database: True
-    Init data paths for lustre
-    Expired time: 0.103 s
-
 
 Create instance of ``ReadGridded`` class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -160,6 +149,11 @@ by printing the string representation, as shown in the cell above).
     data
 
 
+.. parsed-literal::
+
+    Deactivating file search by vertical code for ECMWF_CAMS_REAN, since filenames do not include information about vertical code (probably AeroCom 2 convention)
+
+
 
 
 .. parsed-literal::
@@ -171,38 +165,27 @@ by printing the string representation, as shown in the cell above).
 
 The returned data object is of type
 `GriddedData <http://aerocom.met.no/pyaerocom/api.html#pyaerocom.griddeddata.GriddedData>`__
-class, which will be introduced in more detail later. This data object
-is returned by the ``read_var`` method and can also be accessed from the
-instance of the reading class using:
+class, which will be introduced in more detail later.
 
-.. code:: ipython3
-
-    d = reader.data["od550aer"]
-    d is data #?
-
-
-
-
-.. parsed-literal::
-
-    True
-
-
-
-We may also import other variables using either the above used method
+You may also import other variables using either the above used method
 ``read_var`` or the more general ``read`` method which can read single
 or multiple variables on the run.
 
 .. code:: ipython3
 
-    reader.read(['od550bc', 'od550dust', 'od550oa', 'od550so4'])
+    data_list = reader.read(['od550bc', 'od550dust', 'od550oa', 'od550so4'])
+    data_list
 
 
 .. parsed-literal::
 
+    Deactivating file search by vertical code for ECMWF_CAMS_REAN, since filenames do not include information about vertical code (probably AeroCom 2 convention)
     ECMWF_CAMS_REAN.daily.od550bc.2019.nc
+    Deactivating file search by vertical code for ECMWF_CAMS_REAN, since filenames do not include information about vertical code (probably AeroCom 2 convention)
     ECMWF_CAMS_REAN.daily.od550dust.2019.nc
+    Deactivating file search by vertical code for ECMWF_CAMS_REAN, since filenames do not include information about vertical code (probably AeroCom 2 convention)
     ECMWF_CAMS_REAN.daily.od550oa.2019.nc
+    Deactivating file search by vertical code for ECMWF_CAMS_REAN, since filenames do not include information about vertical code (probably AeroCom 2 convention)
     ECMWF_CAMS_REAN.daily.od550so4.2019.nc
 
 
@@ -221,33 +204,6 @@ or multiple variables on the run.
 
 
 
-Now let’s double check if all variables have been imported.
-
-.. code:: ipython3
-
-    print(reader)
-
-
-.. parsed-literal::
-
-    
-    Pyaerocom ReadGridded
-    ---------------------
-    Data ID: ECMWF_CAMS_REAN
-    Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed
-    Available experiments: ['', 'REAN']
-    Available years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 9999]
-    Available frequencies ['daily' 'monthly']
-    Available variables: ['ang4487aer', 'bscatc532aerboa', 'bscatc532aertoa', 'ec532aer', 'ec532dryaer', 'od440aer', 'od550aer', 'od550bc', 'od550dust', 'od550oa', 'od550so4', 'od550ss', 'od865aer', 'sconcbc', 'sconcdust', 'sconcoa', 'sconcpm10', 'sconcpm25', 'sconcso4', 'sconcss', 'time', 'z']
-    
-    Loaded GriddedData objects:
-    ID: ECMWF_CAMS_REAN, Var: od550aer
-    ID: ECMWF_CAMS_REAN, Var: od550bc
-    ID: ECMWF_CAMS_REAN, Var: od550dust
-    ID: ECMWF_CAMS_REAN, Var: od550oa
-    ID: ECMWF_CAMS_REAN, Var: od550so4
-
-
 In the following we continue with the ``od550aer`` data object that was
 loaded first and that was assigned the name ``data`` above.
 
@@ -264,19 +220,7 @@ loaded first and that was assigned the name ``data`` above.
 
 The returned
 `GriddedData <http://aerocom.met.no/pyaerocom/api.html#pyaerocom.griddeddata.GriddedData>`__
-object contains 1826 time stamps. Given that the defined period of 5
-years includes one leap year, we should expect that we imported data for
-each day of the five years?
-
-.. code:: ipython3
-
-    print(1826 == 5*365+1)
-
-
-.. parsed-literal::
-
-    True
-
+object contains 1826 time stamps, corresponding to 5 years.
 
 Other options for reading
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -327,7 +271,7 @@ data at 550 nm:
       </thead>
       <tbody>
         <tr>
-          <td>15</td>
+          <th>15</th>
           <td>od550aer</td>
           <td>2003</td>
           <td>daily</td>
@@ -341,7 +285,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2003.nc</td>
         </tr>
         <tr>
-          <td>144</td>
+          <th>144</th>
           <td>od550aer</td>
           <td>2003</td>
           <td>monthly</td>
@@ -355,7 +299,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2003.nc</td>
         </tr>
         <tr>
-          <td>85</td>
+          <th>85</th>
           <td>od550aer</td>
           <td>2004</td>
           <td>daily</td>
@@ -369,7 +313,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2004.nc</td>
         </tr>
         <tr>
-          <td>110</td>
+          <th>110</th>
           <td>od550aer</td>
           <td>2004</td>
           <td>monthly</td>
@@ -383,7 +327,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2004.nc</td>
         </tr>
         <tr>
-          <td>236</td>
+          <th>236</th>
           <td>od550aer</td>
           <td>2005</td>
           <td>daily</td>
@@ -397,7 +341,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2005.nc</td>
         </tr>
         <tr>
-          <td>82</td>
+          <th>82</th>
           <td>od550aer</td>
           <td>2005</td>
           <td>monthly</td>
@@ -411,7 +355,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2005.nc</td>
         </tr>
         <tr>
-          <td>215</td>
+          <th>215</th>
           <td>od550aer</td>
           <td>2006</td>
           <td>daily</td>
@@ -425,7 +369,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2006.nc</td>
         </tr>
         <tr>
-          <td>179</td>
+          <th>179</th>
           <td>od550aer</td>
           <td>2006</td>
           <td>monthly</td>
@@ -439,7 +383,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2006.nc</td>
         </tr>
         <tr>
-          <td>157</td>
+          <th>157</th>
           <td>od550aer</td>
           <td>2007</td>
           <td>daily</td>
@@ -453,7 +397,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2007.nc</td>
         </tr>
         <tr>
-          <td>0</td>
+          <th>0</th>
           <td>od550aer</td>
           <td>2007</td>
           <td>monthly</td>
@@ -467,7 +411,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2007.nc</td>
         </tr>
         <tr>
-          <td>191</td>
+          <th>191</th>
           <td>od550aer</td>
           <td>2008</td>
           <td>daily</td>
@@ -481,7 +425,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2008.nc</td>
         </tr>
         <tr>
-          <td>72</td>
+          <th>72</th>
           <td>od550aer</td>
           <td>2009</td>
           <td>daily</td>
@@ -495,7 +439,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2009.nc</td>
         </tr>
         <tr>
-          <td>201</td>
+          <th>201</th>
           <td>od550aer</td>
           <td>2010</td>
           <td>daily</td>
@@ -509,7 +453,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc</td>
         </tr>
         <tr>
-          <td>14</td>
+          <th>14</th>
           <td>od550aer</td>
           <td>2011</td>
           <td>daily</td>
@@ -523,7 +467,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2011.nc</td>
         </tr>
         <tr>
-          <td>152</td>
+          <th>152</th>
           <td>od550aer</td>
           <td>2012</td>
           <td>daily</td>
@@ -537,7 +481,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2012.nc</td>
         </tr>
         <tr>
-          <td>200</td>
+          <th>200</th>
           <td>od550aer</td>
           <td>2013</td>
           <td>daily</td>
@@ -551,7 +495,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2013.nc</td>
         </tr>
         <tr>
-          <td>138</td>
+          <th>138</th>
           <td>od550aer</td>
           <td>2014</td>
           <td>daily</td>
@@ -565,7 +509,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2014.nc</td>
         </tr>
         <tr>
-          <td>145</td>
+          <th>145</th>
           <td>od550aer</td>
           <td>2015</td>
           <td>daily</td>
@@ -579,7 +523,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2015.nc</td>
         </tr>
         <tr>
-          <td>243</td>
+          <th>243</th>
           <td>od550aer</td>
           <td>2016</td>
           <td>daily</td>
@@ -593,7 +537,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2016.nc</td>
         </tr>
         <tr>
-          <td>93</td>
+          <th>93</th>
           <td>od550aer</td>
           <td>2017</td>
           <td>daily</td>
@@ -607,7 +551,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2017.nc</td>
         </tr>
         <tr>
-          <td>104</td>
+          <th>104</th>
           <td>od550aer</td>
           <td>2018</td>
           <td>daily</td>
@@ -621,7 +565,7 @@ data at 550 nm:
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2018.nc</td>
         </tr>
         <tr>
-          <td>187</td>
+          <th>187</th>
           <td>od550aer</td>
           <td>2019</td>
           <td>daily</td>
@@ -686,7 +630,7 @@ however only covers the years 2003-2007, while the daily has data until
       </thead>
       <tbody>
         <tr>
-          <td>144</td>
+          <th>144</th>
           <td>od550aer</td>
           <td>2003</td>
           <td>monthly</td>
@@ -700,7 +644,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2003.nc</td>
         </tr>
         <tr>
-          <td>110</td>
+          <th>110</th>
           <td>od550aer</td>
           <td>2004</td>
           <td>monthly</td>
@@ -714,7 +658,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2004.nc</td>
         </tr>
         <tr>
-          <td>82</td>
+          <th>82</th>
           <td>od550aer</td>
           <td>2005</td>
           <td>monthly</td>
@@ -728,7 +672,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2005.nc</td>
         </tr>
         <tr>
-          <td>179</td>
+          <th>179</th>
           <td>od550aer</td>
           <td>2006</td>
           <td>monthly</td>
@@ -742,7 +686,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2006.nc</td>
         </tr>
         <tr>
-          <td>0</td>
+          <th>0</th>
           <td>od550aer</td>
           <td>2007</td>
           <td>monthly</td>
@@ -803,7 +747,7 @@ however only covers the years 2003-2007, while the daily has data until
       </thead>
       <tbody>
         <tr>
-          <td>15</td>
+          <th>15</th>
           <td>od550aer</td>
           <td>2003</td>
           <td>daily</td>
@@ -817,7 +761,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2003.nc</td>
         </tr>
         <tr>
-          <td>85</td>
+          <th>85</th>
           <td>od550aer</td>
           <td>2004</td>
           <td>daily</td>
@@ -831,7 +775,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2004.nc</td>
         </tr>
         <tr>
-          <td>236</td>
+          <th>236</th>
           <td>od550aer</td>
           <td>2005</td>
           <td>daily</td>
@@ -845,7 +789,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2005.nc</td>
         </tr>
         <tr>
-          <td>215</td>
+          <th>215</th>
           <td>od550aer</td>
           <td>2006</td>
           <td>daily</td>
@@ -859,7 +803,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2006.nc</td>
         </tr>
         <tr>
-          <td>157</td>
+          <th>157</th>
           <td>od550aer</td>
           <td>2007</td>
           <td>daily</td>
@@ -873,7 +817,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2007.nc</td>
         </tr>
         <tr>
-          <td>191</td>
+          <th>191</th>
           <td>od550aer</td>
           <td>2008</td>
           <td>daily</td>
@@ -887,7 +831,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2008.nc</td>
         </tr>
         <tr>
-          <td>72</td>
+          <th>72</th>
           <td>od550aer</td>
           <td>2009</td>
           <td>daily</td>
@@ -901,7 +845,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2009.nc</td>
         </tr>
         <tr>
-          <td>201</td>
+          <th>201</th>
           <td>od550aer</td>
           <td>2010</td>
           <td>daily</td>
@@ -915,7 +859,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc</td>
         </tr>
         <tr>
-          <td>14</td>
+          <th>14</th>
           <td>od550aer</td>
           <td>2011</td>
           <td>daily</td>
@@ -929,7 +873,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2011.nc</td>
         </tr>
         <tr>
-          <td>152</td>
+          <th>152</th>
           <td>od550aer</td>
           <td>2012</td>
           <td>daily</td>
@@ -943,7 +887,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2012.nc</td>
         </tr>
         <tr>
-          <td>200</td>
+          <th>200</th>
           <td>od550aer</td>
           <td>2013</td>
           <td>daily</td>
@@ -957,7 +901,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2013.nc</td>
         </tr>
         <tr>
-          <td>138</td>
+          <th>138</th>
           <td>od550aer</td>
           <td>2014</td>
           <td>daily</td>
@@ -971,7 +915,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2014.nc</td>
         </tr>
         <tr>
-          <td>145</td>
+          <th>145</th>
           <td>od550aer</td>
           <td>2015</td>
           <td>daily</td>
@@ -985,7 +929,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2015.nc</td>
         </tr>
         <tr>
-          <td>243</td>
+          <th>243</th>
           <td>od550aer</td>
           <td>2016</td>
           <td>daily</td>
@@ -999,7 +943,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2016.nc</td>
         </tr>
         <tr>
-          <td>93</td>
+          <th>93</th>
           <td>od550aer</td>
           <td>2017</td>
           <td>daily</td>
@@ -1013,7 +957,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2017.nc</td>
         </tr>
         <tr>
-          <td>104</td>
+          <th>104</th>
           <td>od550aer</td>
           <td>2018</td>
           <td>daily</td>
@@ -1027,7 +971,7 @@ however only covers the years 2003-2007, while the daily has data until
           <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2018.nc</td>
         </tr>
         <tr>
-          <td>187</td>
+          <th>187</th>
           <td>od550aer</td>
           <td>2019</td>
           <td>daily</td>
@@ -1057,6 +1001,11 @@ specified as input:
 
 .. parsed-literal::
 
+    Deactivating file search by vertical code for ECMWF_CAMS_REAN, since filenames do not include information about vertical code (probably AeroCom 2 convention)
+
+
+.. parsed-literal::
+
     2003-01-01T00:00:00.000000 2007-12-31T23:59:59.999999 monthly
 
 
@@ -1068,6 +1017,7 @@ specified as input:
 
 .. parsed-literal::
 
+    Deactivating file search by vertical code for ECMWF_CAMS_REAN, since filenames do not include information about vertical code (probably AeroCom 2 convention)
     ECMWF_CAMS_REAN.daily.od550aer.2019.nc
 
 
@@ -1090,6 +1040,7 @@ timeseries (keyword ``prefer_longer``).
 
 .. parsed-literal::
 
+    Deactivating file search by vertical code for ECMWF_CAMS_REAN, since filenames do not include information about vertical code (probably AeroCom 2 convention)
     ECMWF_CAMS_REAN.daily.od550aer.2019.nc
 
 
@@ -1113,7 +1064,7 @@ that one over the specified ts_type of monthly.
 .. parsed-literal::
 
     pyaerocom.GriddedData
-    Grid data: <iris 'Cube' of Aerosol optical depth at 550 nm / (1) (time: 204; latitude: 161; longitude: 320)>
+    Grid data: <iris 'Cube' of od550aer / (1) (time: 204; latitude: 161; longitude: 320)>
 
 
 
@@ -1156,8 +1107,8 @@ series at the coordinates in the city of Leipzig, Germany.
 
 .. parsed-literal::
 
-    Interpolating data of shape (1826, 161, 320). This may take a while.
-    Successfully interpolated cube
+    Extracting timeseries data from large array (shape: (1826, 161, 320)). This may take a while...
+    Time series extraction successful. Elapsed time: 38 s
 
 
 Plot timeseries
@@ -1181,5 +1132,5 @@ Plot timeseries
 
 
 
-.. image:: tut02_intro_class_ReadGridded/tut02_intro_class_ReadGridded_37_1.png
+.. image:: tut02_intro_class_ReadGridded/tut02_intro_class_ReadGridded_33_1.png
 

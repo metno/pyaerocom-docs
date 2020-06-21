@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -159,10 +159,11 @@
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Mathematical low level utility methods ofcd pyaerocom</span>
+<span class="sd">Mathematical low level utility methods of pyaerocom</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
+<span class="kn">import</span> <span class="nn">cf_units</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span><span class="p">,</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">pearsonr</span><span class="p">,</span> <span class="n">spearmanr</span><span class="p">,</span> <span class="n">kendalltau</span>
 
@@ -172,41 +173,132 @@
 <span class="c1">### OTHER FUNCTIONS</span>
 
 <div class="viewcode-block" id="weighted_sum"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.weighted_sum">[docs]</a><span class="k">def</span> <span class="nf">weighted_sum</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute weighted sum using numpy dot product&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Compute weighted sum using numpy dot product</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        data array that is supposed to be summed up</span>
+<span class="sd">    weights : ndarray</span>
+<span class="sd">        array containing weights for each point in `data`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        weighted sum of values in input array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="sum"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.sum">[docs]</a><span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Summing operation with option to perform weighted sum&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Summing operation with option to perform weighted sum</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        data array that is supposed to be summed up</span>
+<span class="sd">    weights : ndarray, optional</span>
+<span class="sd">        array containing weights for each point in `data`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float or int</span>
+<span class="sd">        sum of values in input array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">weighted_sum</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="weighted_mean"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.weighted_mean">[docs]</a><span class="k">def</span> <span class="nf">weighted_mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Weighted Mean&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">w</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span></div>
+<div class="viewcode-block" id="weighted_mean"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.weighted_mean">[docs]</a><span class="k">def</span> <span class="nf">weighted_mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute weighted mean</span>
 
-<div class="viewcode-block" id="weighted_cov"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.weighted_cov">[docs]</a><span class="k">def</span> <span class="nf">weighted_cov</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Weighted Covariance&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">weighted_mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">weighted_mean</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span></div>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        data array that is supposed to be averaged</span>
+<span class="sd">    weights : ndarray</span>
+<span class="sd">        array containing weights for each point in `data`</span>
 
-<div class="viewcode-block" id="weighted_corr"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.weighted_corr">[docs]</a><span class="k">def</span> <span class="nf">weighted_corr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Weighted Correlation&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">weighted_cov</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weighted_cov</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="n">weighted_cov</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span></div>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float or int</span>
+<span class="sd">        weighted mean of data array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="corr"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.corr">[docs]</a><span class="k">def</span> <span class="nf">corr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute correlation coefficient&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">w</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">weighted_corr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span></div>
+<div class="viewcode-block" id="weighted_cov"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.weighted_cov">[docs]</a><span class="k">def</span> <span class="nf">weighted_cov</span><span class="p">(</span><span class="n">ref_data</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute weighted covariance</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_ref : ndarray</span>
+<span class="sd">        x data</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        y data</span>
+<span class="sd">    weights : ndarray</span>
+<span class="sd">        array containing weights for each point in `data`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        covariance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">avgx</span> <span class="o">=</span> <span class="n">weighted_mean</span><span class="p">(</span><span class="n">ref_data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+    <span class="n">avgy</span> <span class="o">=</span> <span class="n">weighted_mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="p">(</span><span class="n">ref_data</span> <span class="o">-</span> <span class="n">avgx</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">avgy</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="weighted_corr"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.weighted_corr">[docs]</a><span class="k">def</span> <span class="nf">weighted_corr</span><span class="p">(</span><span class="n">ref_data</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute weighted correlation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_ref : ndarray</span>
+<span class="sd">        x data</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        y data</span>
+<span class="sd">    weights : ndarray</span>
+<span class="sd">        array containing weights for each point in `data`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">       weighted correlation coefficient</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wcovxy</span> <span class="o">=</span> <span class="n">weighted_cov</span><span class="p">(</span><span class="n">ref_data</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+
+    <span class="n">wcovxx</span> <span class="o">=</span> <span class="n">weighted_cov</span><span class="p">(</span><span class="n">ref_data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+    <span class="n">wcovyy</span> <span class="o">=</span> <span class="n">weighted_cov</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+    <span class="n">wsigmaxy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">wcovxx</span> <span class="o">*</span> <span class="n">wcovyy</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wcovxy</span> <span class="o">/</span> <span class="n">wsigmaxy</span></div>
+
+<div class="viewcode-block" id="corr"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.corr">[docs]</a><span class="k">def</span> <span class="nf">corr</span><span class="p">(</span><span class="n">ref_data</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute correlation coefficient</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_ref : ndarray</span>
+<span class="sd">        x data</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        y data</span>
+<span class="sd">    weights : ndarray, optional</span>
+<span class="sd">        array containing weights for each point in `data`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">       correlation coefficient</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">ref_data</span><span class="p">,</span> <span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">weighted_corr</span><span class="p">(</span><span class="n">ref_data</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="calc_statistics"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_statistics">[docs]</a><span class="k">def</span> <span class="nf">calc_statistics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">,</span> <span class="n">lowlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">highlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="n">min_num_valid</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                    <span class="n">min_num_valid</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calc statistical properties from two data arrays</span>
-<span class="sd">    </span>
+
 <span class="sd">    Calculates the following statistical properties based on the two provided</span>
-<span class="sd">    1-dimensional data arrays and returns them in a dictionary (keys are </span>
+<span class="sd">    1-dimensional data arrays and returns them in a dictionary (keys are</span>
 <span class="sd">    provided after the arrows):</span>
-<span class="sd">        </span>
+
 <span class="sd">        - Mean value of both arrays -&gt; refdata_mean, data_mean</span>
 <span class="sd">        - Standard deviation of both arrays -&gt; refdata_std, data_std</span>
 <span class="sd">        - RMS (Root mean square) -&gt; rms</span>
@@ -215,12 +307,12 @@
 <span class="sd">        - FGE (Fractional gross error) -&gt; fge</span>
 <span class="sd">        - R (Pearson correlation coefficient) -&gt; R</span>
 <span class="sd">        - R_spearman (Spearman corr. coeff) -&gt; R_spearman</span>
-<span class="sd">        </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    Nans are removed from the input arrays, information about no. of removed</span>
 <span class="sd">    points can be inferred from keys `totnum` and `num_valid` in return dict.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : ndarray</span>
@@ -236,39 +328,39 @@
 <span class="sd">    min_num_valid : int</span>
 <span class="sd">        minimum number of valid measurements required to compute statistical</span>
 <span class="sd">        parameters.</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        dictionary containing computed statistics    </span>
-<span class="sd">    </span>
+<span class="sd">        dictionary containing computed statistics</span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    ValueError </span>
+<span class="sd">    ValueError</span>
 <span class="sd">        if either of the input arrays has dimension other than 1</span>
-<span class="sd">        </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">ref_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ref_data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input. Data arrays must be one dimensional&#39;</span><span class="p">)</span>
-        
+
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
-    
+
     <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span> <span class="o">*</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">num_points</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    
+
     <span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-    
+
     <span class="n">ws</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>    
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="n">ws</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;NOTE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Weights were not applied to FGE and kendall and &#39;</span>
                           <span class="s1">&#39;spearman corr (not implemented)&#39;</span><span class="p">)</span>
-        
+
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;totnum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span>
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;num_valid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_points</span><span class="p">)</span>
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;refdata_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ref_data</span><span class="p">)</span>
@@ -277,7 +369,7 @@
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;data_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;weighted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ws</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">num_points</span> <span class="o">&gt;</span> <span class="n">min_num_valid</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">num_points</span> <span class="o">&gt;=</span> <span class="n">min_num_valid</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">lowlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&gt;</span><span class="n">lowlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&gt;</span><span class="n">lowlim</span><span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
@@ -286,14 +378,14 @@
             <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
             <span class="n">ref_data</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-        
+
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;rms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;fge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_spearman&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        
+
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">if</span> <span class="n">lowlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -304,50 +396,50 @@
         <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">,</span> <span class="n">ref_data</span><span class="o">&lt;</span><span class="n">highlim</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
         <span class="n">ref_data</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-    
+
     <span class="n">difference</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">ref_data</span>
-    
+
     <span class="n">diffsquare</span> <span class="o">=</span> <span class="n">difference</span><span class="o">**</span><span class="mi">2</span>
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;rms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">diffsquare</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">))</span>
-    
-    <span class="c1"># NO implementation to apply weights yet ...</span>
-    <span class="n">cr</span> <span class="o">=</span> <span class="n">corr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
 
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cr</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_spearman&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_kendall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kendalltau</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    
+    <span class="c1"># NO implementation to apply weights yet ...</span>
+
+    <span class="k">if</span> <span class="n">num_points</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">corr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_spearman&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;R_kendall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kendalltau</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
     <span class="c1"># NMB, MNMB and FGE are constrained to positive values, thus negative</span>
     <span class="c1"># values need to be removed</span>
-    <span class="n">neg_ref</span> <span class="o">=</span> <span class="n">ref_data</span> <span class="o">&lt;</span> <span class="mi">0</span>
-    <span class="n">neg_data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">&lt;</span> <span class="mi">0</span>
-    
+    <span class="n">neg_ref</span> <span class="o">=</span> <span class="n">ref_data</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+    <span class="n">neg_data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+
     <span class="n">use_indices</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">neg_data</span> <span class="o">+</span> <span class="n">neg_ref</span><span class="p">)</span>
-    
+
     <span class="n">diff_pos</span> <span class="o">=</span> <span class="n">difference</span><span class="p">[</span><span class="n">use_indices</span><span class="p">]</span>
     <span class="n">ref_data_pos</span> <span class="o">=</span> <span class="n">ref_data</span><span class="p">[</span><span class="n">use_indices</span><span class="p">]</span>
     <span class="n">data_pos</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">use_indices</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">use_indices</span><span class="p">]</span>
-    
+
     <span class="n">num_points_pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_pos</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">num_points_pos</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;fge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">diff_pos</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span> <span class="o">/</span> 
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">diff_pos</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span> <span class="o">/</span>
                          <span class="nb">sum</span><span class="p">(</span><span class="n">ref_data_pos</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">))</span> <span class="c1">#*100.</span>
-        
+
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">diff_pos</span> <span class="o">/</span> <span class="p">(</span><span class="n">data_pos</span> <span class="o">+</span> <span class="n">ref_data_pos</span><span class="p">)</span>
-        
+
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">num_points_pos</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span><span class="c1"># * 100.</span>
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;fge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">num_points_pos</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span> <span class="c1">#* 100.</span>
-        
+
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;num_neg_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">neg_data</span><span class="p">)</span>
     <span class="n">result</span><span class="p">[</span><span class="s1">&#39;num_neg_refdata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">neg_ref</span><span class="p">)</span>
- 
+
     <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="closest_index"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.closest_index">[docs]</a><span class="k">def</span> <span class="nf">closest_index</span><span class="p">(</span><span class="n">num_array</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -356,22 +448,22 @@
 
 <div class="viewcode-block" id="numbers_in_str"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.numbers_in_str">[docs]</a><span class="k">def</span> <span class="nf">numbers_in_str</span><span class="p">(</span><span class="n">input_string</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This method finds all numbers in a string</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    - Beta version, please use with care</span>
 <span class="sd">    - Detects only integer numbers, dots are ignored</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    input_string : str</span>
 <span class="sd">        string containing numbers</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list</span>
 <span class="sd">        list of strings specifying all numbers detected in string</span>
-<span class="sd">        </span>
+
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; numbers_in_str(&#39;Bla42Blub100&#39;)</span>
@@ -388,36 +480,36 @@
                 <span class="n">c_num</span> <span class="o">=</span> <span class="n">char</span>
             <span class="k">elif</span> <span class="n">IN_NUM</span><span class="p">:</span>
                 <span class="n">c_num</span> <span class="o">+=</span> <span class="n">char</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">IN_NUM</span><span class="p">:</span>
                 <span class="n">numbers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_num</span><span class="p">)</span>
             <span class="n">IN_NUM</span><span class="o">=</span><span class="kc">False</span>
     <span class="k">if</span> <span class="n">IN_NUM</span><span class="p">:</span>
         <span class="n">numbers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_num</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">numbers</span>    </div>
-    
+    <span class="k">return</span> <span class="n">numbers</span></div>
+
 <div class="viewcode-block" id="calc_ang4487aer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_ang4487aer">[docs]</a><span class="k">def</span> <span class="nf">calc_ang4487aer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute Angstrom coefficient (440-870nm) from 440 and 870 nm AODs</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : dict-like</span>
 <span class="sd">        data object containing imported results</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
-<span class="sd">    Requires the following two variables to be available in provided data </span>
+<span class="sd">    Requires the following two variables to be available in provided data</span>
 <span class="sd">    object:</span>
-<span class="sd">        </span>
+
 <span class="sd">        1. od440aer</span>
 <span class="sd">        2. od870aer</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
 <span class="sd">        array containing computed angstrom coefficients</span>
-<span class="sd">    </span>
-<span class="sd">    Raises </span>
+
+<span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    AttributError</span>
 <span class="sd">        if either &#39;od440aer&#39; or &#39;od870aer&#39; are not available in data object</span>
@@ -430,92 +522,91 @@
 
 <div class="viewcode-block" id="calc_od550aer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_od550aer">[docs]</a><span class="k">def</span> <span class="nf">calc_od550aer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute AOD at 550 nm using Angstrom coefficient and 500 nm AOD</span>
-<span class="sd">        </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : dict-like</span>
 <span class="sd">        data object containing imported results</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        AOD(s) at shifted wavelength</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> 
-                           <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> 
-                           <span class="n">to_lambda</span><span class="o">=.</span><span class="mi">55</span><span class="p">,</span> 
-                           <span class="n">od_ref</span><span class="o">=</span><span class="s1">&#39;od500aer&#39;</span><span class="p">,</span> 
-                           <span class="n">lambda_ref</span><span class="o">=.</span><span class="mi">50</span><span class="p">,</span> 
-                           <span class="n">od_ref_alt</span><span class="o">=</span><span class="s1">&#39;od440aer&#39;</span><span class="p">,</span> 
+    <span class="k">return</span> <span class="n">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                           <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
+                           <span class="n">to_lambda</span><span class="o">=.</span><span class="mi">55</span><span class="p">,</span>
+                           <span class="n">od_ref</span><span class="o">=</span><span class="s1">&#39;od500aer&#39;</span><span class="p">,</span>
+                           <span class="n">lambda_ref</span><span class="o">=.</span><span class="mi">50</span><span class="p">,</span>
+                           <span class="n">od_ref_alt</span><span class="o">=</span><span class="s1">&#39;od440aer&#39;</span><span class="p">,</span>
                            <span class="n">lambda_ref_alt</span><span class="o">=.</span><span class="mi">44</span><span class="p">,</span>
                            <span class="n">use_angstrom_coeff</span><span class="o">=</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="calc_abs550aer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_abs550aer">[docs]</a><span class="k">def</span> <span class="nf">calc_abs550aer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute AOD at 550 nm using Angstrom coefficient and 500 nm AOD</span>
-<span class="sd">        </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : dict-like</span>
 <span class="sd">        data object containing imported results</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        AOD(s) at shifted wavelength</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> 
-                           <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;abs550aer&#39;</span><span class="p">,</span> 
-                           <span class="n">to_lambda</span><span class="o">=.</span><span class="mi">55</span><span class="p">,</span> 
-                           <span class="n">od_ref</span><span class="o">=</span><span class="s1">&#39;abs500aer&#39;</span><span class="p">,</span> 
-                           <span class="n">lambda_ref</span><span class="o">=.</span><span class="mi">50</span><span class="p">,</span> 
-                           <span class="n">od_ref_alt</span><span class="o">=</span><span class="s1">&#39;abs440aer&#39;</span><span class="p">,</span> 
+    <span class="k">return</span> <span class="n">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                           <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;abs550aer&#39;</span><span class="p">,</span>
+                           <span class="n">to_lambda</span><span class="o">=.</span><span class="mi">55</span><span class="p">,</span>
+                           <span class="n">od_ref</span><span class="o">=</span><span class="s1">&#39;abs500aer&#39;</span><span class="p">,</span>
+                           <span class="n">lambda_ref</span><span class="o">=.</span><span class="mi">50</span><span class="p">,</span>
+                           <span class="n">od_ref_alt</span><span class="o">=</span><span class="s1">&#39;abs440aer&#39;</span><span class="p">,</span>
                            <span class="n">lambda_ref_alt</span><span class="o">=.</span><span class="mi">44</span><span class="p">,</span>
                            <span class="n">use_angstrom_coeff</span><span class="o">=</span><span class="s1">&#39;angabs4487aer&#39;</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="calc_od550gt1aer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_od550gt1aer">[docs]</a><span class="k">def</span> <span class="nf">calc_od550gt1aer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute coarse mode AOD at 550 nm using Angstrom coeff. and 500 nm AOD</span>
-<span class="sd">        </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : dict-like</span>
 <span class="sd">        data object containing imported results</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        AOD(s) at shifted wavelength</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> 
-                           <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550gt1aer&#39;</span><span class="p">,</span> 
-                           <span class="n">to_lambda</span><span class="o">=.</span><span class="mi">55</span><span class="p">,</span> 
-                           <span class="n">od_ref</span><span class="o">=</span><span class="s1">&#39;od500gt1aer&#39;</span><span class="p">,</span> 
+    <span class="k">return</span> <span class="n">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                           <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550gt1aer&#39;</span><span class="p">,</span>
+                           <span class="n">to_lambda</span><span class="o">=.</span><span class="mi">55</span><span class="p">,</span>
+                           <span class="n">od_ref</span><span class="o">=</span><span class="s1">&#39;od500gt1aer&#39;</span><span class="p">,</span>
                            <span class="n">lambda_ref</span><span class="o">=.</span><span class="mi">50</span><span class="p">,</span>
                            <span class="n">use_angstrom_coeff</span><span class="o">=</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="calc_od550lt1aer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.calc_od550lt1aer">[docs]</a><span class="k">def</span> <span class="nf">calc_od550lt1aer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute fine mode AOD at 550 nm using Angstrom coeff. and 500 nm AOD</span>
-<span class="sd">        </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : dict-like</span>
 <span class="sd">        data object containing imported results</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        AOD(s) at shifted wavelength</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> 
-                           <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550lt1aer&#39;</span><span class="p">,</span> 
-                           <span class="n">to_lambda</span><span class="o">=.</span><span class="mi">55</span><span class="p">,</span> 
-                           <span class="n">od_ref</span><span class="o">=</span><span class="s1">&#39;od500lt1aer&#39;</span><span class="p">,</span> 
+    <span class="k">return</span> <span class="n">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                           <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550lt1aer&#39;</span><span class="p">,</span>
+                           <span class="n">to_lambda</span><span class="o">=.</span><span class="mi">55</span><span class="p">,</span>
+                           <span class="n">od_ref</span><span class="o">=</span><span class="s1">&#39;od500lt1aer&#39;</span><span class="p">,</span>
                            <span class="n">lambda_ref</span><span class="o">=.</span><span class="mi">50</span><span class="p">,</span>
                            <span class="n">use_angstrom_coeff</span><span class="o">=</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">)</span></div>
-        
-    
+
 <div class="viewcode-block" id="compute_angstrom_coeff"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_angstrom_coeff">[docs]</a><span class="k">def</span> <span class="nf">compute_angstrom_coeff</span><span class="p">(</span><span class="n">od1</span><span class="p">,</span> <span class="n">od2</span><span class="p">,</span> <span class="n">lambda1</span><span class="p">,</span> <span class="n">lambda2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute Angstrom coefficient based on 2 optical densities</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    od1 : :obj:`float` or :obj:`ndarray`</span>
@@ -526,7 +617,7 @@
 <span class="sd">        wavelength 1</span>
 <span class="sd">    lambda 2 : :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        wavelength 2</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :obj:`float` or :obj:`ndarray`</span>
@@ -534,13 +625,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">od1</span> <span class="o">/</span> <span class="n">od2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda1</span> <span class="o">/</span> <span class="n">lambda2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="compute_od_from_angstromexp"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_od_from_angstromexp">[docs]</a><span class="k">def</span> <span class="nf">compute_od_from_angstromexp</span><span class="p">(</span><span class="n">to_lambda</span><span class="p">,</span> <span class="n">od_ref</span><span class="p">,</span> <span class="n">lambda_ref</span><span class="p">,</span> 
+<div class="viewcode-block" id="compute_od_from_angstromexp"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_od_from_angstromexp">[docs]</a><span class="k">def</span> <span class="nf">compute_od_from_angstromexp</span><span class="p">(</span><span class="n">to_lambda</span><span class="p">,</span> <span class="n">od_ref</span><span class="p">,</span> <span class="n">lambda_ref</span><span class="p">,</span>
                                  <span class="n">angstrom_coeff</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute AOD at specified wavelength </span>
-<span class="sd">    </span>
-<span class="sd">    Uses Angstrom coefficient and reference AOD to compute the </span>
+    <span class="sd">&quot;&quot;&quot;Compute AOD at specified wavelength</span>
+
+<span class="sd">    Uses Angstrom coefficient and reference AOD to compute the</span>
 <span class="sd">    corresponding wavelength shifted AOD</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    to_lambda : :obj:`float` or :obj:`ndarray`</span>
@@ -551,27 +642,27 @@
 <span class="sd">        wavelength corresponding to reference AOD</span>
 <span class="sd">    angstrom_coeff : :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        Angstrom coefficient</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        AOD(s) at shifted wavelength</span>
-<span class="sd">    </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">od_ref</span> <span class="o">*</span> <span class="p">(</span><span class="n">lambda_ref</span> <span class="o">/</span> <span class="n">to_lambda</span><span class="p">)</span> <span class="o">**</span> <span class="n">angstrom_coeff</span></div>
 
-<span class="k">def</span> <span class="nf">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">to_lambda</span><span class="p">,</span> <span class="n">od_ref</span><span class="p">,</span> <span class="n">lambda_ref</span><span class="p">,</span> 
-                    <span class="n">od_ref_alt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_ref_alt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+<span class="k">def</span> <span class="nf">_calc_od_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">to_lambda</span><span class="p">,</span> <span class="n">od_ref</span><span class="p">,</span> <span class="n">lambda_ref</span><span class="p">,</span>
+                    <span class="n">od_ref_alt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_ref_alt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">use_angstrom_coeff</span><span class="o">=</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Helper method for computing ODs</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : dict-like</span>
 <span class="sd">        data object containing loaded results used to compute the ODs at a new</span>
 <span class="sd">        wavelength</span>
 <span class="sd">    var_name : str</span>
-<span class="sd">        name of variable that is supposed to be computed (is used in order to </span>
+<span class="sd">        name of variable that is supposed to be computed (is used in order to</span>
 <span class="sd">        see whether a global lower threshold is defined for this variable and</span>
 <span class="sd">        if this is the case, all computed values that are below this threshold</span>
 <span class="sd">        are replaced with NaNs)</span>
@@ -582,18 +673,18 @@
 <span class="sd">    lambda_ref : :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        wavelength corresponding to reference AOD</span>
 <span class="sd">    od_ref_alt : :obj:`float` or :obj:`ndarray`, optional</span>
-<span class="sd">        alternative reference AOD (is used for datapoints where former is </span>
+<span class="sd">        alternative reference AOD (is used for datapoints where former is</span>
 <span class="sd">        invalid)</span>
 <span class="sd">    lambda_ref_alt : :obj:`float` or :obj:`ndarray`, optional</span>
 <span class="sd">        wavelength corresponding to alternative reference AOD</span>
 <span class="sd">    use_angstrom_coeff : str</span>
 <span class="sd">        name of Angstrom coefficient in data, that is used for computation</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :obj:`float` or :obj:`ndarray`</span>
 <span class="sd">        AOD(s) at shifted wavelength</span>
-<span class="sd">        </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    AttributeError</span>
@@ -606,151 +697,143 @@
         <span class="k">if</span> <span class="n">od_ref_alt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">od_ref_alt</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;No alternative OD found for computation of &#39;</span>
                                  <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">compute_od_from_angstromexp</span><span class="p">(</span><span class="n">to_lambda</span><span class="o">=</span><span class="n">to_lambda</span><span class="p">,</span> 
+        <span class="k">return</span> <span class="n">compute_od_from_angstromexp</span><span class="p">(</span><span class="n">to_lambda</span><span class="o">=</span><span class="n">to_lambda</span><span class="p">,</span>
                                            <span class="n">od_ref</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">od_ref_alt</span><span class="p">],</span>
-                                           <span class="n">lambda_ref</span><span class="o">=</span><span class="n">lambda_ref_alt</span><span class="p">,</span> 
+                                           <span class="n">lambda_ref</span><span class="o">=</span><span class="n">lambda_ref_alt</span><span class="p">,</span>
                                            <span class="n">angstrom_coeff</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">use_angstrom_coeff</span><span class="p">])</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">use_angstrom_coeff</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Angstrom coefficient (440-870 nm) is not &quot;</span>
                              <span class="s2">&quot;available in provided data&quot;</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">compute_od_from_angstromexp</span><span class="p">(</span><span class="n">to_lambda</span><span class="o">=</span><span class="n">to_lambda</span><span class="p">,</span> 
+    <span class="n">result</span> <span class="o">=</span> <span class="n">compute_od_from_angstromexp</span><span class="p">(</span><span class="n">to_lambda</span><span class="o">=</span><span class="n">to_lambda</span><span class="p">,</span>
                                           <span class="n">od_ref</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">od_ref</span><span class="p">],</span>
-                                          <span class="n">lambda_ref</span><span class="o">=</span><span class="n">lambda_ref</span><span class="p">,</span> 
+                                          <span class="n">lambda_ref</span><span class="o">=</span><span class="n">lambda_ref</span><span class="p">,</span>
                                           <span class="n">angstrom_coeff</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">use_angstrom_coeff</span><span class="p">])</span>
     <span class="c1"># optional if available</span>
     <span class="k">if</span> <span class="n">od_ref_alt</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
         <span class="c1"># fill up time steps that are nans with values calculated from the</span>
         <span class="c1"># alternative wavelength to minimise gaps in the time series</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1">#there are nans</span>
             <span class="n">ods_alt</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">od_ref_alt</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span>
             <span class="n">ang</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">use_angstrom_coeff</span><span class="p">][</span><span class="n">mask</span><span class="p">]</span>
-            <span class="n">replace</span> <span class="o">=</span> <span class="n">compute_od_from_angstromexp</span><span class="p">(</span><span class="n">to_lambda</span><span class="o">=</span><span class="n">to_lambda</span><span class="p">,</span> 
+            <span class="n">replace</span> <span class="o">=</span> <span class="n">compute_od_from_angstromexp</span><span class="p">(</span><span class="n">to_lambda</span><span class="o">=</span><span class="n">to_lambda</span><span class="p">,</span>
                                                     <span class="n">od_ref</span><span class="o">=</span><span class="n">ods_alt</span><span class="p">,</span>
-                                                    <span class="n">lambda_ref</span><span class="o">=</span><span class="n">lambda_ref_alt</span><span class="p">,</span> 
+                                                    <span class="n">lambda_ref</span><span class="o">=</span><span class="n">lambda_ref_alt</span><span class="p">,</span>
                                                     <span class="n">angstrom_coeff</span><span class="o">=</span><span class="n">ang</span><span class="p">)</span>
             <span class="n">result</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">replace</span>
-    
-    <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># now replace all values with NaNs that are below the global lower threshold</span>
-        <span class="n">below_thresh</span> <span class="o">=</span> <span class="n">result</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;minimum&#39;</span><span class="p">]</span>
-        <span class="n">result</span><span class="p">[</span><span class="n">below_thresh</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not access lower limit from global settings for &quot;</span>
-                       <span class="s2">&quot;variable </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
-    
+
     <span class="k">return</span> <span class="n">result</span>
 
 <div class="viewcode-block" id="compute_ang4470dryaer_from_dry_scat"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_ang4470dryaer_from_dry_scat">[docs]</a><span class="k">def</span> <span class="nf">compute_ang4470dryaer_from_dry_scat</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute angstrom exponent between 440 and 700 nm </span>
-<span class="sd">    </span>
+    <span class="sd">&quot;&quot;&quot;Compute angstrom exponent between 440 and 700 nm</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    StationData or dict</span>
 <span class="sd">        data containing dry scattering coefficients at 440 and 700 nm</span>
-<span class="sd">        (i.e. keys scatc440dryaer and scatc700dryaer)</span>
-<span class="sd">    </span>
+<span class="sd">        (i.e. keys sc440dryaer and sc700dryaer)</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    StationData or dict</span>
 <span class="sd">        extended data object containing angstrom exponent</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">compute_angstrom_coeff</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;scatc440dryaer&#39;</span><span class="p">],</span>
-                                  <span class="n">data</span><span class="p">[</span><span class="s1">&#39;scatc700dryaer&#39;</span><span class="p">],</span>
+    <span class="k">return</span> <span class="n">compute_angstrom_coeff</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;sc440dryaer&#39;</span><span class="p">],</span>
+                                  <span class="n">data</span><span class="p">[</span><span class="s1">&#39;sc700dryaer&#39;</span><span class="p">],</span>
                                   <span class="mi">440</span><span class="p">,</span> <span class="mi">700</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="compute_scatc550dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_scatc550dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_scatc550dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_sc550dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_sc550dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_sc550dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute dry scattering coefficent applying RH threshold</span>
-<span class="sd">    </span>
+
 <span class="sd">    Cf. :func:`_compute_dry_helper`</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dict</span>
 <span class="sd">        data object containing scattering and RH data</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    dict </span>
-<span class="sd">        modified data object containing new column scatc550dryaer</span>
-<span class="sd">    </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;scatc550dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
-    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> 
-                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scatcrh&#39;</span><span class="p">,</span> 
-                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="compute_scatc440dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_scatc440dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_scatc440dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Compute dry scattering coefficent applying RH threshold</span>
-<span class="sd">    </span>
-<span class="sd">    Cf. :func:`_compute_dry_helper`</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
 <span class="sd">    dict</span>
-<span class="sd">        data object containing scattering and RH data</span>
-<span class="sd">    </span>
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    dict </span>
-<span class="sd">        modified data object containing new column scatc550dryaer</span>
-<span class="sd">    </span>
+<span class="sd">        modified data object containing new column sc550dryaer</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;scatc440dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
-    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;scatc440aer&#39;</span><span class="p">,</span> 
-                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scatcrh&#39;</span><span class="p">,</span> 
+    <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;sc550dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
+    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;sc550aer&#39;</span><span class="p">,</span>
+                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scrh&#39;</span><span class="p">,</span>
                                <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="compute_scatc700dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_scatc700dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_scatc700dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_sc440dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_sc440dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_sc440dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute dry scattering coefficent applying RH threshold</span>
-<span class="sd">    </span>
+
 <span class="sd">    Cf. :func:`_compute_dry_helper`</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dict</span>
 <span class="sd">        data object containing scattering and RH data</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    dict </span>
-<span class="sd">        modified data object containing new column scatc550dryaer</span>
-<span class="sd">    </span>
+<span class="sd">    dict</span>
+<span class="sd">        modified data object containing new column sc550dryaer</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;scatc700dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
-    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;scatc700aer&#39;</span><span class="p">,</span> 
-                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scatcrh&#39;</span><span class="p">,</span> 
+    <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;sc440dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
+    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;sc440aer&#39;</span><span class="p">,</span>
+                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scrh&#39;</span><span class="p">,</span>
                                <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="compute_absc550dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_absc550dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_absc550dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+
+<div class="viewcode-block" id="compute_sc700dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_sc700dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_sc700dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute dry scattering coefficent applying RH threshold</span>
+
+<span class="sd">    Cf. :func:`_compute_dry_helper`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dict</span>
+<span class="sd">        data object containing scattering and RH data</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        modified data object containing new column sc550dryaer</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;sc700dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
+    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;sc700aer&#39;</span><span class="p">,</span>
+                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scrh&#39;</span><span class="p">,</span>
+                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="compute_ac550dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_ac550dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_ac550dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute aerosol dry absorption coefficent applying RH threshold</span>
-<span class="sd">    </span>
+
 <span class="sd">    Cf. :func:`_compute_dry_helper`</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dict</span>
 <span class="sd">        data object containing scattering and RH data</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    dict </span>
-<span class="sd">        modified data object containing new column scatc550dryaer</span>
-<span class="sd">    </span>
+<span class="sd">    dict</span>
+<span class="sd">        modified data object containing new column sc550dryaer</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;absc550dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
-    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;absc550aer&#39;</span><span class="p">,</span> 
-                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;abscrh&#39;</span><span class="p">,</span> 
+    <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;ac550dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
+    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;ac550aer&#39;</span><span class="p">,</span>
+                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;acrh&#39;</span><span class="p">,</span>
                                <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
-    
-<span class="k">def</span> <span class="nf">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="p">,</span> <span class="n">rh_colname</span><span class="p">,</span> 
+
+<span class="k">def</span> <span class="nf">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="p">,</span> <span class="n">rh_colname</span><span class="p">,</span>
                         <span class="n">rh_max_percent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute new column that contains data where RH is smaller than ...</span>
-<span class="sd">    </span>
-<span class="sd">    All values in original data columns are set to NaN, where RH exceeds a </span>
+
+<span class="sd">    All values in original data columns are set to NaN, where RH exceeds a</span>
 <span class="sd">    certain threshold or where RH is NaN.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : dict-like</span>
@@ -761,39 +844,89 @@
 <span class="sd">        column name of RH data</span>
 <span class="sd">    rh_max_percent : int</span>
 <span class="sd">        maximum relative humidity</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        modified data dictionary with new dry data column </span>
+<span class="sd">        modified data dictionary with new dry data column</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">rh_max_percent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rh_max_percent</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">RH_MAX_PERCENT_DRY</span>
-        
+
     <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">data_colname</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">rh</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">rh_colname</span><span class="p">]</span>
-    
+
     <span class="n">high_rh</span> <span class="o">=</span> <span class="n">rh</span> <span class="o">&gt;</span> <span class="n">rh_max_percent</span>
-    
+
     <span class="n">vals</span><span class="p">[</span><span class="n">high_rh</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">vals</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rh</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    
+
     <span class="k">return</span> <span class="n">vals</span>
-    
+
+<div class="viewcode-block" id="vmrx_to_concx"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.vmrx_to_concx">[docs]</a><span class="k">def</span> <span class="nf">vmrx_to_concx</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">p_pascal</span><span class="p">,</span> <span class="n">T_kelvin</span><span class="p">,</span> <span class="n">vmr_unit</span><span class="p">,</span> <span class="n">mmol_var</span><span class="p">,</span> <span class="n">mmol_air</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">to_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert volume mixing ratio (vmr) to mass concentration</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : float or ndarray</span>
+<span class="sd">        array containing vmr values</span>
+<span class="sd">    p_pascal : float</span>
+<span class="sd">        pressure in Pa of input data</span>
+<span class="sd">    T_kelvin : float</span>
+<span class="sd">        temperature in K of input data</span>
+<span class="sd">    vmr_unit : str</span>
+<span class="sd">        unit of input data</span>
+<span class="sd">    mmol_var : float</span>
+<span class="sd">        molar mass of variable represented by input data</span>
+<span class="sd">    mmol_air : float, optional</span>
+<span class="sd">        Molar mass of air. Uses average density of dry air if None.</span>
+<span class="sd">        The default is None.</span>
+<span class="sd">    to_unit : str, optional</span>
+<span class="sd">        Unit to which output data is converted. If None, output unit is</span>
+<span class="sd">        kg m-3. The default is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float or ndarray</span>
+<span class="sd">        input data converted to mass concentration</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mmol_air</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.molmasses</span> <span class="kn">import</span> <span class="n">get_molmass</span>
+        <span class="n">mmol_air</span> <span class="o">=</span> <span class="n">get_molmass</span><span class="p">(</span><span class="s1">&#39;air_dry&#39;</span><span class="p">)</span>
+
+    <span class="n">Rspecific</span> <span class="o">=</span> <span class="mf">287.058</span> <span class="c1"># J kg-1 K-1</span>
+
+    <span class="n">conversion_fac</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">cf_units</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;mol mol-1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmr_unit</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     if conversion_fac != 1:</span>
+<span class="c1">#         data *= conversion_fac #/ conversion_fac</span>
+<span class="c1"># =============================================================================</span>
+    <span class="n">airdensity</span> <span class="o">=</span> <span class="n">p_pascal</span><span class="o">/</span><span class="p">(</span><span class="n">Rspecific</span> <span class="o">*</span> <span class="n">T_kelvin</span><span class="p">)</span> <span class="c1"># kg m-3</span>
+    <span class="n">mulfac</span> <span class="o">=</span> <span class="n">mmol_var</span> <span class="o">/</span> <span class="n">mmol_air</span> <span class="o">*</span> <span class="n">airdensity</span> <span class="c1"># kg m-3</span>
+    <span class="n">conc</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">mulfac</span> <span class="c1"># kg m-3</span>
+    <span class="k">if</span> <span class="n">to_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">conversion_fac</span> <span class="o">*=</span> <span class="n">cf_units</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;kg m-3&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">conversion_fac</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
+        <span class="n">conc</span> <span class="o">*=</span> <span class="n">conversion_fac</span>
+    <span class="k">return</span> <span class="n">conc</span></div>
+
 <div class="viewcode-block" id="exponent"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.exponent">[docs]</a><span class="k">def</span> <span class="nf">exponent</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get exponent of input number</span>
-<span class="sd">        </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    num : :obj:`float` or iterable</span>
 <span class="sd">        input number</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :obj:`int` or :obj:`ndarray` containing ints</span>
 <span class="sd">        exponent of input number(s)</span>
-<span class="sd">        </span>
+
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; from pyaerocom.mathutils import exponent</span>
@@ -804,29 +937,29 @@
 
 <div class="viewcode-block" id="range_magnitude"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.range_magnitude">[docs]</a><span class="k">def</span> <span class="nf">range_magnitude</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns magnitude of value range</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    low : float</span>
 <span class="sd">        lower end of range</span>
 <span class="sd">    high : float</span>
 <span class="sd">        upper end of range</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    int</span>
 <span class="sd">        magnitudes spanned by input numbers</span>
-<span class="sd">    </span>
+
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    </span>
+
 <span class="sd">    &gt;&gt;&gt; range_magnitude(0.1, 100)</span>
 <span class="sd">    3</span>
 <span class="sd">    &gt;&gt;&gt; range_magnitude(100, 0.1)</span>
 <span class="sd">    -3</span>
 <span class="sd">    &gt;&gt;&gt; range_magnitude(1e-3, 1e6)</span>
 <span class="sd">    9</span>
-<span class="sd">    </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">exponent</span><span class="p">(</span><span class="n">high</span><span class="p">)</span> <span class="o">-</span> <span class="n">exponent</span><span class="p">(</span><span class="n">low</span><span class="p">)</span></div>
 
@@ -836,39 +969,38 @@
     <span class="c1">#print(numbers_in_str(&#39;Bla42Blub100&#39;))</span>
     <span class="c1">#run tests in all docstrings</span>
     <span class="c1">#doctest.testmod()</span>
-    
+
     <span class="n">mod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
     <span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
-    
+
     <span class="n">weights</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
-    
+
     <span class="n">mod</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">obs</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
-    
+
     <span class="n">c1</span> <span class="o">=</span> <span class="n">calc_statistics</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">obs</span><span class="p">)</span>
     <span class="n">c2</span> <span class="o">=</span> <span class="n">calc_statistics</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
-    
+
     <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
-    
+
     <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
-    
+
     <span class="n">obs</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span>
-    
+
     <span class="n">c1</span> <span class="o">=</span> <span class="n">calc_statistics</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">obs</span><span class="p">)</span>
     <span class="n">c2</span> <span class="o">=</span> <span class="n">calc_statistics</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
-    
-    <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
-    
-    <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="s1">&#39;nmb&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="s1">&#39;mnmb&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="n">wm</span> <span class="o">=</span> <span class="n">weighted_mean</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">wm</span><span class="p">)</span>
+
+    <span class="n">wcov</span> <span class="o">=</span> <span class="n">weighted_cov</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">wcov</span><span class="p">)</span>
 </pre></div>
 
            </div>

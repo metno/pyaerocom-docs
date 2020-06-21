@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -159,13 +159,13 @@
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">High level module containing analysis classes and methods to perform </span>
+<span class="sd">High level module containing analysis classes and methods to perform</span>
 <span class="sd">colocation.</span>
 
 <span class="sd">NOTE</span>
 <span class="sd">----</span>
 
-<span class="sd">This module will be deprecated soon but most of the code will be refactored </span>
+<span class="sd">This module will be deprecated soon but most of the code will be refactored</span>
 <span class="sd">into colocation.py module.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
@@ -174,31 +174,33 @@
 <span class="kn">import</span> <span class="nn">traceback</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">BrowseDict</span><span class="p">,</span> <span class="n">chk_make_subdir</span>
-<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span><span class="p">,</span> <span class="n">print_log</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">to_pandas_timestamp</span><span class="p">,</span> <span class="n">to_datestring_YYYYMMDD</span><span class="p">,</span>
-                               <span class="n">get_lowest_resolution</span><span class="p">,</span> <span class="n">start_stop</span><span class="p">)</span>
+                               <span class="n">get_lowest_resolution</span><span class="p">,</span> <span class="n">start_stop</span><span class="p">,</span>
+                               <span class="n">varlist_aerocom</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="kn">import</span> <span class="n">get_all_supported_ids_ungridded</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.colocation</span> <span class="kn">import</span> <span class="p">(</span><span class="n">colocate_gridded_gridded</span><span class="p">,</span>
                                   <span class="n">colocate_gridded_ungridded</span><span class="p">,</span>
                                   <span class="n">correct_model_stp_coldata</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">ColocatedData</span><span class="p">,</span> <span class="n">print_log</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.colocateddata</span> <span class="kn">import</span> <span class="n">ColocatedData</span>
+
+<span class="kn">from</span> <span class="nn">pyaerocom.filter</span> <span class="kn">import</span> <span class="n">Filter</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="kn">import</span> <span class="n">ReadUngridded</span><span class="p">,</span> <span class="n">ReadGridded</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DataCoverageError</span><span class="p">,</span>
-                                  <span class="n">TemporalResolutionError</span><span class="p">,</span>
-                                  <span class="n">VarNotAvailableError</span><span class="p">)</span>
-                   
+                                  <span class="n">TemporalResolutionError</span><span class="p">)</span>
+
 <div class="viewcode-block" id="ColocationSetup"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.ColocationSetup">[docs]</a><span class="k">class</span> <span class="nc">ColocationSetup</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Setup class for model / obs intercomparison</span>
-<span class="sd">    </span>
+
 <span class="sd">    An instance of this setup class can be used to run a colocation analysis</span>
-<span class="sd">    between a model and an observation network and will create a number of </span>
+<span class="sd">    between a model and an observation network and will create a number of</span>
 <span class="sd">    :class:`pya.ColocatedData` instances and save them as netCDF file.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    This is a very first draft and will likely undergo significant changes</span>
-<span class="sd">    </span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model_id : str</span>
@@ -206,82 +208,82 @@
 <span class="sd">    obs_id : str</span>
 <span class="sd">        ID of observation network to be used</span>
 <span class="sd">    obs_vars : :obj:`str` or :obj:`list`, optional</span>
-<span class="sd">        variables to be analysed. If any of the provided variables to be </span>
-<span class="sd">        analysed in the model data is not available in obsdata, the obsdata </span>
+<span class="sd">        variables to be analysed. If any of the provided variables to be</span>
+<span class="sd">        analysed in the model data is not available in obsdata, the obsdata</span>
 <span class="sd">        will be checked against potential alternative variables which are</span>
-<span class="sd">        specified in :attr:`model_use_vars` and which can be specified in form of a </span>
+<span class="sd">        specified in :attr:`model_use_vars` and which can be specified in form of a</span>
 <span class="sd">        dictionary for each . If None, all</span>
 <span class="sd">        variables are analysed that are available both in model and obsdata.</span>
-<span class="sd">    ts_type </span>
+<span class="sd">    ts_type</span>
 <span class="sd">        string specifying colocation frequency</span>
-<span class="sd">    start </span>
-<span class="sd">        start time. Input can be anything that can be converted into </span>
-<span class="sd">        :class:`pandas.Timestamp` using </span>
+<span class="sd">    start</span>
+<span class="sd">        start time. Input can be anything that can be converted into</span>
+<span class="sd">        :class:`pandas.Timestamp` using</span>
 <span class="sd">        :func:`pyaerocom.helpers.to_pandas_timestamp`. If None, than the first</span>
 <span class="sd">        available date in the model data is used.</span>
 <span class="sd">    stop</span>
-<span class="sd">        stop time. Anything that can be converted into </span>
-<span class="sd">        :class:`pandas.Timestamp` using </span>
+<span class="sd">        stop time. Anything that can be converted into</span>
+<span class="sd">        :class:`pandas.Timestamp` using</span>
 <span class="sd">        :func:`pyaerocom.helpers.to_pandas_timestamp` or None. If None and if</span>
 <span class="sd">        ``start`` is on resolution of year (e.g. ``start=2010``) then ``stop``</span>
-<span class="sd">        will be automatically set to the end of that year. Else, it will be </span>
+<span class="sd">        will be automatically set to the end of that year. Else, it will be</span>
 <span class="sd">        set to the last available timestamp in the model data.</span>
 <span class="sd">    filter_name : str</span>
 <span class="sd">        name of filter to be applied. If None, AeroCom default is used</span>
 <span class="sd">        (i.e. `pyaerocom.const.DEFAULT_REG_FILTER`)</span>
 <span class="sd">    regrid_res_deg : :obj:`int`, optional</span>
-<span class="sd">        resolution in degrees for regridding of model grid (done before </span>
+<span class="sd">        resolution in degrees for regridding of model grid (done before</span>
 <span class="sd">        colocation)</span>
 <span class="sd">    remove_outliers : bool</span>
-<span class="sd">        if True, outliers are removed from model and obs data before colocation, </span>
+<span class="sd">        if True, outliers are removed from model and obs data before colocation,</span>
 <span class="sd">        else not.</span>
 <span class="sd">    vert_scheme : :obj:`str`, optional</span>
 <span class="sd">        vertical scheme used for colocation</span>
 <span class="sd">    harmonise_units : bool</span>
 <span class="sd">        if True, units are attempted to be harmonised (note: raises Exception</span>
-<span class="sd">        if True and units cannot be harmonised).    </span>
+<span class="sd">        if True and units cannot be harmonised).</span>
 <span class="sd">    model_use_vars : :obj:`dict`, optional</span>
-<span class="sd">        dictionary that specifies mapping of model variables. Keys are </span>
-<span class="sd">        observation variables, values are the corresponding model variables </span>
-<span class="sd">        (e.g. model_use_vars=dict(od550aer=&#39;od550csaer&#39;)). Example: your </span>
-<span class="sd">        observation has var *od550aer* but your model model uses a different </span>
-<span class="sd">        variable name for that variable, say *od550*. Then, you can specify </span>
-<span class="sd">        this via `model_use_vars = {&#39;od550aer&#39; : &#39;od550&#39;}. NOTE: in this case, </span>
+<span class="sd">        dictionary that specifies mapping of model variables. Keys are</span>
+<span class="sd">        observation variables, values are the corresponding model variables</span>
+<span class="sd">        (e.g. model_use_vars=dict(od550aer=&#39;od550csaer&#39;)). Example: your</span>
+<span class="sd">        observation has var *od550aer* but your model model uses a different</span>
+<span class="sd">        variable name for that variable, say *od550*. Then, you can specify</span>
+<span class="sd">        this via `model_use_vars = {&#39;od550aer&#39; : &#39;od550&#39;}. NOTE: in this case,</span>
 <span class="sd">        a model variable *od550aer* will be ignored, even if it exists</span>
 <span class="sd">        (cf :attr:`model_add_vars`).</span>
 <span class="sd">    model_read_aux : :obj:`dict`, optional</span>
 <span class="sd">        may be used to specify additional computation methods of variables from</span>
-<span class="sd">        models. Keys are obs variables, values are dictionaries with keys </span>
-<span class="sd">        `vars_required` (list of required variables for computation of var </span>
+<span class="sd">        models. Keys are obs variables, values are dictionaries with keys</span>
+<span class="sd">        `vars_required` (list of required variables for computation of var</span>
 <span class="sd">        and `fun` (method that takes list of read data objects and computes</span>
 <span class="sd">        and returns var)</span>
 <span class="sd">    read_opts_ungridded : :obj:`dict`, optional</span>
 <span class="sd">        dictionary that specifies reading constraints for ungridded reading</span>
-<span class="sd">        (c.g. :class:`pyaerocom.io.ReadUngridded`).  </span>
+<span class="sd">        (c.g. :class:`pyaerocom.io.ReadUngridded`).</span>
 <span class="sd">    obs_vert_type : str or dict, optional</span>
-<span class="sd">        Aerocom vertical code encoded in the model filenames (only AeroCom 3 </span>
+<span class="sd">        Aerocom vertical code encoded in the model filenames (only AeroCom 3</span>
 <span class="sd">        and later). Specifies which model file should be read in case there are</span>
-<span class="sd">        multiple options (e.g. surface level data can be read from a </span>
-<span class="sd">        *Surface*.nc file as well as from a *ModelLevel*.nc file). If input is </span>
-<span class="sd">        string (e.g. &#39;Surface&#39;), then the corresponding vertical type code is </span>
-<span class="sd">        used for reading of all variables that are colocated (i.e. that are </span>
-<span class="sd">        specified in :attr:`obs_vars`). Else (if input is dictionary, e.g. </span>
-<span class="sd">        `obs_vert_type=dict(od550aer=&#39;Column&#39;, ec550aer=&#39;ModelLevel&#39;)`), </span>
+<span class="sd">        multiple options (e.g. surface level data can be read from a</span>
+<span class="sd">        *Surface*.nc file as well as from a *ModelLevel*.nc file). If input is</span>
+<span class="sd">        string (e.g. &#39;Surface&#39;), then the corresponding vertical type code is</span>
+<span class="sd">        used for reading of all variables that are colocated (i.e. that are</span>
+<span class="sd">        specified in :attr:`obs_vars`). Else (if input is dictionary, e.g.</span>
+<span class="sd">        `obs_vert_type=dict(od550aer=&#39;Column&#39;, ec550aer=&#39;ModelLevel&#39;)`),</span>
 <span class="sd">        information is extracted variable specific, for those who are defined</span>
 <span class="sd">        in the dictionary, for all others, `None` is used.</span>
 <span class="sd">    model_vert_type_alt : str or dict, optional</span>
 <span class="sd">        like :attr:`obs_vert_type` but is used in case of exception cases, i.e.</span>
 <span class="sd">        where the `obs_vert_type` is not available in the models.</span>
 <span class="sd">    var_outlier_ranges : :obj:`dict`, optional</span>
-<span class="sd">        dictionary specifying outlier ranges for individual variables. </span>
+<span class="sd">        dictionary specifying outlier ranges for individual variables.</span>
 <span class="sd">        (e.g. dict(od550aer = [-0.05, 10], ang4487aer=[0,4]))</span>
 <span class="sd">    model_ts_type_read : :obj:`str` or :obj:`dict`, optional</span>
-<span class="sd">        may be specified to explicitly define the reading frequency of the </span>
-<span class="sd">        model data. Not to be confused with :attr:`ts_type`, which specifies </span>
-<span class="sd">        the frequency used for colocation. Can be specified variable specific </span>
+<span class="sd">        may be specified to explicitly define the reading frequency of the</span>
+<span class="sd">        model data. Not to be confused with :attr:`ts_type`, which specifies</span>
+<span class="sd">        the frequency used for colocation. Can be specified variable specific</span>
 <span class="sd">        by providing a dictionary.</span>
 <span class="sd">    obs_ts_type_read : :obj:`str` or :obj:`dict`, optional</span>
-<span class="sd">        may be specified to explicitly define the reading frequency of the </span>
+<span class="sd">        may be specified to explicitly define the reading frequency of the</span>
 <span class="sd">        observation data (so far, this does only apply to gridded obsdata such</span>
 <span class="sd">        as satellites). For ungridded reading, the frequency may be specified</span>
 <span class="sd">        via :attr:`obs_id`, where applicable (e.g. AeronetSunV3Lev2.daily).</span>
@@ -289,75 +291,81 @@
 <span class="sd">        frequency used for colocation. Can be specified variable specific in</span>
 <span class="sd">        form of dictionary.</span>
 <span class="sd">    flex_ts_type_gridded : bool</span>
-<span class="sd">        boolean specifying whether reading frequency of gridded data is </span>
+<span class="sd">        boolean specifying whether reading frequency of gridded data is</span>
 <span class="sd">        allowed to be flexible. This includes all gridded data, whether it is</span>
 <span class="sd">        model or gridded observation (e.g. satellites). Defaults to True.</span>
 <span class="sd">    apply_time_resampling_constraints : bool, optional</span>
-<span class="sd">        if True, then time resampling constraints are applied as provided via </span>
+<span class="sd">        if True, then time resampling constraints are applied as provided via</span>
 <span class="sd">        :attr:`min_num_obs` or if that one is unspecified, as defined in</span>
-<span class="sd">        :attr:`pyaerocom.const.OBS_MIN_NUM_RESAMPLE`. If None, than </span>
+<span class="sd">        :attr:`pyaerocom.const.OBS_MIN_NUM_RESAMPLE`. If None, than</span>
 <span class="sd">        :attr:`pyaerocom.const.OBS_APPLY_TIME_RESAMPLE_CONSTRAINTS` is used</span>
 <span class="sd">        (which defaults to True !!).</span>
 <span class="sd">    min_num_obs : dict or int, optional</span>
-<span class="sd">        time resampling constraints applied if input arg </span>
-<span class="sd">        `apply_time_resampling_constraints` is True - or None, in which case </span>
+<span class="sd">        time resampling constraints applied if input arg</span>
+<span class="sd">        `apply_time_resampling_constraints` is True - or None, in which case</span>
 <span class="sd">        :attr:`pyaerocom.const.OBS_APPLY_TIME_RESAMPLE_CONSTRAINTS` is used.</span>
+<span class="sd">    resample_how : str or dict</span>
+<span class="sd">        string specifying how data should be aggregated when resampling in time.</span>
+<span class="sd">        Default is &quot;mean&quot;. Can also be a nested dictionary, e.g.</span>
+<span class="sd">        resample_how={&#39;conco3&#39;: &#39;daily&#39;: {&#39;hourly&#39; : &#39;max&#39;}}} would use the</span>
+<span class="sd">        maximum value to aggregate from hourly to daily for variable conco3,</span>
+<span class="sd">        rather than the mean.</span>
 <span class="sd">    model_keep_outliers : bool</span>
 <span class="sd">        if True, no outliers are removed from model data</span>
 <span class="sd">    obs_keep_outliers : bool</span>
 <span class="sd">        if True, no outliers are removed from obs / reference data</span>
 <span class="sd">    obs_use_climatology : bool</span>
-<span class="sd">        BETA if True, pyaerocom default climatology is computed from observation </span>
+<span class="sd">        BETA if True, pyaerocom default climatology is computed from observation</span>
 <span class="sd">        stations (so far only possible for unrgidded / gridded colocation)</span>
 <span class="sd">    colocate_time : bool</span>
-<span class="sd">        if True and if obs and model sampling frequency (e.g. daily) are higher </span>
-<span class="sd">        than input colocation frequency (e.g. monthly), then the datasets are </span>
-<span class="sd">        first colocated in time (e.g. on a daily basis), before the monthly </span>
+<span class="sd">        if True and if obs and model sampling frequency (e.g. daily) are higher</span>
+<span class="sd">        than input colocation frequency (e.g. monthly), then the datasets are</span>
+<span class="sd">        first colocated in time (e.g. on a daily basis), before the monthly</span>
 <span class="sd">        averages are calculated. Default is False.</span>
 <span class="sd">    basedir_coldata : str</span>
 <span class="sd">        base directory for storing of colocated data files</span>
 <span class="sd">    obs_name : str, optional</span>
-<span class="sd">        if provided, this string will be used in colocated data filename to </span>
+<span class="sd">        if provided, this string will be used in colocated data filename to</span>
 <span class="sd">        specify obsnetwork, else obs_id will be used</span>
 <span class="sd">    model_name : str, optional</span>
-<span class="sd">        if provided, this string will be used in colocated data filename to </span>
+<span class="sd">        if provided, this string will be used in colocated data filename to</span>
 <span class="sd">        specify model, else obs_id will be used</span>
 <span class="sd">    save_coldata : bool</span>
 <span class="sd">        if True, colocated data objects are saved as NetCDF file.</span>
-<span class="sd">    &quot;&quot;&quot;</span> 
-    <span class="c1">#: Dictionary specifying alternative vertical types that may be used to </span>
-    <span class="c1">#: read model data. E.g. consider the variable is  ec550aer, </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#: Dictionary specifying alternative vertical types that may be used to</span>
+    <span class="c1">#: read model data. E.g. consider the variable is  ec550aer,</span>
     <span class="c1">#: obs_vert_type=&#39;Surface&#39; and obs_vert_type_alt=dict(Surface=&#39;ModelLevel&#39;).</span>
-    <span class="c1">#: Now, if a model that is used for the analysis does not contain a data </span>
+    <span class="c1">#: Now, if a model that is used for the analysis does not contain a data</span>
     <span class="c1">#: file for ec550aer at the surface (&#39;*ec550aer*Surface*.nc&#39;), then, the</span>
     <span class="c1">#: colocation routine will look for &#39;*ec550aer*ModelLevel*.nc&#39; and if this</span>
     <span class="c1">#: exists, it will load it and extract the surface level.</span>
     <span class="n">OBS_VERT_TYPES_ALT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Surface&#39;</span>    <span class="p">:</span>   <span class="s1">&#39;ModelLevel&#39;</span><span class="p">}</span>
-    
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">filter_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">filter_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">regrid_res_deg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">vert_scheme</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonise_units</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
-                 <span class="n">model_use_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_add_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">model_read_aux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_opts_ungridded</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">obs_vert_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_vert_type_alt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">vert_scheme</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonise_units</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">model_use_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_add_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">model_read_aux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_opts_ungridded</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">obs_vert_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_vert_type_alt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_ref_outlier_ranges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">model_ts_type_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                 <span class="n">obs_ts_type_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type_gridded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                 <span class="n">model_ts_type_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">obs_ts_type_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type_gridded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">apply_time_resampling_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">model_keep_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">obs_keep_outliers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">obs_use_climatology</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">colocate_time</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">basedir_coldata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">colocate_time</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">basedir_coldata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">obs_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">save_coldata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">obs_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs_vars</span><span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">Filter</span><span class="p">(</span><span class="n">filter_name</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for filter_name </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_name</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_coldata</span> <span class="o">=</span> <span class="n">save_coldata</span>
         <span class="k">if</span> <span class="n">save_coldata</span><span class="p">:</span>
@@ -366,77 +374,79 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">basedir_coldata</span><span class="p">):</span>
                 <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating directory: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">basedir_coldata</span><span class="p">))</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">basedir_coldata</span><span class="p">)</span>
-        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obs_cache_only</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span> <span class="o">=</span> <span class="n">obs_vars</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars_rename</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span> <span class="o">=</span> <span class="n">obs_vert_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_vert_type_alt</span> <span class="o">=</span> <span class="n">model_vert_type_alt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span> <span class="o">=</span> <span class="n">read_opts_ungridded</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_ts_type_read</span> <span class="o">=</span> <span class="n">obs_ts_type_read</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span> <span class="o">=</span> <span class="n">model_use_vars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span> <span class="o">=</span> <span class="n">model_add_vars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_keep_outliers</span> <span class="o">=</span> <span class="n">model_keep_outliers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_to_stp</span> <span class="o">=</span> <span class="kc">False</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span> <span class="o">=</span> <span class="n">obs_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_name</span> <span class="o">=</span> <span class="n">obs_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_keep_outliers</span> <span class="o">=</span> <span class="n">obs_keep_outliers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_use_climatology</span> <span class="o">=</span> <span class="n">obs_use_climatology</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_add_meta</span> <span class="o">=</span> <span class="p">[]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="o">=</span> <span class="n">stop</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="n">ts_type</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span> <span class="o">=</span> <span class="n">filter_name</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span> <span class="o">=</span> <span class="n">remove_outliers</span>
-        
+
         <span class="c1"># OPtions related to time resampling</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">apply_time_resampling_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">resample_how</span><span class="o">=</span><span class="kc">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span> <span class="o">=</span> <span class="n">var_outlier_ranges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">var_ref_outlier_ranges</span> <span class="o">=</span> <span class="n">var_ref_outlier_ranges</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">harmonise_units</span> <span class="o">=</span> <span class="n">harmonise_units</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vert_scheme</span> <span class="o">=</span> <span class="n">vert_scheme</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">regrid_res_deg</span> <span class="o">=</span> <span class="n">regrid_res_deg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ignore_station_names</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span> <span class="o">=</span> <span class="n">basedir_coldata</span>
-    
+
         <span class="bp">self</span><span class="o">.</span><span class="n">model_ts_type_read</span> <span class="o">=</span> <span class="n">model_ts_type_read</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span> <span class="o">=</span> <span class="n">model_read_aux</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_use_climatology</span> <span class="o">=</span> <span class="kc">False</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">colocate_time</span> <span class="o">=</span> <span class="n">colocate_time</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1">#: If True, existing colocated data files will be re-computed and overwritten</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reanalyse_existing</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="c1">#: If True, the colocation routine will raise any Exception that may occur, </span>
+        <span class="c1">#: If True, the colocation routine will raise any Exception that may occur,</span>
         <span class="c1">#: else (False), expected expcetions will be ignored and logged.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span> <span class="o">=</span> <span class="kc">False</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">basedir_logfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Base directory for storing logfiles&quot;&quot;&quot;</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span><span class="p">,</span> <span class="s1">&#39;logfiles&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">p</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">UNGRIDDED_IDS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;ID&#39;s of all supported ungridded datasets&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_all_supported_ids_ungridded</span><span class="p">()</span>
-    
+
     <span class="k">def</span> <span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-    
+
 <div class="viewcode-block" id="ColocationSetup.update"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.ColocationSetup.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
@@ -452,22 +462,22 @@
 
 <div class="viewcode-block" id="Colocator"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator">[docs]</a><span class="k">class</span> <span class="nc">Colocator</span><span class="p">(</span><span class="n">ColocationSetup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;High level class for running colocation</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    This object inherits from :class:`ColocationSetup` and is also instantiated</span>
 <span class="sd">    as such. For attributes, please see base class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Colocator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logging</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">file_status</span> <span class="o">=</span> <span class="p">{}</span>
-     
+
     <span class="k">def</span> <span class="nf">_write_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logging</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -475,40 +485,43 @@
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Deactivating logging in Colocator. Reason: </span><span class="si">{}</span><span class="s1">&#39;</span>
                                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-                
+
 <div class="viewcode-block" id="Colocator.run"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform colocation for current setup</span>
-<span class="sd">        </span>
+
 <span class="sd">        The current setup comprises at least</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        **opts</span>
 <span class="sd">            keyword args that may be specified to change the current setup</span>
 <span class="sd">            before colocation</span>
-<span class="sd">            </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">opts</span><span class="p">)</span>
+        <span class="c1"># ToDo: setting the defaults for time resampling here should be</span>
+        <span class="c1"># unnecessary since this is done in TimeResampler. Ensure that and</span>
+        <span class="c1"># remove here</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_time_resampling_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">apply_time_resampling_constraints</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_APPLY_TIME_RESAMPLE_CONSTRAINTS</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_time_resampling_constraints</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_num_obs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">min_num_obs</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_MIN_NUM_RESAMPLE</span>
-            
+
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_init_log</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Deactivating logging in Colocator. Reason: </span><span class="si">{}</span><span class="s1">&#39;</span>
                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logging</span> <span class="o">=</span> <span class="kc">False</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_log</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Model: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNGRIDDED_IDS</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_gridded_ungridded</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_gridded_gridded</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to perform analysis: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()))</span>
             <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -518,16 +531,16 @@
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span></div>
-            
+
 <div class="viewcode-block" id="Colocator.get_lowest_resolution"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.get_lowest_resolution">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="o">*</span><span class="n">ts_types</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the lowest resolution ts_type of input ts_types&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="o">*</span><span class="n">ts_types</span><span class="p">)</span></div>
-        
+
 <div class="viewcode-block" id="Colocator.output_dir"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.output_dir">[docs]</a>    <span class="k">def</span> <span class="nf">output_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Output directory for colocated data&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dirs</span><span class="p">[</span><span class="n">task_name</span><span class="p">]</span></div>
-    
+
     <span class="k">def</span> <span class="nf">_check_add_model_read_aux</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -542,19 +555,22 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid value for model_read_aux dict of variable &#39;</span>
                              <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">. Require keys vars_required and fun in dict, &#39;</span>
                              <span class="s1">&#39;got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_var</span><span class="p">,</span> <span class="n">info</span><span class="p">))</span>
-        <span class="n">model_reader</span><span class="o">.</span><span class="n">add_aux_compute</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model_reader</span><span class="o">.</span><span class="n">add_aux_compute</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DataCoverageError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
-    
-    <span class="k">def</span> <span class="nf">_find_var_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_vars</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_find_var_matches_OLD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_vars</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find variable matches in model data for input obs variables&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">obs_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs_vars</span><span class="p">]</span>
         <span class="n">var_matches</span> <span class="o">=</span> <span class="p">{}</span>
-        
+
         <span class="n">muv</span><span class="p">,</span> <span class="n">mav</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">muv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">mav</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span>
 
@@ -563,18 +579,18 @@
                 <span class="n">model_var</span> <span class="o">=</span> <span class="n">muv</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">model_var</span> <span class="o">=</span> <span class="n">obs_var</span>
-                
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_add_model_read_aux</span><span class="p">(</span><span class="n">model_var</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">)</span>
-                
+
             <span class="k">if</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">has_var</span><span class="p">(</span><span class="n">model_var</span><span class="p">):</span>
                 <span class="n">var_matches</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_var</span>
-                
+
             <span class="k">if</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">mav</span><span class="p">:</span> <span class="c1">#observation variable</span>
                 <span class="n">model_add_var</span> <span class="o">=</span> <span class="n">mav</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_check_add_model_read_aux</span><span class="p">(</span><span class="n">model_add_var</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">)</span>    
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check_add_model_read_aux</span><span class="p">(</span><span class="n">model_add_var</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">has_var</span><span class="p">(</span><span class="n">model_add_var</span><span class="p">):</span>
                     <span class="n">var_matches</span><span class="p">[</span><span class="n">model_add_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_var</span>
-        
+
         <span class="k">for</span> <span class="n">obs_var</span><span class="p">,</span> <span class="n">obs_var_altname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars_rename</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">obs_var_altname</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> match was already found for obs &#39;</span>
@@ -582,7 +598,7 @@
                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_var_altname</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">has_var</span><span class="p">(</span><span class="n">obs_var_altname</span><span class="p">):</span>
                 <span class="n">var_matches</span><span class="p">[</span><span class="n">obs_var_altname</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_var</span>
-                    
+
         <span class="k">if</span> <span class="n">var_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">var_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
@@ -594,25 +610,73 @@
                 <span class="k">if</span> <span class="n">mvar</span> <span class="ow">in</span> <span class="n">var_name</span> <span class="ow">or</span> <span class="n">ovar</span> <span class="ow">in</span> <span class="n">var_name</span><span class="p">:</span>
                     <span class="n">_var_matches</span><span class="p">[</span><span class="n">mvar</span><span class="p">]</span> <span class="o">=</span> <span class="n">ovar</span>
             <span class="n">var_matches</span> <span class="o">=</span> <span class="n">_var_matches</span>
-        
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            
+
             <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No variable matches between &#39;</span>
                                     <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> and </span><span class="si">{}</span><span class="s1"> for input vars: </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> 
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
                                             <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">var_matches</span>
-    
+
+    <span class="k">def</span> <span class="nf">_check_model_add_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">,</span> <span class="n">var_matches</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span><span class="p">:</span> <span class="c1">#observation variable</span>
+            <span class="n">add_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_add_model_read_aux</span><span class="p">(</span><span class="n">add_var</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">has_var</span><span class="p">(</span><span class="n">add_var</span><span class="p">):</span>
+                <span class="n">var_matches</span><span class="p">[</span><span class="n">add_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_name</span>
+        <span class="k">return</span> <span class="n">var_matches</span>
+
+    <span class="k">def</span> <span class="nf">_find_var_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_vars</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find variable matches in model data for input obs variables&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">obs_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs_vars</span><span class="p">]</span>
+
+        <span class="c1"># dictionary that will map input variable names (values) with model</span>
+        <span class="c1"># variables (keys)</span>
+        <span class="n">var_matches</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">muv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">muv</span><span class="p">:</span>
+                <span class="n">model_var</span> <span class="o">=</span> <span class="n">muv</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">model_var</span> <span class="o">=</span> <span class="n">obs_var</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_add_model_read_aux</span><span class="p">(</span><span class="n">model_var</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">model_reader</span><span class="o">.</span><span class="n">has_var</span><span class="p">(</span><span class="n">model_var</span><span class="p">):</span>
+                <span class="n">var_matches</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_var</span>
+
+            <span class="n">var_matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_model_add_var</span><span class="p">(</span><span class="n">obs_var</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">,</span>
+                                                    <span class="n">var_matches</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">var_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_var_matches</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">mvar</span><span class="p">,</span> <span class="n">ovar</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">mvar</span> <span class="ow">in</span> <span class="n">var_name</span> <span class="ow">or</span> <span class="n">ovar</span> <span class="ow">in</span> <span class="n">var_name</span><span class="p">:</span>
+                    <span class="n">_var_matches</span><span class="p">[</span><span class="n">mvar</span><span class="p">]</span> <span class="o">=</span> <span class="n">ovar</span>
+            <span class="n">var_matches</span> <span class="o">=</span> <span class="n">_var_matches</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No variable matches between &#39;</span>
+                                    <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> and </span><span class="si">{}</span><span class="s1"> for input vars: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
+                                            <span class="n">obs_vars</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">var_matches</span>
+
 <div class="viewcode-block" id="Colocator.read_model_data"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.read_model_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_model_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read model variable data based on colocation setup</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        var_name : str</span>
 <span class="sd">            variable to be read</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        GriddedData</span>
@@ -621,7 +685,7 @@
         <span class="n">use_input_var</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="s1">&#39;use_input_var&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">use_input_var</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;use_input_var&#39;</span><span class="p">)</span>
-            
+
         <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">use_input_var</span><span class="p">:</span>
             <span class="n">var</span> <span class="o">=</span> <span class="n">var_name</span>
@@ -633,13 +697,10 @@
                                         <span class="s1">&#39;variable </span><span class="si">{}</span><span class="s1">&#39;</span>
                                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">var_name</span><span class="p">))</span>
             <span class="n">var</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">var_matches</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> 
-                                  <span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> 
-                                  <span class="n">stop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> 
-                                  <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span>
+                                  <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-    
-    
+
 <div class="viewcode-block" id="Colocator.read_ungridded"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.read_ungridded">[docs]</a>    <span class="k">def</span> <span class="nf">read_ungridded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vars_to_read</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -655,34 +716,42 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No observation variable matches found for &#39;</span>
                                     <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ropts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ropts</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">datasets_to_read</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
+        <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">datasets_to_read</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
                                    <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">obs_vars</span><span class="p">,</span>
                                    <span class="o">**</span><span class="n">ropts</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;obs_filters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="n">remaining_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_obs_filters</span><span class="p">()</span>
             <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">apply_filters</span><span class="p">(</span><span class="o">**</span><span class="n">remaining_filters</span><span class="p">)</span>
-            
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">:</span>
             <span class="c1">#self._update_var_outlier_ranges(obs_vars=obs_vars)</span>
             <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
                 <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_ref_outlier_ranges</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="k">pass</span>
-                    
-                <span class="n">obs_data</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+
+                <span class="n">obs_data</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                          <span class="n">low</span><span class="o">=</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obs_data</span></div>
     <span class="c1"># ToDo: cumbersome (together with _find_var_matches, review whole handling</span>
     <span class="c1"># of vertical codes for variable mappings...)</span>
-    <span class="k">def</span> <span class="nf">_read_gridded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reader</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                      <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_read_gridded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reader</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span>
         <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
             <span class="n">vert_which</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span>
             <span class="n">ts_type_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_ts_type_read</span>
@@ -701,10 +770,10 @@
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;vert_which&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vert_which</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;ts_type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts_type_read</span>
-                
-            <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
+
+            <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
                                    <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
-                                   <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                                   <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
                                    <span class="n">flex_ts_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span><span class="p">,</span>
                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">DataCoverageError</span><span class="p">:</span>
@@ -712,7 +781,7 @@
             <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">OBS_VERT_TYPES_ALT</span><span class="p">:</span>
                     <span class="n">vt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">OBS_VERT_TYPES_ALT</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span><span class="p">]</span>
-                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_vert_type_alt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>    
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_vert_type_alt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">mva</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_vert_type_alt</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mva</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                         <span class="n">vt</span> <span class="o">=</span> <span class="n">mva</span>
@@ -723,15 +792,14 @@
                 <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">((</span><span class="s1">&#39;No data files available for dataset &#39;</span>
                                          <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">)&#39;</span>
                                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)))</span>
-            
-            <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> 
+
+            <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
                                    <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
-                                   <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                                   <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
                                    <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type_read</span><span class="p">,</span>
                                    <span class="n">flex_ts_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span><span class="p">,</span>
                                    <span class="n">vert_which</span><span class="o">=</span><span class="n">vt</span><span class="p">)</span>
-        
-            
+
     <span class="k">def</span> <span class="nf">_eval_obs_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">obs_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;obs_filters&#39;</span><span class="p">]</span>
         <span class="n">remaining</span> <span class="o">=</span> <span class="p">{}</span>
@@ -748,100 +816,117 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">remaining</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">return</span> <span class="n">remaining</span>
-        
-       
-    <span class="k">def</span> <span class="nf">_save_coldata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coldata</span><span class="p">,</span> <span class="n">savename</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="n">model_data</span><span class="p">,</span> 
+
+    <span class="k">def</span> <span class="nf">_save_coldata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coldata</span><span class="p">,</span> <span class="n">savename</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="n">model_data</span><span class="p">,</span>
                       <span class="n">obs_var</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Helper for saving colocateddata&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">model_var</span> <span class="o">!=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">var_name</span><span class="p">:</span>
             <span class="n">coldata</span><span class="o">.</span><span class="n">rename_variable</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span>
                                     <span class="n">model_var</span><span class="p">,</span>
                                     <span class="n">model_data</span><span class="o">.</span><span class="n">data_id</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> 
-            <span class="n">obs_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span> <span class="ow">and</span> 
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="n">obs_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span> <span class="ow">and</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model_add_vars</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span> <span class="o">==</span> <span class="n">model_var</span><span class="p">):</span>
-            
+
             <span class="n">coldata</span><span class="o">.</span><span class="n">rename_variable</span><span class="p">(</span><span class="n">obs_var</span><span class="p">,</span>
                                     <span class="n">model_var</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span>
-        
+
         <span class="n">coldata</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">savename</span><span class="o">=</span><span class="n">savename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_status</span><span class="p">[</span><span class="n">savename</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;saved&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_write_log</span><span class="p">(</span><span class="s1">&#39;WRITE: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
-            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
-            
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;WRITE: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_log</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_eval_resample_how</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">):</span>
+        <span class="n">rshow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample_how</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rshow</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rshow</span>
+
+        <span class="k">if</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">rshow</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rshow</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">model_var</span> <span class="ow">in</span> <span class="n">rshow</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rshow</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
     <span class="k">def</span> <span class="nf">_run_gridded_ungridded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Analysis method for gridded vs. ungridded data&quot;&quot;&quot;</span>
-        <span class="n">model_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
-        
-        <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span>
-    
-        <span class="n">obs_vars_supported</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span>
+        <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;PREPARING colocation of </span><span class="si">{}</span><span class="s1"> vs. </span><span class="si">{}</span><span class="s1">&#39;</span>
+                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
 
-        <span class="n">obs_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">,</span> <span class="n">obs_vars_supported</span><span class="p">))</span>
-        
+        <span class="n">model_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
+
+        <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span>
+
+        <span class="n">_oreader</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span>
+
+        <span class="n">obs_vars</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">varlist_aerocom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_oreader</span><span class="o">.</span><span class="n">var_supported</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+                <span class="n">obs_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No observation variable matches found for &#39;</span>
                                     <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
-                
+
         <span class="n">var_matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_var_matches</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">,</span>
                                              <span class="n">var_name</span><span class="p">)</span>
-        
+
+        <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;The following variable combinations will be colocated</span><span class="se">\n</span><span class="s1">&#39;</span>
+                       <span class="s1">&#39;MODEL-VAR</span><span class="se">\t</span><span class="s1">OBS-VAR&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+
+        <span class="c1"># get list of unique observation variables</span>
+        <span class="n">obs_vars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">var_matches</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_var_outlier_ranges</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ropts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ropts</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">datasets_to_read</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
-                                   <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">obs_vars</span><span class="p">,</span>
-                                   <span class="o">**</span><span class="n">ropts</span><span class="p">)</span>
-        
-        <span class="c1"># ToDo: consider removing outliers already here.</span>
-        <span class="k">if</span> <span class="s1">&#39;obs_filters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="n">remaining_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_obs_filters</span><span class="p">()</span>
-            <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">apply_filters</span><span class="p">(</span><span class="o">**</span><span class="n">remaining_filters</span><span class="p">)</span>
-            
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_var_outlier_ranges</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span>
-                            
-        <span class="c1">#all_ts_types = const.GRID_IO.TS_TYPES</span>
+
         <span class="n">data_objs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">start_stop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">model_var</span><span class="p">,</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            
+
+            <span class="c1"># ToDo: consider removing outliers already here.</span>
+            <span class="c1">#if &#39;obs_filters&#39; in self:</span>
             <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span>
-            <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">start_stop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
-            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> 
-                                                             <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
-                                                             <span class="n">model_var</span><span class="p">,</span> 
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
+                                                             <span class="n">model_var</span><span class="p">,</span>
                                                              <span class="n">obs_var</span><span class="p">))</span>
+
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">model_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">model_reader</span><span class="p">,</span> 
-                                                <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span> 
-                                                <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> 
-                                                <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                <span class="n">model_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">model_reader</span><span class="p">,</span>
+                                                <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span>
+                                                <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                                <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
                                                 <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                
+
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to load gridded data: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">. Reason </span><span class="si">{}</span><span class="s1">&#39;</span>
                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
                 <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_write_log</span><span class="p">(</span><span class="n">msg</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                
+
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">continue</span>
             <span class="n">ts_type_src</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span>
+            <span class="n">rshow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_resample_how</span><span class="p">(</span><span class="n">model_var</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ts_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># if colocation frequency is not specified</span>
                 <span class="n">ts_type</span> <span class="o">=</span> <span class="n">ts_type_src</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#             if not model_data.ts_type in all_ts_types:</span>
-<span class="c1">#                 raise TemporalResolutionError(&#39;Invalid temporal resolution {} &#39;</span>
-<span class="c1">#                                               &#39;in model {}&#39;.format(model_data.ts_type,</span>
-<span class="c1">#                                                                    self.model_id))</span>
-<span class="c1"># =============================================================================</span>
+
             <span class="n">ignore_stats</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_station_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">ignore_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_station_names</span>
@@ -850,23 +935,24 @@
                         <span class="n">ignore_stats</span> <span class="o">=</span> <span class="n">ignore_stats</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">ignore_stats</span> <span class="o">=</span> <span class="kc">None</span>
-                    
+
             <span class="c1">#ts_type_src = model_data.ts_type</span>
             <span class="k">if</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type_src</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type</span><span class="p">):</span><span class="c1"># &lt; all_ts_types.index(ts_type_src):</span>
                 <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating ts_type from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1"> (highest &#39;</span>
-                               <span class="s1">&#39;available in model </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> 
+                               <span class="s1">&#39;available in model </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span>
                                                                <span class="n">ts_type_src</span><span class="p">,</span>
                                                                <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
                 <span class="n">ts_type</span> <span class="o">=</span> <span class="n">ts_type_src</span>
-            
-            
+
+            <span class="n">really_do_reanalysis</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_coldata</span><span class="p">:</span>
-                <span class="n">savename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coldata_savename</span><span class="p">(</span><span class="n">model_data</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> 
+                <span class="n">really_do_reanalysis</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">savename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coldata_savename</span><span class="p">(</span><span class="n">model_data</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span>
                                                   <span class="n">ts_type</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">)</span>
-                
-                <span class="n">file_exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_coldata_exists</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> 
+
+                <span class="n">file_exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_coldata_exists</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span>
                                                          <span class="n">savename</span><span class="p">)</span>
-                
+
                 <span class="n">out_dir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">file_exists</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reanalyse_existing</span><span class="p">:</span>
@@ -878,20 +964,46 @@
                             <span class="bp">self</span><span class="o">.</span><span class="n">file_status</span><span class="p">[</span><span class="n">savename</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;skipped&#39;</span>
                         <span class="k">continue</span>
                     <span class="k">else</span><span class="p">:</span>
+                        <span class="n">really_do_reanalysis</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Deleting and recomputing existing &#39;</span>
-                                       <span class="s1">&#39;colocated data file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
+                               <span class="s1">&#39;colocated data file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
                         <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;REMOVE: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">savename</span><span class="p">))</span>
                         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">savename</span><span class="p">))</span>
-                        
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">really_do_reanalysis</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">really_do_reanalysis</span><span class="p">:</span>
+                <span class="c1">#Reading obs data only if the co-located data file does</span>
+                <span class="c1">#not already exist.</span>
+                <span class="c1">#This part of the method has been changed by @hansbrenna to work better with</span>
+                <span class="c1">#large observational data sets. Only one variable is loaded into</span>
+                <span class="c1"># the UngriddedData object at a time. Currently the variable is</span>
+                <span class="c1">#re-read a lot of times, which is a weakness.</span>
+                <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+
+                    <span class="n">datasets_to_read</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
+                    <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">obs_var</span><span class="p">,</span>
+                    <span class="n">only_cached</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_obs_cache_only</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">ropts</span><span class="p">)</span>
+
+                        <span class="c1"># ToDo: consider removing outliers already here.</span>
+                <span class="k">if</span> <span class="s1">&#39;obs_filters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="n">remaining_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_obs_filters</span><span class="p">()</span>
+                    <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">apply_filters</span><span class="p">(</span><span class="o">**</span><span class="n">remaining_filters</span><span class="p">)</span>
+
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">by</span><span class="o">=</span><span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">by</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">update_baseyear_gridded</span>
+                    <span class="n">stop</span><span class="o">=</span><span class="kc">None</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">by</span><span class="o">=</span><span class="kc">None</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_use_climatology</span><span class="p">:</span>
                     <span class="n">by</span><span class="o">=</span><span class="n">start</span><span class="o">.</span><span class="n">year</span>
                 <span class="n">coldata</span> <span class="o">=</span> <span class="n">colocate_gridded_ungridded</span><span class="p">(</span>
-                        
-                        <span class="n">gridded_data</span><span class="o">=</span><span class="n">model_data</span><span class="p">,</span> 
-                        <span class="n">ungridded_data</span><span class="o">=</span><span class="n">obs_data</span><span class="p">,</span> 
-                        <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span> 
+
+                        <span class="n">gridded_data</span><span class="o">=</span><span class="n">model_data</span><span class="p">,</span>
+                        <span class="n">ungridded_data</span><span class="o">=</span><span class="n">obs_data</span><span class="p">,</span>
+                        <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
                         <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
                         <span class="n">var_ref</span><span class="o">=</span><span class="n">obs_var</span><span class="p">,</span>
                         <span class="n">filter_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span>
@@ -901,148 +1013,139 @@
                         <span class="n">harmonise_units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">harmonise_units</span><span class="p">,</span>
                         <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">,</span>
                         <span class="n">var_ref_outlier_ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_ref_outlier_ranges</span><span class="p">,</span>
-                        <span class="n">update_baseyear_gridded</span><span class="o">=</span><span class="n">by</span><span class="p">,</span> 
+                        <span class="n">update_baseyear_gridded</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
                         <span class="n">ignore_station_names</span><span class="o">=</span><span class="n">ignore_stats</span><span class="p">,</span>
                         <span class="n">apply_time_resampling_constraints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
                         <span class="n">min_num_obs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_num_obs</span><span class="p">,</span>
                         <span class="n">colocate_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colocate_time</span><span class="p">,</span>
                         <span class="n">var_keep_outliers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_keep_outliers</span><span class="p">,</span>
                         <span class="n">var_ref_keep_outliers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_keep_outliers</span><span class="p">,</span>
-                        <span class="n">use_climatology_ref</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_use_climatology</span><span class="p">)</span>
-                
+                        <span class="n">use_climatology_ref</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_use_climatology</span><span class="p">,</span>
+                        <span class="n">resample_how</span><span class="o">=</span><span class="n">rshow</span><span class="p">)</span>
+
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_to_stp</span><span class="p">:</span>
                     <span class="n">coldata</span> <span class="o">=</span> <span class="n">correct_model_stp_coldata</span><span class="p">(</span><span class="n">coldata</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_coldata</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_coldata</span><span class="p">(</span><span class="n">coldata</span><span class="p">,</span> <span class="n">savename</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_coldata</span><span class="p">(</span><span class="n">coldata</span><span class="p">,</span> <span class="n">savename</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span>
                                        <span class="n">model_data</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">)</span>
                 <span class="n">data_objs</span><span class="p">[</span><span class="n">model_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">coldata</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Colocation between model </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> and obs </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> &#39;</span>
-                       <span class="s1">&#39;failed: Reason </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
-                                                  <span class="n">model_var</span><span class="p">,</span> 
+                       <span class="s1">&#39;failed.</span><span class="se">\n</span><span class="s1">Traceback:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                                  <span class="n">model_var</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
                                                   <span class="n">obs_var</span><span class="p">,</span>
-                                                  <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                                                  <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()))</span>
                 <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_write_log</span><span class="p">(</span><span class="n">msg</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    
+
         <span class="k">return</span> <span class="n">data_objs</span>
-    
+
     <span class="k">def</span> <span class="nf">_run_gridded_gridded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        
+
         <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">start_stop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
         <span class="n">model_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
         <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="s1">&#39;obs_filters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="n">remaining_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_obs_filters</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">remaining_filters</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Cannot apply filters </span><span class="si">{}</span><span class="s1"> to gridded &#39;</span>
-                                          <span class="s1">&#39;observation data.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">remaining_filters</span><span class="p">))</span>
-            
+            <span class="n">obs_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_obs_filters</span><span class="p">()</span>
+
         <span class="n">obs_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span>
-        
-<span class="c1"># =============================================================================</span>
-<span class="c1">#         obs_vars_avail =  obs_reader.vars_provided</span>
-<span class="c1">#         </span>
-<span class="c1">#         for obs_var in obs_vars:</span>
-<span class="c1">#             if not obs_var in obs_vars_avail:</span>
-<span class="c1">#                 raise DataCoverageError(&#39;Variable {} is not supported by {}&#39;</span>
-<span class="c1">#                                         .format(obs_var, self.obs_id))</span>
-<span class="c1"># =============================================================================</span>
-        
+
         <span class="n">var_matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_var_matches</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">,</span> <span class="n">model_reader</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_var_outlier_ranges</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span>
-        
-        
+
         <span class="n">all_ts_types</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span>
-        
+
         <span class="n">ts_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span>
-        
+
         <span class="n">data_objs</span> <span class="o">=</span> <span class="p">{}</span>
-        
+
         <span class="k">for</span> <span class="n">model_var</span><span class="p">,</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">var_matches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            
-            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> 
-                                                             <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> 
-                                                             <span class="n">model_var</span><span class="p">,</span> 
+            <span class="n">obs_filters_var</span> <span class="o">=</span> <span class="n">obs_filters</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span> <span class="k">if</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_filters</span> <span class="k">else</span> <span class="p">{}</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
+                                                             <span class="n">model_var</span><span class="p">,</span>
                                                              <span class="n">obs_var</span><span class="p">))</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">model_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">model_reader</span><span class="p">,</span> 
-                                                <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span> 
-                                                <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> 
-                                                <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                <span class="n">model_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">model_reader</span><span class="p">,</span>
+                                                <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">,</span>
+                                                <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                                <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
                                                 <span class="n">is_model</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                
+
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to load gridded data: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">. Reason </span><span class="si">{}</span><span class="s1">&#39;</span>
                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
                 <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_write_log</span><span class="p">(</span><span class="n">msg</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                
+
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">continue</span>
-            
+
             <span class="k">if</span> <span class="ow">not</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid temporal resolution </span><span class="si">{}</span><span class="s1"> &#39;</span>
                                               <span class="s1">&#39;in model </span><span class="si">{}</span><span class="s1">&#39;</span>
                                               <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
                                                       <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
-            
+
             <span class="k">if</span> <span class="n">ts_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">ts_type</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">obs_data</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">obs_reader</span><span class="p">,</span> 
-                                               <span class="n">var_name</span><span class="o">=</span><span class="n">obs_var</span><span class="p">,</span> 
+                <span class="n">obs_data</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_gridded</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">obs_reader</span><span class="p">,</span>
+                                               <span class="n">var_name</span><span class="o">=</span><span class="n">obs_var</span><span class="p">,</span>
                                                <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
                                                <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
-                                               <span class="n">is_model</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                                               <span class="n">is_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                               <span class="o">**</span><span class="n">obs_filters_var</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                
+
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to load gridded data: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">. Reason </span><span class="si">{}</span><span class="s1">&#39;</span>
                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
                 <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_write_log</span><span class="p">(</span><span class="n">msg</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                
+
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_exceptions</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">continue</span>
-                
+
             <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">ts_type</span> <span class="ow">in</span> <span class="n">all_ts_types</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid temporal resolution </span><span class="si">{}</span><span class="s1"> &#39;</span>
                                               <span class="s1">&#39;in obs </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span>
-            
+
             <span class="c1"># update colocation ts_type, based on the available resolution in</span>
             <span class="c1"># model and obs.</span>
             <span class="n">lowest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">,</span>
                                                 <span class="n">obs_data</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+            <span class="n">rshow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_resample_how</span><span class="p">(</span><span class="n">model_var</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">lowest</span> <span class="o">!=</span> <span class="n">ts_type</span><span class="p">:</span>
                 <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating ts_type from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1"> (highest &#39;</span>
                                <span class="s1">&#39;available in </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> combination)&#39;</span>
                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">lowest</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
                                        <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
                 <span class="n">ts_type</span> <span class="o">=</span> <span class="n">lowest</span>
-            
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_coldata</span><span class="p">:</span>
                 <span class="n">out_dir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span><span class="p">,</span>
                                           <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
-                               
+
                 <span class="n">savename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coldata_savename</span><span class="p">(</span><span class="n">model_data</span><span class="p">,</span>
                                                   <span class="n">start</span><span class="p">,</span>
                                                   <span class="n">stop</span><span class="p">,</span>
                                                   <span class="n">ts_type</span><span class="p">,</span>
                                                   <span class="n">var_name</span><span class="o">=</span><span class="n">model_var</span><span class="p">)</span>
-                
+
                 <span class="n">file_exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_coldata_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
                                                           <span class="n">savename</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">file_exists</span><span class="p">:</span>
@@ -1054,15 +1157,15 @@
                         <span class="k">continue</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">savename</span><span class="p">))</span>
-            <span class="k">try</span><span class="p">:</span>  
+            <span class="k">try</span><span class="p">:</span>
                 <span class="n">by</span><span class="o">=</span><span class="kc">None</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_use_climatology</span><span class="p">:</span>
                     <span class="n">by</span><span class="o">=</span><span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">year</span>
                 <span class="n">coldata</span> <span class="o">=</span> <span class="n">colocate_gridded_gridded</span><span class="p">(</span>
                         <span class="n">gridded_data</span><span class="o">=</span><span class="n">model_data</span><span class="p">,</span>
-                        <span class="n">gridded_data_ref</span><span class="o">=</span><span class="n">obs_data</span><span class="p">,</span> 
-                        <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span> 
-                        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> 
+                        <span class="n">gridded_data_ref</span><span class="o">=</span><span class="n">obs_data</span><span class="p">,</span>
+                        <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
+                        <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span>
                         <span class="n">filter_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">,</span>
                         <span class="n">regrid_res_deg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regrid_res_deg</span><span class="p">,</span>
                         <span class="n">remove_outliers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">,</span>
@@ -1076,9 +1179,10 @@
                         <span class="n">min_num_obs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_num_obs</span><span class="p">,</span>
                         <span class="n">colocate_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colocate_time</span><span class="p">,</span>
                         <span class="n">var_keep_outliers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_keep_outliers</span><span class="p">,</span>
-                        <span class="n">var_ref_keep_outliers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_keep_outliers</span><span class="p">)</span>
+                        <span class="n">var_ref_keep_outliers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_keep_outliers</span><span class="p">,</span>
+                        <span class="n">resample_how</span><span class="o">=</span><span class="n">rshow</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_coldata</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_coldata</span><span class="p">(</span><span class="n">coldata</span><span class="p">,</span> <span class="n">savename</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_coldata</span><span class="p">(</span><span class="n">coldata</span><span class="p">,</span> <span class="n">savename</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span>
                                        <span class="n">model_data</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">)</span>
                     <span class="c1">#coldata.to_netcdf(out_dir, savename=savename)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">:</span>
@@ -1088,7 +1192,7 @@
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Colocation between model </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> and obs </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1"> &#39;</span>
                        <span class="s1">&#39;failed: Reason </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
-                                                  <span class="n">model_var</span><span class="p">,</span> 
+                                                  <span class="n">model_var</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
                                                   <span class="n">obs_var</span><span class="p">,</span>
                                                   <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
@@ -1098,12 +1202,11 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data_objs</span>
-    
+
     <span class="k">def</span> <span class="nf">_init_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">logdir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_logfiles</span><span class="p">,</span> 
+        <span class="n">logdir</span> <span class="o">=</span> <span class="n">chk_make_subdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_logfiles</span><span class="p">,</span>
                                  <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
-                                 
-        
+
         <span class="n">fname</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.log&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="n">log</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">logdir</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="s1">&#39;a+&#39;</span><span class="p">)</span>
         <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">------------------ NEW ----------------</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -1111,13 +1214,13 @@
         <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Analysis configuration</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
-        
+
     <span class="k">def</span> <span class="nf">_close_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="kc">None</span>
-        
-    <span class="k">def</span> <span class="nf">_coldata_savename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_data</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+
+    <span class="k">def</span> <span class="nf">_coldata_savename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_data</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Based on current setup, get savename of colocated data file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1131,33 +1234,31 @@
             <span class="n">stop</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ts_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ts_type</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span>
-        
+
         <span class="k">if</span> <span class="n">var_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">var_name</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">var_name</span>
         <span class="n">start_str</span> <span class="o">=</span> <span class="n">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
         <span class="n">stop_str</span> <span class="o">=</span> <span class="n">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
-    
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">obs_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_name</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">obs_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span>
-            
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">model_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">data_id</span>
-    
+
         <span class="n">col_data_name</span> <span class="o">=</span> <span class="n">ColocatedData</span><span class="o">.</span><span class="n">_aerocom_savename</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">var_name</span><span class="p">,</span>
-                                                        <span class="n">obs_id</span><span class="o">=</span><span class="n">obs_id</span><span class="p">,</span> 
-                                                        <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span> 
-                                                        <span class="n">start_str</span><span class="o">=</span><span class="n">start_str</span><span class="p">,</span> 
-                                                        <span class="n">stop_str</span><span class="o">=</span><span class="n">stop_str</span><span class="p">,</span> 
+                                                        <span class="n">obs_id</span><span class="o">=</span><span class="n">obs_id</span><span class="p">,</span>
+                                                        <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
+                                                        <span class="n">start_str</span><span class="o">=</span><span class="n">start_str</span><span class="p">,</span>
+                                                        <span class="n">stop_str</span><span class="o">=</span><span class="n">stop_str</span><span class="p">,</span>
                                                         <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
                                                         <span class="n">filter_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">col_data_name</span> <span class="o">+</span> <span class="s1">&#39;.nc&#39;</span>
-    
-    
-    
+
     <span class="k">def</span> <span class="nf">_check_coldata_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">coldata_savename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if colocated data file exists&quot;&quot;&quot;</span>
         <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedir_coldata</span><span class="p">,</span>
@@ -1170,64 +1271,52 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_status</span><span class="p">[</span><span class="n">coldata_savename</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;exists_not&#39;</span>
         <span class="k">return</span> <span class="kc">False</span>
-    
-    <span class="k">def</span> <span class="nf">_update_var_outlier_ranges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_matches</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+
+    <span class="k">def</span> <span class="nf">_update_var_outlier_ranges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_matches</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                    <span class="n">mod_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var_matches</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">obs_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">var_matches</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
             <span class="n">mod_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">var_matches</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            
+
         <span class="n">oor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_ref_outlier_ranges</span>
         <span class="n">mor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mor</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mod_vars</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">mvar</span> <span class="ow">in</span> <span class="n">mod_vars</span><span class="p">:</span>
                 <span class="n">mname</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">mvar</span><span class="p">]</span><span class="o">.</span><span class="n">var_name</span>
                 <span class="k">if</span> <span class="n">mname</span> <span class="o">!=</span> <span class="n">mvar</span> <span class="ow">and</span> <span class="n">mvar</span> <span class="ow">in</span> <span class="n">mor</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mname</span> <span class="ow">in</span> <span class="n">mor</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">[</span><span class="n">mname</span><span class="p">]</span> <span class="o">=</span> <span class="n">mor</span><span class="p">[</span><span class="n">mvar</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">oor</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs_vars</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">ovar</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
                 <span class="n">oname</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">ovar</span><span class="p">]</span><span class="o">.</span><span class="n">var_name</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">oname</span> <span class="o">!=</span> <span class="n">ovar</span> <span class="ow">and</span> <span class="n">ovar</span> <span class="ow">in</span> <span class="n">oor</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">oname</span> <span class="ow">in</span> <span class="n">oor</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">var_ref_outlier_ranges</span><span class="p">[</span><span class="n">oname</span><span class="p">]</span> <span class="o">=</span> <span class="n">oor</span><span class="p">[</span><span class="n">ovar</span><span class="p">]</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#         for mvar, ovar in var_matches.items():</span>
-<span class="c1">#             if isinstance(oor, dict): </span>
-<span class="c1">#                 oname = const.VARS[ovar].var_name</span>
-<span class="c1">#                 if (oname != ovar and ovar in oor and not oname in oor):</span>
-<span class="c1">#                         self.var_ref_outlier_ranges[oname] = oor[ovar]</span>
-<span class="c1">#             if isinstance(mor, dict):</span>
-<span class="c1">#                 mname = const.VARS[mvar].var_name</span>
-<span class="c1">#                 if mname != mvar and mvar in mor and not mname in mor:</span>
-<span class="c1">#                     self.var_outlier_ranges[mname] = mor[mvar]</span>
-<span class="c1"># =============================================================================</span>
+
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
-        
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
-    
     <span class="n">MODEL_ID</span> <span class="o">=</span>  <span class="s1">&#39;CAM5.3-Oslo_AP3-CTRL2016-PD&#39;</span>
     <span class="n">col</span> <span class="o">=</span> <span class="n">Colocator</span><span class="p">(</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">MODEL_ID</span><span class="p">,</span>
                     <span class="n">obs_id</span><span class="o">=</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span>
-                    <span class="n">obs_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;ang4487aer&#39;</span><span class="p">],</span> 
+                    <span class="n">obs_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;ang4487aer&#39;</span><span class="p">],</span>
                     <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
                     <span class="n">filter_name</span><span class="o">=</span><span class="s1">&#39;WORLD-wMOUNTAINS&#39;</span><span class="p">,</span>
                     <span class="n">model_use_vars</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">od550aer</span> <span class="o">=</span> <span class="s1">&#39;od550csaer&#39;</span><span class="p">),</span>
                     <span class="n">vert_scheme</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">od550aer</span><span class="o">=</span><span class="s1">&#39;Column&#39;</span><span class="p">))</span>
-    
+
     <span class="n">col</span><span class="o">.</span><span class="n">raise_exceptions</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">col</span><span class="o">.</span><span class="n">reanalyse_existing</span> <span class="o">=</span> <span class="kc">True</span>
-    
+
     <span class="nb">print</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
-    
-    
+
     <span class="n">run</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">run</span><span class="p">:</span>
         <span class="n">col</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>

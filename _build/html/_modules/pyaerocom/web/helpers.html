@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -166,119 +166,40 @@
 <span class="sd">- the configuration classes could inherit from a base class or could be more unified</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">simplejson</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">BrowseDict</span><span class="p">,</span> <span class="n">sort_dict_by_name</span>
+<span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">BrowseDict</span>
 
-<div class="viewcode-block" id="delete_experiment_data_evaluation_iface"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.delete_experiment_data_evaluation_iface">[docs]</a><span class="k">def</span> <span class="nf">delete_experiment_data_evaluation_iface</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">proj_id</span><span class="p">,</span> <span class="n">exp_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Delete all data associated with a certain experiment</span>
-<span class="sd">        </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    base_dir : str, optional</span>
-<span class="sd">        basic output direcory (containg subdirs of all projects)</span>
-<span class="sd">    proj_name : str, optional</span>
-<span class="sd">        name of project, if None, then this project is used</span>
-<span class="sd">    exp_name : str, optional</span>
-<span class="sd">        name experiment, if None, then this project is used</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="n">p</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">proj_id</span><span class="p">,</span> <span class="n">exp_id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;No such data directory found: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
-    
-    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="get_all_config_files_evaluation_iface"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.get_all_config_files_evaluation_iface">[docs]</a><span class="k">def</span> <span class="nf">get_all_config_files_evaluation_iface</span><span class="p">(</span><span class="n">config_dir</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    </span>
-<span class="sd">    Note</span>
-<span class="sd">    ----</span>
-<span class="sd">    This code only checks json configuration files, not .py module files</span>
-<span class="sd">    containing configuration.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    config_dir : str</span>
-<span class="sd">        directory containing config json files for AerocomEvaluation interface</span>
-<span class="sd">        </span>
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    dict</span>
-<span class="sd">        nested dictionary containing file paths of all config files that were</span>
-<span class="sd">        detected, where first level of dict id `proj_id` and second level </span>
-<span class="sd">        is `exp_id`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
-    
-    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/*.json&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config_dir</span><span class="p">)):</span>
-        <span class="n">spl</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">spl</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;cfg&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;Invalid config file name &#39;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-        <span class="n">proj</span><span class="p">,</span> <span class="n">exp</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">spl</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="n">proj</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">results</span><span class="p">[</span><span class="n">proj</span><span class="p">][</span><span class="n">exp</span><span class="p">]</span> <span class="o">=</span> <span class="n">file</span>
-    <span class="k">return</span> <span class="n">results</span></div>
-
-<div class="viewcode-block" id="get_all_config_files_trends_iface"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.get_all_config_files_trends_iface">[docs]</a><span class="k">def</span> <span class="nf">get_all_config_files_trends_iface</span><span class="p">(</span><span class="n">config_dir</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Get all configuration files of trends interface</span>
-<span class="sd">    </span>
-<span class="sd">    Note</span>
-<span class="sd">    ----</span>
-<span class="sd">    This code only checks json configuration files, not .py module files</span>
-<span class="sd">    containing configuration.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    config_dir : str</span>
-<span class="sd">        directory containing config json files for AerosolTrends interface</span>
-<span class="sd">        </span>
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">   dictionary</span>
-<span class="sd">        keys are configuration names, values are corresponding file paths</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span>  <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/cfg_*.json&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config_dir</span><span class="p">)):</span>
-        <span class="n">spl</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">spl</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;cfg&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;Invalid config file name &#39;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-        <span class="n">results</span><span class="p">[</span><span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">file</span>
-    <span class="k">return</span> <span class="n">results</span></div>
-      
 <div class="viewcode-block" id="ObsConfigEval"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.ObsConfigEval">[docs]</a><span class="k">class</span> <span class="nc">ObsConfigEval</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Observation configuration for evaluation (dictionary)</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    Only :attr:`obs_id` and `obs_vars` are mandatory, the rest is optional.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    obs_id : str</span>
-<span class="sd">        ID of observation network in AeroCom database </span>
+<span class="sd">        ID of observation network in AeroCom database</span>
 <span class="sd">        (e.g. &#39;AeronetSunV3Lev2.daily&#39;)</span>
 <span class="sd">    obs_vars : list</span>
 <span class="sd">        list of pyaerocom variable names that are supposed to be analysed</span>
 <span class="sd">        (e.g. [&#39;od550aer&#39;, &#39;ang4487aer&#39;])</span>
 <span class="sd">    obs_ts_type_read : :obj:`str` or :obj:`dict`, optional</span>
-<span class="sd">        may be specified to explicitly define the reading frequency of the </span>
+<span class="sd">        may be specified to explicitly define the reading frequency of the</span>
 <span class="sd">        observation data (so far, this does only apply to gridded obsdata such</span>
 <span class="sd">        as satellites). For ungridded reading, the frequency may be specified</span>
 <span class="sd">        via :attr:`obs_id`, where applicable (e.g. AeronetSunV3Lev2.daily).</span>
 <span class="sd">        Can be specified variable specific in form of dictionary.</span>
 <span class="sd">    obs_vert_type : :obj:`str` or :obj:`dict`, optional</span>
-<span class="sd">        Aerocom vertical code encoded in the model filenames (only AeroCom 3 </span>
+<span class="sd">        Aerocom vertical code encoded in the model filenames (only AeroCom 3</span>
 <span class="sd">        and later). Specifies which model file should be read in case there are</span>
-<span class="sd">        multiple options (e.g. surface level data can be read from a </span>
-<span class="sd">        *Surface*.nc file as well as from a *ModelLevel*.nc file). If input is </span>
-<span class="sd">        string (e.g. &#39;Surface&#39;), then the corresponding vertical type code is </span>
-<span class="sd">        used for reading of all variables that are colocated (i.e. that are </span>
-<span class="sd">        specified in :attr:`obs_vars`). Else (if input is dictionary, e.g. </span>
-<span class="sd">        `obs_vert_type=dict(od550aer=&#39;Column&#39;, ec550aer=&#39;ModelLevel&#39;)`), </span>
+<span class="sd">        multiple options (e.g. surface level data can be read from a</span>
+<span class="sd">        *Surface*.nc file as well as from a *ModelLevel*.nc file). If input is</span>
+<span class="sd">        string (e.g. &#39;Surface&#39;), then the corresponding vertical type code is</span>
+<span class="sd">        used for reading of all variables that are colocated (i.e. that are</span>
+<span class="sd">        specified in :attr:`obs_vars`). Else (if input is dictionary, e.g.</span>
+<span class="sd">        `obs_vert_type=dict(od550aer=&#39;Column&#39;, ec550aer=&#39;ModelLevel&#39;)`),</span>
 <span class="sd">        information is extracted variable specific, for those who are defined</span>
 <span class="sd">        in the dictionary, for all others, `None` is used.</span>
 <span class="sd">    read_opts_ungridded : :obj:`dict`, optional</span>
@@ -288,20 +209,20 @@
     <span class="n">SUPPORTED_VERT_CODES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Column&#39;</span><span class="p">,</span> <span class="s1">&#39;Profile&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">]</span>
     <span class="n">ALT_NAMES_VERT_CODES</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ModelLevel</span> <span class="o">=</span> <span class="s1">&#39;Profile&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_ts_type_read</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_cfg</span><span class="p">()</span>
-    
+
 <div class="viewcode-block" id="ObsConfigEval.check_cfg"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.ObsConfigEval.check_cfg">[docs]</a>    <span class="k">def</span> <span class="nf">check_cfg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check that minimum required attributes are set and okay&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid value for obs_id: </span><span class="si">{}</span><span class="s1">. Need str.&#39;</span>
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -328,17 +249,17 @@
                                              <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_VERT_CODES</span><span class="p">))</span></div>
     <span class="k">def</span> <span class="nf">_check_ovt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ovt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if obs_vert_type string is valid alias</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        ovt : str</span>
 <span class="sd">            obs_vert_type string</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            valid obs_vert_type</span>
-<span class="sd">        </span>
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
@@ -354,191 +275,57 @@
                          <span class="s1">&#39;Supported codes are </span><span class="si">{}</span><span class="s1">.&#39;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span><span class="p">,</span>
                                  <span class="n">valid</span><span class="p">))</span></div>
-            
-        
+
 <div class="viewcode-block" id="ModelConfigEval"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.ModelConfigEval">[docs]</a><span class="k">class</span> <span class="nc">ModelConfigEval</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Modeln configuration for evaluation (dictionary)</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    Only :attr:`model_id` is mandatory, the rest is optional.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model_id : str</span>
 <span class="sd">        ID of model run in AeroCom database (e.g. &#39;ECMWF_CAMS_REAN&#39;)</span>
 <span class="sd">    model_ts_type_read : :obj:`str` or :obj:`dict`, optional</span>
-<span class="sd">        may be specified to explicitly define the reading frequency of the </span>
-<span class="sd">        model data. Not to be confused with :attr:`ts_type`, which specifies </span>
-<span class="sd">        the frequency used for colocation. Can be specified variable specific </span>
+<span class="sd">        may be specified to explicitly define the reading frequency of the</span>
+<span class="sd">        model data. Not to be confused with :attr:`ts_type`, which specifies</span>
+<span class="sd">        the frequency used for colocation. Can be specified variable specific</span>
 <span class="sd">        by providing a dictionary.</span>
 <span class="sd">    model_use_vars : :obj:`dict`, optional</span>
-<span class="sd">        dictionary that specifies mapping of model variables. Keys are </span>
-<span class="sd">        observation variables, values are the corresponding model variables </span>
+<span class="sd">        dictionary that specifies mapping of model variables. Keys are</span>
+<span class="sd">        observation variables, values are the corresponding model variables</span>
 <span class="sd">        (e.g. model_use_vars=dict(od550aer=&#39;od550csaer&#39;))</span>
 <span class="sd">    model_read_aux : :obj:`dict`, optional</span>
 <span class="sd">        may be used to specify additional computation methods of variables from</span>
-<span class="sd">        models. Keys are obs variables, values are dictionaries with keys </span>
-<span class="sd">        `vars_required` (list of required variables for computation of var </span>
+<span class="sd">        models. Keys are obs variables, values are dictionaries with keys</span>
+<span class="sd">        `vars_required` (list of required variables for computation of var</span>
 <span class="sd">        and `fun` (method that takes list of read data objects and computes</span>
-<span class="sd">        and returns var)    </span>
+<span class="sd">        and returns var)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_ts_type_read</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_use_vars</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_read_aux</span> <span class="o">=</span> <span class="p">{}</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_cfg</span><span class="p">()</span>
-    
+
 <div class="viewcode-block" id="ModelConfigEval.check_cfg"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.ModelConfigEval.check_cfg">[docs]</a>    <span class="k">def</span> <span class="nf">check_cfg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check that minimum required attributes are set and okay&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for model_id </span><span class="si">{}</span><span class="s1">. Need str.&#39;</span>
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">))</span></div></div>
-    
-<div class="viewcode-block" id="reorder_experiments_menu_evaluation_iface"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.reorder_experiments_menu_evaluation_iface">[docs]</a><span class="k">def</span> <span class="nf">reorder_experiments_menu_evaluation_iface</span><span class="p">(</span><span class="n">menu_file</span><span class="p">,</span> <span class="n">exp_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Reorder experiment order in evaluation interface</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    menu_file : str</span>
-<span class="sd">        file path of menu.json file</span>
-<span class="sd">    exp_order : str or list, optional</span>
-<span class="sd">        desired experiment order (must not contain all available experiments </span>
-<span class="sd">        in menu)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">current</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">menu_file</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">exp_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># keep the way it is</span>
-        <span class="n">exp_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exp_order</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">exp_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">exp_order</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exp_order</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for exp_order, need None, str or list&#39;</span><span class="p">)</span>
-    
-    <span class="n">new</span> <span class="o">=</span> <span class="n">sort_dict_by_name</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">pref_list</span><span class="o">=</span><span class="n">exp_order</span><span class="p">)</span>
-    <span class="n">write_json</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">menu_file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="update_menu_evaluation_iface"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.update_menu_evaluation_iface">[docs]</a><span class="k">def</span> <span class="nf">update_menu_evaluation_iface</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ignore_experiments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Update menu for Aerocom Evaluation interface</span>
-<span class="sd">    </span>
-<span class="sd">    The menu.json file is created based on the available json map files in the</span>
-<span class="sd">    map directory of an experiment.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    config : AerocomEvaluation</span>
-<span class="sd">        instance of config class that has all relevant paths specified</span>
-<span class="sd">    ignore_experiments : list, optional</span>
-<span class="sd">        list containing experiment IDs that may be in the current menu.json </span>
-<span class="sd">        file and that are supposed to be removed from it.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">var_dummy</span><span class="p">():</span>
-        <span class="sd">&quot;&quot;&quot;Helper that creates empty dict for variable info&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span>      <span class="p">:</span>   <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;cat&#39;</span>       <span class="p">:</span>   <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;name&#39;</span>      <span class="p">:</span>   <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;longname&#39;</span>  <span class="p">:</span>   <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;obs&#39;</span>       <span class="p">:</span>   <span class="p">{}}</span>
-        
-    <span class="n">new</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">exp_id</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">exp_id</span>
-    <span class="k">if</span> <span class="n">ignore_experiments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ignore_experiments</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">tab</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_web_overview_table</span><span class="p">()</span>
-    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-        <span class="n">tab</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-    
-    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">tab</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-        <span class="n">obs_var</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">vert_code</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">mod_var</span> <span class="o">=</span> <span class="n">info</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">new</span><span class="p">:</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Adding new observation variable: </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_var</span><span class="p">))</span>
-            <span class="n">new</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span> <span class="o">=</span> <span class="n">var_dummy</span><span class="p">()</span>
-            <span class="n">name</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_obsvar_name_and_type</span><span class="p">(</span><span class="n">obs_var</span><span class="p">)</span>
-    
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tp</span>
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span>  <span class="o">=</span><span class="n">cat</span>
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;longname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span><span class="o">.</span><span class="n">description</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">]:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">][</span><span class="n">obs_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dobs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dobs</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">][</span><span class="n">obs_name</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">vert_code</span> <span class="ow">in</span> <span class="n">dobs</span><span class="p">:</span>
-            <span class="n">dobs</span><span class="p">[</span><span class="n">vert_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">dobs_vert</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dobs_vert</span> <span class="o">=</span> <span class="n">dobs</span><span class="p">[</span><span class="n">vert_code</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">mod_name</span> <span class="ow">in</span> <span class="n">dobs_vert</span><span class="p">:</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Overwriting old entry for </span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">dobs_vert</span><span class="p">[</span><span class="n">mod_name</span><span class="p">]))</span>
-        <span class="n">dobs_vert</span><span class="p">[</span><span class="n">mod_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dir&#39;</span> <span class="p">:</span> <span class="n">mod_name</span><span class="p">,</span>
-                               <span class="s1">&#39;id&#39;</span>  <span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">model_config</span><span class="p">[</span><span class="n">mod_name</span><span class="p">][</span><span class="s1">&#39;model_id&#39;</span><span class="p">],</span>
-                               <span class="s1">&#39;var&#39;</span> <span class="p">:</span> <span class="n">mod_var</span><span class="p">}</span>
-    
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>  <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">_new</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">var_order_menu</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">_new</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No variable </span><span class="si">{}</span><span class="s1"> found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">_new</span><span class="p">:</span>
-                <span class="n">_new</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
-        <span class="n">new</span> <span class="o">=</span> <span class="n">_new</span>
-        
-    <span class="n">new_sorted</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">new_sorted</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
-        <span class="n">sorted_obs</span> <span class="o">=</span> <span class="n">sort_dict_by_name</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">])</span>
-        <span class="n">new_sorted</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;obs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sorted_obs</span>
-        <span class="k">for</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">vert_codes</span> <span class="ow">in</span> <span class="n">sorted_obs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">vert_codes_sorted</span> <span class="o">=</span> <span class="n">sort_dict_by_name</span><span class="p">(</span><span class="n">vert_codes</span><span class="p">)</span>
-            <span class="n">new_sorted</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;obs&#39;</span><span class="p">][</span><span class="n">obs_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">vert_codes_sorted</span>
-            <span class="k">for</span> <span class="n">vert_code</span><span class="p">,</span> <span class="n">models</span> <span class="ow">in</span> <span class="n">vert_codes_sorted</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">models_sorted</span> <span class="o">=</span> <span class="n">sort_dict_by_name</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
-                <span class="n">new_sorted</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;obs&#39;</span><span class="p">][</span><span class="n">obs_name</span><span class="p">][</span><span class="n">vert_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">models_sorted</span>
-    <span class="n">new_menu</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">basedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">menu_file</span><span class="p">)</span>
-    <span class="n">available_exps</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">menu_file</span><span class="p">):</span>
-        <span class="n">current</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">menu_file</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">submenu</span> <span class="ow">in</span> <span class="n">current</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">ignore_experiments</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">submenu</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">available_exps</span><span class="p">:</span>
-                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Removing outdated experiment </span><span class="si">{}</span><span class="s1"> from &#39;</span>
-                                     <span class="s1">&#39;menu.json&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exp</span><span class="p">))</span>
-                <span class="k">continue</span>
-            <span class="n">new_menu</span><span class="p">[</span><span class="n">exp</span><span class="p">]</span> <span class="o">=</span> <span class="n">submenu</span>
-    
-    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">exp_id</span> <span class="ow">in</span> <span class="n">new_menu</span><span class="p">:</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Sub menu for experiment </span><span class="si">{}</span><span class="s1"> already exists in &#39;</span>
-                                <span class="s1">&#39;menu.json and will be overwritten&#39;</span>
-                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">exp_id</span><span class="p">))</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_sorted</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">new_menu</span><span class="p">[</span><span class="n">exp_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_sorted</span>
-    
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">menu_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_menu</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span></div>
- 
+
 <div class="viewcode-block" id="read_json"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.read_json">[docs]</a><span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read json file</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    file_path : str</span>
 <span class="sd">        json file path</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
@@ -550,7 +337,7 @@
 
 <div class="viewcode-block" id="write_json"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.write_json">[docs]</a><span class="k">def</span> <span class="nf">write_json</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save json file</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data_dict : dict</span>
@@ -560,169 +347,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="update_menu_trends_iface"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.update_menu_trends_iface">[docs]</a><span class="k">def</span> <span class="nf">update_menu_trends_iface</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Update menu for Aerosol trends interface</span>
-<span class="sd">    </span>
-<span class="sd">    The menu.json file is created based on the available json map files in the</span>
-<span class="sd">    map directory of an experiment.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    config : AerocomEvaluation</span>
-<span class="sd">        instance of config class that has all relevant paths specified</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">var_dummy</span><span class="p">():</span>
-        <span class="sd">&quot;&quot;&quot;Helper that creates empty dict for variable info&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span>      <span class="p">:</span>   <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;cat&#39;</span>       <span class="p">:</span>   <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;name&#39;</span>      <span class="p">:</span>   <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;longname&#39;</span>  <span class="p">:</span>   <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;obs&#39;</span>       <span class="p">:</span>   <span class="p">{}}</span>
-        
-    <span class="n">new</span> <span class="o">=</span> <span class="p">{}</span>
-    
-    <span class="n">tab</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_web_overview_table</span><span class="p">()</span>
-    
-    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">tab</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-        <span class="p">(</span><span class="n">obs_name</span><span class="p">,</span> <span class="n">obs_id</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">,</span> 
-         <span class="n">vert_code</span><span class="p">,</span> 
-         <span class="n">mod_name</span><span class="p">,</span> <span class="n">mod_id</span><span class="p">,</span> <span class="n">mod_var</span><span class="p">,</span> <span class="n">mod_type</span><span class="p">,</span> 
-         <span class="n">periods</span><span class="p">)</span> <span class="o">=</span> <span class="n">info</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">new</span><span class="p">:</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Adding new observation variable: </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_var</span><span class="p">))</span>
-            <span class="n">new</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span> <span class="o">=</span> <span class="n">var_dummy</span><span class="p">()</span>
-            <span class="n">name</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_obsvar_name_and_type</span><span class="p">(</span><span class="n">obs_var</span><span class="p">)</span>
-    
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tp</span>
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cat</span>
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;longname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span><span class="o">.</span><span class="n">description</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">]:</span>
-            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">][</span><span class="n">obs_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dobs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dobs</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">][</span><span class="n">obs_name</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">vert_code</span> <span class="ow">in</span> <span class="n">dobs</span><span class="p">:</span>
-            <span class="n">dobs</span><span class="p">[</span><span class="n">vert_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">dobs_vert</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">obs_id</span><span class="o">=</span><span class="n">obs_id</span><span class="p">,</span>
-                                               <span class="n">period</span><span class="o">=</span><span class="n">periods</span><span class="p">,</span>
-                                               <span class="n">modsat</span><span class="o">=</span> <span class="p">{})</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dobs_vert</span> <span class="o">=</span> <span class="n">dobs</span><span class="p">[</span><span class="n">vert_code</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">mod_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">mod_name</span> <span class="ow">in</span> <span class="n">dobs_vert</span><span class="p">[</span><span class="s1">&#39;modsat&#39;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Model </span><span class="si">{}</span><span class="s1"> already exists in </span><span class="si">{}</span><span class="s1">. This should &#39;</span>
-                               <span class="s1">&#39;not occur. please debug...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">dobs</span><span class="p">))</span>
-            <span class="n">dobs_vert</span><span class="p">[</span><span class="s1">&#39;modsat&#39;</span><span class="p">][</span><span class="n">mod_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">var</span><span class="o">=</span> <span class="n">mod_var</span><span class="p">,</span>
-                                                 <span class="n">mtype</span><span class="o">=</span><span class="n">mod_type</span><span class="p">,</span>
-                                                 <span class="n">mid</span><span class="o">=</span><span class="n">mod_id</span><span class="p">)</span>
-        
-    <span class="n">_new</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">var_order_menu</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">_new</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No variable </span><span class="si">{}</span><span class="s1"> found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">_new</span><span class="p">:</span>
-            <span class="n">_new</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
-    <span class="n">new</span> <span class="o">=</span> <span class="n">_new</span>
-    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">obs_order_menu_cfg</span><span class="p">:</span>
-        <span class="n">pref_obs_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">obs_config</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">pref_obs_order</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">new_sorted</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">new_sorted</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
-        <span class="n">sorted_obs</span> <span class="o">=</span> <span class="n">sort_dict_by_name</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">],</span>
-                                       <span class="n">pref_list</span><span class="o">=</span><span class="n">pref_obs_order</span><span class="p">)</span>
-        <span class="n">new_sorted</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;obs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sorted_obs</span>
-        <span class="k">for</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">vert_codes</span> <span class="ow">in</span> <span class="n">sorted_obs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">vert_codes_sorted</span> <span class="o">=</span> <span class="n">sort_dict_by_name</span><span class="p">(</span><span class="n">vert_codes</span><span class="p">)</span>
-            <span class="n">new_sorted</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;obs&#39;</span><span class="p">][</span><span class="n">obs_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">vert_codes_sorted</span>
-            <span class="k">for</span> <span class="n">vert_code</span><span class="p">,</span> <span class="n">models</span> <span class="ow">in</span> <span class="n">vert_codes_sorted</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">models_sorted</span> <span class="o">=</span> <span class="n">sort_dict_by_name</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
-                <span class="n">new_sorted</span><span class="p">[</span><span class="n">var</span><span class="p">][</span><span class="s1">&#39;obs&#39;</span><span class="p">][</span><span class="n">obs_name</span><span class="p">][</span><span class="n">vert_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">models_sorted</span>
-    
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">menu_file</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_sorted</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span></div>
-        
-<div class="viewcode-block" id="make_info_table_evaluation_iface"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.make_info_table_evaluation_iface">[docs]</a><span class="k">def</span> <span class="nf">make_info_table_evaluation_iface</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">ColocatedData</span>
-    <span class="kn">import</span> <span class="nn">glob</span>
-    <span class="n">menu</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">menu_file</span>
-        
-        
-    <span class="n">SKIP_META</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="s1">&#39;var_name&#39;</span><span class="p">,</span> <span class="s1">&#39;lon_range&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;lat_range&#39;</span><span class="p">,</span> <span class="s1">&#39;alt_range&#39;</span><span class="p">]</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">menu</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">menu</span> <span class="o">=</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">exp_id</span> <span class="ow">in</span> <span class="n">menu</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;No menu entry available for experiment </span><span class="si">{}</span><span class="s1">&#39;</span>
-                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">exp_id</span><span class="p">))</span>
-    <span class="n">table</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">exp</span> <span class="o">=</span> <span class="n">menu</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">exp_id</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">obs_var</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">vert_types</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">for</span> <span class="n">vert_type</span><span class="p">,</span> <span class="n">models</span> <span class="ow">in</span> <span class="n">vert_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">for</span> <span class="n">mname</span><span class="p">,</span> <span class="n">minfo</span> <span class="ow">in</span> <span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">mname</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
-                        <span class="n">table</span><span class="p">[</span><span class="n">mname</span><span class="p">]</span> <span class="o">=</span> <span class="n">mi</span> <span class="o">=</span> <span class="p">{}</span>
-                        <span class="n">mi</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_id</span> <span class="o">=</span> <span class="n">minfo</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">mi</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">mname</span><span class="p">]</span>
-                        <span class="n">model_id</span> <span class="o">=</span> <span class="n">mi</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="n">minfo</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">mi</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]:</span>
-                            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Unexpected error: conflict in model ID and name&#39;</span><span class="p">)</span>
-                    
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">mo</span> <span class="o">=</span> <span class="n">mi</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">]</span>
-                    <span class="k">except</span><span class="p">:</span>
-                        <span class="n">mi</span><span class="p">[</span><span class="s1">&#39;obs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mo</span> <span class="o">=</span> <span class="p">{}</span>
-                    <span class="k">if</span> <span class="s1">&#39;var&#39;</span> <span class="ow">in</span> <span class="n">minfo</span><span class="p">:</span>
-                        <span class="n">mvar</span> <span class="o">=</span> <span class="n">minfo</span><span class="p">[</span><span class="s1">&#39;var&#39;</span><span class="p">]</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">mvar</span> <span class="o">=</span> <span class="n">obs_var</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">mo</span><span class="p">:</span>
-                        <span class="n">mo</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">oi</span> <span class="o">=</span> <span class="p">{}</span>
-                    <span class="k">else</span><span class="p">:</span> 
-                        <span class="n">oi</span> <span class="o">=</span> <span class="n">mo</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="n">oi</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">Exception</span>
-                    <span class="n">oi</span><span class="p">[</span><span class="n">obs_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">motab</span> <span class="o">=</span> <span class="p">{}</span>
-                    <span class="n">motab</span><span class="p">[</span><span class="s1">&#39;model_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mvar</span>
-                    <span class="n">motab</span><span class="p">[</span><span class="s1">&#39;obs_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_obs_id</span><span class="p">(</span><span class="n">obs_name</span><span class="p">)</span>
-                    <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">*REF-</span><span class="si">{}</span><span class="s1">*.nc&#39;</span>
-                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">coldata_dir</span><span class="p">,</span> 
-                                              <span class="n">model_id</span><span class="p">,</span> <span class="n">mvar</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">))</span>
-                    
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                            <span class="n">motab</span><span class="p">[</span><span class="s1">&#39;MULTIFILES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">motab</span><span class="p">[</span><span class="s1">&#39;NOFILES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">continue</span>
-                    
-                    <span class="n">coldata</span> <span class="o">=</span> <span class="n">ColocatedData</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">coldata</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">SKIP_META</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                                    <span class="n">motab</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_obs&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                                    <span class="n">motab</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_mod&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                                <span class="k">else</span><span class="p">:</span>
-                                    <span class="n">motab</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">])</span>
-                            <span class="k">else</span><span class="p">:</span>
-                                <span class="n">motab</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">table</span></div>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">()</span>
-    
 </pre></div>
 
            </div>

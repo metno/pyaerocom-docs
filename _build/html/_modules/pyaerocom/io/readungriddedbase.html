@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -168,65 +168,67 @@
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">list_to_shortstr</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="kn">import</span> <span class="n">get_obsnetwork_dir</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">LOGLEVELS</span>
-<span class="c1"># TODO: Proposal: include attribute ts_type that is by default undefined but </span>
-<span class="c1"># may be set to either of the defined </span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">varlist_aerocom</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">DataSourceError</span>
+<span class="c1"># TODO: Proposal: include attribute ts_type that is by default undefined but</span>
+<span class="c1"># may be set to either of the defined</span>
 <div class="viewcode-block" id="ReadUngriddedBase"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase">[docs]</a><span class="k">class</span> <span class="nc">ReadUngriddedBase</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;TEMPLATE: Abstract base class template for reading of ungridded data</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. note::</span>
-<span class="sd">    </span>
-<span class="sd">        The two dictionaries ``AUX_REQUIRES`` and ``AUX_FUNS`` can be filled </span>
+
+<span class="sd">        The two dictionaries ``AUX_REQUIRES`` and ``AUX_FUNS`` can be filled</span>
 <span class="sd">        with variables that are not contained in the original data files but</span>
-<span class="sd">        are computed during the reading. The former specifies what additional </span>
-<span class="sd">        variables are required to perform the computation and the latter </span>
-<span class="sd">        specifies functions used to perform the computations of the auxiliary </span>
-<span class="sd">        variables. </span>
-<span class="sd">        See, for instance, the class :class:`ReadAeronetSunV3`, which includes </span>
-<span class="sd">        the computation of the AOD at 550nm and the Angstrom coefficient </span>
+<span class="sd">        are computed during the reading. The former specifies what additional</span>
+<span class="sd">        variables are required to perform the computation and the latter</span>
+<span class="sd">        specifies functions used to perform the computations of the auxiliary</span>
+<span class="sd">        variables.</span>
+<span class="sd">        See, for instance, the class :class:`ReadAeronetSunV3`, which includes</span>
+<span class="sd">        the computation of the AOD at 550nm and the Angstrom coefficient</span>
 <span class="sd">        (in 440-870 nm range) from AODs measured at other wavelengths.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#: version of this base class. Please update if you apply changes to this</span>
     <span class="c1">#: code. This version is required for caching and needs to be considered</span>
     <span class="c1">#: in the definition of __version__ in all derived classes, so that</span>
     <span class="c1">#: caching can be done reliably</span>
-    <span class="n">__baseversion__</span> <span class="o">=</span> <span class="s1">&#39;0.07&#39;</span>
-    
+    <span class="n">__baseversion__</span> <span class="o">=</span> <span class="s1">&#39;0.08&#39;</span>
+
     <span class="c1">#: dictionary containing information about additionally required variables</span>
     <span class="c1">#: for each auxiliary variable (i.e. each variable that is not provided</span>
     <span class="c1">#: by the original data but computed on import)</span>
     <span class="n">AUX_REQUIRES</span> <span class="o">=</span> <span class="p">{}</span>
-    
-    <span class="c1">#: Functions that are used to compute additional variables (i.e. one </span>
+
+    <span class="c1">#: Functions that are used to compute additional variables (i.e. one</span>
     <span class="c1">#: for each variable defined in AUX_REQUIRES)</span>
     <span class="n">AUX_FUNS</span> <span class="o">=</span> <span class="p">{}</span>
-    
+
     <span class="n">IGNORE_META_KEYS</span> <span class="o">=</span> <span class="p">[]</span>
-    
+
     <span class="n">_FILEMASK</span> <span class="o">=</span> <span class="s1">&#39;*.*&#39;</span>
-    
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Dataset name: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;Data directory: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;Supported variables: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;Last revision: </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">,</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_revision</span><span class="p">))</span>
-    
+
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span> <span class="nf">TS_TYPE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Temporal resolution of dataset </span>
-<span class="sd">        </span>
-<span class="sd">        This should be defined in the header of an implementation class if </span>
-<span class="sd">        it can be globally defined for the corresponding obs-network or in </span>
-<span class="sd">        other cases it should be initated as string ``undefined`` and then, </span>
-<span class="sd">        if applicable, updated in the reading routine of a file. </span>
-<span class="sd">        </span>
-<span class="sd">        The TS_TYPE information should ultimately be written into the meta-data </span>
+        <span class="sd">&quot;&quot;&quot;Temporal resolution of dataset</span>
+
+<span class="sd">        This should be defined in the header of an implementation class if</span>
+<span class="sd">        it can be globally defined for the corresponding obs-network or in</span>
+<span class="sd">        other cases it should be initated as string ``undefined`` and then,</span>
+<span class="sd">        if applicable, updated in the reading routine of a file.</span>
+
+<span class="sd">        The TS_TYPE information should ultimately be written into the meta-data</span>
 <span class="sd">        of objects returned by the implementation of :func:`read_file` (e.g.</span>
 <span class="sd">        instance of :class:`StationData` or a normal dictionary) and the method</span>
-<span class="sd">        :func:`read` (which should ALWAYS return an instance of the </span>
+<span class="sd">        :func:`read` (which should ALWAYS return an instance of the</span>
 <span class="sd">        :class:`UngriddedData` class).</span>
-<span class="sd">        </span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        - Please use ``&quot;undefined&quot;`` if the derived class is not sampled on \</span>
@@ -242,116 +244,114 @@
 <span class="sd">            network versions, you may also assign</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
-    
+
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span> <span class="nf">_FILEMASK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Mask for identifying datafiles (e.g. &#39;*.txt&#39;)</span>
-<span class="sd">        </span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        May be implemented as global constant in header</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
-    
+
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span> <span class="nf">__version__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Version of reading class</span>
-<span class="sd">        </span>
-<span class="sd">        Keeps track of changes in derived reading class (e.g. to assess whether </span>
+
+<span class="sd">        Keeps track of changes in derived reading class (e.g. to assess whether</span>
 <span class="sd">        potential cache-files are outdated).</span>
-<span class="sd">        </span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        May be implemented as global constant in header</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
-    
+
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span> <span class="nf">DATA_ID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Name of dataset (OBS_ID)</span>
-<span class="sd">        </span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        </span>
+
 <span class="sd">        - May be implemented as global constant in header of derieved class</span>
 <span class="sd">        - May be multiple that can be specified on init (see example below)</span>
-<span class="sd">        </span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>        
-    
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">data_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Wrapper for :attr:`DATA_ID` (pyaerocom standard name)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span>
-    
+        <span class="k">pass</span>
+
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span> <span class="nf">SUPPORTED_DATASETS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List of all datasets supported by this interface</span>
-<span class="sd">        </span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        </span>
+
 <span class="sd">        - best practice to specify in header of class definition</span>
 <span class="sd">        - needless to mention that :attr:`DATA_ID` needs to be in this list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
-    
+
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span> <span class="nf">PROVIDES_VARIABLES</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List of variables that are provided by this dataset</span>
-<span class="sd">        </span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        May be implemented as global constant in header</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
-    
+
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span> <span class="nf">DEFAULT_VARS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List containing default variables to read&quot;&quot;&quot;</span>
         <span class="k">pass</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">DATASET_PATH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Path to datafiles of specified dataset </span>
-<span class="sd">        </span>
-<span class="sd">        Is retrieved automatically based on network ID (:attr:`DATA_ID`)</span>
-<span class="sd">        using :func:`get_obsnetwork_dir` (which uses the information in </span>
+        <span class="sd">&quot;&quot;&quot;Path to datafiles of specified dataset</span>
+
+<span class="sd">        Is retrieved automatically (if not specified explicitely on class</span>
+<span class="sd">        instantiation), based on network ID (:attr:`DATA_ID`)</span>
+<span class="sd">        using :func:`get_obsnetwork_dir` (which uses the information in</span>
 <span class="sd">        ``pyaerocom.const``).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">get_obsnetwork_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span><span class="p">)</span>
-        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_path</span>
+        <span class="k">return</span> <span class="n">get_obsnetwork_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">)</span>
+
 <div class="viewcode-block" id="ReadUngriddedBase.read_file"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.read_file">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Read single file </span>
-<span class="sd">        </span>
+        <span class="sd">&quot;&quot;&quot;Read single file</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filename : str</span>
 <span class="sd">            string specifying filename</span>
 <span class="sd">        vars_to_retrieve : :obj:`list` or similar, optional,</span>
-<span class="sd">            list containing variable IDs that are supposed to be read. If None, </span>
+<span class="sd">            list containing variable IDs that are supposed to be read. If None,</span>
 <span class="sd">            all variables in :attr:`PROVIDES_VARIABLES` are loaded</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :obj:`dict` or :obj:`StationData`, or other...</span>
-<span class="sd">            imported data in a suitable format that can be handled by </span>
-<span class="sd">            :func:`read` which is supposed to append the loaded results from </span>
-<span class="sd">            this method (which reads one datafile) to an instance of </span>
+<span class="sd">            imported data in a suitable format that can be handled by</span>
+<span class="sd">            :func:`read` which is supposed to append the loaded results from</span>
+<span class="sd">            this method (which reads one datafile) to an instance of</span>
 <span class="sd">            :class:`UngriddedData` for all files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
-    
+
 <div class="viewcode-block" id="ReadUngriddedBase.read"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.read">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">[],</span> <span class="n">first_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">[],</span> <span class="n">first_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">last_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method that reads list of files as instance of :class:`UngriddedData`</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        vars_to_retrieve : :obj:`list` or similar, optional,</span>
-<span class="sd">            list containing variable IDs that are supposed to be read. If None, </span>
+<span class="sd">            list containing variable IDs that are supposed to be read. If None,</span>
 <span class="sd">            all variables in :attr:`PROVIDES_VARIABLES` are loaded</span>
 <span class="sd">        files : :obj:`list`, optional</span>
 <span class="sd">            list of files to be read. If None, then the file list is used that</span>
@@ -360,9 +360,9 @@
 <span class="sd">            index of first file in file list to read. If None, the very first</span>
 <span class="sd">            file in the list is used</span>
 <span class="sd">        last_file : :obj:`int`, optional</span>
-<span class="sd">            index of last file in list to read. If None, the very last file </span>
+<span class="sd">            index of last file in list to read. If None, the very last file</span>
 <span class="sd">            in the list is used</span>
-<span class="sd">            </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        UngriddedData</span>
@@ -372,44 +372,52 @@
 
     <span class="c1">### Concrete implementations of methods that are the same for all (or most)</span>
     <span class="c1"># of the derived reading classes</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1">#object that holds the loaded data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># list that will be updated in read method to store all files that</span>
         <span class="c1"># could not be read. It is the responsibility of developers of derived</span>
-        <span class="c1"># classes to include a try / except block in method read, where the </span>
+        <span class="c1"># classes to include a try / except block in method read, where the</span>
         <span class="c1"># method read_file is called, and in case of an Exception, append the</span>
         <span class="c1"># corresponding file path to this list.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_failed</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_path</span> <span class="o">=</span> <span class="n">dataset_path</span>
+
         <span class="c1">#: Class own instance of logger class</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_aux_variables</span><span class="p">()</span>
-        
+
         <span class="k">if</span> <span class="n">dataset_to_read</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_DATASETS</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Dataset </span><span class="si">{}</span><span class="s2"> not supported by this &quot;</span>
                                      <span class="s2">&quot;interface&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span> <span class="o">=</span> <span class="n">dataset_to_read</span>
-    
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span> <span class="o">=</span> <span class="n">dataset_to_read</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wrapper for :attr:`DATA_ID` (pyaerocom standard name)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">REVISION_FILE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Name of revision file located in data directory&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">REVISION_FILE</span>
-            
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">AUX_VARS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;List of auxiliary variables (keys of attr. :attr:`AUX_REQUIRES`)</span>
-<span class="sd">        </span>
+
 <span class="sd">        Auxiliary variables are those that are not included in original files</span>
 <span class="sd">        but are computed from other variables during import</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AUX_REQUIRES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dataset_to_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span>
-    
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data_revision</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Revision string from file Revision.txt in the main data directory</span>
@@ -422,16 +430,16 @@
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">revision_file</span><span class="p">):</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">revision_file</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_file</span><span class="p">:</span>
                     <span class="n">rev</span> <span class="o">=</span> <span class="n">in_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_revision</span> <span class="o">=</span> <span class="n">rev</span>
         <span class="k">return</span> <span class="n">rev</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">verbosity_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Current level of verbosity of logger&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span>
-    
+
     <span class="nd">@verbosity_level</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">verbosity_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -439,7 +447,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid input for loglevel&quot;</span><span class="p">)</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">LOGLEVELS</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-        
+
     <span class="k">def</span> <span class="nf">_add_aux_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Helper that makes sure all auxiliary variables can be computed&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUX_REQUIRES</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -450,34 +458,34 @@
                                      <span class="s2">&quot;AUX_FUNS&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-                
+
     <span class="k">def</span> <span class="nf">_add_additional_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add required additional variables for computation to input list</span>
-<span class="sd">        </span>
-<span class="sd">        Helper method that is called in :func:`check_vars_to_retrieve` </span>
-<span class="sd">        in order to find all variables that are required for a specified </span>
-<span class="sd">        retrieval. This is relevant for additionally computed variables </span>
-<span class="sd">        (attribute ``AUX_VARS``) that are not available in the original data </span>
-<span class="sd">        files, but are computed from available parameters. </span>
-<span class="sd">        </span>
+
+<span class="sd">        Helper method that is called in :func:`check_vars_to_retrieve`</span>
+<span class="sd">        in order to find all variables that are required for a specified</span>
+<span class="sd">        retrieval. This is relevant for additionally computed variables</span>
+<span class="sd">        (attribute ``AUX_VARS``) that are not available in the original data</span>
+<span class="sd">        files, but are computed from available parameters.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        vars_to_retrieve : list</span>
-<span class="sd">            list of variables supported by this interface (i.e. must be </span>
+<span class="sd">            list of variables supported by this interface (i.e. must be</span>
 <span class="sd">            contained in ``PROVIDES_VARIABLES``)</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        tuple</span>
 <span class="sd">            2-element tuple, containing</span>
-<span class="sd">            </span>
+
 <span class="sd">            - bool : boolean, specifying whether variables list of required \</span>
 <span class="sd">            variables needs to be extended or the order was changed</span>
 <span class="sd">            - list : additionally required variables</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">added_vars</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUX_VARS</span><span class="p">:</span>
                 <span class="n">vars_req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUX_REQUIRES</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
@@ -492,46 +500,71 @@
                             <span class="c1"># calling this method until nothing is changed or</span>
                             <span class="c1"># added)</span>
                             <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">added_vars</span> <span class="o">+</span> <span class="n">vars_to_retrieve</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span> 
+                    <span class="k">else</span><span class="p">:</span>
                         <span class="n">added_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var_req</span><span class="p">)</span>
                         <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1"># it is important to insert the additionally required variables in</span>
-        <span class="c1"># the beginning, as these need to be computed first later on </span>
+        <span class="c1"># the beginning, as these need to be computed first later on</span>
         <span class="c1"># Example: if vars_to_retrieve=[&#39;od550aer&#39;] then this loop will</span>
-        <span class="c1"># find out that this requires &#39;ang4487aer&#39; to be computed as </span>
-        <span class="c1"># well. So at the end of this function, ang4487aer needs to be </span>
+        <span class="c1"># find out that this requires &#39;ang4487aer&#39; to be computed as</span>
+        <span class="c1"># well. So at the end of this function, ang4487aer needs to be</span>
         <span class="c1"># before od550aer in the list vars_to_compute, since the method</span>
         <span class="c1"># &quot;compute_additional_vars&quot; loops over that list in the specified</span>
         <span class="c1"># order</span>
         <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">added_vars</span> <span class="o">+</span> <span class="n">vars_to_retrieve</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">changed</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="p">)</span>
-                
+
+<div class="viewcode-block" id="ReadUngriddedBase.var_supported"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.var_supported">[docs]</a>    <span class="k">def</span> <span class="nf">var_supported</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if input variable is supported</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        var_name : str</span>
+<span class="sd">            AeroCom variable name or alias</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        VariableDefinitionError</span>
+<span class="sd">            if input variable is not supported by pyaerocom</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True, if variable is supported by this interface, else False</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span> <span class="ow">or</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">var_name_aerocom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
 <div class="viewcode-block" id="ReadUngriddedBase.check_vars_to_retrieve"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.check_vars_to_retrieve">[docs]</a>    <span class="k">def</span> <span class="nf">check_vars_to_retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Separate variables that are in file from those that are computed</span>
-<span class="sd">        </span>
+
 <span class="sd">        Some of the provided variables by this interface are not included in</span>
 <span class="sd">        the data files but are computed within this class during data import</span>
-<span class="sd">        (e.g. od550aer, ang4487aer). </span>
-<span class="sd">        </span>
-<span class="sd">        The latter may require additional parameters to be retrieved from the </span>
+<span class="sd">        (e.g. od550aer, ang4487aer).</span>
+
+<span class="sd">        The latter may require additional parameters to be retrieved from the</span>
 <span class="sd">        file, which is specified in the class header (cf. attribute</span>
 <span class="sd">        ``AUX_REQUIRES``).</span>
-<span class="sd">        </span>
-<span class="sd">        This function checks the input list that specifies all required </span>
+
+<span class="sd">        This function checks the input list that specifies all required</span>
 <span class="sd">        variables and separates them into two lists, one that includes all</span>
 <span class="sd">        variables that can be read from the files and a second list that</span>
 <span class="sd">        specifies all variables that are computed in this class.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        vars_to_retrieve : list</span>
 <span class="sd">            all parameter names that are supposed to be loaded</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        tuple</span>
 <span class="sd">            2-element tuple, containing</span>
-<span class="sd">            </span>
+
 <span class="sd">            - list: list containing all variables to be read</span>
 <span class="sd">            - list: list containing all variables to be computed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -539,28 +572,30 @@
             <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_VARS</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_to_retrieve</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">all</span><span class="p">([</span><span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span><span class="p">])):</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;One or more of the desired variables is not &quot;</span>
-                                 <span class="s2">&quot;supported by this dataset.&quot;</span><span class="p">)</span>
-        
-        
+        <span class="c1"># first, check if input variables are alias names, and replace</span>
+        <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">varlist_aerocom</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">)</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1">#         if not(all([x in self.PROVIDES_VARIABLES for x in vars_to_retrieve])):</span>
+<span class="c1">#             raise AttributeError(&quot;One or more of the desired variables is not &quot;</span>
+<span class="c1">#                                  &quot;supported by this dataset.&quot;)</span>
+<span class="c1"># =============================================================================</span>
         <span class="n">repeat</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">while</span> <span class="n">repeat</span><span class="p">:</span>
             <span class="n">repeat</span><span class="p">,</span> <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_additional_vars</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">)</span>
-            
-        
-        <span class="c1"># unique list containing all variables that are supposed to be read, </span>
-        <span class="c1"># either because they are required to be retrieved, or because they </span>
-        <span class="c1"># are supposed to be read because they are required to compute one </span>
+
+        <span class="c1"># unique list containing all variables that are supposed to be read,</span>
+        <span class="c1"># either because they are required to be retrieved, or because they</span>
+        <span class="c1"># are supposed to be read because they are required to compute one</span>
         <span class="c1"># of the output variables</span>
         <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">))</span>
-    
-        <span class="c1"># in the following, vars_to_retrieve is separated into two arrays, one </span>
-        <span class="c1"># containing all variables that can be read from the files, and the </span>
+
+        <span class="c1"># in the following, vars_to_retrieve is separated into two arrays, one</span>
+        <span class="c1"># containing all variables that can be read from the files, and the</span>
         <span class="c1"># second containing all variables that are computed</span>
         <span class="n">vars_to_read</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">vars_to_compute</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid variable </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
@@ -569,64 +604,59 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">vars_to_read</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">vars_to_read</span><span class="p">,</span> <span class="n">vars_to_compute</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="ReadUngriddedBase.compute_additional_vars"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.compute_additional_vars">[docs]</a>    <span class="k">def</span> <span class="nf">compute_additional_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">vars_to_compute</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute all additional variables</span>
-<span class="sd">        </span>
-<span class="sd">        The computations for each additional parameter are done using the </span>
+
+<span class="sd">        The computations for each additional parameter are done using the</span>
 <span class="sd">        specified methods in ``AUX_FUNS``.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        data : dict-like</span>
 <span class="sd">            data object containing data vectors for variables that are required</span>
 <span class="sd">            for computation (cf. input param ``vars_to_compute``)</span>
 <span class="sd">        vars_to_compute : list</span>
-<span class="sd">            list of variable names that are supposed to be computed. </span>
+<span class="sd">            list of variable names that are supposed to be computed.</span>
 <span class="sd">            Variables that are required for the computation of the variables</span>
-<span class="sd">            need to be specified in :attr:`AUX_VARS` and need to be </span>
+<span class="sd">            need to be specified in :attr:`AUX_VARS` and need to be</span>
 <span class="sd">            available as data vectors in the provided data dictionary (key is</span>
 <span class="sd">            the corresponding variable name of the required variable).</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
 <span class="sd">            updated data object now containing also computed variables</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;var_info&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_compute</span><span class="p">:</span>
             <span class="n">required</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUX_REQUIRES</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
             <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">required</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
                     <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
-                    
+
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUX_FUNS</span><span class="p">[</span><span class="n">var</span><span class="p">](</span><span class="n">data</span><span class="p">)</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;contains_vars&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;contains_vars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span><span class="p">]</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#             else:</span>
-<span class="c1">#                 data[&#39;var_info&#39;][var][&#39;missing&#39;] = {&#39;num&#39; : len(data.dtime),</span>
-<span class="c1">#                                                     &#39;vars&#39;: missing}</span>
-<span class="c1"># =============================================================================</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;computed&#39;</span> <span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
         <span class="k">return</span> <span class="n">data</span></div>
-    
+
 <div class="viewcode-block" id="ReadUngriddedBase.remove_outliers"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.remove_outliers">[docs]</a>    <span class="k">def</span> <span class="nf">remove_outliers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="p">,</span> <span class="o">**</span><span class="n">valid_rng_vars</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove outliers from data</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        data : dict-like</span>
 <span class="sd">            data object containing data vectors for variables that are required</span>
 <span class="sd">            for computation (cf. input param ``vars_to_compute``)</span>
 <span class="sd">        vars_to_retrieve : list</span>
-<span class="sd">            list of variable names for which outliers will be removed from </span>
+<span class="sd">            list of variable names for which outliers will be removed from</span>
 <span class="sd">            data</span>
-<span class="sd">        **valid_rng_vars </span>
+<span class="sd">        **valid_rng_vars</span>
 <span class="sd">            additional keyword args specifying variable name and corresponding</span>
-<span class="sd">            min / max interval (list or tuple) that specifies valid range </span>
+<span class="sd">            min / max interval (list or tuple) that specifies valid range</span>
 <span class="sd">            for the variable. For each variable that is not explicitely defined</span>
 <span class="sd">            here, the default minimum / maximum value is used (accessed via</span>
 <span class="sd">            ``pyaerocom.const.VARS[var_name]``)</span>
@@ -644,22 +674,22 @@
                 <span class="n">vals</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                 <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
         <span class="k">return</span> <span class="n">data</span></div>
-    
+
 <div class="viewcode-block" id="ReadUngriddedBase.find_in_file_list"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.find_in_file_list">[docs]</a>    <span class="k">def</span> <span class="nf">find_in_file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find all files that match a certain wildcard pattern</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        pattern : :obj:`str`, optional</span>
 <span class="sd">            wildcard pattern that may be used to narrow down the search (e.g.</span>
-<span class="sd">            use ``pattern=*Berlin*`` to find only files that contain Berlin </span>
+<span class="sd">            use ``pattern=*Berlin*`` to find only files that contain Berlin</span>
 <span class="sd">            in their filename)</span>
-<span class="sd">            </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list </span>
+<span class="sd">        list</span>
 <span class="sd">            list containing all files in :attr:`files` that match pattern</span>
-<span class="sd">            </span>
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        IOError</span>
@@ -672,23 +702,23 @@
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;No files could be detected that match the &quot;</span>
                           <span class="s2">&quot;pattern&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">files</span></div>
-    
+
 <div class="viewcode-block" id="ReadUngriddedBase.get_file_list"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.get_file_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search all files to be read</span>
-<span class="sd">        </span>
-<span class="sd">        Uses :attr:`_FILEMASK` (+ optional input search pattern, e.g. </span>
+
+<span class="sd">        Uses :attr:`_FILEMASK` (+ optional input search pattern, e.g.</span>
 <span class="sd">        station_name) to find valid files for query.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        pattern : str, optional</span>
 <span class="sd">            file name pattern applied to search</span>
-<span class="sd">            </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list</span>
 <span class="sd">            list containing retrieved file locations</span>
-<span class="sd">        </span>
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        IOError</span>
@@ -703,39 +733,39 @@
                                     <span class="s1">&#39;using default pattern *.* for file search&#39;</span><span class="p">)</span>
             <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;*.*&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetching data files. This might take a while...&#39;</span><span class="p">)</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">,</span> 
+        <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">,</span>
                                               <span class="n">pattern</span><span class="p">)))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">all_str</span> <span class="o">=</span> <span class="n">list_to_shortstr</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">))</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;No files could be detected matching file mask </span><span class="si">{}</span><span class="s2"> &quot;</span>
-                          <span class="s2">&quot;in dataset </span><span class="si">{}</span><span class="s2">, files in folder </span><span class="si">{}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">Files in &quot;</span>
-                          <span class="s2">&quot;folder:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> 
+            <span class="k">raise</span> <span class="n">DataSourceError</span><span class="p">(</span><span class="s1">&#39;No files could be detected matching file &#39;</span>
+                                  <span class="s1">&#39;mask </span><span class="si">{}</span><span class="s1"> in dataset </span><span class="si">{}</span><span class="s1">, files in folder </span><span class="si">{}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                  <span class="s1">&#39;Files in folder:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span>
                                   <span class="bp">self</span><span class="o">.</span><span class="n">dataset_to_read</span><span class="p">,</span>
                                   <span class="bp">self</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">,</span>
                                   <span class="n">all_str</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="n">files</span>
         <span class="k">return</span> <span class="n">files</span></div>
-    
+
 <div class="viewcode-block" id="ReadUngriddedBase.read_station"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.read_station">[docs]</a>    <span class="k">def</span> <span class="nf">read_station</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">station_id_filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read data from a single station into :class:`UngriddedData`</span>
-<span class="sd">        </span>
+
 <span class="sd">        Find all files that contain the station ID in their filename and then</span>
-<span class="sd">        call :func:`read`, providing the reduced filelist as input, in order </span>
+<span class="sd">        call :func:`read`, providing the reduced filelist as input, in order</span>
 <span class="sd">        to read all files from this station into data object.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        station_id_filename : str</span>
 <span class="sd">            name of station (MUST be encrypted in filename)</span>
 <span class="sd">        **kwargs</span>
-<span class="sd">            additional keyword args passed to :func:`read` </span>
+<span class="sd">            additional keyword args passed to :func:`read`</span>
 <span class="sd">            (e.g. ``vars_to_retrieve``)</span>
-<span class="sd">            </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        UngriddedData</span>
 <span class="sd">            loaded data</span>
-<span class="sd">        </span>
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        IOError</span>
@@ -743,19 +773,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_in_file_list</span><span class="p">(</span><span class="s1">&#39;*</span><span class="si">{}</span><span class="s1">*&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">station_id_filename</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-        
+
 <div class="viewcode-block" id="ReadUngriddedBase.read_first_file"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungriddedbase.ReadUngriddedBase.read_first_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_first_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read first file returned from :func:`get_file_list`</span>
-<span class="sd">        </span>
+
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        This method may be used for test purposes. </span>
-<span class="sd">        </span>
+<span class="sd">        This method may be used for test purposes.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        **kwargs</span>
 <span class="sd">            keyword args passed to :func:`read_file` (e.g. vars_to_retrieve)</span>
-<span class="sd">            </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict-like</span>
@@ -774,17 +804,17 @@
         <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.01&quot;</span>
         <span class="n">PROVIDES_VARIABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;od550aer&quot;</span><span class="p">]</span>
         <span class="n">REVISION_FILE</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">REVISION_FILE</span>
-        
+
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">dataset_to_read</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">DATA_ID</span> <span class="o">=</span> <span class="n">dataset_to_read</span>
-        
+
         <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-            
+
         <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-            
+
     <span class="n">c</span> <span class="o">=</span> <span class="n">ReadUngriddedImplementationExample</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="o">=</span><span class="s1">&#39;AeronetSunV2Lev1.5.daily&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">DATASET_PATH</span><span class="p">)</span>
 </pre></div>

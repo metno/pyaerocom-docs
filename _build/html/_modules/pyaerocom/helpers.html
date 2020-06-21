@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -168,9 +168,11 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xray</span>
 
-<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">LongitudeConstraintError</span><span class="p">,</span> 
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">LongitudeConstraintError</span><span class="p">,</span>
                                   <span class="n">DataCoverageError</span><span class="p">,</span> <span class="n">MetaDataError</span><span class="p">,</span>
-                                  <span class="n">DataDimensionError</span><span class="p">)</span>
+                                  <span class="n">DataDimensionError</span><span class="p">,</span>
+                                  <span class="n">VariableDefinitionError</span><span class="p">,</span>
+                                  <span class="n">ResamplingError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.time_config</span> <span class="kn">import</span> <span class="p">(</span><span class="n">GREGORIAN_BASE</span><span class="p">,</span> <span class="n">TS_TYPE_SECS</span><span class="p">,</span>
                                    <span class="n">TS_TYPE_TO_PANDAS_FREQ</span><span class="p">,</span>
@@ -194,9 +196,27 @@
                    <span class="n">linear</span>      <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">Linear</span><span class="p">,</span>
                    <span class="n">areaweighted</span><span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">AreaWeighted</span><span class="p">)</span>
 
+<div class="viewcode-block" id="varlist_aerocom"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.varlist_aerocom">[docs]</a><span class="k">def</span> <span class="nf">varlist_aerocom</span><span class="p">(</span><span class="n">varlist</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">varlist</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">varlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">varlist</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">varlist</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Need string or list&#39;</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">varlist</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_var</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">var_name_aerocom</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_var</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_var</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">VariableDefinitionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;None of the input variables appears to be valid&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
 <div class="viewcode-block" id="delete_all_coords_cube"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.delete_all_coords_cube">[docs]</a><span class="k">def</span> <span class="nf">delete_all_coords_cube</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Delete all coordinates of an iris cube</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cube : iris.cube.Cube</span>
@@ -204,15 +224,15 @@
 <span class="sd">    inplace : bool</span>
 <span class="sd">        if True, then the coordinates are deleted in the input object, else in</span>
 <span class="sd">        a copy of it</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    iris.cube.Cube</span>
-<span class="sd">        input cube without coordinates </span>
+<span class="sd">        input cube without coordinates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
         <span class="n">cube</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
+
     <span class="k">for</span> <span class="n">aux_fac</span> <span class="ow">in</span> <span class="n">cube</span><span class="o">.</span><span class="n">aux_factories</span><span class="p">:</span>
         <span class="n">cube</span><span class="o">.</span><span class="n">remove_aux_factory</span><span class="p">(</span><span class="n">aux_fac</span><span class="p">)</span>
 
@@ -222,9 +242,9 @@
 
 <div class="viewcode-block" id="extract_latlon_dataarray"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.extract_latlon_dataarray">[docs]</a><span class="k">def</span> <span class="nf">extract_latlon_dataarray</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat_dimname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                              <span class="n">lon_dimname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span>
-                             <span class="n">new_index_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                             <span class="n">new_index_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">check_domain</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Extract individual lat / lon coordinates from `DataArray`</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    arr : DataArray</span>
@@ -243,23 +263,15 @@
 <span class="sd">        how to interpolate to input coordinates (defaults to nearest neighbour)</span>
 <span class="sd">    new_index_name : str, optional</span>
 <span class="sd">        name of flattend latlon dimension (defaults to latlon)</span>
-<span class="sd">    </span>
+<span class="sd">    check_domain : bool</span>
+<span class="sd">        if True, lat/lon domain of datarray is checked and all input coordinates</span>
+<span class="sd">        that are outside of the domain are ignored.</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    DataArray</span>
 <span class="sd">        data at input coordinates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     if lat_dimname is None:</span>
-<span class="c1">#         for name in [&#39;lat&#39;, &#39;latitude&#39;]:</span>
-<span class="c1">#             if name in arr.dims:</span>
-<span class="c1">#                 lat_dimname = name</span>
-<span class="c1">#     if lon_dimname is None:</span>
-<span class="c1">#         for name in [&#39;lon&#39;, &#39;longitude&#39;]:</span>
-<span class="c1">#             if name in arr.dims:</span>
-<span class="c1">#                 lon_dimname = name</span>
-<span class="c1"># =============================================================================</span>
     <span class="k">if</span> <span class="n">lat_dimname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">lat_dimname</span> <span class="o">=</span> <span class="s1">&#39;lat&#39;</span>
     <span class="k">if</span> <span class="n">lon_dimname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -273,24 +285,38 @@
         <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">COORDINFO</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
                 <span class="n">lon_dimname</span> <span class="o">=</span> <span class="n">alias</span>
-                <span class="k">break</span>    
+                <span class="k">break</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">lat</span> <span class="o">=</span> <span class="p">[</span><span class="n">lat</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">lon</span> <span class="o">=</span> <span class="p">[</span><span class="n">lon</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">check_domain</span><span class="p">:</span>
+        <span class="n">arr_lat</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">lat_dimname</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">arr_lon</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">lon_dimname</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">lat0</span><span class="p">,</span> <span class="n">lat1</span> <span class="o">=</span> <span class="n">arr_lat</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">arr_lat</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">lon0</span><span class="p">,</span> <span class="n">lon1</span> <span class="o">=</span> <span class="n">arr_lon</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">arr_lon</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">new_lat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">new_lon</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">lat0</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">lat1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">lon0</span> <span class="o">&lt;=</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="n">lon1</span><span class="p">):</span>
+                <span class="n">new_lat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">new_lon</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_lat</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_lon</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;Coordinates not found in dataarray&#39;</span><span class="p">)</span>
+        <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="n">new_lat</span><span class="p">,</span> <span class="n">new_lon</span>
     <span class="k">if</span> <span class="n">new_index_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">new_index_name</span> <span class="o">=</span> <span class="s1">&#39;latlon&#39;</span>
-    <span class="n">where</span> <span class="o">=</span> <span class="p">{</span><span class="n">lat_dimname</span> <span class="p">:</span> <span class="n">xray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">new_index_name</span><span class="p">),</span> 
+    <span class="n">where</span> <span class="o">=</span> <span class="p">{</span><span class="n">lat_dimname</span> <span class="p">:</span> <span class="n">xray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">new_index_name</span><span class="p">),</span>
              <span class="n">lon_dimname</span> <span class="p">:</span> <span class="n">xray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">new_index_name</span><span class="p">)}</span>
     <span class="n">subset</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">where</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
     <span class="n">subset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;lat_dimname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_dimname</span>
     <span class="n">subset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;lon_dimname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_dimname</span>
     <span class="k">return</span> <span class="n">subset</span></div>
-    
+
 <div class="viewcode-block" id="lists_to_tuple_list"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.lists_to_tuple_list">[docs]</a><span class="k">def</span> <span class="nf">lists_to_tuple_list</span><span class="p">(</span><span class="o">*</span><span class="n">lists</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert input lists (of same length) into list of tuples</span>
-<span class="sd">    </span>
-<span class="sd">    e.g. input 2 lists of latitude and longitude coords, output one list </span>
+
+<span class="sd">    e.g. input 2 lists of latitude and longitude coords, output one list</span>
 <span class="sd">    with tuple coordinates at each index</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">lists</span><span class="p">))</span></div>
@@ -299,12 +325,12 @@
     <span class="sd">&quot;&quot;&quot;Convert list with tuples (e.g. (lat, lon)) into multiple lists&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tuple_list</span><span class="p">)))</span></div>
 
-<div class="viewcode-block" id="make_dummy_cube_latlon"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.make_dummy_cube_latlon">[docs]</a><span class="k">def</span> <span class="nf">make_dummy_cube_latlon</span><span class="p">(</span><span class="n">lat_res_deg</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lon_res_deg</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">lat_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+<div class="viewcode-block" id="make_dummy_cube_latlon"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.make_dummy_cube_latlon">[docs]</a><span class="k">def</span> <span class="nf">make_dummy_cube_latlon</span><span class="p">(</span><span class="n">lat_res_deg</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">lon_res_deg</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">lat_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">lon_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Make an empty Cube with given latitude and longitude resolution</span>
-<span class="sd">    </span>
+
 <span class="sd">    Dimensions will be lat, lon</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lat_res_deg : float or int</span>
@@ -317,33 +343,33 @@
 <span class="sd">    lon_range : tuple or list</span>
 <span class="sd">        2-element list containing longitude range. If `None`, then `(-180, 180)`</span>
 <span class="sd">        is used.</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Cube    </span>
+<span class="sd">    Cube</span>
 <span class="sd">        dummy cube in input resolution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">lat_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">lat_range</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">lon_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">lon_range</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
-    
-    <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">lon_res_deg</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">lon_res_deg</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> 
+
+    <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">lon_res_deg</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">lon_res_deg</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
                      <span class="n">lon_res_deg</span><span class="p">)</span>
-    <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">lat_res_deg</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">lat_res_deg</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> 
+    <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">lat_res_deg</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">lat_res_deg</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
                      <span class="n">lat_res_deg</span><span class="p">)</span>
-    
+
     <span class="n">lon_circ</span> <span class="o">=</span> <span class="n">check_coord_circular</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">modulus</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
-    <span class="n">latdim</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">DimCoord</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> 
-                                  <span class="n">standard_name</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> 
-                                  <span class="n">circular</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+    <span class="n">latdim</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">DimCoord</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span>
+                                  <span class="n">standard_name</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span>
+                                  <span class="n">circular</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                   <span class="n">units</span><span class="o">=</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;degrees&#39;</span><span class="p">))</span>
-    
-    <span class="n">londim</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">DimCoord</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> 
-                                  <span class="n">standard_name</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> 
-                                  <span class="n">circular</span><span class="o">=</span><span class="n">lon_circ</span><span class="p">,</span> 
+
+    <span class="n">londim</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">DimCoord</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span>
+                                  <span class="n">standard_name</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span>
+                                  <span class="n">circular</span><span class="o">=</span><span class="n">lon_circ</span><span class="p">,</span>
                                   <span class="n">units</span><span class="o">=</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;degrees&#39;</span><span class="p">))</span>
-    
+
     <span class="n">latdim</span><span class="o">.</span><span class="n">guess_bounds</span><span class="p">()</span>
     <span class="n">londim</span><span class="o">.</span><span class="n">guess_bounds</span><span class="p">()</span>
     <span class="n">dummy</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">cube</span><span class="o">.</span><span class="n">Cube</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">lats</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">lons</span><span class="p">))))</span>
@@ -356,7 +382,7 @@
 
 <div class="viewcode-block" id="check_coord_circular"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.check_coord_circular">[docs]</a><span class="k">def</span> <span class="nf">check_coord_circular</span><span class="p">(</span><span class="n">coord_vals</span><span class="p">,</span> <span class="n">modulus</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check circularity of coordinate</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    coord_vals : list or ndarray</span>
@@ -365,20 +391,19 @@
 <span class="sd">        modulus of coordinate (e.g. 360 for longitude)</span>
 <span class="sd">    rtol : float</span>
 <span class="sd">        relative tolerance</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
 <span class="sd">        True if circularity is given, else False</span>
-<span class="sd">    </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
-<span class="sd">        if circularity is given and results in overlap (right end of input </span>
+<span class="sd">        if circularity is given and results in overlap (right end of input</span>
 <span class="sd">        array is mapped to a value larger than the first one at the left end</span>
 <span class="sd">        of the array)</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coord_vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
@@ -395,18 +420,17 @@
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">modulus</span> <span class="o">-</span> <span class="n">diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span></div>
-        
-    
+
 <div class="viewcode-block" id="numpy_to_cube"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.numpy_to_cube">[docs]</a><span class="k">def</span> <span class="nf">numpy_to_cube</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Make a cube from a numpy array</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : ndarray</span>
 <span class="sd">        input data</span>
 <span class="sd">    dims : list, optional</span>
-<span class="sd">        list of :class:`iris.coord.DimCoord` instances in order of dimensions </span>
-<span class="sd">        of input data array (length of list and shapes of each of the </span>
+<span class="sd">        list of :class:`iris.coord.DimCoord` instances in order of dimensions</span>
+<span class="sd">        of input data array (length of list and shapes of each of the</span>
 <span class="sd">        coordinates must match dimensions of input data)</span>
 <span class="sd">    var_name : str, optional</span>
 <span class="sd">        name of variable</span>
@@ -414,12 +438,12 @@
 <span class="sd">        unit of variable</span>
 <span class="sd">    **attrs</span>
 <span class="sd">        additional attributes to be added to metadata</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    iris.cube.Cube</span>
-<span class="sd">    </span>
-<span class="sd">    Raises </span>
+
+<span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    DataDimensionError</span>
 <span class="sd">        if input `dims` is specified and results in conflict</span>
@@ -427,14 +451,14 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input, need numpy array&#39;</span><span class="p">)</span>
     <span class="n">cube</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">cube</span><span class="o">.</span><span class="n">Cube</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    
+
     <span class="n">cube</span><span class="o">.</span><span class="n">var_name</span><span class="o">=</span><span class="n">var_name</span>
     <span class="n">cube</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
-    
+
     <span class="n">sh</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
     <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
-            
+
             <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Input number of dimensios must match array &#39;</span>
                                      <span class="s1">&#39;dimension number&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dims</span><span class="p">):</span>
@@ -452,21 +476,21 @@
 
 <div class="viewcode-block" id="copy_coords_cube"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.copy_coords_cube">[docs]</a><span class="k">def</span> <span class="nf">copy_coords_cube</span><span class="p">(</span><span class="n">to_cube</span><span class="p">,</span> <span class="n">from_cube</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Copy all coordinates from one cube to another</span>
-<span class="sd">    </span>
-<span class="sd">    Requires the underlying data to be the same shape. </span>
-<span class="sd">    </span>
+
+<span class="sd">    Requires the underlying data to be the same shape.</span>
+
 <span class="sd">    Warning</span>
 <span class="sd">    --------</span>
-<span class="sd">    This operation will delete all existing coordinates and auxiliary </span>
+<span class="sd">    This operation will delete all existing coordinates and auxiliary</span>
 <span class="sd">    coordinates and will then copy the ones from the input data object.</span>
 <span class="sd">    No checks of any kind will be performed</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    to_cube</span>
 <span class="sd">    other : GriddedData or Cube</span>
 <span class="sd">        other data object (needs to be same shape as this object)</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    GriddedData</span>
@@ -474,54 +498,77 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">cube</span><span class="o">.</span><span class="n">Cube</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">to_cube</span><span class="p">,</span> <span class="n">from_cube</span><span class="p">]]):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input. Need instances of iris.cube.Cube class...&#39;</span><span class="p">)</span>
-        
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">from_cube</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">to_cube</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">DataDimensionError</span><span class="p">(</span><span class="s1">&#39;Cannot copy coordinates: shape mismatch&#39;</span><span class="p">)</span>
-    
+
     <span class="n">to_cube</span> <span class="o">=</span> <span class="n">delete_all_coords_cube</span><span class="p">(</span><span class="n">to_cube</span><span class="p">,</span> <span class="n">inplace</span><span class="p">)</span>
-    
+
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dim_coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">from_cube</span><span class="o">.</span><span class="n">dim_coords</span><span class="p">):</span>
         <span class="n">to_cube</span><span class="o">.</span><span class="n">add_dim_coord</span><span class="p">(</span><span class="n">dim_coord</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-    
+
     <span class="k">for</span> <span class="n">aux_coord</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">from_cube</span><span class="o">.</span><span class="n">_aux_coords_and_dims</span><span class="p">:</span>
         <span class="n">to_cube</span><span class="o">.</span><span class="n">add_aux_coord</span><span class="p">(</span><span class="n">aux_coord</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
-        
+
     <span class="k">for</span> <span class="n">aux_fac</span> <span class="ow">in</span> <span class="n">from_cube</span><span class="o">.</span><span class="n">aux_factories</span><span class="p">:</span>
         <span class="n">to_cube</span><span class="o">.</span><span class="n">add_aux_factory</span><span class="p">(</span><span class="n">aux_fac</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">to_cube</span></div>
 
 <div class="viewcode-block" id="infer_time_resolution"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.infer_time_resolution">[docs]</a><span class="k">def</span> <span class="nf">infer_time_resolution</span><span class="p">(</span><span class="n">time_stamps</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Infer time resolution based on input time-stamps</span>
-<span class="sd">    </span>
+
 <span class="sd">    Uses the minimum time difference found in input array between consecutive</span>
 <span class="sd">    time stamps and based on that finds the corresponding AeroCom resolution</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    time_stamps : pandas.DatetimeIndex</span>
-<span class="sd">        time stamps </span>
-<span class="sd">    </span>
-<span class="sd">    Ret    </span>
+<span class="sd">        time stamps</span>
+
+<span class="sd">    Ret</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
     <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
 
-
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_stamps</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">time_stamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">time_stamps</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not infer time resolution: failed to &#39;</span>
                              <span class="s1">&#39;convert input to pandas.DatetimeIndex&#39;</span><span class="p">)</span>
     <span class="n">vals</span> <span class="o">=</span> <span class="n">time_stamps</span><span class="o">.</span><span class="n">values</span>
     <span class="n">highest_secs</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">vals</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;timedelta64[s]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    
+
     <span class="k">for</span> <span class="n">tp</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">highest_secs</span> <span class="o">&lt;=</span> <span class="n">TS_TYPE_SECS</span><span class="p">[</span><span class="n">tp</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">tp</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not infer time resolution&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="get_tot_number_of_seconds"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_tot_number_of_seconds">[docs]</a><span class="k">def</span> <span class="nf">get_tot_number_of_seconds</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">dtime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_tot_number_of_seconds"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_tot_number_of_seconds">[docs]</a><span class="k">def</span> <span class="nf">get_tot_number_of_seconds</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="n">dtime</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get total no. of seconds for a given frequency</span>
+
+<span class="sd">    ToDo</span>
+<span class="sd">    ----</span>
+<span class="sd">    This method needs revision and can be solved simpler probably</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ts_type : str or TsType</span>
+<span class="sd">        frequency for which number of seconds is supposed to be retrieved</span>
+<span class="sd">    dtime : TYPE, optional</span>
+<span class="sd">        DESCRIPTION. The default is None.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    AttributeError</span>
+<span class="sd">        DESCRIPTION.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    TYPE</span>
+<span class="sd">        DESCRIPTION.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
 
     <span class="n">ts_tpe</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span>
@@ -530,27 +577,28 @@
         <span class="k">if</span> <span class="n">dtime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;For frequncies larger than or eq. monthly you&#39;</span> <span class="o">+</span>
                                  <span class="s1">&#39; need to provide dtime in order to compute the number of second.&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># find seconds from dtime</span>
-            <span class="c1"># TODO generalize this</span>
-            <span class="n">days_in_month</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">daysinmonth</span>
-            <span class="k">if</span> <span class="n">ts_type</span> <span class="o">==</span> <span class="s1">&#39;monthly&#39;</span><span class="p">:</span>
-                <span class="n">monthly_to_sec</span> <span class="o">=</span> <span class="n">days_in_month</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
-            <span class="k">return</span> <span class="n">monthly_to_sec</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ts_type</span> <span class="o">==</span> <span class="s1">&#39;monthly&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Can only handle monthly so far...&#39;</span><span class="p">)</span>
+
+        <span class="c1"># find seconds from dtime</span>
+        <span class="c1"># TODO generalize this</span>
+        <span class="n">days_in_month</span> <span class="o">=</span> <span class="n">dtime</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">daysinmonth</span>
+
+        <span class="k">return</span> <span class="n">days_in_month</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TS_TYPE_SECS</span><span class="p">[</span><span class="n">ts_type</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="get_standard_name"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_standard_name">[docs]</a><span class="k">def</span> <span class="nf">get_standard_name</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converts AeroCom variable name to CF standard name</span>
-<span class="sd">    </span>
+
 <span class="sd">    Also handles alias names for variables, etc. or strings corresponding to</span>
 <span class="sd">    older conventions (e.g. names containing 3D).</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    var_name : str</span>
 <span class="sd">        AeroCom variable name</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
@@ -561,15 +609,15 @@
 
 <div class="viewcode-block" id="get_standard_unit"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_standard_unit">[docs]</a><span class="k">def</span> <span class="nf">get_standard_unit</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Gets standard unit of AeroCom variable</span>
-<span class="sd">    </span>
+
 <span class="sd">    Also handles alias names for variables, etc. or strings corresponding to</span>
 <span class="sd">    older conventions (e.g. names containing 3D).</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    var_name : str</span>
 <span class="sd">        AeroCom variable name</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
@@ -580,19 +628,19 @@
 
 <div class="viewcode-block" id="get_lowest_resolution"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_lowest_resolution">[docs]</a><span class="k">def</span> <span class="nf">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="o">*</span><span class="n">ts_types</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get the lowest resolution from several ts_type codes</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    ts_type : str</span>
 <span class="sd">        first ts_type</span>
 <span class="sd">    *ts_types</span>
 <span class="sd">        one or more additional ts_type codes</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
 <span class="sd">        the ts_type that corresponds to the lowest resolution</span>
-<span class="sd">        </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
@@ -614,18 +662,18 @@
 
 <div class="viewcode-block" id="sort_ts_types"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.sort_ts_types">[docs]</a><span class="k">def</span> <span class="nf">sort_ts_types</span><span class="p">(</span><span class="n">ts_types</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sort a list of ts_types</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    ts_types : list</span>
 <span class="sd">        list of strings (or instance of :class:`TsType`) to be sorted</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list</span>
 <span class="sd">        list of strings with sorted frequencies</span>
-<span class="sd">        </span>
-<span class="sd">    Raises </span>
+
+<span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    TemporalResolutionError</span>
 <span class="sd">        if one of the input ts_types is not supported</span>
@@ -636,7 +684,7 @@
             <span class="n">ts_type</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">freqs_sorted</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">freqs_sorted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span> 
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">insert</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freqs_sorted</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">tt</span> <span class="o">&lt;</span> <span class="n">ts_type</span><span class="p">:</span>
@@ -650,19 +698,19 @@
 
 <div class="viewcode-block" id="get_highest_resolution"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_highest_resolution">[docs]</a><span class="k">def</span> <span class="nf">get_highest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="o">*</span><span class="n">ts_types</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get the highest resolution from several ts_type codes</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    ts_type : str</span>
 <span class="sd">        first ts_type</span>
 <span class="sd">    *ts_types</span>
 <span class="sd">        one or more additional ts_type codes</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
 <span class="sd">        the ts_type that corresponds to the highest resolution</span>
-<span class="sd">        </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
@@ -674,25 +722,25 @@
 
 <div class="viewcode-block" id="isnumeric"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.isnumeric">[docs]</a><span class="k">def</span> <span class="nf">isnumeric</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check if input value is numeric</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    val</span>
 <span class="sd">        input value to be checked</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    bool </span>
+<span class="sd">    bool</span>
 <span class="sd">        True, if input value corresponds to a range, else False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="kc">False</span></div>
-    
+
 <div class="viewcode-block" id="isrange"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.isrange">[docs]</a><span class="k">def</span> <span class="nf">isrange</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check if input value corresponds to a range</span>
-<span class="sd">    </span>
+
 <span class="sd">    Checks if input is list, or array or tuple with 2 entries, or alternatively</span>
 <span class="sd">    a slice that has defined start and stop and has set step to None.</span>
 
@@ -700,15 +748,15 @@
 <span class="sd">    ----</span>
 <span class="sd">    No check is performed, whether first entry is smaller than second entry if</span>
 <span class="sd">    all requirements for a range are fulfilled.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    val</span>
 <span class="sd">        input value to be checked</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    bool </span>
+<span class="sd">    bool</span>
 <span class="sd">        True, if input value corresponds to a range, else False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
@@ -720,53 +768,53 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="kc">False</span></div>
-       
-<div class="viewcode-block" id="merge_station_data"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.merge_station_data">[docs]</a><span class="k">def</span> <span class="nf">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">pref_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                       <span class="n">sort_by_largest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fill_missing_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+
+<div class="viewcode-block" id="merge_station_data"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.merge_station_data">[docs]</a><span class="k">def</span> <span class="nf">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">pref_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">sort_by_largest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fill_missing_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="o">**</span><span class="n">add_meta_keys</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Merge multiple StationData objects (from one station) into one instance</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    - all input :class:`StationData` objects need to have same attributes\</span>
 <span class="sd">       ``station_name``, ``latitude``, ``longitude`` and ``altitude``</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    stats : list</span>
-<span class="sd">        list containing :class:`StationData` objects (note: all of these </span>
+<span class="sd">        list containing :class:`StationData` objects (note: all of these</span>
 <span class="sd">        objects must contain variable data for the specified input variable)</span>
 <span class="sd">    var_name : str</span>
 <span class="sd">        data variable name that is to be merged</span>
-<span class="sd">    pref_attr </span>
+<span class="sd">    pref_attr</span>
 <span class="sd">        optional argument that may be used to specify a metadata attribute</span>
 <span class="sd">        that is available in all input :class:`StationData` objects and that</span>
 <span class="sd">        is used to order the input stations by relevance. The associated values</span>
-<span class="sd">        of this attribute need to be sortable (e.g. revision_date). This is </span>
-<span class="sd">        only relevant in case overlaps occur. If unspecified the relevance of </span>
-<span class="sd">        the stations is sorted based on the length of the associated data </span>
+<span class="sd">        of this attribute need to be sortable (e.g. revision_date). This is</span>
+<span class="sd">        only relevant in case overlaps occur. If unspecified the relevance of</span>
+<span class="sd">        the stations is sorted based on the length of the associated data</span>
 <span class="sd">        arrays.</span>
 <span class="sd">    sort_by_largest : bool</span>
-<span class="sd">        if True, the result from the sorting is inverted. E.g. if </span>
+<span class="sd">        if True, the result from the sorting is inverted. E.g. if</span>
 <span class="sd">        ``pref_attr`` is unspecified, then the stations will be sorted based on</span>
 <span class="sd">        the length of the data vectors, starting with the shortest, ending with</span>
-<span class="sd">        the longest. This sorting result will then be inverted, if </span>
+<span class="sd">        the longest. This sorting result will then be inverted, if</span>
 <span class="sd">        ``sort_by_largest=True``, so that the longest time series get&#39;s highest</span>
-<span class="sd">        importance. If, e.g. ``pref_attr=&#39;revision_date&#39;``, then the stations </span>
-<span class="sd">        are sorted by the associated revision date value, starting with the </span>
-<span class="sd">        earliest, ending with the latest (which will also be inverted if </span>
+<span class="sd">        importance. If, e.g. ``pref_attr=&#39;revision_date&#39;``, then the stations</span>
+<span class="sd">        are sorted by the associated revision date value, starting with the</span>
+<span class="sd">        earliest, ending with the latest (which will also be inverted if</span>
 <span class="sd">        this argument is set to True)</span>
 <span class="sd">    fill_missing_nan : bool</span>
-<span class="sd">        if True, the resulting time series is filled with NaNs. NOTE: this </span>
+<span class="sd">        if True, the resulting time series is filled with NaNs. NOTE: this</span>
 <span class="sd">        requires that information about the temporal resolution (ts_type) of</span>
 <span class="sd">        the data is available in each of the StationData objects.</span>
-<span class="sd">    &quot;&quot;&quot;</span>    
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Merging of multivar data not yet possible&#39;</span><span class="p">)</span>
         <span class="n">var_name</span> <span class="o">=</span> <span class="n">var_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        
+
     <span class="c1"># make sure the data is provided as pandas.Series object</span>
     <span class="n">is_3d</span><span class="p">,</span> <span class="n">has_errs</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
     <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
@@ -802,20 +850,20 @@
                              <span class="s1">&#39;not.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">stat</span><span class="o">.</span><span class="n">data_err</span><span class="p">:</span>
             <span class="n">has_errs</span> <span class="o">=</span> <span class="kc">True</span>
-            
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_3d</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pref_attr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">stats</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="n">pref_attr</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">stats</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()))</span>
-        
+
         <span class="k">if</span> <span class="n">sort_by_largest</span><span class="p">:</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="c1"># remove first station from the list</span>
         <span class="n">merged</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span> 
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
             <span class="n">merged</span><span class="o">.</span><span class="n">merge_other</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">add_meta_keys</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">xarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
@@ -828,13 +876,13 @@
                                           <span class="s1">&#39;sampled at the same time&#39;</span><span class="p">)</span>
             <span class="n">dtime</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">tidx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dtime</span><span class="p">)</span>
-        
+
         <span class="c1"># AeroCom default vertical grid</span>
         <span class="n">vert_grid</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">make_default_vert_grid</span><span class="p">()</span>
         <span class="n">_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">vert_grid</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">tidx</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="k">if</span> <span class="n">has_errs</span><span class="p">:</span>
             <span class="n">_data_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">vert_grid</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">tidx</span><span class="p">)))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        
+
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
             <span class="c1">#print(stat[var_name].values)</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -842,26 +890,26 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">merged</span><span class="o">.</span><span class="n">merge_meta_same_station</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="o">**</span><span class="n">add_meta_keys</span><span class="p">)</span>
 
-            <span class="n">_data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">vert_grid</span><span class="p">,</span> <span class="n">stat</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">],</span> 
+            <span class="n">_data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">vert_grid</span><span class="p">,</span> <span class="n">stat</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">],</span>
                                     <span class="n">stat</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-            
+
             <span class="k">if</span> <span class="n">has_errs</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">_data_err</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">vert_grid</span><span class="p">,</span> 
-                                                <span class="n">stat</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">],</span> 
+                    <span class="n">_data_err</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">vert_grid</span><span class="p">,</span>
+                                                <span class="n">stat</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">],</span>
                                                 <span class="n">stat</span><span class="o">.</span><span class="n">data_err</span><span class="p">[</span><span class="n">var_name</span><span class="p">])</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="k">pass</span>
         <span class="n">_coords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;time&#39;</span>     <span class="p">:</span> <span class="n">tidx</span><span class="p">,</span>
                    <span class="s1">&#39;altitude&#39;</span> <span class="p">:</span> <span class="n">vert_grid</span><span class="p">}</span>
-        
-        <span class="n">d</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">_data</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">_coords</span><span class="p">,</span> 
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">_data</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">_coords</span><span class="p">,</span>
                       <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;altitude&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">var_name</span><span class="p">)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">sortby</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
         <span class="n">merged</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
         <span class="n">merged</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">time</span>
         <span class="n">merged</span><span class="o">.</span><span class="n">altitude</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">altitude</span>
-    
+
     <span class="k">if</span> <span class="n">fill_missing_nan</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">merged</span><span class="o">.</span><span class="n">insert_nans_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
@@ -869,7 +917,7 @@
             <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Could not insert NaNs into timeseries of &#39;</span>
                                     <span class="s1">&#39;variable </span><span class="si">{}</span><span class="s1"> after merging stations. &#39;</span>
                                     <span class="s1">&#39;Reason: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-            
+
     <span class="n">merged</span><span class="p">[</span><span class="s1">&#39;stat_merge_pref_attr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pref_attr</span>
     <span class="k">return</span> <span class="n">merged</span></div>
 
@@ -884,21 +932,21 @@
 
 <div class="viewcode-block" id="make_datetime_index"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.make_datetime_index">[docs]</a><span class="k">def</span> <span class="nf">make_datetime_index</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">freq</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Make pandas.DatetimeIndex for input specs</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
-<span class="sd">    If input frequency is specified in `PANDAS_RESAMPLE_OFFSETS`, an offset </span>
+<span class="sd">    If input frequency is specified in `PANDAS_RESAMPLE_OFFSETS`, an offset</span>
 <span class="sd">    will be added (e.g. 15 days for monthly data).</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    start </span>
+<span class="sd">    start</span>
 <span class="sd">        start time</span>
 <span class="sd">    stop</span>
 <span class="sd">        stop time</span>
 <span class="sd">    freq</span>
 <span class="sd">        frequency</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    DatetimeIndex</span>
@@ -907,7 +955,7 @@
         <span class="n">start</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">):</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
-        
+
     <span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span> <span class="o">=</span> <span class="n">_get_pandas_freq_and_loffset</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">loffset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -917,37 +965,37 @@
 <div class="viewcode-block" id="calc_climatology"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.calc_climatology">[docs]</a><span class="k">def</span> <span class="nf">calc_climatology</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">min_count</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">set_year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resample_how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute climatological timeseries from pandas.Series</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    s : Series</span>
 <span class="sd">        time series data</span>
-<span class="sd">    start </span>
+<span class="sd">    start</span>
 <span class="sd">        start time of data used to compute climatology</span>
 <span class="sd">    stop</span>
 <span class="sd">        start time of data used to compute climatology</span>
 <span class="sd">    mincount_month : int, optional</span>
-<span class="sd">        minimum number of observations required per aggregated month in  </span>
+<span class="sd">        minimum number of observations required per aggregated month in</span>
 <span class="sd">        climatological interval. Months not meeting this requirement will be</span>
 <span class="sd">        set to NaN.</span>
 <span class="sd">    set_year : int, optional</span>
 <span class="sd">        if specified, the output data will be assigned the input year. Else</span>
 <span class="sd">        the middle year of the climatological interval is used.</span>
 <span class="sd">    resample_how : str</span>
-<span class="sd">        string specifying how the climatological timeseries is to be </span>
+<span class="sd">        string specifying how the climatological timeseries is to be</span>
 <span class="sd">        aggregated</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    DataFrame</span>
-<span class="sd">        dataframe containing climatological mean and median timeseries as </span>
+<span class="sd">        dataframe containing climatological mean and median timeseries as</span>
 <span class="sd">        well as columns std and count</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">):</span>
         <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">start_stop</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
     <span class="n">sc</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span>
     <span class="n">sc</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cropping input time series in climatological &#39;</span>
                          <span class="s1">&#39;interval resulted in empty series&#39;</span><span class="p">)</span>
@@ -956,13 +1004,12 @@
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span>
-    
-    
+
     <span class="n">clim</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="n">resample_how</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">])</span>
-    
+
     <span class="c1">#clim.columns = clim.columns.droplevel(0)</span>
     <span class="n">clim</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="s1">&#39;numobs&#39;</span><span class="p">]</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-</span><span class="si">{:02d}</span><span class="s1">-15&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">set_year</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> 
+    <span class="n">idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-</span><span class="si">{:02d}</span><span class="s1">-15&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">set_year</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
            <span class="n">clim</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
     <span class="n">clim</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">min_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -971,12 +1018,12 @@
         <span class="c1">#mean[num &lt; min_num_obs] = np.nan</span>
     <span class="k">return</span> <span class="n">clim</span></div>
 
-<div class="viewcode-block" id="resample_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.resample_timeseries">[docs]</a><span class="k">def</span> <span class="nf">resample_timeseries</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="resample_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.resample_timeseries">[docs]</a><span class="k">def</span> <span class="nf">resample_timeseries</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Resample a timeseries (pandas.Series)</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    s : Series</span>
+<span class="sd">    ts : Series</span>
 <span class="sd">        time series instance</span>
 <span class="sd">    freq : str</span>
 <span class="sd">        new temporal resolution (can be pandas freq. string, or pyaerocom</span>
@@ -985,39 +1032,34 @@
 <span class="sd">        choose from mean or median</span>
 <span class="sd">    min_num_obs : :obj:`int`, optional</span>
 <span class="sd">        minimum number of observations required per period (when downsampling).</span>
-<span class="sd">        E.g. if input is in daily resolution and freq is monthly and </span>
+<span class="sd">        E.g. if input is in daily resolution and freq is monthly and</span>
 <span class="sd">        min_num_obs is 10, then all months that have less than 10 days of data</span>
 <span class="sd">        are set to nan.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Series</span>
 <span class="sd">        resampled time series object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
-    <span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span> <span class="o">=</span> <span class="n">_get_pandas_freq_and_loffset</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>    
-    <span class="n">resampler</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">)</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span> <span class="o">=</span> <span class="n">_get_pandas_freq_and_loffset</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+    <span class="n">resampler</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">min_num_obs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">resampler</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">how</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">resampler</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="n">how</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="p">)</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;before mean&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">how</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
         <span class="n">invalid</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_num_obs</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">invalid</span><span class="p">),</span> <span class="n">invalid</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
         <span class="n">df</span><span class="p">[</span><span class="n">how</span><span class="p">][</span><span class="n">invalid</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;after mean&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">how</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">how</span><span class="p">]</span>
-
-    <span class="k">return</span> <span class="n">data</span><span class="c1">#.loc[s.index[0]:s.index[-1]]</span></div>
+    <span class="c1">#print(freq, min_num_obs, how)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="resample_time_dataarray"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.resample_time_dataarray">[docs]</a><span class="k">def</span> <span class="nf">resample_time_dataarray</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Resample the time dimension of a :class:`xarray.DataArray`</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    The dataarray must have a dimension coordinate named &quot;time&quot;</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    arr : DataArray</span>
@@ -1029,15 +1071,15 @@
 <span class="sd">        choose from mean or median</span>
 <span class="sd">    min_num_obs : :obj:`int`, optional</span>
 <span class="sd">        minimum number of observations required per period (when downsampling).</span>
-<span class="sd">        E.g. if input is in daily resolution and freq is monthly and </span>
+<span class="sd">        E.g. if input is in daily resolution and freq is monthly and</span>
 <span class="sd">        min_num_obs is 10, then all months that have less than 10 days of data</span>
 <span class="sd">        are set to nan.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    DataArray</span>
 <span class="sd">        resampled data array object</span>
-<span class="sd">    </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    IOError</span>
@@ -1045,7 +1087,7 @@
 <span class="sd">    DataDimensionError</span>
 <span class="sd">        if time dimension is not available in dataset</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">xray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Invalid input for arr: need DataArray, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arr</span><span class="p">)))</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
@@ -1066,16 +1108,23 @@
         <span class="c1">#invalid = arr.groupby(&#39;time.{}&#39;.format(gr)).count(dim=&#39;time&#39;) &lt; min_num_obs</span>
         <span class="n">invalid</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">pd_freq</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_num_obs</span>
 
-    <span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span> <span class="o">=</span> <span class="n">_get_pandas_freq_and_loffset</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>    
-    <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">pd_freq</span><span class="p">,</span> <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">loffset</span> <span class="o">=</span> <span class="n">_get_pandas_freq_and_loffset</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+    <span class="n">resampler</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">pd_freq</span><span class="p">,</span> <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">aggfun</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">resampler</span><span class="p">,</span> <span class="n">how</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ResamplingError</span><span class="p">(</span><span class="s1">&#39;Invalid aggregator </span><span class="si">{}</span><span class="s1"> for temporal resampling &#39;</span>
+                              <span class="s1">&#39;of DataArray...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">how</span><span class="p">))</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">aggfun</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">invalid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">arr</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">invalid</span><span class="o">.</span><span class="n">data</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="k">return</span> <span class="n">arr</span></div>
-    
-<div class="viewcode-block" id="same_meta_dict"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.same_meta_dict">[docs]</a><span class="k">def</span> <span class="nf">same_meta_dict</span><span class="p">(</span><span class="n">meta1</span><span class="p">,</span> <span class="n">meta2</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">],</span> 
+
+<div class="viewcode-block" id="same_meta_dict"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.same_meta_dict">[docs]</a><span class="k">def</span> <span class="nf">same_meta_dict</span><span class="p">(</span><span class="n">meta1</span><span class="p">,</span> <span class="n">meta2</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">],</span>
                    <span class="n">num_keys</span><span class="o">=</span><span class="n">NUM_KEYS_META</span><span class="p">,</span> <span class="n">num_rtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compare meta dictionaries</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    meta1 : dict</span>
@@ -1087,10 +1136,10 @@
 <span class="sd">    num_keys : keys that contain numerical values</span>
 <span class="sd">    num_rtol : float</span>
 <span class="sd">        relative tolerance level for comparison of numerical values</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    bool </span>
+<span class="sd">    bool</span>
 <span class="sd">        True, if dictionaries are the same, else False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">meta1</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">==</span> <span class="n">meta2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -1108,17 +1157,17 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span> <span class="o">==</span> <span class="n">meta2</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span></div>
-            
+
 <div class="viewcode-block" id="str_to_iris"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.str_to_iris">[docs]</a><span class="k">def</span> <span class="nf">str_to_iris</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Mapping function that converts strings into iris analysis objects</span>
-<span class="sd">    </span>
+
 <span class="sd">    Please see dictionary ``STR_TO_IRIS`` in this module for valid definitions</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    key : str</span>
 <span class="sd">        key of :attr:`STR_TO_IRIS` dictionary</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    obj</span>
@@ -1135,12 +1184,12 @@
 
 <div class="viewcode-block" id="to_pandas_timestamp"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.to_pandas_timestamp">[docs]</a><span class="k">def</span> <span class="nf">to_pandas_timestamp</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert input to instance of :class:`pandas.Timestamp`</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    value</span>
 <span class="sd">        input value that is supposed to be converted to time stamp</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    --------</span>
 <span class="sd">    pandas.Timestamp</span>
@@ -1158,18 +1207,18 @@
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">numval</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to convert </span><span class="si">{}</span><span class="s1"> to Timestamp: </span><span class="si">{}</span><span class="s1">&#39;</span>
-                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>    </div>
-    
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
+
 <div class="viewcode-block" id="to_datetime64"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.to_datetime64">[docs]</a><span class="k">def</span> <span class="nf">to_datetime64</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert input value to numpy.datetime64 </span>
-<span class="sd">    </span>
+    <span class="sd">&quot;&quot;&quot;Convert input value to numpy.datetime64</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    value</span>
-<span class="sd">        input value that is supposed to be converted, needs to be either str, </span>
-<span class="sd">        datetime.datetime, pandas.Timestamp or an integer specifying the </span>
+<span class="sd">        input value that is supposed to be converted, needs to be either str,</span>
+<span class="sd">        datetime.datetime, pandas.Timestamp or an integer specifying the</span>
 <span class="sd">        desired year.</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    datetime64</span>
@@ -1183,15 +1232,15 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to convert </span><span class="si">{}</span><span class="s1"> to datetime64 object&#39;</span>
                              <span class="s1">&#39;Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
-  
+
 <div class="viewcode-block" id="is_year"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.is_year">[docs]</a><span class="k">def</span> <span class="nf">is_year</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check if input is / may be year</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    val</span>
-<span class="sd">        input that is supposed to be checked    </span>
-<span class="sd">    </span>
+<span class="sd">        input that is supposed to be checked</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
@@ -1201,9 +1250,9 @@
         <span class="k">if</span> <span class="o">-</span><span class="mi">2000</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10000</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">raise</span> <span class="ne">Exception</span>
-    <span class="k">except</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span></div>
-  
+
 <span class="k">def</span> <span class="nf">_check_climatology_timestamp</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="ow">and</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">9999</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;1-1-2222&#39;</span><span class="p">)</span>
@@ -1217,30 +1266,30 @@
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2222</span><span class="p">))</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to identify </span><span class="si">{}</span><span class="s1"> as climatological timestamp...&#39;</span>
                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
-    
+
 <div class="viewcode-block" id="start_stop"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.start_stop">[docs]</a><span class="k">def</span> <span class="nf">start_stop</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create pandas timestamps from input start / stop values</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
-<span class="sd">    If input suggests climatological data in AeroCom format (i.e. year=9999) </span>
-<span class="sd">    then the year is converted to 2222 instead since pandas cannot handle </span>
+<span class="sd">    If input suggests climatological data in AeroCom format (i.e. year=9999)</span>
+<span class="sd">    then the year is converted to 2222 instead since pandas cannot handle</span>
 <span class="sd">    year 9999.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
 <span class="sd">    start</span>
 <span class="sd">        start time (any format that can be converted to pandas.Timestamp)</span>
 <span class="sd">    stop</span>
 <span class="sd">        stop time (any format that can be converted to pandas.Timestamp)</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    pandas.Timestamp</span>
 <span class="sd">        start timestamp</span>
 <span class="sd">    pandas.Timestamp</span>
 <span class="sd">        stop timestamp</span>
-<span class="sd">    </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
@@ -1252,7 +1301,7 @@
     <span class="k">except</span> <span class="n">pd</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">OutOfBoundsDatetime</span><span class="p">:</span> <span class="c1"># probably climatology</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">_check_climatology_timestamp</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
         <span class="n">isclim</span> <span class="o">=</span> <span class="kc">True</span>
-        
+
     <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">isclim</span><span class="p">:</span>
             <span class="n">yr</span> <span class="o">=</span> <span class="mi">2222</span>
@@ -1285,7 +1334,7 @@
     <span class="k">return</span> <span class="n">time</span></div>
 
 <div class="viewcode-block" id="start_stop_str"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.start_stop_str">[docs]</a><span class="k">def</span> <span class="nf">start_stop_str</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    
+
     <span class="n">conv</span> <span class="o">=</span> <span class="n">TS_TYPE_DATETIME_CONV</span><span class="p">[</span><span class="n">ts_type</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">is_year</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="ow">and</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
@@ -1298,38 +1347,38 @@
 
 <div class="viewcode-block" id="start_stop_from_year"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.start_stop_from_year">[docs]</a><span class="k">def</span> <span class="nf">start_stop_from_year</span><span class="p">(</span><span class="n">year</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create start / stop timestamp from year</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    year : int</span>
 <span class="sd">        the year for which start / stop is to be instantiated</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    tuple</span>
 <span class="sd">        2-element tuple containing</span>
-<span class="sd">        </span>
+
 <span class="sd">        - :obj:`pandas.Timestamp`: start timestamp</span>
 <span class="sd">        - :obj:`pandas.Timestamp`: end timestamp</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
     <span class="n">stop</span> <span class="o">=</span> <span class="n">to_pandas_timestamp</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-12-31 23:59:59&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span></div>
-            
+
 <div class="viewcode-block" id="to_datestring_YYYYMMDD"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.to_datestring_YYYYMMDD">[docs]</a><span class="k">def</span> <span class="nf">to_datestring_YYYYMMDD</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert input time to string with format YYYYMMDD</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    value</span>
-<span class="sd">        input time, may be string, datetime, numpy.datetime64 or </span>
+<span class="sd">        input time, may be string, datetime, numpy.datetime64 or</span>
 <span class="sd">        pandas.Timestamp</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
 <span class="sd">        input formatted to string YYYYMMDD</span>
-<span class="sd">        </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
@@ -1344,44 +1393,44 @@
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input, need str, datetime, numpy.datetime64 &#39;</span>
                          <span class="s1">&#39;or pandas.Timestamp. Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
-    
+
 <div class="viewcode-block" id="cftime_to_datetime64"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.cftime_to_datetime64">[docs]</a><span class="k">def</span> <span class="nf">cftime_to_datetime64</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">cfunit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calendar</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert numerical timestamps with epoch to numpy datetime64</span>
-<span class="sd">    </span>
+
 <span class="sd">    This method was designed to enhance the performance of datetime conversions</span>
-<span class="sd">    and is based on the corresponding information provided in the cftime </span>
+<span class="sd">    and is based on the corresponding information provided in the cftime</span>
 <span class="sd">    package (`see here &lt;https://github.com/Unidata/cftime/blob/master/cftime/</span>
-<span class="sd">    _cftime.pyx&gt;`__). Particularly, this object does, what the :func:`num2date` </span>
+<span class="sd">    _cftime.pyx&gt;`__). Particularly, this object does, what the :func:`num2date`</span>
 <span class="sd">    therein does, but faster, in case the time stamps are not defined on a non</span>
 <span class="sd">    standard calendar.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    times : :obj:`list` or :obj:`ndarray` or :obj:`iris.coords.DimCoord`</span>
-<span class="sd">        array containing numerical time stamps (relative to basedate of </span>
+<span class="sd">        array containing numerical time stamps (relative to basedate of</span>
 <span class="sd">        ``cfunit``). Can also be a single number.</span>
 <span class="sd">    cfunit : :obj:`str` or :obj:`Unit`, optional</span>
 <span class="sd">        CF unit string (e.g. day since 2018-01-01 00:00:00.00000000 UTC) or</span>
-<span class="sd">        unit. Required if `times` is not an instance of </span>
+<span class="sd">        unit. Required if `times` is not an instance of</span>
 <span class="sd">        :class:`iris.coords.DimCoord`</span>
 <span class="sd">    calendar : :obj:`str`, optional</span>
 <span class="sd">        string specifying calendar (only required if ``cfunit`` is of type</span>
 <span class="sd">        ``str``).</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndarray</span>
 <span class="sd">        numpy array containing timestamps as datetime64 objects</span>
-<span class="sd">        </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
-<span class="sd">        if cfunit is ``str`` and calendar is not provided or invalid, or if </span>
+<span class="sd">        if cfunit is ``str`` and calendar is not provided or invalid, or if</span>
 <span class="sd">        the cfunit string is invalid</span>
-<span class="sd">        </span>
+
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    </span>
+
 <span class="sd">    &gt;&gt;&gt; cfunit_str = &#39;day since 2018-01-01 00:00:00.00000000 UTC&#39;</span>
 <span class="sd">    &gt;&gt;&gt; cftime_to_datetime64(10, cfunit_str, &quot;gregorian&quot;)</span>
 <span class="sd">    array([&#39;2018-01-11T00:00:00.000000&#39;], dtype=&#39;datetime64[us]&#39;)</span>
@@ -1390,7 +1439,7 @@
         <span class="n">times</span><span class="p">,</span> <span class="n">cfunit</span> <span class="o">=</span> <span class="n">times</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">times</span><span class="o">.</span><span class="n">units</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">times</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfunit</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">calendar</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1402,13 +1451,13 @@
                          <span class="s2">&quot;cf_units.Unit or as a string&quot;</span><span class="p">)</span>
     <span class="n">calendar</span> <span class="o">=</span> <span class="n">cfunit</span><span class="o">.</span><span class="n">calendar</span>
     <span class="n">basedate</span> <span class="o">=</span> <span class="n">cfunit</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">((</span><span class="n">calendar</span> <span class="o">==</span> <span class="s1">&#39;proleptic_gregorian&#39;</span> <span class="ow">and</span> <span class="n">basedate</span><span class="o">.</span><span class="n">year</span> <span class="o">&gt;=</span> <span class="n">MINYEAR</span><span class="p">)</span> <span class="ow">or</span> 
+    <span class="k">if</span> <span class="p">((</span><span class="n">calendar</span> <span class="o">==</span> <span class="s1">&#39;proleptic_gregorian&#39;</span> <span class="ow">and</span> <span class="n">basedate</span><span class="o">.</span><span class="n">year</span> <span class="o">&gt;=</span> <span class="n">MINYEAR</span><span class="p">)</span> <span class="ow">or</span>
         <span class="p">(</span><span class="n">calendar</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gregorian&#39;</span><span class="p">,</span><span class="s1">&#39;standard&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">basedate</span> <span class="o">&gt;</span> <span class="n">GREGORIAN_BASE</span><span class="p">)):</span>
         <span class="c1"># NOTE: changed on 9 July 2018 by jgliss due to error (kernel died)</span>
         <span class="c1"># after update of dependencies (cf_units). Attribute name does not</span>
         <span class="c1"># work anymore...</span>
         <span class="n">cfu_str</span> <span class="o">=</span> <span class="n">cfunit</span><span class="o">.</span><span class="n">origin</span> <span class="c1">#cfunit.name</span>
-        
+
         <span class="n">res</span> <span class="o">=</span> <span class="n">cfu_str</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">microsec_units</span><span class="p">:</span>
             <span class="n">tstr</span> <span class="o">=</span> <span class="s2">&quot;us&quot;</span>
@@ -1424,54 +1473,54 @@
             <span class="n">tstr</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unsupported time units&#39;</span><span class="p">)</span>
-        
+
         <span class="n">basedate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">basedate</span><span class="p">)</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">times</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;timedelta64[</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span><span class="n">tstr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">basedate</span> <span class="o">+</span> <span class="n">dt</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">cfunit</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span><span class="n">times</span><span class="p">)])</span></div>
 
-<div class="viewcode-block" id="get_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_constraint</span><span class="p">(</span><span class="n">lon_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+<div class="viewcode-block" id="get_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_constraint</span><span class="p">(</span><span class="n">lon_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">time_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meridian_centre</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Function that creates an :class:`iris.Constraint` based on input</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
-<span class="sd">    Please be aware of the definition of the longitudes in your data when </span>
-<span class="sd">    cropping within the longitude dimension. The longitudes in your data may be </span>
-<span class="sd">    defined either from **-180 &lt;= lon &lt;= 180** (pyaerocom standard) or from </span>
-<span class="sd">    **0 &lt;= lon &lt;= 360**. In the former case (-180 -&gt; 180) you can leave the </span>
-<span class="sd">    additional input parameter ``meridian_centre=True`` (default). </span>
-<span class="sd">    </span>
+<span class="sd">    Please be aware of the definition of the longitudes in your data when</span>
+<span class="sd">    cropping within the longitude dimension. The longitudes in your data may be</span>
+<span class="sd">    defined either from **-180 &lt;= lon &lt;= 180** (pyaerocom standard) or from</span>
+<span class="sd">    **0 &lt;= lon &lt;= 360**. In the former case (-180 -&gt; 180) you can leave the</span>
+<span class="sd">    additional input parameter ``meridian_centre=True`` (default).</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lon_range : :obj:`tuple`, optional</span>
 <span class="sd">        2-element tuple containing longitude range for cropping</span>
 <span class="sd">        Example input to crop around meridian: `lon_range=(-30, 30)`</span>
 <span class="sd">    lat_range : :obj:`tuple`, optional</span>
-<span class="sd">        2-element tuple containing latitude range for cropping. </span>
+<span class="sd">        2-element tuple containing latitude range for cropping.</span>
 <span class="sd">    time_range : :obj:`tuple`, optional</span>
 <span class="sd">        2-element tuple containing time range for cropping. Allowed data</span>
-<span class="sd">        types for specifying the times are </span>
-<span class="sd">        </span>
-<span class="sd">            1. a combination of 2 :class:`pandas.Timestamp` instances or </span>
+<span class="sd">        types for specifying the times are</span>
+
+<span class="sd">            1. a combination of 2 :class:`pandas.Timestamp` instances or</span>
 <span class="sd">            2. a combination of two strings that can be directly converted\</span>
 <span class="sd">            into :class:`pandas.Timestamp` instances (e.g.\</span>
 <span class="sd">            `time_range=(&quot;2010-1-1&quot;, &quot;2012-1-1&quot;)`) or</span>
-<span class="sd">            3. directly a combination of indices (:obj:`int`). </span>
+<span class="sd">            3. directly a combination of indices (:obj:`int`).</span>
 <span class="sd">    meridian_centre : bool</span>
-<span class="sd">        specifies the coordinate definition range of longitude array. If True, </span>
+<span class="sd">        specifies the coordinate definition range of longitude array. If True,</span>
 <span class="sd">        then -180 -&gt; 180 is assumed, else 0 -&gt; 360</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    iris.Constraint</span>
 <span class="sd">        the combined constraint from all valid input parameters</span>
-<span class="sd">    </span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    The following example shows how to crop over the meridian</span>
-<span class="sd">    </span>
+
 <span class="sd">    &gt;&gt;&gt; from pyaerocom.helpers import get_constraint</span>
 <span class="sd">    &gt;&gt;&gt; from pyaerocom.io.fileconventions import FileConventionRead</span>
 <span class="sd">    &gt;&gt;&gt; from iris import load</span>
@@ -1488,8 +1537,8 @@
 <span class="sd">    &gt;&gt;&gt; lons = cubes[0].coord(&quot;longitude&quot;).points</span>
 <span class="sd">    &gt;&gt;&gt; meridian_centre = True if lons.max() &gt; 180 else False</span>
 <span class="sd">    &gt;&gt;&gt; year = meta_info[&quot;year&quot;]</span>
-<span class="sd">    &gt;&gt;&gt; c = get_constraint(lon_range=(50, 150), </span>
-<span class="sd">    ...                    lat_range=(20, 60), </span>
+<span class="sd">    &gt;&gt;&gt; c = get_constraint(lon_range=(50, 150),</span>
+<span class="sd">    ...                    lat_range=(20, 60),</span>
 <span class="sd">    ...                    time_range=(&quot;%s-02-05&quot; %year, &quot;%s-02-25&quot; %year))</span>
 <span class="sd">    &gt;&gt;&gt; cube_crop = cubes.extract(c)[0]</span>
 <span class="sd">    &gt;&gt;&gt; cube_crop.shape</span>
@@ -1507,23 +1556,23 @@
         <span class="k">for</span> <span class="n">cadd</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">&amp;</span> <span class="n">cadd</span>
     <span class="k">return</span> <span class="n">c</span></div>
-    
+
 <div class="viewcode-block" id="get_lat_rng_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_lat_rng_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_lat_rng_constraint</span><span class="p">(</span><span class="n">lat_range</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create latitude constraint based on input range</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lat_range : tuple</span>
 <span class="sd">        2-element tuple specifying latitude range</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    iris.Constraint</span>
 <span class="sd">        the corresponding iris.Constraint instance</span>
-<span class="sd">        </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">iris</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
-    
+
 <div class="viewcode-block" id="get_lon_rng_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_lon_rng_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_lon_rng_constraint</span><span class="p">(</span><span class="n">lon_range</span><span class="p">,</span> <span class="n">meridian_centre</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create longitude constraint based on input range</span>
 
@@ -1532,14 +1581,14 @@
 <span class="sd">    lon_range : tuple</span>
 <span class="sd">        2-element tuple containing from left -&gt; right end of range</span>
 <span class="sd">    meridian_centre : bool</span>
-<span class="sd">        specifies the coordinate definition range of longitude array of the </span>
+<span class="sd">        specifies the coordinate definition range of longitude array of the</span>
 <span class="sd">        data to be cropped. If True, then -180 -&gt; 180 is assumed, else 0 -&gt; 360</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    iris.Constraint</span>
-<span class="sd">        the corresponding iris.Constraint instance </span>
-<span class="sd">    </span>
+<span class="sd">        the corresponding iris.Constraint instance</span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
@@ -1578,16 +1627,16 @@
 
 <div class="viewcode-block" id="get_time_rng_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_time_rng_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_time_rng_constraint</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create iris.Constraint for data extraction along time axis</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    start : :obj:`Timestamp` or :obj:` str`</span>
-<span class="sd">        start time of desired subset. If string, it must be convertible </span>
+<span class="sd">        start time of desired subset. If string, it must be convertible</span>
 <span class="sd">        into :class:`pandas.Timestamp` (e.g. &quot;2012-1-1&quot;)</span>
 <span class="sd">    stop : :obj:`Timestamp` or :obj:` str`</span>
-<span class="sd">        start time of desired subset. If string, it must be convertible </span>
+<span class="sd">        start time of desired subset. If string, it must be convertible</span>
 <span class="sd">        into :class:`pandas.Timestamp` (e.g. &quot;2012-1-1&quot;)</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    iris.Constraint</span>
@@ -1598,26 +1647,28 @@
         <span class="n">start</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">):</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
-        
+
     <span class="n">t_lower</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">PartialDateTime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">start</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
                                         <span class="n">month</span><span class="o">=</span><span class="n">start</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
                                         <span class="n">day</span><span class="o">=</span><span class="n">start</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
     <span class="n">t_upper</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">PartialDateTime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">stop</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
                                         <span class="n">month</span><span class="o">=</span><span class="n">stop</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
                                         <span class="n">day</span><span class="o">=</span><span class="n">stop</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
-    
+
     <span class="k">return</span> <span class="n">iris</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cell</span><span class="p">:</span> <span class="n">t_lower</span> <span class="o">&lt;=</span> <span class="n">cell</span> <span class="o">&lt;=</span> <span class="n">t_upper</span><span class="p">)</span></div>
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">make_datetime_index</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2011</span><span class="p">,</span> <span class="s1">&#39;3hourly&#39;</span><span class="p">)</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">make_datetime_index</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">2011</span><span class="p">,</span> <span class="s1">&#39;hourly&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">get_lowest_resolution</span><span class="p">(</span><span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">get_highest_resolution</span><span class="p">(</span><span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;monthly&#39;</span><span class="p">))</span>
-    
+
     <span class="nb">print</span><span class="p">(</span><span class="n">infer_time_resolution</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2010-01-01&#39;</span><span class="p">),</span>
                                  <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2010-01-02&#39;</span><span class="p">),</span>
                                  <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2010-01-05&#39;</span><span class="p">),</span>
                                  <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2010-10-15&#39;</span><span class="p">)]))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">varlist_aerocom</span><span class="p">([</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550csaer&#39;</span><span class="p">]))</span>
 </pre></div>
 
            </div>

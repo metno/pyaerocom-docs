@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -158,11 +158,6 @@
   <h1>Source code for pyaerocom.metastandards</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on Mon Jan 28 13:26:36 2019</span>
-
-<span class="sd">@author: jonasg</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">BrowseDict</span>
@@ -170,7 +165,7 @@
 
 <div class="viewcode-block" id="DataSource"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.DataSource">[docs]</a><span class="k">class</span> <span class="nc">DataSource</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Dict-like object defining a data source</span>
-<span class="sd">    </span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data_id</span>
@@ -181,27 +176,27 @@
 <span class="sd">        data product (e.g. SDA, Inv, Sun for Aeronet)</span>
 <span class="sd">    data_version</span>
 <span class="sd">        version of data (e.g. 3)</span>
-<span class="sd">    data_level </span>
+<span class="sd">    data_level</span>
 <span class="sd">        level of data (e.g. 2)</span>
 <span class="sd">    revision_date</span>
 <span class="sd">        last revision date of dataset</span>
-<span class="sd">    ts_type_src </span>
+<span class="sd">    ts_type_src</span>
 <span class="sd">        sampling frequency as defined in data files (use None if undefined)</span>
 <span class="sd">    stat_merge_pref_attr : str</span>
 <span class="sd">        optional, a metadata attribute that is available in data and that</span>
 <span class="sd">        is used to order the individual stations by relevance in case overlaps</span>
-<span class="sd">        occur. The associated values of this attribute need to be sortable </span>
-<span class="sd">        (e.g. revision_date). This is only relevant in case overlaps occur. </span>
+<span class="sd">        occur. The associated values of this attribute need to be sortable</span>
+<span class="sd">        (e.g. revision_date). This is only relevant in case overlaps occur.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dataset_name</span>          <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">data_product</span>          <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">data_version</span>          <span class="o">=</span>   <span class="nb">float</span><span class="p">,</span>
                   <span class="n">data_level</span>            <span class="o">=</span>   <span class="nb">float</span><span class="p">,</span>
                   <span class="n">ts_type_src</span>           <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
-                  <span class="n">stat_merge_pref_attr</span>  <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span> 
+                  <span class="n">stat_merge_pref_attr</span>  <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">revision_date</span>         <span class="o">=</span>   <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
                   <span class="n">website</span>               <span class="o">=</span>   <span class="nb">str</span><span class="p">)</span>
-    
+
     <span class="n">_ini_file_name</span> <span class="o">=</span> <span class="s1">&#39;data_sources.ini&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
 
@@ -212,22 +207,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_level</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">revision_date</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">website</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">ts_type_src</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">stat_merge_pref_attr</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_source_info_from_ini</span><span class="p">()</span>
-        
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Directory containing data files&quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="kn">import</span> <span class="n">get_obsnetwork_dir</span>
         <span class="k">return</span> <span class="n">get_obsnetwork_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">)</span>
-    
-    
+
 <div class="viewcode-block" id="DataSource.dataset_str"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.DataSource.dataset_str">[docs]</a>    <span class="k">def</span> <span class="nf">dataset_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -246,20 +240,17 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span>
         <span class="k">return</span> <span class="n">s</span></div>
-    
+
 <div class="viewcode-block" id="DataSource.load_dataset_info"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.DataSource.load_dataset_info">[docs]</a>    <span class="k">def</span> <span class="nf">load_dataset_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Wrapper for :func:`_parse_source_info_from_ini`&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_source_info_from_ini</span><span class="p">()</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span></div>
-        
+
     <span class="k">def</span> <span class="nf">_parse_source_info_from_ini</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parse source info from ini file&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+        <span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
         <span class="n">cfg</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
         <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">DIR_INI_FILES</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ini_file_name</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
@@ -271,19 +262,19 @@
                     <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_types</span><span class="p">[</span><span class="n">k</span><span class="p">](</span><span class="n">v</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
-              
+
 <div class="viewcode-block" id="StationMetaData"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.StationMetaData">[docs]</a><span class="k">class</span> <span class="nc">StationMetaData</span><span class="p">(</span><span class="n">DataSource</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This object defines a standard for station metadata in pyaerocom</span>
-<span class="sd">    </span>
-<span class="sd">    Variable names associated with meta data can vary significantly between </span>
-<span class="sd">    different conventions (e.g. conventions in modellers community vs. </span>
-<span class="sd">    observations community). </span>
-<span class="sd">    </span>
+
+<span class="sd">    Variable names associated with meta data can vary significantly between</span>
+<span class="sd">    different conventions (e.g. conventions in modellers community vs.</span>
+<span class="sd">    observations community).</span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    - This object is a dictionary and can be easily expanded</span>
 <span class="sd">    - In many cases, only some of the attributes are relevant</span>
-<span class="sd">    </span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    filename : str</span>
@@ -291,7 +282,7 @@
 <span class="sd">    station_id : str</span>
 <span class="sd">        Code or unique ID of station</span>
 <span class="sd">    station_name :str</span>
-<span class="sd">        name or ID of a station. Note, that the concept of a station in </span>
+<span class="sd">        name or ID of a station. Note, that the concept of a station in</span>
 <span class="sd">        pyaerocom is not necessarily related to a fixed coordinate. A station</span>
 <span class="sd">        can also be a satellite, ship, or a human walking around and measuring</span>
 <span class="sd">        something</span>
@@ -302,7 +293,7 @@
 <span class="sd">    country : str</span>
 <span class="sd">        string specifying country (or country ID)</span>
 <span class="sd">    ts_type : str</span>
-<span class="sd">        frequency of data (e.g. monthly). Note the difference between </span>
+<span class="sd">        frequency of data (e.g. monthly). Note the difference between</span>
 <span class="sd">        :attr:`ts_type_src` of :class:`DataSource`, which specifies the freq.</span>
 <span class="sd">        of the original files.</span>
 <span class="sd">    latitude : float</span>
@@ -311,33 +302,241 @@
 <span class="sd">        longitude coordinate</span>
 <span class="sd">    altitude : float</span>
 <span class="sd">        altitude coordinate</span>
-<span class="sd">    </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">station_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">station_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instrument_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">PI</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">country</span> <span class="o">=</span> <span class="kc">None</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">country_code</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">altitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        
+
         <span class="nb">super</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span></div>
-                
-     
+
+<div class="viewcode-block" id="AerocomDataID"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.AerocomDataID">[docs]</a><span class="k">class</span> <span class="nc">AerocomDataID</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class representing a model data ID following AeroCom PhaseIII conventions</span>
+
+<span class="sd">    The ID must contain 4 substrings with meta parameters:</span>
+
+<span class="sd">        &lt;ModelName&gt;-&lt;MeteoConfigSpecifier&gt;_&lt;ExperimentName&gt;-&lt;PerturbationName&gt;</span>
+
+<span class="sd">    E.g.</span>
+
+<span class="sd">        NorESM2-met2010_CTRL-AP3</span>
+
+<span class="sd">    For more information see `AeroCom diagnostics spreadsheet &lt;https://docs.google.com/spreadsheets/d/1NiHLVTDsBo0JEBSnnDECNI2ojUnCVlxuy2PFrsRJW38/edit#gid=1475397852&gt;`__</span>
+
+<span class="sd">    This interface can be used to make sure a provided data ID is following</span>
+<span class="sd">    this convention and to extract the corresponding meta parameters as</span>
+<span class="sd">    dictionary (:func:`to_dict`) or to create an data_id from the corresponding</span>
+<span class="sd">    meta parameters :func:`from_dict`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DELIM</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span>
+    <span class="n">SUBDELIM</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+    <span class="n">KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;model_name&#39;</span><span class="p">,</span> <span class="s1">&#39;meteo&#39;</span><span class="p">,</span> <span class="s1">&#39;experiment&#39;</span><span class="p">,</span> <span class="s1">&#39;perturbation&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">meta_info</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">data_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span> <span class="o">=</span> <span class="n">data_id</span>
+        <span class="k">elif</span> <span class="n">meta_info</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_values_from_dict</span><span class="p">(</span><span class="n">meta_info</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        str</span>
+<span class="sd">            AeroCom data ID</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span>
+
+    <span class="nd">@data_id</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_data_id</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Meta value list is not set.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@values</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEYS</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input: need list of length </span><span class="si">{}</span><span class="s1">&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEYS</span><span class="p">)))</span>
+        <span class="c1"># this will first create a data_id string from input values and</span>
+        <span class="c1"># then call setter method to make sure the input is correct.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_values</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AerocomDataID.to_dict"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.AerocomDataID.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert data_id to dictionary</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            dictionary with metadata information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEYS</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eval_data_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEYS</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_values_from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">):</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">KEYS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Missing specification of </span><span class="si">{}</span><span class="s1"> in input meta dict&#39;</span>
+                               <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_values</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">vals</span>
+
+<div class="viewcode-block" id="AerocomDataID.from_dict"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.AerocomDataID.from_dict">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">meta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create instance of AerocomDataID from input meta dictionary</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        meta : dict</span>
+<span class="sd">            dictionary containing required keys (cf. :attr:`KEYS`) and</span>
+<span class="sd">            corresponding values to create an data_id</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            if not all information required is provided</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AerocomDataID</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">AerocomDataID</span><span class="p">(</span><span class="o">**</span><span class="n">meta</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AerocomDataID.from_values"><a class="viewcode-back" href="../../api.html#pyaerocom.metastandards.AerocomDataID.from_values">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_values</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create data_id from list of values</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The values have to be in the right order, cf. :attr:`KEYS`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : list</span>
+<span class="sd">            list containing values for each key in :attr:`KEYS`</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            if length of input list mismatches length of :attr:`KEYS`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            generated data_id</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Need 4 entries model_name, meteo_config, &#39;</span>
+                             <span class="s1">&#39;experiment, perturbation&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_eval_data_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check and extract meta information from input data_id</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        val : str</span>
+<span class="sd">            data_id</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            if input is not string or is not in format</span>
+<span class="sd">            &lt;model_name&gt;-&lt;meteo_config&gt;_&lt;experiment&gt;-&lt;perturbation&gt;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        values</span>
+<span class="sd">            DESCRIPTION.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for data_id. Need str. Got </span><span class="si">{}</span><span class="s1">&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEYS</span><span class="p">)</span>
+        <span class="n">spl</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DELIM</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">spl</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Invalid data ID </span><span class="si">{}</span><span class="s1">. Need format &#39;</span>
+                                 <span class="s1">&#39;&lt;model-name&gt;_&lt;meteo-config&gt;_&lt;eperiment-name&gt;&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">return</span> <span class="n">values</span>
+
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SUBDELIM</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#model_name</span>
+
+            <span class="n">meteo</span> <span class="o">=</span> <span class="n">sub</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">meteo</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;met&#39;</span><span class="p">):</span>
+                <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">meteo</span> <span class="c1">#meteo_config</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Meteorology config substring in &#39;</span>
+                                        <span class="s1">&#39;data_id </span><span class="si">{}</span><span class="s1"> needs to start with met. &#39;</span>
+                                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">meteo</span><span class="p">))</span>
+                <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SUBDELIM</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span></div>
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="n">StationMetaData</span><span class="p">(</span><span class="n">data_id</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span>
                            <span class="n">ts_type</span> <span class="o">=</span> <span class="s1">&#39;blaaaa&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">dataset_str</span><span class="p">())</span>
+
+    <span class="n">data_id</span> <span class="o">=</span> <span class="n">AerocomDataID</span><span class="p">(</span><span class="s1">&#39;EMEP-met2010_EXP-PERT&#39;</span><span class="p">)</span>
+
+    <span class="n">dd</span> <span class="o">=</span> <span class="n">data_id</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="n">AerocomDataID</span><span class="p">(</span><span class="o">**</span><span class="n">dd</span><span class="p">)</span> <span class="o">==</span> <span class="n">AerocomDataID</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
 </pre></div>
 
            </div>

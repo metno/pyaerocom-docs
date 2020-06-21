@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -160,60 +160,89 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
-<span class="k">except</span><span class="p">:</span> 
-    <span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">BrowseDict</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="kn">import</span> <span class="n">EbasSQLRequest</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">VarNotAvailableError</span>
 
 <div class="viewcode-block" id="EbasVarInfo"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.EbasVarInfo">[docs]</a><span class="k">class</span> <span class="nc">EbasVarInfo</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;EBAS IO variable information for Aerocom</span>
-<span class="sd">    </span>
-<span class="sd">    ToDo</span>
-<span class="sd">    ----</span>
-<span class="sd">    Complete documentation</span>
+    <span class="sd">&quot;&quot;&quot;Interface for mapping between EBAS variable information and AeroCom</span>
+
+<span class="sd">    For more information about EBAS variable and data information see</span>
+<span class="sd">    `EBAS website &lt;http://ebas.nilu.no/&gt;`__.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    var_name : str</span>
+<span class="sd">        AeroCom variable name</span>
+<span class="sd">    component : list</span>
+<span class="sd">        list of EBAS variable / component names that are mapped to</span>
+<span class="sd">        :attr:`var_name`</span>
+<span class="sd">    matrix : list, optional</span>
+<span class="sd">        list of EBAS matrix values that are accepted, default is None, i.e.</span>
+<span class="sd">        all available matrices are used</span>
+<span class="sd">    instrument : list, optional</span>
+<span class="sd">        list of all instruments that are accepted for this variable</span>
+<span class="sd">    requires : list, optional</span>
+<span class="sd">        for variables that are computed and not directly available in EBAS.</span>
+<span class="sd">        Provided as list of (AeroCom) variables that are required to</span>
+<span class="sd">        compute :attr:`var_name` (e.g. for `sc550dryaer` this would be</span>
+<span class="sd">        `[sc550aer,scrh]`).</span>
+<span class="sd">    scale_factor : float, optional</span>
+<span class="sd">        multiplicative scale factor that is applied in order to convert</span>
+<span class="sd">        EBAS variable into AeroCom variable (e.g. 1.4 for conversion of</span>
+<span class="sd">        EBAS OC measurement to AeroCom concoa variable)</span>
+<span class="sd">    old_name : str</span>
+<span class="sd">        old variable name (refers to outdated conventions, currently not used)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    var_name : str</span>
+<span class="sd">        AeroCom variable name</span>
+<span class="sd">    init : bool</span>
+<span class="sd">        if True, EBAS configuration for input variable is retrieved from</span>
+<span class="sd">        data file ebas_config.ini (if possible)</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        additional keyword arguments (currently not used)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;abs550aer&quot;</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span> <span class="o">=</span> <span class="n">var_name</span>
-        
-        <span class="c1">#: aliases</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span> <span class="o">=</span> <span class="p">[]</span>
-        
-        <span class="c1">#: old variable name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">old_name</span> <span class="o">=</span> <span class="kc">None</span>
-        
-        <span class="c1">#: list of variable / component names (EBAS side)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="c1">#: list of matrix names (EBAS side, optional)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="c1">#: list of instrument names (EBAS side, optional)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="c1">#: list containing variable statistics info (EBAS side, optional)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">statistics</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="c1">#: list of additional variable required for retrieval of this variable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">requires</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="c1">#: scale factor for conversion to Aerocom units</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scale_factor</span> <span class="o">=</span> <span class="mi">1</span>
-        
-        <span class="c1">#imports default information and, on top, variable information (if </span>
+
+        <span class="c1">#: old variable name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#imports default information and, on top, variable information (if</span>
         <span class="c1"># applicable)</span>
         <span class="k">if</span> <span class="n">init</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parse_from_ini</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span> 
-    
+            <span class="bp">self</span><span class="o">.</span><span class="n">parse_from_ini</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+
 <div class="viewcode-block" id="EbasVarInfo.PROVIDES_VARIABLES"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.EbasVarInfo.PROVIDES_VARIABLES">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">PROVIDES_VARIABLES</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;List specifying provided variables&quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">EbasVarInfo</span><span class="o">.</span><span class="n">open_config</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span></div>
-        
+
 <div class="viewcode-block" id="EbasVarInfo.open_config"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.EbasVarInfo.open_config">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">open_config</span><span class="p">():</span>
         <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="fm">__dir__</span>
@@ -223,67 +252,60 @@
         <span class="n">conf_reader</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
         <span class="n">conf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">conf_reader</span></div>
-    
-    <span class="k">def</span> <span class="nf">_check_aliases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">varname</span><span class="p">,</span> <span class="n">conf_reader</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">conf_reader</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="s1">&#39;aliases&#39;</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">varname</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;aliases&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]:</span>
-                    <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Found alias match (</span><span class="si">{}</span><span class="s1">) for variable </span><span class="si">{}</span><span class="s1">, &#39;</span>
-                                   <span class="s1">&#39;Note that searching for aliases slows down &#39;</span>
-                                   <span class="s1">&#39;things, thus, please consider using the &#39;</span>
-                                   <span class="s1">&#39;actual aerocom variable &#39;</span>
-                                   <span class="s1">&#39;name&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">section</span><span class="p">))</span>
-                    <span class="k">return</span> <span class="n">section</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;No alias match could be found for variable </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">varname</span><span class="p">))</span>
-        
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">var_name_aerocom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Variable name in AeroCom convention&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">var_name_aerocom</span>
+
 <div class="viewcode-block" id="EbasVarInfo.parse_from_ini"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.EbasVarInfo.parse_from_ini">[docs]</a>    <span class="k">def</span> <span class="nf">parse_from_ini</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conf_reader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Import information about default region</span>
-<span class="sd">        </span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse EBAS info for input AeroCom variable (works also for aliases)</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        var_name : str</span>
-<span class="sd">            strind ID of region (must be specified in `regions.ini &lt;https://</span>
-<span class="sd">            github.com/metno/pyaerocom/blob/master/pyaerocom/data/regions.ini&gt;`__ </span>
-<span class="sd">            file)</span>
+<span class="sd">            AeroCom variable name</span>
 <span class="sd">        conf_reader : ConfigParser</span>
 <span class="sd">            open config parser object</span>
-<span class="sd">            </span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        VarNotAvailableError</span>
+<span class="sd">            if variable is not supported</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
 <span class="sd">            True, if default could be loaded, False if not</span>
-<span class="sd">        </span>
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        IOError</span>
-<span class="sd">            if regions.ini file does not exist</span>
-
-<span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">conf_reader</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">conf_reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_config</span><span class="p">()</span>
-        
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">conf_reader</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">var_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_aliases</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">conf_reader</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;No variable information  found for </span><span class="si">{}</span><span class="s2"> &quot;</span>
-                              <span class="s2">&quot;(including aliases): Error: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
-                               <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="c1"># this will raise Variable</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">var_name_aerocom</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#             const.print_log.warning(&#39;Updating variable name {} to {}&#39;</span>
+<span class="c1">#                                     .format(self.var_name, var_name))</span>
+<span class="c1">#             self.var_name = var_name</span>
+<span class="c1"># =============================================================================</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">conf_reader</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;Variable </span><span class="si">{}</span><span class="s1"> is not available in &#39;</span>
+                                           <span class="s1">&#39;EBAS interface&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+
         <span class="n">var_info</span> <span class="o">=</span> <span class="n">conf_reader</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">var_info</span><span class="p">:</span>
                 <span class="n">val</span> <span class="o">=</span> <span class="n">var_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;var_name&#39;</span><span class="p">,</span> <span class="s1">&#39;old_name&#39;</span><span class="p">)</span> <span class="p">:</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span><span class="s1">&#39;scale_factor&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;scale_factor&#39;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]))</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">old_name</span><span class="p">)</span></div>
-    
+        <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="o">=</span><span class="n">var_name</span></div>
+
 <div class="viewcode-block" id="EbasVarInfo.to_dict"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.EbasVarInfo.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert into dictionary&quot;&quot;&quot;</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
@@ -293,24 +315,24 @@
             <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">return</span> <span class="n">d</span></div>
-    
+
 <div class="viewcode-block" id="EbasVarInfo.get_all_components"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.EbasVarInfo.get_all_components">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get list of all components&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_all_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="EbasVarInfo.make_sql_request"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.EbasVarInfo.make_sql_request">[docs]</a>    <span class="k">def</span> <span class="nf">make_sql_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">constraints</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create an SQL request for the specifications in this object</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        constraints</span>
-<span class="sd">            request constraints deviating from default. For details on </span>
+<span class="sd">            request constraints deviating from default. For details on</span>
 <span class="sd">            parameters see :class:`EbasSQLRequest`</span>
-<span class="sd">            </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        EbasSQLRequest</span>
-<span class="sd">            the SQL request object that can be used to retrieve corresponding </span>
+<span class="sd">            the SQL request object that can be used to retrieve corresponding</span>
 <span class="sd">            file names using instance of :func:`EbasFileIndex.get_file_names`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_components</span><span class="p">()</span>
@@ -319,16 +341,15 @@
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;At least one component (Ebas variable name) &#39;</span>
                              <span class="s1">&#39;must be specified for retrieval of variable &#39;</span>
                              <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">))</span>
-    
+
         <span class="c1"># default request</span>
         <span class="n">req</span> <span class="o">=</span> <span class="n">EbasSQLRequest</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">matrices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">,</span>
                               <span class="n">instrument_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span>
                               <span class="n">statistics</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics</span><span class="p">)</span>
-        
-            
+
         <span class="n">req</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">constraints</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">req</span></div>
-        
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">head</span> <span class="o">=</span> <span class="s2">&quot;Pyaerocom </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span><span class="o">*</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
@@ -338,14 +359,14 @@
 
 <div class="viewcode-block" id="get_all_components"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.get_all_components">[docs]</a><span class="k">def</span> <span class="nf">get_all_components</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">varlist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get all EBAS components required to read a certain variable</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    var_name : str</span>
 <span class="sd">        AeroCom variable name</span>
 <span class="sd">    varlist : list, optional</span>
 <span class="sd">        list of components already inferred (this function runs recursively).</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list</span>
@@ -363,15 +384,18 @@
 
 <div class="viewcode-block" id="check_all_variables"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_varinfo.check_all_variables">[docs]</a><span class="k">def</span> <span class="nf">check_all_variables</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Helper function that checks all EBAS variables against SQL database</span>
-<span class="sd">    </span>
+
 <span class="sd">    For all variables, see file ``ebas_config.ini`` in data directory</span>
-<span class="sd">    </span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    AttributeError</span>
 <span class="sd">        if one of the variable definitions in the ini file is not according to</span>
 <span class="sd">        requirements</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: check this method...</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;This method needs review and should be moved &#39;</span>
+                              <span class="s1">&#39;into another module...&#39;</span><span class="p">)</span>
     <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="kn">import</span> <span class="n">EbasFileIndex</span>
     <span class="n">all_vars</span> <span class="o">=</span> <span class="n">EbasVarInfo</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span><span class="p">()</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">EbasFileIndex</span><span class="p">()</span>
@@ -379,7 +403,7 @@
                <span class="s1">&#39;matrix&#39;</span>        <span class="p">:</span>   <span class="n">db</span><span class="o">.</span><span class="n">ALL_MATRICES</span><span class="p">,</span>
                <span class="s1">&#39;instrument&#39;</span>    <span class="p">:</span>   <span class="n">db</span><span class="o">.</span><span class="n">ALL_INSTRUMENTS</span><span class="p">,</span>
                <span class="s1">&#39;statistics&#39;</span>    <span class="p">:</span>   <span class="n">db</span><span class="o">.</span><span class="n">ALL_STATISTICS_PARAMS</span><span class="p">}</span>
-    
+
     <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">checked_vars</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">all_vars</span><span class="p">:</span>
@@ -402,16 +426,16 @@
                                 <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Additional info: ID </span><span class="si">{}</span><span class="s1"> was found in &#39;</span>
                                       <span class="s1">&#39;databes attr </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">compname</span><span class="p">))</span>
                         <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;No such </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">) in database. Please &quot;</span>
-                                       <span class="s2">&quot;check variable </span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> 
+                                       <span class="s2">&quot;check variable </span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span>
                                                                      <span class="n">item</span><span class="p">,</span>
                                                                      <span class="n">varname</span><span class="p">,</span>
                                                                      <span class="n">s</span><span class="p">)))</span>
-                        
+
     <span class="k">return</span> <span class="n">errors</span></div>
-            
+
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">EbasVarInfo</span><span class="p">(</span><span class="s1">&#39;concso2&#39;</span><span class="p">))</span>
-    
+
     <span class="nb">print</span><span class="p">(</span><span class="n">get_all_components</span><span class="p">(</span><span class="s1">&#39;ang4470dryaer&#39;</span><span class="p">))</span>
 </pre></div>
 

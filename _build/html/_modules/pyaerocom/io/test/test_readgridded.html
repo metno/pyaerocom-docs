@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -165,41 +165,87 @@
 <span class="c1"># TODO: Docstrings</span>
 <span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="n">DataFrame</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.test.settings</span> <span class="kn">import</span> <span class="n">TEST_RTOL</span><span class="p">,</span> <span class="n">lustre_unavail</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.conftest</span> <span class="kn">import</span> <span class="n">TEST_RTOL</span><span class="p">,</span> <span class="n">lustre_unavail</span><span class="p">,</span> <span class="n">testdata_unavail</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.readgridded</span> <span class="kn">import</span> <span class="n">ReadGridded</span>
 
 <span class="n">START</span> <span class="o">=</span> <span class="s2">&quot;1-1-2003&quot;</span>
 <span class="n">STOP</span> <span class="o">=</span> <span class="s2">&quot;31-12-2007&quot;</span>
 
-<div class="viewcode-block" id="make_dataset"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.make_dataset">[docs]</a><span class="k">def</span> <span class="nf">make_dataset</span><span class="p">():</span>
+<div class="viewcode-block" id="init_reader"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.init_reader">[docs]</a><span class="k">def</span> <span class="nf">init_reader</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="s2">&quot;ECMWF_CAMS_REAN&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="dataset"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.dataset">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;session&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">dataset</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">make_dataset</span><span class="p">()</span></div>
-    
-<div class="viewcode-block" id="test_file_info"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_file_info">[docs]</a><span class="nd">@lustre_unavail</span>    
-<span class="k">def</span> <span class="nf">test_file_info</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+<div class="viewcode-block" id="reader_reanalysis"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.reader_reanalysis">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;session&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">reader_reanalysis</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">init_reader</span><span class="p">()</span></div>
 
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">file_info</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">file_info</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">11</span><span class="p">,</span> <span class="s1">&#39;Mismatch colnum file_info (df)&#39;</span></div>
+<div class="viewcode-block" id="reader_tm5"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.reader_tm5">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">reader_tm5</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;TM5-met2010_CTRL-TEST&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="test_years_available"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_years_available">[docs]</a><span class="nd">@lustre_unavail</span>    
-<span class="k">def</span> <span class="nf">test_years_available</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+
+<div class="viewcode-block" id="test_read_var"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_read_var">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;input_args,mean_val&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">),</span> <span class="mf">0.1186</span><span class="p">),</span>
+    <span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="p">{</span>
+                                  <span class="s1">&#39;var_name&#39;</span>   <span class="p">:</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;operator&#39;</span>   <span class="p">:</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;filter_val&#39;</span> <span class="p">:</span> <span class="mi">1000</span>
+                                  <span class="p">}),</span> <span class="mf">0.1186</span><span class="p">),</span>
+    <span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="p">{</span>
+                                  <span class="s1">&#39;var_name&#39;</span>   <span class="p">:</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;operator&#39;</span>   <span class="p">:</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;filter_val&#39;</span> <span class="p">:</span> <span class="mf">0.1</span>
+                                  <span class="p">}),</span> <span class="mf">0.2062</span><span class="p">),</span>
+    <span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;var_name&#39;</span>   <span class="p">:</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;operator&#39;</span>   <span class="p">:</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;filter_val&#39;</span> <span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;var_name&#39;</span>   <span class="p">:</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;operator&#39;</span>   <span class="p">:</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;filter_val&#39;</span> <span class="p">:</span> <span class="mf">0.11</span><span class="p">}</span>
+        <span class="p">]),</span> <span class="mf">0.1047</span><span class="p">)</span>
+    <span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_read_var</span><span class="p">(</span><span class="n">reader_tm5</span><span class="p">,</span> <span class="n">input_args</span><span class="p">,</span> <span class="n">mean_val</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">reader_tm5</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="o">**</span><span class="n">input_args</span><span class="p">)</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">mean_val</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="test_ReadGridded_class_empty"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_ReadGridded_class_empty">[docs]</a><span class="k">def</span> <span class="nf">test_ReadGridded_class_empty</span><span class="p">():</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">data_id</span> <span class="o">==</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">==</span> <span class="kc">None</span>
+    <span class="kn">from</span> <span class="nn">pyaerocom.io.aerocom_browser</span> <span class="kn">import</span> <span class="n">AerocomBrowser</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">browser</span><span class="p">,</span> <span class="n">AerocomBrowser</span><span class="p">)</span>
+
+    <span class="n">failed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">years_avail</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">assert</span> <span class="n">failed</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">vars_filename</span> <span class="o">==</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="test_file_info"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_file_info">[docs]</a><span class="nd">@lustre_unavail</span>
+<span class="k">def</span> <span class="nf">test_file_info</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="o">.</span><span class="n">file_info</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="o">.</span><span class="n">file_info</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span><span class="p">,</span> <span class="s1">&#39;Mismatch colnum file_info (df)&#39;</span></div>
+
+<div class="viewcode-block" id="test_years_available"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_years_available">[docs]</a><span class="nd">@lustre_unavail</span>
+<span class="k">def</span> <span class="nf">test_years_available</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="p">):</span>
     <span class="n">years</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2003</span><span class="p">,</span> <span class="mi">2020</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="mi">9999</span><span class="p">]</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">years_avail</span><span class="p">,</span> <span class="n">years</span><span class="p">)</span>    </div>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="o">.</span><span class="n">years_avail</span><span class="p">,</span> <span class="n">years</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="test_data_dir"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_data_dir">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="k">def</span> <span class="nf">test_data_dir</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">==</span> <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed&#39;</span></div>
-    
-<div class="viewcode-block" id="test_read_var"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_read_var">[docs]</a><span class="nd">@lustre_unavail</span>    
-<span class="k">def</span> <span class="nf">test_read_var</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">test_data_dir</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">reader_reanalysis</span><span class="o">.</span><span class="n">data_dir</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="test_read_var_lustre"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_read_var_lustre">[docs]</a><span class="nd">@lustre_unavail</span>
+<span class="k">def</span> <span class="nf">test_read_var_lustre</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">datetime64</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;od550aer&quot;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">reader_reanalysis</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;od550aer&quot;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
                          <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">STOP</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">GriddedData</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">GriddedData</span><span class="p">)</span>
     <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">stop</span><span class="p">],</span>
                            <span class="p">[</span><span class="s2">&quot;od550aer&quot;</span><span class="p">,</span> <span class="mi">1826</span> <span class="o">+</span> <span class="mi">161</span> <span class="o">+</span> <span class="mi">320</span><span class="p">,</span>
                             <span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2003-01-01T00:00:00.000000&#39;</span><span class="p">),</span>
@@ -207,47 +253,32 @@
     <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
             <span class="n">d</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
             <span class="n">d</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">d</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-            <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()]</span>
-    <span class="n">nominal</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="mf">178.875</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">0.11248</span><span class="p">]</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">nominal</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="mf">178.875</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">]</span>
     <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">actual</span><span class="o">=</span><span class="n">vals</span><span class="p">,</span> <span class="n">desired</span><span class="o">=</span><span class="n">nominal</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">d</span></div>
 
 <div class="viewcode-block" id="test_prefer_longer"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_prefer_longer">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="k">def</span> <span class="nf">test_prefer_longer</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-    <span class="n">daily</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> 
+<span class="k">def</span> <span class="nf">test_prefer_longer</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="p">):</span>
+    <span class="n">daily</span> <span class="o">=</span> <span class="n">reader_reanalysis</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
                              <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">prefer_longer</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">daily</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">==</span> <span class="s1">&#39;daily&#39;</span></div>
-    
+
 <div class="viewcode-block" id="test_read_vars"><a class="viewcode-back" href="../../../../api_testsuite.html#pyaerocom.io.test.test_readgridded.test_read_vars">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="k">def</span> <span class="nf">test_read_vars</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read</span><span class="p">([</span><span class="s1">&#39;od440aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od865aer&#39;</span><span class="p">],</span> 
+<span class="k">def</span> <span class="nf">test_read_vars</span><span class="p">(</span><span class="n">reader_reanalysis</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">reader_reanalysis</span><span class="o">.</span><span class="n">read</span><span class="p">([</span><span class="s1">&#39;od440aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od865aer&#39;</span><span class="p">],</span>
                         <span class="n">ts_type</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">START</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">STOP</span><span class="p">)</span>
     <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
             <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
             <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
             <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)]</span>
     <span class="n">nominal</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2307</span><span class="p">,</span> <span class="mi">2307</span><span class="p">,</span> <span class="mi">2307</span><span class="p">]</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">nominal</span><span class="p">)</span>
-    
-    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1825</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> 
-            <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1825</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> 
-            <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1825</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()]</span>
-    <span class="c1">#nominal = [0.11754113, 0.09734518, 0.06728536]</span>
-    <span class="c1"># updated on 25.11.2019 since now by default area weighted mean is used</span>
-    <span class="n">nominal</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.14793</span><span class="p">,</span> <span class="mf">0.12195</span><span class="p">,</span> <span class="mf">0.08345</span><span class="p">]</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">actual</span><span class="o">=</span><span class="n">vals</span><span class="p">,</span> <span class="n">desired</span><span class="o">=</span><span class="n">nominal</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span></div>
-    
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">nominal</span><span class="p">)</span></div>
+
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">make_dataset</span><span class="p">()</span>
-    <span class="n">test_read_var</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-    <span class="n">test_years_available</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-    <span class="n">test_file_info</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-    <span class="n">test_read_vars</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-    
-    
-    
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
 </pre></div>
 
            </div>

@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyaerocom.time_resampler &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyaerocom.time_resampler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyaerocom.time_resampler</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module containing time resampling functionality</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xarr</span>
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">TemporalResolutionError</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.time_config</span> <span class="kn">import</span> <span class="n">TS_TYPE_TO_PANDAS_FREQ</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">resample_time_dataarray</span><span class="p">,</span>
+                               <span class="n">resample_timeseries</span><span class="p">,</span> <span class="n">isnumeric</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TimeResampler"><a class="viewcode-back" href="../../api.html#pyaerocom.time_resampler.TimeResampler">[docs]</a><span class="k">class</span> <span class="nc">TimeResampler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Object that can be use to resample timeseries data</span>
+
+<span class="sd">    It supports hierarchical resampling of :class:`xarray.DataArray` objects</span>
+<span class="sd">    and :class:`pandas.Series` objects.</span>
+
+<span class="sd">    Hierarchical means, that resampling constraints can be applied for each</span>
+<span class="sd">    level, that is, if hourly data is to be resampled to monthly, it may be</span>
+<span class="sd">    specified to first required minimum number of hours per day, and minimum</span>
+<span class="sd">    days per month, to create the output data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SAMPLING_CONSTRAINTS</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_MIN_NUM_RESAMPLE</span>
+    <span class="n">APPLY_CONSTRAINTS</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_APPLY_TIME_RESAMPLE_CONSTRAINTS</span>
+    <span class="n">FREQS_SUPPORTED</span> <span class="o">=</span> <span class="n">TS_TYPE_TO_PANDAS_FREQ</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_setup</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid_base_ts_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span> <span class="k">if</span>
+                                    <span class="n">TsType</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">mulfac</span><span class="o">==</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Input data object that is to be resampled&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_data</span>
+
+    <span class="nd">@input_data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">input_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">xarr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input: need Series or DataArray&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_data</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resamplig method (depends on input data type)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">resample_timeseries</span>
+        <span class="k">return</span> <span class="n">resample_time_dataarray</span>
+
+    <span class="k">def</span> <span class="nf">_gen_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_ts_type</span><span class="p">,</span> <span class="n">to_ts_type</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="p">,</span> <span class="n">how</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">min_num_obs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">how</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Error initialising resampling constraints. &#39;</span>
+                                 <span class="s1">&#39;min_num_obs is numeric (</span><span class="si">{}</span><span class="s1">) and input how &#39;</span>
+                                 <span class="s1">&#39;is </span><span class="si">{}</span><span class="s1"> (would need to be string, e.g. mean)&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_num_obs</span><span class="p">,</span> <span class="n">how</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">[(</span><span class="n">to_ts_type</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_num_obs</span><span class="p">),</span> <span class="n">how</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">min_num_obs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for min_num_obs, need dictionary &#39;</span>
+                             <span class="s1">&#39;or integer, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_num_obs</span><span class="p">))</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_base_ts_types</span>
+        <span class="n">from_mul</span> <span class="o">=</span> <span class="n">from_ts_type</span><span class="o">.</span><span class="n">mulfac</span>
+        <span class="k">if</span> <span class="n">from_mul</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Ignoring multiplication factor </span><span class="si">{}</span><span class="s1"> in &#39;</span>
+                                 <span class="s1">&#39;data with resolution </span><span class="si">{}</span><span class="s1"> in resampling method&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_mul</span><span class="p">,</span> <span class="n">from_ts_type</span><span class="p">))</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">valid</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_ts_type</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">valid</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to_ts_type</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+
+        <span class="n">last_from</span> <span class="o">=</span> <span class="n">valid</span><span class="p">[</span><span class="n">start</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">to</span> <span class="o">=</span> <span class="n">valid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">to</span> <span class="ow">in</span> <span class="n">min_num_obs</span> <span class="ow">and</span> <span class="n">last_from</span> <span class="ow">in</span> <span class="n">min_num_obs</span><span class="p">[</span><span class="n">to</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">how</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">to</span> <span class="ow">in</span> <span class="n">how</span> <span class="ow">and</span> <span class="n">last_from</span> <span class="ow">in</span> <span class="n">how</span><span class="p">[</span><span class="n">to</span><span class="p">]:</span>
+                    <span class="n">_how</span> <span class="o">=</span> <span class="n">how</span><span class="p">[</span><span class="n">to</span><span class="p">][</span><span class="n">last_from</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_how</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span>
+                <span class="n">min_num</span> <span class="o">=</span> <span class="n">min_num_obs</span><span class="p">[</span><span class="n">to</span><span class="p">][</span><span class="n">last_from</span><span class="p">]</span>
+                <span class="n">last_from</span> <span class="o">=</span> <span class="n">to</span>
+                <span class="n">idx</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">to</span><span class="p">,</span> <span class="n">min_num</span><span class="p">,</span> <span class="n">_how</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>  <span class="ow">or</span> <span class="ow">not</span> <span class="n">idx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">to_ts_type</span><span class="o">.</span><span class="n">val</span><span class="p">:</span>
+            <span class="n">idx</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">to_ts_type</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">idx</span>
+
+<div class="viewcode-block" id="TimeResampler.resample"><a class="viewcode-back" href="../../api.html#pyaerocom.time_resampler.TimeResampler.resample">[docs]</a>    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_ts_type</span><span class="p">,</span> <span class="n">input_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">from_ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">how</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">apply_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resample input data</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        to_ts_type : str or pyaerocom.tstype.TsType</span>
+<span class="sd">            output resolution</span>
+<span class="sd">        input_data : pandas.Series or xarray.DataArray</span>
+<span class="sd">            data to be resampled</span>
+<span class="sd">        how : str</span>
+<span class="sd">            string specifying how the data is to be aggregated, default is mean</span>
+<span class="sd">        apply_constraints : bool, optional</span>
+<span class="sd">            if True, hierarchical resampling is applied using input</span>
+<span class="sd">            `samping_constraints` (if provided) or else, using constraints</span>
+<span class="sd">            specified in :attr:`pyaerocom.const.OBS_MIN_NUM_RESAMPLE`</span>
+<span class="sd">        min_num_obs : dict or int, optinal</span>
+<span class="sd">            integer or nested dictionary specifying minimum number of</span>
+<span class="sd">            observations required to resample from higher to lower frequency.</span>
+<span class="sd">            For instance, if `input_data` is hourly and `to_ts_type` is</span>
+<span class="sd">            monthly, you may specify something like::</span>
+
+<span class="sd">                min_num_obs =</span>
+<span class="sd">                    {&#39;monthly&#39;  :   {&#39;daily&#39;  : 7},</span>
+<span class="sd">                     &#39;daily&#39;    :   {&#39;hourly&#39; : 6}}</span>
+
+<span class="sd">            to require at least 6 hours per day and 7 days per month.</span>
+
+<span class="sd">        **kwargs</span>
+<span class="sd">           additional input arguments passed to resampling method</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.Series or xarray.DataArray</span>
+<span class="sd">            resampled data object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">how</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_ts_type</span><span class="p">,</span> <span class="n">TsType</span><span class="p">):</span>
+            <span class="n">to_ts_type</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">to_ts_type</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">input_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please provide data (Series or DataArray)&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">apply_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">apply_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">APPLY_CONSTRAINTS</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_setup</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">apply_constraints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                               <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">apply_constraints</span> <span class="ow">or</span> <span class="n">from_ts_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="n">to_ts_type</span><span class="o">.</span><span class="n">to_pandas_freq</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">how</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Temporal resampling without constraints can &#39;</span>
+                                 <span class="s1">&#39;only use string type argument how (e.g. &#39;</span>
+                                 <span class="s1">&#39;how=mean). Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">how</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+                            <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#         elif from_ts_type is None:</span>
+<span class="c1">#             self.last_setup = dict(apply_constraints=False,</span>
+<span class="c1">#                                    min_num_obs=None)</span>
+<span class="c1">#             freq = to_ts_type.to_pandas_freq()</span>
+<span class="c1">#             return self.fun(self.input_data, freq=freq,</span>
+<span class="c1">#                             how=how, **kwargs)</span>
+<span class="c1"># =============================================================================</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">from_ts_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">from_ts_type</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">from_ts_type</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">from_ts_type</span><span class="p">,</span> <span class="n">TsType</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for from_ts_type: </span><span class="si">{}</span><span class="s1">. Need valid &#39;</span>
+                             <span class="s1">&#39;str or TsType. Input arg from_ts_type is &#39;</span>
+                             <span class="s1">&#39;required if resampling using hierarchical &#39;</span>
+                             <span class="s1">&#39;constraints (arg apply_constraints) is activated&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_ts_type</span><span class="o">.</span><span class="n">val</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">to_ts_type</span> <span class="o">&gt;</span> <span class="n">from_ts_type</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Cannot resample time-series from </span><span class="si">{}</span><span class="s1"> &#39;</span>
+                                          <span class="s1">&#39;to </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_ts_type</span><span class="p">,</span> <span class="n">to_ts_type</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">to_ts_type</span> <span class="o">==</span> <span class="n">from_ts_type</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Input time frequency </span><span class="si">{}</span><span class="s1"> equals current frequency &#39;</span>
+                              <span class="s1">&#39;of data. Resampling will be applied anyways &#39;</span>
+                              <span class="s1">&#39;which will introduce NaN values at missing &#39;</span>
+                              <span class="s1">&#39;time stamps&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">to_ts_type</span><span class="o">.</span><span class="n">val</span><span class="p">))</span>
+
+            <span class="n">freq</span> <span class="o">=</span> <span class="n">to_ts_type</span><span class="o">.</span><span class="n">to_pandas_freq</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">min_num_obs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_num_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SAMPLING_CONSTRAINTS</span>
+
+        <span class="n">_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_idx</span><span class="p">(</span><span class="n">from_ts_type</span><span class="p">,</span> <span class="n">to_ts_type</span><span class="p">,</span> <span class="n">min_num_obs</span><span class="p">,</span> <span class="n">how</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span>
+        <span class="k">for</span> <span class="n">to_ts_type</span><span class="p">,</span> <span class="n">mno</span><span class="p">,</span> <span class="n">rshow</span> <span class="ow">in</span> <span class="n">_idx</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;TO: </span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">to_ts_type</span><span class="p">,</span> <span class="n">mno</span><span class="p">,</span> <span class="n">rshow</span><span class="p">))</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">to_ts_type</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas_freq</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">rshow</span><span class="p">,</span>
+                            <span class="n">min_num_obs</span><span class="o">=</span><span class="n">mno</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_setup</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">apply_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                               <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
+                               <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;AATSR_SU_v4.3&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span>
+    <span class="n">mon_iris</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+
+    <span class="n">mon_xarr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">apply_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">min_num_obs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;EBASMC&#39;</span><span class="p">,</span> <span class="s1">&#39;concpm10&#39;</span><span class="p">)</span>
+
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data_all</span><span class="p">(</span><span class="s1">&#39;concpm10&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MET Norway
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

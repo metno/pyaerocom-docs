@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -166,27 +166,74 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="kn">import</span> <span class="n">exponent</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">FuncFormatter</span>
-<span class="kn">from</span> <span class="nn">seaborn</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">from</span> <span class="nn">seaborn</span> <span class="kn">import</span> <span class="n">heatmap</span><span class="p">,</span> <span class="n">mpl_palette</span>
 
-<div class="viewcode-block" id="df_to_heatmap"><a class="viewcode-back" href="../../../api.html#pyaerocom.plot.heatmaps.df_to_heatmap">[docs]</a><span class="k">def</span> <span class="nf">df_to_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;bwr&quot;</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> 
+<span class="k">def</span> <span class="nf">_format_annot_heatmap</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">annot_fmt_rows</span><span class="p">,</span> <span class="n">annot_fmt_exceed</span><span class="p">):</span>
+    <span class="n">_annot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot_fmt_rows</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">annot_fmt_rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">annot</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">row</span><span class="p">)]</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">exps</span> <span class="o">=</span> <span class="n">exponent</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+            <span class="n">minexp</span> <span class="o">=</span> <span class="n">exps</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">minexp</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span>
+                <span class="n">annot_fmt_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.1E&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">minexp</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">annot_fmt_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.</span><span class="si">{}</span><span class="s1">f&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">-</span><span class="n">minexp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">minexp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">annot_fmt_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.1f&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">annot_fmt_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.4g&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot_fmt_exceed</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">exceed_val</span><span class="p">,</span> <span class="n">exceed_fmt</span> <span class="o">=</span> <span class="n">annot_fmt_exceed</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">exceed_val</span><span class="p">,</span> <span class="n">exceed_fmt</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">annot</span><span class="p">):</span>
+        <span class="n">rowfmt</span> <span class="o">=</span> <span class="n">annot_fmt_rows</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1">#numdigits = -exps.min()</span>
+        <span class="n">row_fmt</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">#lowest = np.min(row)</span>
+        <span class="c1">#exp = exponent(lowest)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+                <span class="n">valstr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#exp = exps(i)</span>
+                <span class="c1">#fmt = &#39;.{}f&#39;.format(numdigits)</span>
+                <span class="k">if</span> <span class="n">exceed_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="n">exceed_val</span><span class="p">:</span>
+                    <span class="n">valstr</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">exceed_fmt</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">valstr</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">rowfmt</span><span class="p">)</span>
+
+            <span class="n">row_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">valstr</span><span class="p">)</span>
+        <span class="n">_annot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_fmt</span><span class="p">)</span>
+    <span class="n">annot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">_annot</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">annot</span><span class="p">,</span> <span class="n">annot_fmt_rows</span>
+
+<div class="viewcode-block" id="df_to_heatmap"><a class="viewcode-back" href="../../../api.html#pyaerocom.plot.heatmaps.df_to_heatmap">[docs]</a><span class="k">def</span> <span class="nf">df_to_heatmap</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;bwr&quot;</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
                   <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_rowwise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">normalise_rows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                  <span class="n">normalise_rows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">normalise_rows_how</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span>
                   <span class="n">normalise_rows_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                  <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_digits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-                  <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> 
+                  <span class="n">norm_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_digits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                   <span class="n">cbar_labelsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">xticklabels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xtick_rot</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
-                  <span class="n">yticklabels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ytick_rot</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> 
-                  <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                  <span class="n">yticklabels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ytick_rot</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+                  <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">circle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
                   <span class="n">annot_fontsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">annot_fmt_rowwise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">annot_fmt_exceed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">annot_fmt_rows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># explicit formatting strings for rows</span>
+                  <span class="n">cbar_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    
 
     <span class="sd">&quot;&quot;&quot;Plot a pandas dataframe as heatmap</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    df : DataFrame</span>
@@ -196,26 +243,26 @@
 <span class="sd">    center : float</span>
 <span class="sd">        value that is mapped to center colour of colormap (e.g. 0)</span>
 <span class="sd">    low : float</span>
-<span class="sd">        Extends lower range of the table values so that when mapped to  the </span>
-<span class="sd">        colormap, it’s entire range isn’t used. E.g. 0.3 roughly corresponds </span>
+<span class="sd">        Extends lower range of the table values so that when mapped to  the</span>
+<span class="sd">        colormap, it’s entire range isn’t used. E.g. 0.3 roughly corresponds</span>
 <span class="sd">        to colormap crop of 30% at the lower end.</span>
 <span class="sd">    high : float</span>
-<span class="sd">        Extends upper range of the table values so that when mapped to the </span>
-<span class="sd">        colormap, it’s entire range isn’t used. E.g. 0.3 roughly corresponds </span>
+<span class="sd">        Extends upper range of the table values so that when mapped to the</span>
+<span class="sd">        colormap, it’s entire range isn’t used. E.g. 0.3 roughly corresponds</span>
 <span class="sd">        to colormap crop of 30% at the upper end.</span>
 <span class="sd">    color_rowwise : bool</span>
 <span class="sd">        if True, the color mapping is applied row by row, else, for the whole</span>
 <span class="sd">        table</span>
 <span class="sd">    normalise_rows : bool</span>
 <span class="sd">        if True, the table is normalised in a rowwise manner either using the</span>
-<span class="sd">        mean value in each row (if argument ``normalise_rows_col`` is </span>
-<span class="sd">        unspecified) or using the value in a specified column. </span>
+<span class="sd">        mean value in each row (if argument ``normalise_rows_col`` is</span>
+<span class="sd">        unspecified) or using the value in a specified column.</span>
 <span class="sd">    normalise_rows_how : str</span>
 <span class="sd">        aggregation string for row normalisation. Choose from ``mean, median,</span>
 <span class="sd">        sum``. Only relevant if input arg ``normalise_rows==True``.</span>
 <span class="sd">    normalise_rows_col : int, optional</span>
-<span class="sd">        if provided and if prev. arg. ``normalise_rows==True``, then the </span>
-<span class="sd">        corresponding table column is used for normalisation rather than </span>
+<span class="sd">        if provided and if prev. arg. ``normalise_rows==True``, then the</span>
+<span class="sd">        corresponding table column is used for normalisation rather than</span>
 <span class="sd">        the mean value of each row</span>
 <span class="sd">    annot : bool</span>
 <span class="sd">        if True, the table values are printed into the heatmap</span>
@@ -236,7 +283,7 @@
 <span class="sd">        List of string labels.</span>
 <span class="sd">    yticklabels : List[str]</span>
 <span class="sd">        List of string labels.</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    axes</span>
@@ -244,158 +291,147 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">cbar_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">cbar_label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="c1"># Old vesion only for </span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">):</span>
-        <span class="c1"># If pandas is a instance of multicolumns make sure that it only ha one column.</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Heatmaps can only be created for &quot;</span><span class="o">+</span>
-                                 <span class="s2">&quot;single column tabular data (e.g. Bias or &quot;</span><span class="o">+</span>
-                                 <span class="s2">&quot;RMSE) with a partly unstacked MultiIndex or a &quot;</span><span class="o">+</span>
-                                 <span class="s2">&quot;single index DataFrame. &quot;</span><span class="o">+</span>
-                                 <span class="s2">&quot;Not MulitiIndex of </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">+</span>
-                                 <span class="s2">&quot; columns which you provided. &quot;</span><span class="o">+</span>
-                                 <span class="s2">&quot;Please extract a column. &quot;</span><span class="p">)</span>  
-            
+    <span class="c1"># Old vesion only for</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     if isinstance(df.columns, pd.MultiIndex):</span>
+<span class="c1">#         # If pandas is a instance of multicolumns make sure that it only ha one column.</span>
+<span class="c1">#         if len(df.columns.levels) &gt; 1:</span>
+<span class="c1">#              raise AttributeError(&quot;Heatmaps can only be created for &quot;+</span>
+<span class="c1">#                                  &quot;single column tabular data (e.g. Bias or &quot;+</span>
+<span class="c1">#                                  &quot;RMSE) with a partly unstacked MultiIndex or a &quot;+</span>
+<span class="c1">#                                  &quot;single index DataFrame. &quot;+</span>
+<span class="c1">#                                  &quot;Not MulitiIndex of {} &quot;.format(len(df.columns.levels[0]))+</span>
+<span class="c1">#                                  &quot; columns which you provided. &quot;+</span>
+<span class="c1">#                                  &quot;Please extract a column. &quot;)</span>
+<span class="c1"># =============================================================================</span>
+
     <span class="k">if</span> <span class="n">circle</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Adding circles to heatmap is not implemented yet.&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span>
-    <span class="n">cbar_kws</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cbar_kws</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cbar_kws</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">annot_fontsize</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">annot_fontsize</span> <span class="o">=</span> <span class="n">labelsize</span><span class="o">-</span><span class="mi">4</span>
-    <span class="n">annot_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">annot_fontsize</span><span class="p">}</span>
-    
+    <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;annot_kws&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;annot_kws&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;annot_kws&#39;</span><span class="p">][</span><span class="s1">&#39;size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">annot_fontsize</span>
+    <span class="n">df_hm</span> <span class="o">=</span> <span class="n">df</span>
     <span class="k">if</span> <span class="n">normalise_rows</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">normalise_rows_col</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">normalise_rows_col</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">normalise_rows_col</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">normalise_rows_col</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to localise column </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalise_rows_col</span><span class="p">))</span>
-            <span class="n">norm_ref</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">normalise_rows_col</span><span class="p">]</span>
-            <span class="n">cbar_label</span> <span class="o">+=</span> <span class="s2">&quot; (norm. col. </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalise_rows_col</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">normalise_rows_how</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-                <span class="n">norm_ref</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">normalise_rows_how</span> <span class="o">==</span> <span class="s1">&#39;median&#39;</span><span class="p">:</span>
-                <span class="n">norm_ref</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">normalise_rows_how</span> <span class="o">==</span> <span class="s1">&#39;sum&#39;</span><span class="p">:</span>
-                <span class="n">norm_ref</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">norm_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">normalise_rows_col</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">normalise_rows_col</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">normalise_rows_col</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">normalise_rows_col</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to localise column </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalise_rows_col</span><span class="p">))</span>
+                <span class="n">norm_ref</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">normalise_rows_col</span><span class="p">]</span>
+                <span class="c1">#cbar_label += &quot; (norm. col. {})&quot;.format(normalise_rows_col)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for normalise_rows_how (</span><span class="si">{}</span><span class="s1">). &#39;</span>
-                                 <span class="s1">&#39;Choose from mean, median or sum&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalise_rows_how</span><span class="p">))</span>
-            <span class="n">cbar_label</span> <span class="o">+=</span> <span class="s2">&quot; (norm. row </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalise_rows_how</span><span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">norm_ref</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">norm_ref</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">num_fmt</span> <span class="o">=</span> <span class="s2">&quot;.0%&quot;</span>
-        
+                <span class="k">if</span> <span class="n">normalise_rows_how</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+                    <span class="n">norm_ref</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">normalise_rows_how</span> <span class="o">==</span> <span class="s1">&#39;median&#39;</span><span class="p">:</span>
+                    <span class="n">norm_ref</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">normalise_rows_how</span> <span class="o">==</span> <span class="s1">&#39;sum&#39;</span><span class="p">:</span>
+                    <span class="n">norm_ref</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for normalise_rows_how (</span><span class="si">{}</span><span class="s1">). &#39;</span>
+                                     <span class="s1">&#39;Choose from mean, median or sum&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalise_rows_how</span><span class="p">))</span>
+            <span class="c1">#cbar_label += &quot; (norm. row {})&quot;.format(normalise_rows_how)</span>
+        <span class="n">df_hm</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">norm_ref</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">norm_ref</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#         try:</span>
+<span class="c1">#             df_hm.MEDIAN.values[3] = 0.32</span>
+<span class="c1">#         except:</span>
+<span class="c1">#             pass</span>
+<span class="c1"># =============================================================================</span>
+        <span class="c1">#num_fmt = &quot;.0%&quot;</span>
+
         <span class="n">cbar_kws</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FuncFormatter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:.0%}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="c1">#df = df.div(df.max(axis=1), axis=0)</span>
     <span class="k">if</span> <span class="n">color_rowwise</span><span class="p">:</span>
-        <span class="n">df_hm</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">df_hm</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="n">df_hm</span> <span class="o">=</span> <span class="n">df_hm</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">df_hm</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         df_hm = df</span>
+<span class="c1"># =============================================================================</span>
 
     <span class="n">cbar_kws</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cbar_label</span>
-    
-    <span class="c1">#cbar_kws[&#39;fontsize&#39;] = 18</span>
-    
+
+    <span class="k">if</span> <span class="s1">&#39;norm&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;norm&#39;</span><span class="p">]</span>
+        <span class="n">vmin</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">boundaries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">vmax</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">boundaries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">vmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vmin</span> <span class="o">=</span> <span class="n">df_hm</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">low</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vmax</span> <span class="o">=</span> <span class="n">df_hm</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">high</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">annot</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">annot</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span>
-
-    <span class="k">if</span> <span class="n">vmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">vmin</span> <span class="o">=</span> <span class="n">df_hm</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">low</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">vmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">vmax</span> <span class="o">=</span> <span class="n">df_hm</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">high</span><span class="p">)</span>
-    
-    
-    <span class="c1">#num_fmt=None   </span>
-    <span class="c1">#num_fmt = &#39;3.2G&#39;</span>
-    <span class="k">if</span> <span class="n">annot_fmt_rowwise</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="n">_annot</span> <span class="o">=</span> <span class="p">[]</span>
-        
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">annot</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">row</span><span class="p">)]</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">exps</span> <span class="o">=</span> <span class="n">exponent</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
-            <span class="n">minexp</span> <span class="o">=</span> <span class="n">exps</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">minexp</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span>
-                <span class="n">rowfmt</span> <span class="o">=</span> <span class="s1">&#39;.1E&#39;</span>
-            <span class="k">elif</span> <span class="n">minexp</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">rowfmt</span> <span class="o">=</span> <span class="s1">&#39;.</span><span class="si">{}</span><span class="s1">f&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">-</span><span class="n">minexp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">minexp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">rowfmt</span> <span class="o">=</span> <span class="s1">&#39;.1f&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">rowfmt</span> <span class="o">=</span> <span class="s1">&#39;.4g&#39;</span>
-            <span class="c1">#numdigits = -exps.min()</span>
-            <span class="n">row_fmt</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="c1">#lowest = np.min(row)</span>
-            <span class="c1">#exp = exponent(lowest)</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-                    <span class="n">valstr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1">#exp = exps(i)</span>
-                    <span class="c1">#fmt = &#39;.{}f&#39;.format(numdigits)</span>
-                    <span class="n">valstr</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">rowfmt</span><span class="p">)</span>
-                
-                <span class="n">row_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">valstr</span><span class="p">)</span>
-            <span class="n">_annot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_fmt</span><span class="p">)</span>
-        <span class="n">annot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">_annot</span><span class="p">)</span>
-            <span class="c1">#print(row)</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">df_hm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">center</span> <span class="o">=</span> <span class="n">center</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="n">annot</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="c1"># changes this from df_hm to df because the annotation and colorbar didn&#39;t work.</span>
-                     <span class="n">cbar</span><span class="o">=</span><span class="n">cbar</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="n">cbar_kws</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> 
-                     <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">annot_kws</span><span class="o">=</span><span class="n">annot_kws</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">annot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">annot</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># If the user needs too many displays </span>
-        <span class="k">if</span> <span class="n">num_digits</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">num_digits</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
-            <span class="n">num_fmt</span> <span class="o">=</span> <span class="s2">&quot;.4g&quot;</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">annot</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for annot: needs to have same &#39;</span>
+                             <span class="s1">&#39;shape as input dataframe&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">annot</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]):</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">elif</span> <span class="n">annot_fmt_rowwise</span><span class="p">:</span>
+            <span class="n">annot</span><span class="p">,</span> <span class="n">annot_fmt_rows</span> <span class="o">=</span> <span class="n">_format_annot_heatmap</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span>
+                                                          <span class="n">annot_fmt_rows</span><span class="p">,</span>
+                                                          <span class="n">annot_fmt_exceed</span><span class="p">)</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">elif</span> <span class="n">num_digits</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">num_digits</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;.4g&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">num_fmt</span> <span class="o">=</span> <span class="s2">&quot;.</span><span class="si">{}</span><span class="s2">f&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_digits</span><span class="p">)</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">df_hm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">center</span> <span class="o">=</span> <span class="n">center</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="n">annot</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="c1"># changes this from df_hm to df because the annotation and colorbar didn&#39;t work.</span>
-                     <span class="n">cbar</span><span class="o">=</span><span class="n">cbar</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="n">cbar_kws</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">num_fmt</span><span class="p">,</span> 
-                     <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">annot_kws</span><span class="o">=</span><span class="n">annot_kws</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        
-    <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_size</span><span class="p">(</span><span class="n">labelsize</span><span class="p">)</span>  
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;.</span><span class="si">{}</span><span class="s2">f&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_digits</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">df_hm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="n">annot</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="c1"># changes this from df_hm to df because the annotation and colorbar didn&#39;t work.</span>
+                 <span class="n">cbar</span><span class="o">=</span><span class="n">cbar</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="n">cbar_kws</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span>
+                 <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_size</span><span class="p">(</span><span class="n">labelsize</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">labelsize</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">yticklabels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">yticklabels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">()</span>
-        
-    
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">yticklabels</span><span class="p">,</span> 
-                       <span class="n">rotation</span><span class="o">=</span><span class="n">ytick_rot</span><span class="p">,</span> 
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">yticklabels</span><span class="p">,</span>
+                       <span class="n">rotation</span><span class="o">=</span><span class="n">ytick_rot</span><span class="p">,</span>
                        <span class="n">fontsize</span><span class="o">=</span><span class="n">labelsize</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">xticklabels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">xticklabels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span>
-        
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xticklabels</span><span class="p">,</span> 
-                       <span class="n">rotation</span><span class="o">=</span><span class="n">xtick_rot</span><span class="p">,</span> 
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xticklabels</span><span class="p">,</span>
+                       <span class="n">rotation</span><span class="o">=</span><span class="n">xtick_rot</span><span class="p">,</span>
                        <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>
                        <span class="n">fontsize</span><span class="o">=</span><span class="n">labelsize</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
-    
+
     <span class="c1">#ax.set_xticklabels(xticklabels, rotation=45, ha=&#39;right&#39;)</span>
-    
+
     <span class="k">if</span> <span class="n">xlabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        
+
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">labelsize</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">ylabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">labelsize</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cbar_labelsize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_size</span><span class="p">(</span><span class="n">cbar_labelsize</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-    
-    <span class="k">return</span> <span class="n">ax</span></div>
+    <span class="c1">#fig.tight_layout()</span>
+
+    <span class="k">return</span> <span class="n">ax</span><span class="p">,</span> <span class="n">annot_fmt_rows</span></div>
 </pre></div>
 
            </div>

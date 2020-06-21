@@ -17,17 +17,6 @@ Germany.
 
     import pyaerocom as pya
 
-
-.. parsed-literal::
-
-    Initating pyaerocom configuration
-    Checking database access...
-    Checking access to: /lustre/storeA
-    Access to lustre database: True
-    Init data paths for lustre
-    Expired time: 0.021 s
-
-
 Get list of all files containing scattering data for EBAS station Jungfraujoch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -43,20 +32,20 @@ Get list of all files containing scattering data for EBAS station Jungfraujoch
 
     Retrieving EBAS files for variables
     ['scatc550aer']
-    Reading files 1-3 of 28 (ReadEbas) | 15:55:23 (delta = 0 s')
-    Reading files 3-5 of 28 (ReadEbas) | 15:55:23 (delta = 0 s')
-    Reading files 5-7 of 28 (ReadEbas) | 15:55:24 (delta = 0 s')
-    Reading files 7-9 of 28 (ReadEbas) | 15:55:24 (delta = 0 s')
-    Reading files 9-11 of 28 (ReadEbas) | 15:55:24 (delta = 0 s')
-    Reading files 11-13 of 28 (ReadEbas) | 15:55:25 (delta = 0 s')
-    Reading files 13-15 of 28 (ReadEbas) | 15:55:26 (delta = 0 s')
-    Reading files 15-17 of 28 (ReadEbas) | 15:55:26 (delta = 0 s')
-    Reading files 17-19 of 28 (ReadEbas) | 15:55:27 (delta = 0 s')
-    Reading files 19-21 of 28 (ReadEbas) | 15:55:27 (delta = 0 s')
-    Reading files 21-23 of 28 (ReadEbas) | 15:55:28 (delta = 0 s')
-    Reading files 23-25 of 28 (ReadEbas) | 15:55:28 (delta = 0 s')
-    Reading files 25-27 of 28 (ReadEbas) | 15:55:29 (delta = 0 s')
-    Reading files 27-29 of 28 (ReadEbas) | 15:55:30 (delta = 0 s')
+    Reading files 1-3 of 28 (ReadEbas) | 14:23:50 (delta = 0 s')
+    Reading files 3-5 of 28 (ReadEbas) | 14:23:51 (delta = 0 s')
+    Reading files 5-7 of 28 (ReadEbas) | 14:23:52 (delta = 0 s')
+    Reading files 7-9 of 28 (ReadEbas) | 14:23:52 (delta = 0 s')
+    Reading files 9-11 of 28 (ReadEbas) | 14:23:53 (delta = 0 s')
+    Reading files 11-13 of 28 (ReadEbas) | 14:23:54 (delta = 0 s')
+    Reading files 13-15 of 28 (ReadEbas) | 14:23:55 (delta = 0 s')
+    Reading files 15-17 of 28 (ReadEbas) | 14:23:55 (delta = 0 s')
+    Reading files 17-19 of 28 (ReadEbas) | 14:23:56 (delta = 0 s')
+    Reading files 19-21 of 28 (ReadEbas) | 14:23:57 (delta = 0 s')
+    Reading files 21-23 of 28 (ReadEbas) | 14:23:58 (delta = 0 s')
+    Reading files 23-25 of 28 (ReadEbas) | 14:23:59 (delta = 1 s')
+    Reading files 25-27 of 28 (ReadEbas) | 14:24:00 (delta = 1 s')
+    Reading files 27-29 of 28 (ReadEbas) | 14:24:01 (delta = 1 s')
 
 
 .. parsed-literal::
@@ -69,12 +58,12 @@ Get list of all files containing scattering data for EBAS station Jungfraujoch
     Contains instruments: ['IN3563', 'TSI_3563_JFJ_dry', 'Ecotech_Aurora3000_JFJ_dry']
     Total no. of meta-blocks: 28
     Filters that were applied:
-     Filter time log: 20191012155523
+     Filter time log: 20200121142350
     	prefer_statistics: ['arithmetic mean', 'median']
     	wavelength_tol_nm: 50
     	datalevel: 2
     	station_names: Jungfraujoch
-     Filter time log: 20191012155531
+     Filter time log: 20200121142402
     	Removed 0 metadata blocks that have no data assigned
 
 
@@ -112,7 +101,7 @@ dictionary assigned. Let’s look at the metadata from the first file:
                  ('website', None),
                  ('ts_type_src', None),
                  ('stat_merge_pref_attr', None),
-                 ('data_revision', '20191001'),
+                 ('data_revision', '20191218'),
                  ('var_info',
                   OrderedDict([('scatc550aer',
                                 OrderedDict([('name',
@@ -158,21 +147,25 @@ And the last one:
                  ('website', None),
                  ('ts_type_src', None),
                  ('stat_merge_pref_attr', None),
-                 ('data_revision', '20191001'),
+                 ('data_revision', '20191218'),
                  ('var_info',
                   OrderedDict([('scatc550aer',
                                 OrderedDict([('name',
                                               'aerosol_light_scattering_coefficient'),
                                              ('units', '1/Mm'),
-                                             ('wavelength', '525.0 nm'),
+                                             ('wavelength', '550.0 nm'),
                                              ('statistics', 'arithmetic mean'),
+                                             ('wavelength_adjustment', True),
+                                             ('from_wavelength', 525.0),
+                                             ('wavelength_adjustment_angstrom',
+                                              1.0),
                                              ('matrix', 'aerosol')]))])),
                  ('variables', ['scatc550aer'])])
 
 
 
 As you can see, both files contain scattering data but do not share all
-the same metadata attributes (e.g. ``instrument_name`` is different,
+the same metadata attributes (e.g. ``instrument_name`` is different,
 which might be due to technological updates over time).
 
 Let’s have a look at the respective time-series for both stations.
@@ -204,6 +197,7 @@ First, convert into instance of ``StationData`` class and then plot.
       altitude: 3578.0
     data_err (BrowseDict): <empty_dict>
     overlap (BrowseDict): <empty_dict>
+    numobs (BrowseDict): <empty_dict>
     data_flagged (BrowseDict):
       scatc550aer (ndarray, 8760 items): [1.00, 1.00, ..., 0.0, 0.0]
     filename: CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas
@@ -225,7 +219,7 @@ First, convert into instance of ``StationData`` class and then plot.
     website: None
     ts_type_src: hourly
     stat_merge_pref_attr: None
-    data_revision: 20191001
+    data_revision: 20191218
     
     Data arrays
     .................
@@ -250,8 +244,11 @@ First, convert into instance of ``StationData`` class and then plot.
       scatc550aer (OrderedDict):
         name: aerosol_light_scattering_coefficient
         units: 1/Mm
-        wavelength: 525.0 nm
+        wavelength: 550.0 nm
         statistics: arithmetic mean
+        wavelength_adjustment: True
+        from_wavelength: 525.0
+        wavelength_adjustment_angstrom: 1.0
         matrix: aerosol
         overlap: False
     station_coords (dict):
@@ -260,6 +257,7 @@ First, convert into instance of ``StationData`` class and then plot.
       altitude: 3580.0
     data_err (BrowseDict): <empty_dict>
     overlap (BrowseDict): <empty_dict>
+    numobs (BrowseDict): <empty_dict>
     data_flagged (BrowseDict):
       scatc550aer (ndarray, 8760 items): [1.00, 1.00, ..., 1.00, 0.0]
     filename: CH0001G.20170101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas
@@ -281,7 +279,7 @@ First, convert into instance of ``StationData`` class and then plot.
     website: None
     ts_type_src: hourly
     stat_merge_pref_attr: None
-    data_revision: 20191001
+    data_revision: 20191218
     
     Data arrays
     .................
@@ -330,7 +328,7 @@ This is actually very easy:
       scatc550aer (OrderedDict):
         name: aerosol_light_scattering_coefficient
         units: 1/Mm
-        wavelength: 550.0 nm;525.0 nm
+        wavelength: 550.0 nm
         method_ref: CH02L_scat_coef
         matrix: aerosol
         statistics: arithmetic mean
@@ -338,12 +336,16 @@ This is actually very easy:
         ts_type: hourly
         apply_constraints: False
         min_num_obs: None
+        wavelength_adjustment: True
+        from_wavelength: 525.0
+        wavelength_adjustment_angstrom: 1.0
     station_coords (dict):
       latitude: 46.5475
       longitude: 7.985
       altitude: 3578.0
     data_err (BrowseDict): <empty_dict>
     overlap (BrowseDict): <empty_dict>
+    numobs (BrowseDict): <empty_dict>
     data_flagged (BrowseDict):
       scatc550aer (ndarray, 8760 items): [1.00, 1.00, ..., 0.0, 0.0]
     filename: CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.20170101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas
@@ -365,7 +367,7 @@ This is actually very easy:
     website: None
     ts_type_src: hourly
     stat_merge_pref_attr: None
-    data_revision: 20191001
+    data_revision: 20191218
     
     Data arrays
     .................
@@ -423,13 +425,16 @@ Now merge them into one long time series:
       scatc550aer (OrderedDict):
         name: aerosol_light_scattering_coefficient
         units: 1/Mm
-        wavelength: 550.0 nm;525.0 nm
+        wavelength: 550.0 nm
         statistics: arithmetic mean
         matrix: aerosol
         overlap: False
         ts_type: hourly
         apply_constraints: False
         min_num_obs: None
+        wavelength_adjustment: True
+        from_wavelength: 525.0
+        wavelength_adjustment_angstrom: 1.0
         method_ref: CH02L_scat_coef
     station_coords (dict):
       latitude: 46.5475
@@ -437,18 +442,19 @@ Now merge them into one long time series:
       altitude: 3580.0
     data_err (BrowseDict): <empty_dict>
     overlap (BrowseDict):
-      scatc550aer: 2015-01-01 01:00:00    0.255198
+      scatc550aer: 2015-01-01 00:00:00    0.068376
+    2015-01-01 01:00:00    0.255198
     2015-01-01 02:00:00   -0.284809
     2015-01-01 03:00:00    0.123830
     2015-01-01 04:00:00    0.127599
-    2015-01-01 05:00:00    0.052224
                              ...   
     2018-12-31 19:00:00   -0.030204
     2018-12-31 20:00:00    0.625988
     2018-12-31 21:00:00    0.178854
     2018-12-31 22:00:00    0.175893
     2018-12-31 23:00:00    0.329280
-    Length: 25787, dtype: float64
+    Length: 25789, dtype: float64
+    numobs (BrowseDict): <empty_dict>
     data_flagged (BrowseDict):
       scatc550aer (ndarray, 8760 items): [0.0, 0.0, ..., 0.0, 0.0]
     filename: CH0001G.20010101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20100101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20060101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20180101000000.20190520125514.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas; CH0001G.20040101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20180101000000.20190520124723.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20080101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20050101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20070101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20110101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20030101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20150101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas; CH0001G.20170101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20160101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20000101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.20140101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20020101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20090101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20120101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20130101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.19980101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.19960101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.20170101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas; CH0001G.19990101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.20150101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20160101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas; CH0001G.19970101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas
@@ -470,7 +476,7 @@ Now merge them into one long time series:
     website: None
     ts_type_src: hourly
     stat_merge_pref_attr: None
-    data_revision: 20191001
+    data_revision: 20191218
     
     Data arrays
     .................
@@ -513,7 +519,7 @@ The default here is ``True``, so you can just go ahead and do:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7faa0a0d6b00>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f9f860b1090>
 
 
 
@@ -548,18 +554,18 @@ the Jungfraujoch data:
 
 .. parsed-literal::
 
-    BrowseDict([('scatc550aer', 2015-01-01 01:00:00    0.255198
+    BrowseDict([('scatc550aer', 2015-01-01 00:00:00    0.068376
+                 2015-01-01 01:00:00    0.255198
                  2015-01-01 02:00:00   -0.284809
                  2015-01-01 03:00:00    0.123830
                  2015-01-01 04:00:00    0.127599
-                 2015-01-01 05:00:00    0.052224
                                           ...   
                  2018-12-31 19:00:00   -0.030204
                  2018-12-31 20:00:00    0.625988
                  2018-12-31 21:00:00    0.178854
                  2018-12-31 22:00:00    0.175893
                  2018-12-31 23:00:00    0.329280
-                 Length: 25787, dtype: float64)])
+                 Length: 25789, dtype: float64)])
 
 
 
@@ -672,7 +678,7 @@ instead:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7faa0a25e400>
+    <matplotlib.axes._subplots.AxesSubplot at 0x7f9f85f0c810>
 
 
 

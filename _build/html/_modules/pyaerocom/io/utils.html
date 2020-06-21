@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -167,19 +167,31 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.io.readungridded</span> <span class="kn">import</span> <span class="n">ReadUngridded</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span><span class="p">,</span> <span class="n">change_verbosity</span>
 
+<div class="viewcode-block" id="get_ungridded_reader"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.utils.get_ungridded_reader">[docs]</a><span class="k">def</span> <span class="nf">get_ungridded_reader</span><span class="p">(</span><span class="n">obs_id</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">reader</span> <span class="ow">in</span> <span class="n">ReadUngridded</span><span class="o">.</span><span class="n">SUPPORTED</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obs_id</span> <span class="ow">in</span> <span class="n">reader</span><span class="o">.</span><span class="n">SUPPORTED_DATASETS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">reader</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No ungridded reader found that supports </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_id</span><span class="p">))</span></div>
+
 <div class="viewcode-block" id="browse_database"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.utils.browse_database">[docs]</a><span class="k">def</span> <span class="nf">browse_database</span><span class="p">(</span><span class="n">model_or_obs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Browse Aerocom database using model or obs ID (or wildcard)</span>
-<span class="sd">    </span>
-<span class="sd">    Searches database for matches and prints information about all matches </span>
+
+<span class="sd">    Searches database for matches and prints information about all matches</span>
 <span class="sd">    found (e.g. available variables, years, etc.)</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model_or_obs : str</span>
-<span class="sd">        model or obs ID or search pattern </span>
+<span class="sd">        model or obs ID or search pattern</span>
 <span class="sd">    verbose : bool</span>
 <span class="sd">        if True, verbosity level will be set to debug, else to critical</span>
-<span class="sd">        </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        list with data_ids of all matches</span>
+
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; import pyaerocom as pya</span>
@@ -191,6 +203,7 @@
 <span class="sd">    Available variables: [&#39;abs550aer&#39;, &#39;ang4487aer&#39;, &#39;clt&#39;, &#39;landseamask&#39;, &#39;od550aer&#39;, &#39;od550dust&#39;, &#39;od550gt1aer&#39;, &#39;od550lt1aer&#39;, &#39;pixelcount&#39;]</span>
 <span class="sd">    Available years: [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012]</span>
 <span class="sd">    Available time resolutions [&#39;daily&#39;]</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="n">change_verbosity</span><span class="p">(</span><span class="s1">&#39;critical&#39;</span><span class="p">)</span>
@@ -209,24 +222,24 @@
         <span class="k">return</span>
     <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_IDS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_IDS_UNGRIDDED</span><span class="p">:</span>
                 <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Reading failed for </span><span class="si">{}</span><span class="s1">. Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">match</span><span class="p">,</span>
-                  <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
-    
+                  <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">matches</span></div>
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    
+
     <span class="n">obs_id</span> <span class="o">=</span> <span class="s1">&#39;AATSR*&#39;</span>
-    
+
     <span class="n">browse_database</span><span class="p">(</span><span class="s1">&#39;AATSR_SU*&#39;</span><span class="p">)</span>
-    
+
     <span class="n">browse_database</span><span class="p">(</span><span class="s1">&#39;AATSR*ORAC*v4*&#39;</span><span class="p">)</span>
-    
+
     <span class="n">browse_database</span><span class="p">(</span><span class="n">obs_id</span><span class="p">)</span>
 </pre></div>
 

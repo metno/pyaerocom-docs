@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -168,157 +168,96 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy.testing</span> <span class="k">as</span> <span class="nn">npt</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.test.settings</span> <span class="kn">import</span> <span class="n">TEST_RTOL</span><span class="p">,</span> <span class="n">lustre_unavail</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.conftest</span> <span class="kn">import</span> <span class="n">TEST_RTOL</span><span class="p">,</span> <span class="n">testdata_unavail</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">GriddedData</span>
 
-<span class="c1">### Helpers that may be used in __main__ for testing</span>
-<span class="k">def</span> <span class="nf">_load_osuite</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">pyaerocom.io.testfiles</span> <span class="kn">import</span> <span class="n">get</span>
-    <span class="n">test_file</span> <span class="o">=</span> <span class="n">get</span><span class="p">()[</span><span class="s1">&#39;models&#39;</span><span class="p">][</span><span class="s1">&#39;ecmwf_osuite&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">test_file</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;od550aer&quot;</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">_load_cams_rean</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="kn">import</span> <span class="n">ReadGridded</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="s2">&quot;ECMWF_CAMS_REAN&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span>
-                      <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">2013</span><span class="p">)</span>
-    
-<span class="k">def</span> <span class="nf">_load_tm5_2010_monthly</span><span class="p">():</span>
-    <span class="n">fp</span> <span class="o">=</span> <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom-users-database/AEROCOM-PHASE-III/TM5_AP3-CTRL2016/renamed/aerocom3_TM5_AP3-CTRL2016_od550aer_Column_2010_monthly.nc&#39;</span>
-    <span class="k">return</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
-    
-<span class="c1">### fixtures</span>
-
-<div class="viewcode-block" id="data_cci"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.data_cci">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">data_cci</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39;import example data from Aerosol CCI</span>
-<span class="sd">    </span>
-<span class="sd">    The fixture property makes sure that this &quot;variable&quot; is only created once</span>
-<span class="sd">    for the entire scope of this test session within this module</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="kn">from</span> <span class="nn">pyaerocom.io.testfiles</span> <span class="kn">import</span> <span class="n">get</span>
-    <span class="n">test_file</span> <span class="o">=</span> <span class="n">get</span><span class="p">()[</span><span class="s1">&#39;models&#39;</span><span class="p">][</span><span class="s1">&#39;aatsr_su_v4.3&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">test_file</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;od550aer&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="data_cams_rean"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.data_cams_rean">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">data_cams_rean</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">_load_cams_rean</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="data_tm5"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.data_tm5">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">data_tm5</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">_load_tm5_2010_monthly</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="data_osuite"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.data_osuite">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">data_osuite</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39;import example data from ECMWF_OSUITE</span>
-<span class="sd">    </span>
-<span class="sd">    The fixture property makes sure that this &quot;variable&quot; is only created once</span>
-<span class="sd">    for the entire scope of this test session within this module</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">return</span> <span class="n">_load_osuite</span><span class="p">()</span>    </div>
+<span class="n">TESTLATS</span> <span class="o">=</span>  <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
+<span class="n">TESTLONS</span> <span class="o">=</span>  <span class="p">[</span><span class="o">-</span><span class="mi">120</span><span class="p">,</span> <span class="mi">69</span><span class="p">]</span>
 
 <span class="c1">### tests</span>
-<div class="viewcode-block" id="test_cams_rean_basic_properties"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_cams_rean_basic_properties">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="k">def</span> <span class="nf">test_cams_rean_basic_properties</span><span class="p">(</span><span class="n">data_cams_rean</span><span class="p">):</span>
-    
-    <span class="n">data</span> <span class="o">=</span>  <span class="n">data_cams_rean</span>
-    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">==</span> <span class="s1">&#39;daily&#39;</span>
+<div class="viewcode-block" id="test_basic_properties"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_basic_properties">[docs]</a><span class="nd">@testdata_unavail</span>
+<span class="k">def</span> <span class="nf">test_basic_properties</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">):</span>
+
+    <span class="n">data</span> <span class="o">=</span>  <span class="n">data_tm5</span>
+    <span class="kn">from</span> <span class="nn">iris.cube</span> <span class="kn">import</span> <span class="n">Cube</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span> <span class="n">Cube</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">==</span> <span class="s1">&#39;monthly&#39;</span>
     <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;2010-01-01T00:00:00.000000&#39;</span>
-    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;2012-12-31T23:59:59.999999&#39;</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">points</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1096</span>
-    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">data_id</span> <span class="o">==</span> <span class="s1">&#39;ECMWF_CAMS_REAN&#39;</span>
-    <span class="n">ff</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;aerocom.ECMWF_CAMS_REAN.daily.od550aer.2011.nc&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;aerocom.ECMWF_CAMS_REAN.daily.od550aer.2012.nc&#39;</span><span class="p">]</span>
-    <span class="k">assert</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">from_files</span><span class="p">]</span> <span class="o">==</span> <span class="n">ff</span>
-    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1096</span><span class="p">,</span> <span class="mi">161</span><span class="p">,</span> <span class="mi">320</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="test_longitude"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_longitude">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="k">def</span> <span class="nf">test_longitude</span><span class="p">(</span><span class="n">data_cci</span><span class="p">,</span> <span class="n">data_osuite</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;2010-12-31T23:59:59.999999&#39;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">points</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span>
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">data_id</span> <span class="o">==</span> <span class="s1">&#39;TM5_AP3-CTRL2016&#39;</span>
+    <span class="n">ff</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;aerocom3_TM5_AP3-CTRL2016_od550aer_Column_2010_monthly.nc&#39;</span><span class="p">]</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">from_files</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">files</span> <span class="o">==</span> <span class="n">ff</span>
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">lat_res</span> <span class="o">==</span> <span class="mf">2.0</span>
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">lon_res</span> <span class="o">==</span> <span class="mf">3.0</span></div>
+
+<div class="viewcode-block" id="test_longitude"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_longitude">[docs]</a><span class="nd">@testdata_unavail</span>
+<span class="k">def</span> <span class="nf">test_longitude</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Test if longitudes are defined right&quot;&quot;&quot;</span>
-    <span class="n">lons_cci</span> <span class="o">=</span> <span class="n">data_cci</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">points</span>
-    <span class="n">lons_osuite</span> <span class="o">=</span> <span class="n">data_osuite</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">points</span>
-    <span class="n">nominal</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">179.5</span><span class="p">,</span> <span class="mf">179.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">180.0</span><span class="p">,</span> <span class="mf">179.6</span><span class="p">]</span>
-    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">lons_cci</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">lons_cci</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
-            <span class="n">lons_osuite</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">lons_osuite</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_tm5</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">units</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;degrees&#39;</span>
+
+    <span class="n">lons</span> <span class="o">=</span> <span class="n">data_tm5</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">points</span>
+    <span class="n">nominal</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">181.5</span><span class="p">,</span> <span class="mf">175.5</span><span class="p">]</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">lons</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">lons</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
     <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">actual</span><span class="o">=</span><span class="n">vals</span><span class="p">,</span> <span class="n">desired</span><span class="o">=</span><span class="n">nominal</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="test_latitude"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_latitude">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="k">def</span> <span class="nf">test_latitude</span><span class="p">(</span><span class="n">data_cci</span><span class="p">):</span>
+
+<div class="viewcode-block" id="test_latitude"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_latitude">[docs]</a><span class="nd">@testdata_unavail</span>
+<span class="k">def</span> <span class="nf">test_latitude</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;test latitude array&quot;&quot;&quot;</span>
-    <span class="n">nominal_eq</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;arc_degree&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="n">vals_eq</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_cci</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-               <span class="nb">int</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">data_cci</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">points</span><span class="p">))]</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">nominal_eq</span><span class="p">,</span> <span class="n">vals_eq</span><span class="p">)</span></div>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_tm5</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">units</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;degrees&#39;</span>
+    <span class="n">lats</span> <span class="o">=</span> <span class="n">data_tm5</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">points</span>
+    <span class="n">nominal</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">89</span><span class="p">,</span> <span class="mi">89</span><span class="p">]</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">lats</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">lats</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">actual</span><span class="o">=</span><span class="n">vals</span><span class="p">,</span> <span class="n">desired</span><span class="o">=</span><span class="n">nominal</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="test_time"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_time">[docs]</a><span class="nd">@lustre_unavail</span>    
-<span class="k">def</span> <span class="nf">test_time</span><span class="p">(</span><span class="n">data_cci</span><span class="p">,</span> <span class="n">data_osuite</span><span class="p">):</span>
+<div class="viewcode-block" id="test_time"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_time">[docs]</a><span class="nd">@testdata_unavail</span>
+<span class="k">def</span> <span class="nf">test_time</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Test time dimension access and values&quot;&quot;&quot;</span>
-    <span class="n">time_cci</span> <span class="o">=</span> <span class="n">data_cci</span><span class="o">.</span><span class="n">time</span>
-    <span class="n">time_osuite</span> <span class="o">=</span> <span class="n">data_osuite</span><span class="o">.</span><span class="n">time</span>
-    <span class="n">nominal_eq</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;gregorian&quot;</span><span class="p">,</span> 
-                  <span class="s2">&quot;julian&quot;</span><span class="p">,</span>
-                  <span class="s1">&#39;day since 2018-01-01 00:00:00.00000000 UTC&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;day since 2008-01-01 00:00:00.00000000 UTC&#39;</span><span class="p">,</span> 
-                  <span class="kc">True</span><span class="p">,</span> 
-                  <span class="kc">False</span><span class="p">]</span>
-    <span class="n">vals_eq</span> <span class="o">=</span> <span class="p">[</span><span class="n">time_osuite</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">calendar</span><span class="p">,</span> 
-               <span class="n">time_cci</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">calendar</span><span class="p">,</span>
-               <span class="n">time_osuite</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> 
-               <span class="n">time_cci</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-               <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_osuite</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">point</span><span class="p">,</span> <span class="n">datetime</span><span class="p">),</span>
-               <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_cci</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">point</span><span class="p">,</span> <span class="n">datetime</span><span class="p">)]</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">nominal_eq</span><span class="p">,</span> <span class="n">vals_eq</span><span class="p">)</span></div>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">data_tm5</span><span class="o">.</span><span class="n">time</span>
 
+    <span class="n">nominal_eq</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;julian&#39;</span><span class="p">,</span> <span class="s1">&#39;day since 1850-01-01 00:00:00.0000000 UTC&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+    <span class="n">vals_eq</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">calendar</span><span class="p">,</span>
+               <span class="n">time</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">point</span><span class="p">,</span> <span class="n">datetime</span><span class="p">)]</span>
+    <span class="k">assert</span> <span class="n">nominal_eq</span> <span class="o">==</span> <span class="n">vals_eq</span></div>
 
-<div class="viewcode-block" id="test_resample_time"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_resample_time">[docs]</a><span class="nd">@lustre_unavail</span>
-<span class="k">def</span> <span class="nf">test_resample_time</span><span class="p">(</span><span class="n">data_cams_rean</span><span class="p">):</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">data_cams_rean</span>
-    
-    <span class="n">monthly</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_resample_time"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_resample_time">[docs]</a><span class="nd">@testdata_unavail</span>
+<span class="k">def</span> <span class="nf">test_resample_time</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data_tm5</span>
+
     <span class="n">yearly</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;yearly&#39;</span><span class="p">)</span>
-    
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="mi">1096</span><span class="p">,</span> <span class="mi">161</span><span class="p">,</span> <span class="mi">320</span><span class="p">))</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">monthly</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="mi">36</span><span class="p">,</span> <span class="mi">161</span><span class="p">,</span> <span class="mi">320</span><span class="p">))</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">yearly</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">161</span><span class="p">,</span> <span class="mi">320</span><span class="p">))</span>
-    
-    <span class="n">mean_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">monthly</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">yearly</span><span class="o">.</span><span class="n">mean</span><span class="p">()]</span>
+
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">yearly</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">120</span><span class="p">))</span>
+
+    <span class="c1"># make sure means are preserved (more or less)</span>
+    <span class="n">mean_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">yearly</span><span class="o">.</span><span class="n">mean</span><span class="p">()]</span>
     <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">actual</span><span class="o">=</span><span class="n">mean_vals</span><span class="p">,</span>
-                        <span class="n">desired</span><span class="o">=</span><span class="p">[</span><span class="mf">0.14915</span><span class="p">,</span> 
-                                 <span class="mf">0.14906</span><span class="p">,</span> 
-                                 <span class="mf">0.14906</span><span class="p">],</span> <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span></div>
-<div class="viewcode-block" id="test_interpolate"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_interpolate">[docs]</a><span class="nd">@lustre_unavail</span>
+                        <span class="n">desired</span><span class="o">=</span><span class="p">[</span><span class="mf">0.11865</span><span class="p">,</span> <span class="mf">0.11865</span><span class="p">],</span> <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span></div>
+<div class="viewcode-block" id="test_interpolate"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_interpolate">[docs]</a><span class="nd">@testdata_unavail</span>
 <span class="k">def</span> <span class="nf">test_interpolate</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">):</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data_tm5</span>
-    <span class="c1">#test_resample_time(data)</span>
-    
-    
-    <span class="n">lats</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
-    <span class="n">lons</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">120</span><span class="p">,</span> <span class="mi">69</span><span class="p">]</span>
-    
-    <span class="n">itp</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lats</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">lons</span><span class="p">)</span>
-    
+
+    <span class="n">itp</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">TESTLATS</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">TESTLONS</span><span class="p">)</span>
+
     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">itp</span><span class="p">)</span> <span class="o">==</span> <span class="n">GriddedData</span>
     <span class="k">assert</span> <span class="n">itp</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">actual</span><span class="o">=</span><span class="p">[</span><span class="n">itp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span>
-                                <span class="n">itp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="kc">True</span><span class="p">)],</span> 
-                        <span class="n">desired</span><span class="o">=</span><span class="p">[</span><span class="mf">0.138774</span><span class="p">,</span>
-                                <span class="mf">0.137484</span><span class="p">],</span> 
-                                 <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span></div>
-    
-<div class="viewcode-block" id="test_to_time_series"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_to_time_series">[docs]</a><span class="nd">@lustre_unavail</span>
+
+    <span class="n">desired</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.13877</span><span class="p">,</span> <span class="mf">0.13748</span><span class="p">]</span>
+    <span class="n">actual</span><span class="o">=</span><span class="p">[</span><span class="n">itp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">itp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="kc">True</span><span class="p">)]</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">actual</span><span class="o">=</span><span class="n">actual</span><span class="p">,</span>
+                        <span class="n">desired</span><span class="o">=</span><span class="n">desired</span><span class="p">,</span>
+                        <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="test_to_time_series"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_to_time_series">[docs]</a><span class="nd">@testdata_unavail</span>
 <span class="k">def</span> <span class="nf">test_to_time_series</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">):</span>
-    <span class="n">lats</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
-    <span class="n">lons</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">120</span><span class="p">,</span> <span class="mi">69</span><span class="p">]</span>
-    
+
     <span class="n">latsm</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="mi">21</span><span class="p">]</span>
     <span class="n">lonsm</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">118.5</span><span class="p">,</span> <span class="mf">70.5</span><span class="p">]</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">data_tm5</span><span class="o">.</span><span class="n">to_time_series</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lats</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">lons</span><span class="p">)</span>
-    
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">data_tm5</span><span class="o">.</span><span class="n">to_time_series</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">TESTLATS</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">TESTLONS</span><span class="p">)</span>
+
     <span class="n">lats_actual</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">lons_actual</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">means_actual</span> <span class="o">=</span> <span class="p">[]</span>
@@ -331,13 +270,24 @@
     <span class="n">npt</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">lons_actual</span><span class="p">,</span> <span class="n">lonsm</span><span class="p">)</span>
     <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">means_actual</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.101353</span><span class="p">,</span> <span class="mf">0.270886</span><span class="p">],</span> <span class="n">rtol</span><span class="o">=</span><span class="n">TEST_RTOL</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="test_change_baseyear"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_change_baseyear">[docs]</a><span class="nd">@testdata_unavail</span>
+<span class="k">def</span> <span class="nf">test_change_baseyear</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">):</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">data_tm5</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">cp</span><span class="o">.</span><span class="n">change_base_year</span><span class="p">(</span><span class="mi">901</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">units</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;days since 901-01-01 00:00:00&#39;</span></div>
+
+<div class="viewcode-block" id="test_mean"><a class="viewcode-back" href="../../../api_testsuite.html#pyaerocom.test.test_griddeddata.test_mean">[docs]</a><span class="nd">@testdata_unavail</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">&#39;kwargs,result&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">(</span><span class="nb">dict</span><span class="p">(),</span> <span class="mf">0.11864813532841474</span><span class="p">),</span>
+    <span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">areaweighted</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="mf">0.09825691</span><span class="p">),</span>
+    <span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_mean</span><span class="p">(</span><span class="n">data_tm5</span><span class="p">,</span><span class="n">kwargs</span><span class="p">,</span><span class="n">result</span><span class="p">):</span>
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">data_tm5</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span></div>
+
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    
-    <span class="n">data</span> <span class="o">=</span> <span class="n">_load_tm5_2010_monthly</span><span class="p">()</span>
-    
-    <span class="n">test_interpolate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    <span class="n">test_to_time_series</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
 </pre></div>
 
            </div>

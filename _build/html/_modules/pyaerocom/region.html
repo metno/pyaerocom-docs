@@ -85,6 +85,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
@@ -92,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_testsuite.html">Tests (for developers)</a></li>
 </ul>
 
             
@@ -165,7 +165,7 @@
 <span class="kn">from</span> <span class="nn">ast</span> <span class="kn">import</span> <span class="n">literal_eval</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
 <span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
-
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="c1">#from pyaerocom import Config</span>
 <span class="c1">#const = Config()</span>
 <span class="c1">#from pyaerocom import __dir__</span>
@@ -173,11 +173,11 @@
 
 <div class="viewcode-block" id="Region"><a class="viewcode-back" href="../../api.html#pyaerocom.region.Region">[docs]</a><span class="k">class</span> <span class="nc">Region</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Interface that specifies an AEROCOM region</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    Extended dictionary-like object</span>
-<span class="sd">    </span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    name : str</span>
@@ -187,16 +187,16 @@
 <span class="sd">    lat_range : :obj:`list` or :obj:`tuple`</span>
 <span class="sd">        latitude range (min, max) covered by region</span>
 <span class="sd">    lon_range_plot : :obj:`list` or :obj:`tuple`</span>
-<span class="sd">        longitude range (min, max) used for plotting region. Defaults to </span>
+<span class="sd">        longitude range (min, max) used for plotting region. Defaults to</span>
 <span class="sd">        values of :attr:`lon_range` but may be extended, see e.g.</span>
 <span class="sd">        `the example of india &lt;http://aerocom.met.no/DATA/SURFOBS/</span>
 <span class="sd">        ECMWF_OSUITE_NRT/plots/OD550_AER_an2018_d20180319_INDIA_MAP.ps.png&gt;`__</span>
 <span class="sd">    lat_range_plot : :obj:`list` or :obj:`tuple`</span>
-<span class="sd">        latitude range (min, max) used for plotting region. Defaults to </span>
+<span class="sd">        latitude range (min, max) used for plotting region. Defaults to</span>
 <span class="sd">        values of :attr:`lat_range` but may be extended, see e.g.</span>
 <span class="sd">        `the example of india &lt;http://aerocom.met.no/DATA/SURFOBS/</span>
 <span class="sd">        ECMWF_OSUITE_NRT/plots/OD550_AER_an2018_d20180319_INDIA_MAP.ps.png&gt;`__</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    name : str</span>
@@ -205,11 +205,11 @@
 <span class="sd">        longitude range (min, max) covered by region</span>
 <span class="sd">    lat_range : :obj:`list` or :obj:`tuple`</span>
 <span class="sd">        latitude range (min, max) covered by region</span>
-<span class="sd">        </span>
+
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    Just initiate with a valid region ID</span>
-<span class="sd">    </span>
+
 <span class="sd">        &gt;&gt;&gt; from pyaerocom import Region(&quot;</span>
 <span class="sd">        &gt;&gt;&gt; europe = Region(&quot;EUROPE&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; india = Region(&quot;INDIA&quot;)</span>
@@ -227,59 +227,59 @@
 <span class="sd">        Latitude range: [5, 35]</span>
 <span class="sd">        Longitude range (plots): [50, 100]</span>
 <span class="sd">        Latitude range (plots): [0, 40]</span>
-<span class="sd">        </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;WORLD&quot;</span><span class="p">,</span> <span class="n">lon_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;WORLD&quot;</span><span class="p">,</span> <span class="n">lon_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="c1"># longitude / latitude range of data </span>
+        <span class="c1"># longitude / latitude range of data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lon_range</span> <span class="o">=</span> <span class="n">lon_range</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lat_range</span> <span class="o">=</span> <span class="n">lat_range</span>
-        
+
         <span class="c1"># longitude / latitude range of data in plots</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lon_range_plot</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lat_range_plot</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">lon_ticks</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lat_ticks</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">([</span><span class="n">x</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">lon_range</span><span class="p">,</span> <span class="n">lat_range</span><span class="p">]]):</span>
-           <span class="bp">self</span><span class="o">.</span><span class="n">import_default</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> 
-        
+           <span class="bp">self</span><span class="o">.</span><span class="n">import_default</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Name of region&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_htap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">HTAP_REGIONS</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-    
+
 <div class="viewcode-block" id="Region.import_default"><a class="viewcode-back" href="../../api.html#pyaerocom.region.Region.import_default">[docs]</a>    <span class="k">def</span> <span class="nf">import_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Import information about default region</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        name : str</span>
 <span class="sd">            strind ID of region (must be specified in `regions.ini &lt;https://</span>
-<span class="sd">            github.com/metno/pyaerocom/blob/master/pyaerocom/data/regions.ini&gt;`__ </span>
+<span class="sd">            github.com/metno/pyaerocom/blob/master/pyaerocom/data/regions.ini&gt;`__</span>
 <span class="sd">            file)</span>
-<span class="sd">            </span>
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        IOError</span>
 <span class="sd">            if regions.ini file does not exist</span>
 <span class="sd">        NameError</span>
-<span class="sd">            if default region with ID specified by input parameter ``name`` </span>
+<span class="sd">            if default region with ID specified by input parameter ``name``</span>
 <span class="sd">            cannot be found in regions.ini file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="fm">__dir__</span>
@@ -290,7 +290,7 @@
                           <span class="o">%</span><span class="n">fpath</span><span class="p">)</span>
         <span class="n">conf_reader</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
         <span class="n">conf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">conf_reader</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;No default region available for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
@@ -302,31 +302,31 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-                    <span class="k">except</span><span class="p">:</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                         <span class="k">pass</span>
                 <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon_range_plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lon_range_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon_range</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat_range_plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lat_range_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat_range</span></div>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">center_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Center coordinate of this region&quot;&quot;&quot;</span>
         <span class="n">latc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
         <span class="n">lonc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lon_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">latc</span><span class="p">,</span> <span class="n">lonc</span><span class="p">)</span>
-    
+
 <div class="viewcode-block" id="Region.distance_to_center"><a class="viewcode-back" href="../../api.html#pyaerocom.region.Region.distance_to_center">[docs]</a>    <span class="k">def</span> <span class="nf">distance_to_center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute distance of input coordinate to center of this region</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        lat : float</span>
 <span class="sd">            latitude of coordinate</span>
 <span class="sd">        lon : float</span>
 <span class="sd">            longitude of coordinate</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
@@ -334,22 +334,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">pyaerocom.geodesy</span> <span class="kn">import</span> <span class="n">calc_distance</span>
         <span class="n">cc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_coordinate</span>
-        <span class="k">return</span> <span class="n">calc_distance</span><span class="p">(</span><span class="n">lat0</span><span class="o">=</span><span class="n">cc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
-                             <span class="n">lon0</span><span class="o">=</span><span class="n">cc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> 
-                             <span class="n">lat1</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> 
+        <span class="k">return</span> <span class="n">calc_distance</span><span class="p">(</span><span class="n">lat0</span><span class="o">=</span><span class="n">cc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                             <span class="n">lon0</span><span class="o">=</span><span class="n">cc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                             <span class="n">lat1</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span>
                              <span class="n">lon1</span><span class="o">=</span><span class="n">lon</span><span class="p">)</span></div>
-        
+
 <div class="viewcode-block" id="Region.contains_coordinate"><a class="viewcode-back" href="../../api.html#pyaerocom.region.Region.contains_coordinate">[docs]</a>    <span class="k">def</span> <span class="nf">contains_coordinate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if input lat/lon coordinate is contained in region</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        lat : float</span>
 <span class="sd">            latitude of coordinate</span>
 <span class="sd">        lon : float</span>
 <span class="sd">            longitude of coordinate</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
@@ -358,29 +357,39 @@
         <span class="n">lat_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">lat</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">lon_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">lon</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">lat_ok</span> <span class="o">*</span> <span class="n">lon_ok</span></div>
-    
-<div class="viewcode-block" id="Region.plot"><a class="viewcode-back" href="../../api.html#pyaerocom.region.Region.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Region.plot"><a class="viewcode-back" href="../../api.html#pyaerocom.region.Region.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+
 <span class="sd">        Returns</span>
-<span class="sd">        --------------</span>
-<span class="sd">        ax </span>
-<span class="sd">            Plot of masked regions</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax</span>
+<span class="sd">            Map plot indicating region</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_htap</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Comming soon ... &quot;</span><span class="p">)</span>
-    
+        <span class="kn">from</span> <span class="nn">cartopy.mpl.geoaxes</span> <span class="kn">import</span> <span class="n">GeoAxes</span>
         <span class="kn">from</span> <span class="nn">pyaerocom.plot.mapping</span> <span class="kn">import</span> <span class="n">init_map</span>
-        <span class="kn">from</span> <span class="nn">pyaerocom.land_sea_mask</span> <span class="kn">import</span> <span class="n">load_region_mask_xr</span>
-        
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">init_map</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">init_map</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">GeoAxes</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for ax: need cartopy GeoAxes..&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_htap</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ax</span>
+            <span class="c1">#raise NotImplementedError(&#39;Coming soon&#39;)</span>
+
+        <span class="kn">from</span> <span class="nn">pyaerocom.helpers_landsea_masks</span> <span class="kn">import</span> <span class="n">load_region_mask_xr</span>
+
         <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Longitude&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Latitude&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Region name: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="n">load_region_mask_xr</span><span class="p">(</span><span class="n">region_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>    
-        <span class="c1"># ax add geoaxes </span>
-        <span class="k">return</span> <span class="n">ax</span>        </div>
-    
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">load_region_mask_xr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="c1">#import numpy as np</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">mask</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="n">mask</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
     <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid input, need tuple&#39;</span><span class="p">)</span>
@@ -388,16 +397,16 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input: coordinate must contain 2 &#39;</span>
                              <span class="s1">&#39;elements (lat, lon)&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">contains_coordinate</span><span class="p">(</span><span class="n">lat</span><span class="o">=</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lon</span><span class="o">=</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        
+
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;Region </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">super</span><span class="p">(</span><span class="n">Region</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()))</span>
-   
+
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;pyaeorocom Region</span><span class="se">\n</span><span class="s2">Name: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span>
              <span class="s2">&quot;Longitude range: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span>
-             <span class="s2">&quot;Latitude range: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> 
+             <span class="s2">&quot;Latitude range: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span>
              <span class="s2">&quot;Longitude range (plots): </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span>
-             <span class="s2">&quot;Latitude range (plots): </span><span class="si">%s</span><span class="s2">&quot;</span> 
+             <span class="s2">&quot;Latitude range (plots): </span><span class="si">%s</span><span class="s2">&quot;</span>
              <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon_range</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat_range</span><span class="p">,</span>
                <span class="bp">self</span><span class="o">.</span><span class="n">lon_range_plot</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat_range_plot</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">s</span></div>
@@ -409,13 +418,13 @@
 
 <div class="viewcode-block" id="get_all_default_region_ids"><a class="viewcode-back" href="../../api.html#pyaerocom.region.get_all_default_region_ids">[docs]</a><span class="k">def</span> <span class="nf">get_all_default_region_ids</span><span class="p">(</span><span class="n">use_all_in_ini</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get list containing IDs of all default regions</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    use_all_in_ini : bool</span>
-<span class="sd">        if True, then all regions defined in regions.ini are used, else, </span>
+<span class="sd">        if True, then all regions defined in regions.ini are used, else,</span>
 <span class="sd">        the list of regions, defined in header of :class:`Config`</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list</span>
@@ -436,24 +445,24 @@
     <span class="k">for</span> <span class="n">rid</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">conf_reader</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">rid</span> <span class="o">==</span> <span class="s2">&quot;DEFAULT&quot;</span><span class="p">:</span>
             <span class="n">all_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rid</span><span class="p">)</span>
-        
+
     <span class="k">return</span> <span class="n">all_ids</span></div>
 
 <div class="viewcode-block" id="get_all_default_regions"><a class="viewcode-back" href="../../api.html#pyaerocom.region.get_all_default_regions">[docs]</a><span class="k">def</span> <span class="nf">get_all_default_regions</span><span class="p">(</span><span class="n">use_all_in_ini</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get dictionary containing all default regions from region.ini file</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
-<span class="sd">        The values are already :class:`Region` instances, use </span>
+<span class="sd">        The values are already :class:`Region` instances, use</span>
 <span class="sd">        :func:`get_all_default_region_ids`</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict</span>
-<span class="sd">        dictionary containing all default regions that are found in </span>
+<span class="sd">        dictionary containing all default regions that are found in</span>
 <span class="sd">        the `regions.ini &lt;https://github.com/metno/pyaerocom/blob/</span>
 <span class="sd">        master/pyaerocom/data/regions.ini&gt;`__ file</span>
-<span class="sd">        </span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">all_regions</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">use_all_in_ini</span><span class="p">:</span>
@@ -461,29 +470,29 @@
         <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">OLD_AEROCOM_REGIONS</span><span class="p">:</span>
             <span class="n">all_regions</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="n">Region</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">all_regions</span>
-    <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="fm">__dir__</span>      
+    <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="fm">__dir__</span>
     <span class="n">fpath</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="fm">__dir__</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;regions.ini&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;File conventions ini file could not be found: </span><span class="si">%s</span><span class="s2">&quot;</span>
                       <span class="o">%</span><span class="n">fpath</span><span class="p">)</span>
     <span class="n">conf_reader</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
     <span class="n">conf_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
-    
+
     <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">conf_reader</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">region</span> <span class="o">==</span> <span class="s2">&quot;DEFAULT&quot;</span><span class="p">:</span> <span class="c1"># TODO this should be updated right Jonas?</span>
             <span class="n">all_regions</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="n">Region</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
-        
+
     <span class="k">return</span> <span class="n">all_regions</span></div>
-  
+
 <span class="c1">#: ToDO: check how to handle methods properly with HTAP regions...</span>
-<div class="viewcode-block" id="get_regions_coord"><a class="viewcode-back" href="../../api.html#pyaerocom.region.get_regions_coord">[docs]</a><span class="k">def</span> <span class="nf">get_regions_coord</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="o">**</span><span class="n">add_regions</span><span class="p">):</span>
+<div class="viewcode-block" id="get_regions_coord"><a class="viewcode-back" href="../../api.html#pyaerocom.region.get_regions_coord">[docs]</a><span class="k">def</span> <span class="nf">get_regions_coord</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">default_regs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">add_regions</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get all regions that contain input coordinate</span>
-<span class="sd">    </span>
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    This does not yet include HTAP, since this causes troules in automated</span>
 <span class="sd">    AeroCom processing</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lat : float</span>
@@ -491,23 +500,24 @@
 <span class="sd">    lon : float</span>
 <span class="sd">        longitude of coordinate</span>
 <span class="sd">    **add_regions</span>
-<span class="sd">        additional regions other than default regions, that are supposed to </span>
+<span class="sd">        additional regions other than default regions, that are supposed to</span>
 <span class="sd">        be considered</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list</span>
 <span class="sd">        list of regions that contain this coordinate</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-     
-    <span class="n">regs</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">all_regs</span> <span class="o">=</span> <span class="n">get_all_default_regions</span><span class="p">(</span><span class="n">use_all_in_ini</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">an</span><span class="p">,</span> <span class="n">ar</span> <span class="ow">in</span> <span class="n">add_regions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">Region</span><span class="p">):</span>      
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">ar</span><span class="o">.</span><span class="n">is_htap</span><span class="p">:</span>
-                <span class="n">all_regs</span><span class="p">[</span><span class="n">an</span><span class="p">]</span> <span class="o">=</span> <span class="n">ar</span>
 
-    <span class="k">for</span> <span class="n">rname</span><span class="p">,</span> <span class="n">reg</span> <span class="ow">in</span> <span class="n">all_regs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">default_regs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">default_regs</span> <span class="o">=</span> <span class="n">get_all_default_regions</span><span class="p">(</span><span class="n">use_all_in_ini</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">an</span><span class="p">,</span> <span class="n">ar</span> <span class="ow">in</span> <span class="n">add_regions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">Region</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ar</span><span class="o">.</span><span class="n">is_htap</span><span class="p">:</span>
+                <span class="n">default_regs</span><span class="p">[</span><span class="n">an</span><span class="p">]</span> <span class="o">=</span> <span class="n">ar</span>
+
+    <span class="k">for</span> <span class="n">rname</span><span class="p">,</span> <span class="n">reg</span> <span class="ow">in</span> <span class="n">default_regs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">rname</span> <span class="o">==</span> <span class="s1">&#39;WORLD&#39;</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="k">if</span> <span class="n">reg</span><span class="o">.</span><span class="n">contains_coordinate</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
@@ -516,9 +526,9 @@
         <span class="n">regs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;WORLD&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">regs</span></div>
 
-<div class="viewcode-block" id="find_closest_region_coord"><a class="viewcode-back" href="../../api.html#pyaerocom.region.find_closest_region_coord">[docs]</a><span class="k">def</span> <span class="nf">find_closest_region_coord</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="o">**</span><span class="n">add_regions</span><span class="p">):</span>
+<div class="viewcode-block" id="find_closest_region_coord"><a class="viewcode-back" href="../../api.html#pyaerocom.region.find_closest_region_coord">[docs]</a><span class="k">def</span> <span class="nf">find_closest_region_coord</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">default_regs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">add_regions</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find region that has it&#39;s center closest to input coordinate</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lat : float</span>
@@ -526,16 +536,17 @@
 <span class="sd">    lon : float</span>
 <span class="sd">        longitude of coordinate</span>
 <span class="sd">    **add_regions</span>
-<span class="sd">        additional regions other than default regions, that are supposed to </span>
+<span class="sd">        additional regions other than default regions, that are supposed to</span>
 <span class="sd">        be considered</span>
-<span class="sd">        </span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        name of sqaure region</span>
-<span class="sd">    &quot;&quot;&quot;</span> 
-    <span class="n">regs</span> <span class="o">=</span> <span class="n">get_regions_coord</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="o">**</span><span class="n">add_regions</span><span class="p">)</span>
-    
+<span class="sd">        name of square region</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">get_regions_coord</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">default_regs</span><span class="o">=</span><span class="n">default_regs</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">add_regions</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">regs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">regs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
@@ -553,25 +564,33 @@
                 <span class="n">best</span><span class="o">=</span><span class="n">rname</span>
         <span class="k">return</span> <span class="n">best</span></div>
 
-<div class="viewcode-block" id="valid_region"><a class="viewcode-back" href="../../api.html#pyaerocom.region.valid_region">[docs]</a><span class="k">def</span> <span class="nf">valid_region</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="valid_default_region"><a class="viewcode-back" href="../../api.html#pyaerocom.region.valid_default_region">[docs]</a><span class="k">def</span> <span class="nf">valid_default_region</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Boolean specifying whether input region is valid or not&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">get_all_default_region_ids</span><span class="p">()</span> <span class="k">else</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">False</span></div>
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">Region</span><span class="p">(</span><span class="s2">&quot;EUR&quot;</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">from</span> <span class="nn">pyaerocom.helpers_landsea_masks</span> <span class="kn">import</span> <span class="n">load_region_mask_xr</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">load_region_mask_xr</span><span class="p">(</span><span class="s1">&#39;EUR&#39;</span><span class="p">,</span> <span class="s1">&#39;PAN&#39;</span><span class="p">)</span>
+
     <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">is_htap</span><span class="p">)</span>
     <span class="n">r</span><span class="o">.</span><span class="n">import_default</span><span class="p">(</span><span class="s2">&quot;EUROPE&quot;</span><span class="p">)</span>
-        
+
     <span class="n">all_ids</span> <span class="o">=</span> <span class="n">get_all_default_region_ids</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    
+
     <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span>
     <span class="n">reg</span> <span class="o">=</span> <span class="n">find_closest_region_coord</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
-    
+
     <span class="nb">print</span><span class="p">(</span><span class="n">reg</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">valid_region</span><span class="p">(</span><span class="s1">&#39;europe&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">valid_default_region</span><span class="p">)</span>
 </pre></div>
 
            </div>
