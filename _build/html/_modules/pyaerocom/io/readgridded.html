@@ -21,12 +21,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
@@ -194,6 +194,7 @@
 <span class="kn">import</span> <span class="nn">fnmatch</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -206,6 +207,7 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.aux_read_cubes</span> <span class="kn">import</span> <span class="p">(</span><span class="n">compute_angstrom_coeff_cubes</span><span class="p">,</span>
                                          <span class="n">multiply_cubes</span><span class="p">,</span>
+                                         <span class="n">divide_cubes</span><span class="p">,</span>
                                          <span class="n">subtract_cubes</span><span class="p">,</span>
                                          <span class="n">add_cubes</span><span class="p">)</span>
 
@@ -298,11 +300,15 @@
 
 
     <span class="n">AUX_REQUIRES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ang4487aer&#39;</span>    <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;od440aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od870aer&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;angabs4487aer&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;abs440aer&#39;</span><span class="p">,</span> <span class="s1">&#39;abs870aer&#39;</span><span class="p">),</span>
                     <span class="s1">&#39;od550gt1aer&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550lt1aer&#39;</span><span class="p">),</span>
                     <span class="s1">&#39;wetoa&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;wetpoa&#39;</span><span class="p">,</span> <span class="s1">&#39;wetsoa&#39;</span><span class="p">),</span>
                     <span class="s1">&#39;dryoa&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;drypoa&#39;</span><span class="p">,</span> <span class="s1">&#39;drysoa&#39;</span><span class="p">),</span>
                     <span class="s1">&#39;conc*&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;mmr*&#39;</span><span class="p">,</span> <span class="s1">&#39;rho&#39;</span><span class="p">),</span>
                     <span class="s1">&#39;sc550dryaer&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;ec550dryaer&#39;</span><span class="p">,</span> <span class="s1">&#39;ac550dryaer&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;concox&#39;</span>        <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;concno2&#39;</span><span class="p">,</span> <span class="s1">&#39;conco3&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;vmrox&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;vmrno2&#39;</span><span class="p">,</span> <span class="s1">&#39;vmro3&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;fmf550aer&#39;</span>     <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;od550lt1aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
                     <span class="c1">#&#39;mec550*&#39;       : [&#39;od550*&#39;, &#39;load*&#39;],</span>
                     <span class="c1">#&#39;tau*&#39;          : [&#39;load*&#39;, &#39;wet*&#39;, &#39;dry*&#39;] #DOES NOT WORK POINT BY POINT</span>
                     <span class="p">}</span>
@@ -311,12 +317,16 @@
                     <span class="s1">&#39;od870aer&#39;</span>      <span class="p">:</span>   <span class="p">[</span><span class="s1">&#39;od865aer&#39;</span><span class="p">],</span>
                     <span class="s1">&#39;ac550dryaer&#39;</span>   <span class="p">:</span>   <span class="p">[</span><span class="s1">&#39;ac550aer&#39;</span><span class="p">]}</span>
 
-    <span class="n">AUX_FUNS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ang4487aer&#39;</span>   <span class="p">:</span>    <span class="n">compute_angstrom_coeff_cubes</span><span class="p">,</span>
-                <span class="s1">&#39;od550gt1aer&#39;</span>  <span class="p">:</span>    <span class="n">subtract_cubes</span><span class="p">,</span>
-                <span class="s1">&#39;wetoa&#39;</span>        <span class="p">:</span>    <span class="n">add_cubes</span><span class="p">,</span>
-                <span class="s1">&#39;dryoa&#39;</span>        <span class="p">:</span>    <span class="n">add_cubes</span><span class="p">,</span>
-                <span class="s1">&#39;sc550dryaer&#39;</span>  <span class="p">:</span>    <span class="n">subtract_cubes</span><span class="p">,</span>
-                <span class="s1">&#39;conc*&#39;</span>        <span class="p">:</span>    <span class="n">multiply_cubes</span><span class="p">,</span>
+    <span class="n">AUX_FUNS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ang4487aer&#39;</span>    <span class="p">:</span>   <span class="n">compute_angstrom_coeff_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;angabs4487aer&#39;</span> <span class="p">:</span>   <span class="n">compute_angstrom_coeff_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;od550gt1aer&#39;</span>   <span class="p">:</span>   <span class="n">subtract_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;wetoa&#39;</span>         <span class="p">:</span>   <span class="n">add_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;dryoa&#39;</span>         <span class="p">:</span>   <span class="n">add_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;sc550dryaer&#39;</span>   <span class="p">:</span>   <span class="n">subtract_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;conc*&#39;</span>         <span class="p">:</span>   <span class="n">multiply_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;concox&#39;</span>        <span class="p">:</span>   <span class="n">add_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;vmrox&#39;</span>         <span class="p">:</span>   <span class="n">add_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;fmf550aer&#39;</span>     <span class="p">:</span>   <span class="n">divide_cubes</span>
                 <span class="c1">#&#39;mec550*&#39;      :    divide_cubes,</span>
                 <span class="c1">#&#39;tau*&#39;         :    lifetime_from_load_and_dep</span>
                 <span class="p">}</span>
@@ -325,7 +335,8 @@
 
     <span class="n">VERT_ALT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Surface&#39;</span> <span class="p">:</span> <span class="s1">&#39;ModelLevel&#39;</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_convention</span><span class="o">=</span><span class="s2">&quot;aerocom3&quot;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">file_convention</span><span class="o">=</span><span class="s2">&quot;aerocom3&quot;</span><span class="p">,</span>
                  <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span> <span class="o">=</span> <span class="kc">None</span>
@@ -394,6 +405,8 @@
 
     <span class="nd">@data_dir</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;Input data directory </span><span class="si">{}</span><span class="s1"> does not exist&#39;</span>
                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
@@ -585,6 +598,20 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_check_var_match_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if input variable can be accessed via auxiliary variable family</span>
+
+<span class="sd">        E.g. if var_name is concpm10 and mmrpm10 and rho are available</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        var_name : str</span>
+<span class="sd">            variable that is supposed to be read</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if variable can be read, else False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vars_found</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_var_patterns</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
@@ -650,7 +677,6 @@
 <span class="sd">        callable</span>
 <span class="sd">            function that is used to compute input variable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="n">var_to_compute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aux_avail</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_compute_var</span><span class="p">(</span><span class="n">var_to_compute</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;Variable </span><span class="si">{}</span><span class="s1"> cannot be computed&#39;</span>
@@ -681,7 +707,6 @@
             <span class="k">raise</span> <span class="n">VariableDefinitionError</span><span class="p">(</span><span class="s1">&#39;Invalid variable name </span><span class="si">{}</span><span class="s1">. Must not &#39;</span>
                                           <span class="s1">&#39;contain *&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aux_avail</span><span class="p">:</span>
-
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_aux_compute_access</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -725,7 +750,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">var</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
         <span class="k">except</span> <span class="n">VariableDefinitionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_compute_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
@@ -1201,6 +1226,8 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">vars_to_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_aux_vars_and_fun</span><span class="p">(</span><span class="n">var_to_compute</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">except</span> <span class="n">VarNotAvailableError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">VariableDefinitionError</span><span class="p">:</span>
                 <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># init result info dict for aux variable</span>
@@ -2293,19 +2320,7 @@
 
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
-    <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;AATSR_SU_v4.3&#39;</span><span class="p">)</span>
-    <span class="n">read_constraint</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
-        <span class="n">operator</span><span class="o">=</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
-        <span class="n">filter_val</span><span class="o">=</span><span class="mf">0.1</span>
-    <span class="p">)</span>
-
-    <span class="n">ae</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span>
-    <span class="n">ae_qa</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
-                         <span class="n">constraints</span><span class="o">=</span><span class="p">[</span><span class="n">read_constraint</span><span class="p">])</span>
-
-    <span class="n">ae</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="n">apply_constraints</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">()</span>
-    <span class="n">ae_qa</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="n">apply_constraints</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">()</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">()</span>
 </pre></div>
 
            </div>

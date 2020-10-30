@@ -21,12 +21,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
@@ -191,9 +191,11 @@
 <span class="c1"># Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,</span>
 <span class="c1"># MA 02110-1301, USA</span>
 <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">logging</span>
-
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.combine_vardata_ungridded</span> <span class="kn">import</span> <span class="n">combine_vardata_ungridded</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DataRetrievalError</span><span class="p">,</span>
                                   <span class="n">NetworkNotImplemented</span><span class="p">,</span> <span class="n">NetworkNotSupported</span><span class="p">)</span>
+
 <span class="kn">from</span> <span class="nn">pyaerocom.io.read_aeronet_sdav2</span> <span class="kn">import</span> <span class="n">ReadAeronetSdaV2</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.read_aeronet_sdav3</span> <span class="kn">import</span> <span class="n">ReadAeronetSdaV3</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.read_aeronet_invv2</span> <span class="kn">import</span> <span class="n">ReadAeronetInvV2</span>
@@ -212,49 +214,95 @@
 
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span><span class="p">,</span> <span class="n">print_log</span>
 
-<span class="c1"># TODO Note: Removed infiles (list of files from which datasets were read, since it</span>
-<span class="c1"># was not used anywhere so far)</span>
 <div class="viewcode-block" id="ReadUngridded"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded">[docs]</a><span class="k">class</span> <span class="nc">ReadUngridded</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Factory class for reading of ungridded data based on obsnetwork ID&quot;&quot;&quot;</span>
-    <span class="n">SUPPORTED</span> <span class="o">=</span> <span class="p">[</span><span class="n">ReadAeronetInvV3</span><span class="p">,</span>
-                 <span class="n">ReadAeronetInvV2</span><span class="p">,</span>
-                 <span class="n">ReadAeronetSdaV2</span><span class="p">,</span>
-                 <span class="n">ReadAeronetSdaV3</span><span class="p">,</span>
-                 <span class="n">ReadAeronetSunV2</span><span class="p">,</span>
-                 <span class="n">ReadAeronetSunV3</span><span class="p">,</span>
-                 <span class="n">ReadEarlinet</span><span class="p">,</span>
-                 <span class="n">ReadEbas</span><span class="p">,</span>
-                 <span class="n">ReadGAW</span><span class="p">,</span>
-                 <span class="n">ReadAasEtal</span><span class="p">,</span>
-                 <span class="n">ReadGhost</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Factory class for reading of ungridded data based on obsnetwork ID</span>
 
-    <span class="c1"># when this file exists, an existing cache file is not read</span>
-    <span class="n">_DONOTCACHEFILE</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">):</span>
-        <span class="n">_DONOTCACHEFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">_cachedir</span><span class="p">,</span> <span class="s1">&#39;DONOTCACHE&#39;</span><span class="p">)</span>
+<span class="sd">    This class also features reading functionality that goes beyond reading</span>
+<span class="sd">    of inidividual observation datasets; including, reading of multiple</span>
+<span class="sd">    datasets and post computation of new variables based on datasets that can</span>
+<span class="sd">    be read.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SUPPORTED_READERS</span> <span class="o">=</span> <span class="p">[</span><span class="n">ReadAeronetInvV3</span><span class="p">,</span>
+                         <span class="n">ReadAeronetInvV2</span><span class="p">,</span>
+                         <span class="n">ReadAeronetSdaV2</span><span class="p">,</span>
+                         <span class="n">ReadAeronetSdaV3</span><span class="p">,</span>
+                         <span class="n">ReadAeronetSunV2</span><span class="p">,</span>
+                         <span class="n">ReadAeronetSunV3</span><span class="p">,</span>
+                         <span class="n">ReadEarlinet</span><span class="p">,</span>
+                         <span class="n">ReadEbas</span><span class="p">,</span>
+                         <span class="n">ReadGAW</span><span class="p">,</span>
+                         <span class="n">ReadAasEtal</span><span class="p">,</span>
+                         <span class="n">ReadGhost</span><span class="p">]</span>
+    <span class="n">DONOTCACHE_NAME</span> <span class="o">=</span> <span class="s1">&#39;DONOTCACHE&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">ignore_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">datasets_to_read</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">datasets_to_read</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">AERONET_SUN_V3L2_AOD_DAILY_NAME</span>
         <span class="c1">#will be assigned in setter method of dataset_to_read</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_datasets_to_read</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vars_to_retrieve</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="c1">#: dictionary containing reading classes for each dataset to read (will</span>
         <span class="c1">#: be filled in setter of datasets_to_read)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">datasets_to_read</span> <span class="o">=</span> <span class="n">datasets_to_read</span>
+        <span class="k">if</span> <span class="n">datasets_to_read</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets_to_read</span> <span class="o">=</span> <span class="n">datasets_to_read</span>
 
-        <span class="c1"># optional: list of variables that are supposed to be imported, if</span>
-        <span class="c1"># None, all variables provided by the corresponding network are loaded</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">vars_to_retrieve</span>
+        <span class="k">if</span> <span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">vars_to_retrieve</span>
 
         <span class="c1"># initiate a logger for this class</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">data_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span>
+
+        <span class="k">if</span> <span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">vars_to_retrieve</span>
+
         <span class="k">if</span> <span class="n">ignore_cache</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Deactivating caching&#39;</span><span class="p">)</span>
             <span class="n">const</span><span class="o">.</span><span class="n">CACHING</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Data directory(ies) for dataset(s) to read&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span>
+
+    <span class="nd">@data_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">dsr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets_to_read</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dsr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="p">{</span><span class="n">dsr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">val</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input data_dir (</span><span class="si">{}</span><span class="s1">); needs to be a &#39;</span>
+                             <span class="s1">&#39;dictionary for each dataset that is supposed to &#39;</span>
+                             <span class="s1">&#39;be read (</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">dsr</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">ds</span><span class="p">,</span> <span class="n">data_dir</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vars_to_retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Variables to retrieve (list or dict)</span>
+
+<span class="sd">        Dictionary can be used in case different variables from multiple</span>
+<span class="sd">        datasets are supposed to be read.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_to_retrieve</span>
+
+    <span class="nd">@vars_to_retrieve</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vars_to_retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for vars_to_retrieve (</span><span class="si">{}</span><span class="s1">). &#39;</span>
+                             <span class="s1">&#39;Need either str, list or dict&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vars_to_retrieve</span> <span class="o">=</span> <span class="n">val</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">DATASET_PATH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -268,9 +316,26 @@
                              <span class="s1">&#39;single dataset retrievals&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_datasets_to_read</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">DATASET_PATH</span>
 
+    <span class="k">def</span> <span class="nf">_check_donotcachefile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if donotcache file exists</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if file exists, else False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">cache_basedir</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">DONOTCACHE_NAME</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ignore_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DONOTCACHEFILE</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">const</span><span class="o">.</span><span class="n">CACHING</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Boolean specifying whether caching is active or not&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_donotcachefile</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">const</span><span class="o">.</span><span class="n">CACHING</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
 
@@ -311,14 +376,17 @@
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Invalid input for parameter datasets_to_read&#39;</span><span class="p">)</span>
         <span class="n">avail</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">find_read_class</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_UNGRIDDED_POST</span><span class="p">:</span> <span class="c1"># no reader available</span>
                 <span class="n">avail</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">NetworkNotSupported</span><span class="p">:</span>
-                <span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Removing </span><span class="si">{}</span><span class="s1"> from list of datasets to read &#39;</span>
-                                  <span class="s1">&#39;in ReadUngridded class. Reason: network &#39;</span>
-                                  <span class="s1">&#39;not supported or data is not available&#39;</span>
-                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">find_read_class</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+                    <span class="n">avail</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">NetworkNotSupported</span><span class="p">:</span>
+                    <span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Removing </span><span class="si">{}</span><span class="s1"> from list of datasets to read &#39;</span>
+                                      <span class="s1">&#39;in ReadUngridded class. Reason: network &#39;</span>
+                                      <span class="s1">&#39;not supported or data is not available&#39;</span>
+                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_datasets_to_read</span> <span class="o">=</span> <span class="n">avail</span>
 
 <div class="viewcode-block" id="ReadUngridded.dataset_provides_variables"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.dataset_provides_variables">[docs]</a>    <span class="k">def</span> <span class="nf">dataset_provides_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -363,9 +431,10 @@
 <div class="viewcode-block" id="ReadUngridded.find_read_class"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.find_read_class">[docs]</a>    <span class="k">def</span> <span class="nf">find_read_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find reading class for dataset name</span>
 
-<span class="sd">        Loops over all reading classes available in :attr:`SUPPORTED` and finds</span>
-<span class="sd">        the first one that matches the input dataset name, by checking the</span>
-<span class="sd">        attribute :attr:`SUPPORTED_DATASETS` in each respective reading class</span>
+<span class="sd">        Loops over all reading classes available in :attr:`SUPPORTED_READERS`</span>
+<span class="sd">        and finds the first one that matches the input dataset name, by</span>
+<span class="sd">        checking the attribute :attr:`SUPPORTED_DATASETS` in each respective</span>
+<span class="sd">        reading class.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -388,27 +457,71 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#         if not dataset_to_read in const.OBS_IDS_UNGRIDDED:</span>
-<span class="c1">#             raise NetworkNotSupported(&quot;Network {} is not supported or data is &quot;</span>
-<span class="c1">#                                       &quot;not available on this machine&quot;</span>
-<span class="c1">#                                       .format(dataset_to_read))</span>
-<span class="c1"># =============================================================================</span>
-        <span class="k">for</span> <span class="n">_cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">_cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_READERS</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="n">_cls</span><span class="o">.</span><span class="n">SUPPORTED_DATASETS</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cls</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cls</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DataRetrievalError</span><span class="p">(</span><span class="s1">&#39;Failed to instantiate reader for &#39;</span>
+                                             <span class="s1">&#39;dataset </span><span class="si">{}</span><span class="s1">. Reason: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readers</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span>
-        <span class="k">raise</span> <span class="n">NetworkNotImplemented</span><span class="p">(</span><span class="s2">&quot;No reading class available yet for dataset &quot;</span>
-                                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">))</span></div>
+        <span class="k">raise</span> <span class="n">NetworkNotImplemented</span><span class="p">(</span><span class="s1">&#39;Could not find reading class for dataset &#39;</span>
+                                    <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper to retrieve data directory for a given dataset (if available)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset_to_read : str</span>
+<span class="sd">            ID of dataset to be imported</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str or None</span>
+<span class="sd">            directory path if a data directory is specified, else None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">data_dir</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="n">data_dir</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data_dir</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_get_vars_to_retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper to retrieve variables to be read for a given dataset</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset_to_read : str</span>
+<span class="sd">            ID of dataset to be imported</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        DataRetrievalError</span>
+<span class="sd">            if :attr:`vars_to_retrieve` is a dictionary (i.e., dataset</span>
+<span class="sd">            specific) and the input data ID is not specified therein.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            list of variable to be retrieved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vtr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vtr</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">vtr</span>
+        <span class="c1">#vars_to_retrieve is a dict (dataset specific)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="n">vtr</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataRetrievalError</span><span class="p">(</span>
+                <span class="s1">&#39;Missing specification of vars_to_retrieve for </span><span class="si">{}</span><span class="s1">&#39;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">vtr</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span>
 
 <div class="viewcode-block" id="ReadUngridded.read_dataset"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.read_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read dataset into an instance of :class:`ReadUngridded`</span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-<span class="sd">        This method does not assign loaded data obj to class attribute</span>
-<span class="sd">        :attr:`data` (only :func:`read` does)</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -420,6 +533,9 @@
 <span class="sd">            if True, then nothing is reloaded but only data is loaded that is</span>
 <span class="sd">            available as cached objects (not recommended to use but may be</span>
 <span class="sd">            used if working offline without connection to database)</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            additional reading constraints. If any are provided, caching is</span>
+<span class="sd">            deactivated and the data will be read from disk.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
@@ -433,18 +549,32 @@
 
             <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Received additional reading constraints, &#39;</span>
                            <span class="s1">&#39;ignoring caching&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># Note: self.vars_to_retrieve may be None as well, then</span>
-            <span class="c1"># default variables of each network are read</span>
-            <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span>
-        <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">varlist_aerocom</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">)</span>
 
         <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_to_retrieve</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Note: self.vars_to_retrieve may be None as well, then</span>
+            <span class="c1"># default variables of each network are read</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">vars_to_retrieve</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span>
+
+        <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">varlist_aerocom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span><span class="p">)</span>
+
+        <span class="c1"># data_dir will be None in most cases, but can be specified when</span>
+        <span class="c1"># creating the instance, by default, data_dir is inferred automatically</span>
+        <span class="c1"># in the reading class, using database location</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_dir</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                    <span class="s1">&#39;Trying to read </span><span class="si">{}</span><span class="s1"> from specified data_dir </span><span class="si">{}</span><span class="s1"> failed. &#39;</span>
+                    <span class="s1">&#39;Directory does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">_dataset_path</span> <span class="o">=</span> <span class="n">data_dir</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Reading </span><span class="si">{}</span><span class="s1"> from specified data loaction: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">))</span>
 
         <span class="c1"># Since this interface enables to load multiple datasets, each of</span>
         <span class="c1"># which support a number of variables, here, only the variables are</span>
@@ -460,7 +590,7 @@
             <span class="c1"># initate cache handler</span>
             <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_available</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">cache</span><span class="o">.</span><span class="n">check_and_load</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">var</span><span class="p">,</span>
+                    <span class="n">cache</span><span class="o">.</span><span class="n">check_and_load</span><span class="p">(</span><span class="n">var</span><span class="p">,</span>
                                          <span class="n">force_use_outdated</span><span class="o">=</span><span class="n">only_cached</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Fatal: compatibility error between &#39;</span>
@@ -505,6 +635,78 @@
             <span class="n">const</span><span class="o">.</span><span class="n">CACHING</span> <span class="o">=</span> <span class="n">_caching</span>
         <span class="k">return</span> <span class="n">data_out</span></div>
 
+<div class="viewcode-block" id="ReadUngridded.read_dataset_post"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.read_dataset_post">[docs]</a>    <span class="k">def</span> <span class="nf">read_dataset_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="p">,</span>
+                          <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read dataset into an instance of :class:`ReadUngridded`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset_to_read : str</span>
+<span class="sd">            name of dataset</span>
+<span class="sd">        vars_to_retrieve : list</span>
+<span class="sd">            variable or list of variables to be imported</span>
+<span class="sd">        only_cached : bool</span>
+<span class="sd">            if True, then nothing is reloaded but only data is loaded that is</span>
+<span class="sd">            available as cached objects (not recommended to use but may be</span>
+<span class="sd">            used if working offline without connection to database)</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            additional reading constraints. If any are provided, caching is</span>
+<span class="sd">            deactivated and the data will be read from disk.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        UngriddedData</span>
+<span class="sd">            data object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">aux_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_compute</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span><span class="p">:</span>
+            <span class="n">input_data_ids_vars</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">aux_info_var</span> <span class="o">=</span> <span class="n">aux_info</span><span class="p">[</span><span class="s1">&#39;aux_requires&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">aux_id</span><span class="p">,</span> <span class="n">aux_vars</span> <span class="ow">in</span> <span class="n">aux_info_var</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">aux_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_compute</span><span class="p">:</span>
+                    <span class="n">aux_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataset_post</span><span class="p">(</span>
+                                    <span class="n">dataset_to_read</span><span class="o">=</span><span class="n">aux_id</span><span class="p">,</span>
+                                    <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">aux_vars</span><span class="p">,</span>
+                                    <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">aux_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataset</span><span class="p">(</span><span class="n">aux_id</span><span class="p">,</span>
+                                                 <span class="n">aux_vars</span><span class="p">,</span>
+                                                 <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
+                                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">aux_var</span> <span class="ow">in</span> <span class="n">aux_vars</span><span class="p">:</span>
+                    <span class="n">input_data_ids_vars</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">aux_data</span><span class="p">,</span> <span class="n">aux_id</span><span class="p">,</span> <span class="n">aux_var</span><span class="p">))</span>
+
+            <span class="n">aux_merge_how</span> <span class="o">=</span> <span class="n">aux_info</span><span class="p">[</span><span class="s1">&#39;aux_merge_how&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">aux_info</span><span class="p">[</span><span class="s1">&#39;aux_units&#39;</span><span class="p">]:</span>
+                <span class="n">var_unit_out</span> <span class="o">=</span> <span class="n">aux_info</span><span class="p">[</span><span class="s1">&#39;aux_units&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">var_unit_out</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">aux_merge_how</span> <span class="o">==</span> <span class="s1">&#39;eval&#39;</span><span class="p">:</span>
+                <span class="c1"># function MUST be defined</span>
+                <span class="n">aux_fun</span> <span class="o">=</span> <span class="n">aux_info</span><span class="p">[</span><span class="s1">&#39;aux_funs&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">aux_fun</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">merged_stats</span> <span class="o">=</span> <span class="n">combine_vardata_ungridded</span><span class="p">(</span>
+                <span class="n">data_ids_and_vars</span><span class="o">=</span><span class="n">input_data_ids_vars</span><span class="p">,</span>
+                <span class="n">merge_eval_fun</span><span class="o">=</span><span class="n">aux_fun</span><span class="p">,</span>
+                <span class="n">merge_how</span><span class="o">=</span><span class="n">aux_merge_how</span><span class="p">,</span>
+                <span class="n">var_name_out</span><span class="o">=</span><span class="n">var</span><span class="p">,</span>
+                <span class="n">var_unit_out</span><span class="o">=</span><span class="n">var_unit_out</span><span class="p">,</span>
+                <span class="n">data_id_out</span><span class="o">=</span><span class="n">aux_info</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">])</span>
+            <span class="n">loaded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">UngriddedData</span><span class="o">.</span><span class="n">from_station_data</span><span class="p">(</span><span class="n">merged_stats</span><span class="p">))</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">loaded</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loaded</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">first</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">loaded</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">first</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">first</span></div>
+
 <div class="viewcode-block" id="ReadUngridded.read"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read observations</span>
@@ -540,152 +742,100 @@
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">UngriddedData</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets_to_read</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Reading </span><span class="si">{}</span><span class="s1"> data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="p">,</span>
+            <span class="n">read_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_vars_to_retrieve</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Reading </span><span class="si">{}</span><span class="s1"> data, variables: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">read_vars</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_compute</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_dataset_post</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">read_vars</span><span class="p">,</span>
+                                                   <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
+                                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">read_vars</span><span class="p">,</span>
                                               <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
                                               <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-            <span class="k">except</span> <span class="n">DataRetrievalError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">print_log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Failed to read </span><span class="si">{}</span><span class="s1">. Reason: </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Successfully imported </span><span class="si">{}</span><span class="s1"> data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">data</span></div>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">post_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Information about datasets that can be computed in post&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">OBS_UNGRIDDED_POST</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">SUPPORTED_DATASETS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns list of strings containing all supported dataset names&quot;&quot;&quot;</span>
-        <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED</span><span class="p">:</span>
-            <span class="n">l</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">SUPPORTED_DATASETS</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">l</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns list of strings containing all supported dataset names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">reader</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_READERS</span><span class="p">:</span>
+            <span class="n">lst</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">SUPPORTED_DATASETS</span><span class="p">)</span>
+        <span class="n">lst</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_compute</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lst</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">supported_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrapper for :attr:`SUPPORTED_DATASETS`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_DATASETS</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1">#raise NotImplementedError(&quot;Requires review after API changes&quot;)</span>
-        <span class="n">s</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
-        <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets_to_read</span><span class="p">:</span>
-            <span class="n">s</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">s</span>
-
-    <span class="c1"># OUTSOURCED</span>
-<div class="viewcode-block" id="ReadUngridded.read_datasetOLD"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.read_datasetOLD">[docs]</a>    <span class="k">def</span> <span class="nf">read_datasetOLD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Read single dataset into instance of :class:`ReadUngridded`</span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-<span class="sd">        This method does not write class attribute :attr:`data` (only</span>
-<span class="sd">        :func:`read` does)</span>
+<div class="viewcode-block" id="ReadUngridded.get_vars_supported"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.get_vars_supported">[docs]</a>    <span class="k">def</span> <span class="nf">get_vars_supported</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_id</span><span class="p">,</span> <span class="n">vars_desired</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter input list of variables by supported ones for a certain data ID</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        dataset_to_read : str</span>
-<span class="sd">            name of dataset</span>
-<span class="sd">        vars_to_retrieve : list</span>
-<span class="sd">            list of variables to be retrieved. If None (default), the default</span>
-<span class="sd">            variables of each reading routine are imported</span>
+<span class="sd">        obs_id : str</span>
+<span class="sd">            ID of observation network</span>
+<span class="sd">        vars_desired : list</span>
+<span class="sd">            List of variables that are desired</span>
 
 <span class="sd">        Returns</span>
-<span class="sd">        --------</span>
-<span class="sd">        UngriddedData</span>
-<span class="sd">            data object</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            list of variables that can be read through the input network</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_caching</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">_caching</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">CACHING</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">CACHING</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">obs_vars</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_desired</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">vars_desired</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_desired</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">obs_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_compute</span><span class="p">:</span>
+            <span class="c1"># check if all required are accessible</span>
+            <span class="n">postinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_compute</span><span class="p">[</span><span class="n">obs_id</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">varlist_aerocom</span><span class="p">(</span><span class="n">vars_desired</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">postinfo</span><span class="p">[</span><span class="s1">&#39;vars_supported&#39;</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="n">requires</span> <span class="o">=</span> <span class="n">postinfo</span><span class="p">[</span><span class="s1">&#39;aux_requires&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
+                <span class="n">all_good</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">ds</span><span class="p">,</span> <span class="n">vars_required</span> <span class="ow">in</span> <span class="n">requires</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_required</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+                        <span class="n">vars_required</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_required</span><span class="p">]</span>
+                    <span class="n">vars_avail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vars_supported</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">vars_required</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">vars_required</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">vars_avail</span><span class="p">):</span>
+                        <span class="n">all_good</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">all_good</span><span class="p">:</span>
+                    <span class="n">obs_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
 
-            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Received additional reading constraints, &#39;</span>
-                           <span class="s1">&#39;ignoring caching&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># Note: self.vars_to_retrieve may be None as well, then</span>
-            <span class="c1"># default variables of each network are read</span>
-            <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars_to_retrieve</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># check if variable can be read from a dataset on disk</span>
+            <span class="n">_oreader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="n">obs_id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">varlist_aerocom</span><span class="p">(</span><span class="n">vars_desired</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">_oreader</span><span class="o">.</span><span class="n">var_supported</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+                    <span class="n">obs_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obs_vars</span></div>
 
-        <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets_to_read</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">s</span></div>
 
-        <span class="k">if</span> <span class="n">vars_to_retrieve</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">vars_to_retrieve</span> <span class="o">=</span> <span class="p">[</span><span class="n">vars_to_retrieve</span><span class="p">]</span>
-
-        <span class="c1"># Since this interface enables to load multiple datasets, each of</span>
-        <span class="c1"># which support a number of variables, here, only the variables are</span>
-        <span class="c1"># considered that are supported by the dataset</span>
-        <span class="n">vars_available</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_to_retrieve</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span>
-                          <span class="n">reader</span><span class="o">.</span><span class="n">PROVIDES_VARIABLES</span><span class="p">]</span>
-
-        <span class="c1"># read the data sets</span>
-        <span class="n">cache_hit_flag</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_cache</span><span class="p">:</span>
-            <span class="c1"># initate cache handler</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">cache</span> <span class="o">=</span> <span class="n">CacheHandlerUngridded</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">vars_available</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">cache</span><span class="o">.</span><span class="n">check_and_load</span><span class="p">():</span>
-                    <span class="n">all_avail</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_available</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">cache</span><span class="o">.</span><span class="n">loaded_data</span><span class="p">:</span>
-                            <span class="n">all_avail</span> <span class="o">=</span> <span class="kc">False</span>
-                            <span class="k">break</span>
-                    <span class="k">if</span> <span class="n">all_avail</span><span class="p">:</span>
-                        <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found Cache match for </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">))</span>
-                        <span class="n">cache_hit_flag</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">data</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">loaded_data</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Fatal: compatibility error between old &#39;</span>
-                                      <span class="s1">&#39;cache file and current version of code &#39;</span><span class="p">)</span>
-                <span class="n">cache_hit_flag</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_hit_flag</span><span class="p">:</span>
-            <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No Cache match found for </span><span class="si">{}</span><span class="s1"> in </span><span class="si">{}</span><span class="s1">. &#39;</span>
-                           <span class="s1">&#39;Reading from files (this &#39;</span>
-                           <span class="s1">&#39;may take a while)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dataset_to_read</span><span class="p">,</span>
-                                                      <span class="n">const</span><span class="o">.</span><span class="n">CACHEDIR</span><span class="p">))</span>
-            <span class="n">_loglevel</span> <span class="o">=</span> <span class="n">print_log</span><span class="o">.</span><span class="n">level</span>
-            <span class="n">print_log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_available</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="n">print_log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_loglevel</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">revision</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">data_revision</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_version</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">__version__</span>
-
-        <span class="c1"># write the cache file</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_hit_flag</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_cache</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">cache</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">_caching</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Failed to write to cache directory:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span>
-                               <span class="s1">&#39;Deactivating caching in pyaerocom&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
-
-        <span class="k">if</span> <span class="n">_caching</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">CACHING</span> <span class="o">=</span> <span class="n">_caching</span>
-        <span class="k">return</span> <span class="n">data</span></div></div>
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 
+
     <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">()</span>
-
-    <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;GHOST.daily&#39;</span><span class="p">,</span> <span class="s1">&#39;concpm10&#39;</span><span class="p">,</span>
-                       <span class="n">only_cached</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     data = reader.read(&#39;EBASMC&#39;,</span>
-<span class="c1">#                        vars_to_retrieve=[&#39;conctc&#39;, &#39;concoa&#39;, &#39;concbc&#39;, &#39;conceqbc&#39;])</span>
-<span class="c1"># =============================================================================</span>
-
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     data = reader.read([const.AERONET_SUN_V2L2_AOD_DAILY_NAME,</span>
-<span class="c1">#                         const.AERONET_SUN_V3L2_AOD_DAILY_NAME],</span>
-<span class="c1">#                     vars_to_retrieve=&#39;od550aer&#39;,</span>
-<span class="c1">#                     last_file=10)</span>
-<span class="c1">#</span>
-<span class="c1"># =============================================================================</span>
 </pre></div>
 
            </div>

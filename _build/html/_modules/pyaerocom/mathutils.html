@@ -21,12 +21,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -760,9 +760,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;sc550dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
-    <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;sc550aer&#39;</span><span class="p">,</span>
+    <span class="n">vals</span><span class="p">,</span> <span class="n">rh_mean</span> <span class="o">=</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;sc550aer&#39;</span><span class="p">,</span>
                                <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scrh&#39;</span><span class="p">,</span>
-                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
+                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;sc550dryaer&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">var_info</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;sc550dryaer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="s1">&#39;sc550dryaer&#39;</span><span class="p">][</span><span class="s1">&#39;rh_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rh_mean</span>
+
+    <span class="k">return</span> <span class="n">vals</span></div>
 
 <div class="viewcode-block" id="compute_sc440dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_sc440dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_sc440dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute dry scattering coefficent applying RH threshold</span>
@@ -783,7 +788,7 @@
     <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;sc440dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
     <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;sc440aer&#39;</span><span class="p">,</span>
                                <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scrh&#39;</span><span class="p">,</span>
-                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
+                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="compute_sc700dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_sc700dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_sc700dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute dry scattering coefficent applying RH threshold</span>
@@ -804,7 +809,7 @@
     <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;sc700dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
     <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;sc700aer&#39;</span><span class="p">,</span>
                                <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;scrh&#39;</span><span class="p">,</span>
-                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
+                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="compute_ac550dryaer"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.compute_ac550dryaer">[docs]</a><span class="k">def</span> <span class="nf">compute_ac550dryaer</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute aerosol dry absorption coefficent applying RH threshold</span>
@@ -824,8 +829,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rh_max</span><span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="s1">&#39;ac550dryaer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dry_rh_max</span>
     <span class="k">return</span> <span class="n">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="o">=</span><span class="s1">&#39;ac550aer&#39;</span><span class="p">,</span>
-                               <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;acrh&#39;</span><span class="p">,</span>
-                               <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)</span></div>
+                                         <span class="n">rh_colname</span><span class="o">=</span><span class="s1">&#39;acrh&#39;</span><span class="p">,</span>
+                                         <span class="n">rh_max_percent</span><span class="o">=</span><span class="n">rh_max</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
 
 <span class="k">def</span> <span class="nf">_compute_dry_helper</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_colname</span><span class="p">,</span> <span class="n">rh_colname</span><span class="p">,</span>
                         <span class="n">rh_max_percent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -862,7 +868,9 @@
     <span class="n">vals</span><span class="p">[</span><span class="n">high_rh</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">vals</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">rh</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-    <span class="k">return</span> <span class="n">vals</span>
+    <span class="n">rh_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">rh</span><span class="p">[</span><span class="o">~</span><span class="n">high_rh</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">vals</span><span class="p">,</span> <span class="n">rh_mean</span>
 
 <div class="viewcode-block" id="vmrx_to_concx"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.vmrx_to_concx">[docs]</a><span class="k">def</span> <span class="nf">vmrx_to_concx</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">p_pascal</span><span class="p">,</span> <span class="n">T_kelvin</span><span class="p">,</span> <span class="n">vmr_unit</span><span class="p">,</span> <span class="n">mmol_var</span><span class="p">,</span> <span class="n">mmol_air</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">to_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

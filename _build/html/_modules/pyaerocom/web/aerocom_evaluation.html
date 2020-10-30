@@ -21,12 +21,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
@@ -162,12 +162,13 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">traceback</span> <span class="kn">import</span> <span class="n">format_exc</span>
 <span class="kn">import</span> <span class="nn">simplejson</span>
 
 <span class="c1"># internal pyaerocom imports</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_dirs_exist</span><span class="p">,</span> <span class="n">dict_to_str</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.region</span> <span class="kn">import</span> <span class="n">Region</span><span class="p">,</span> <span class="n">get_all_default_region_ids</span>
+<span class="c1">#from pyaerocom.region import Region, get_all_default_region_ids</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="kn">import</span> <span class="n">save_dict_json</span>
 
@@ -373,7 +374,7 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">try_load_json</span> <span class="ow">and</span> <span class="n">proj_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span><span class="p">,</span> <span class="n">config_dir</span><span class="p">)</span>
-                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Found and imported config file for </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">&#39;</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Found and imported config file for </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">&#39;</span>
                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">pass</span>
@@ -539,12 +540,12 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="s1">&#39;obs_id&#39;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Obs config for key </span><span class="si">{}</span><span class="s1">  already exists and &#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Obs config for key </span><span class="si">{}</span><span class="s1">  already exists and &#39;</span>
                                    <span class="s1">&#39;will be overwritten </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ObsConfigEval</span><span class="p">(</span><span class="o">**</span><span class="n">val</span><span class="p">)</span>
             <span class="k">elif</span> <span class="s1">&#39;model_id&#39;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Model config for key </span><span class="si">{}</span><span class="s1">  already exists and &#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Model config for key </span><span class="si">{}</span><span class="s1">  already exists and &#39;</span>
                                    <span class="s1">&#39;will be overwritten </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ModelConfigEval</span><span class="p">(</span><span class="o">**</span><span class="n">val</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -682,13 +683,19 @@
         <span class="n">vert_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vert_code</span><span class="p">(</span><span class="n">obs_name</span><span class="p">,</span> <span class="n">coldata</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_groups</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Filtering of grouped regions is not ready yet...&#39;</span><span class="p">)</span>
+
+        <span class="n">col</span> <span class="o">=</span> <span class="n">Colocator</span><span class="p">()</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">colocation_settings</span><span class="p">)</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">])</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_config</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+
         <span class="k">return</span> <span class="n">compute_json_files_from_colocateddata</span><span class="p">(</span>
                 <span class="n">coldata</span><span class="o">=</span><span class="n">coldata</span><span class="p">,</span>
                 <span class="n">obs_name</span><span class="o">=</span><span class="n">obs_name</span><span class="p">,</span>
                 <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
                 <span class="n">use_weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weighted_stats</span><span class="p">,</span>
                 <span class="n">vert_code</span><span class="o">=</span><span class="n">vert_code</span><span class="p">,</span>
-                <span class="n">colocation_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colocation_settings</span><span class="p">,</span>
+                <span class="n">colocation_settings</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
                 <span class="n">out_dirs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dirs</span><span class="p">,</span>
                 <span class="n">regions_json</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regions_file</span><span class="p">,</span>
                 <span class="n">regions_how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regions_how</span><span class="p">)</span></div>
@@ -927,6 +934,7 @@
         <span class="n">obs_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">obs_cfg</span><span class="p">[</span><span class="s1">&#39;obs_vert_type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VERT_SCHEMES</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s1">&#39;vert_scheme&#39;</span> <span class="ow">in</span> <span class="n">obs_cfg</span><span class="p">:</span>
             <span class="n">obs_cfg</span><span class="p">[</span><span class="s1">&#39;vert_scheme&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VERT_SCHEMES</span><span class="p">[</span><span class="n">obs_cfg</span><span class="p">[</span><span class="s1">&#39;obs_vert_type&#39;</span><span class="p">]]</span>
+
         <span class="n">col</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">obs_cfg</span><span class="p">)</span>
         <span class="n">col</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_config</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
 
@@ -1051,8 +1059,9 @@
                 <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">mname</span><span class="p">,</span> <span class="n">search_pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mname</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
                     <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mname</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;No observations could be found that match input </span><span class="si">{}</span><span class="s1">&#39;</span>
-                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name_or_pattern</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;No observations could be found that match input </span><span class="si">{}</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="s1">&#39;Choose from</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span>
+                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name_or_pattern</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
         <span class="k">return</span> <span class="n">matches</span></div>
 
 <div class="viewcode-block" id="AerocomEvaluation.run_evaluation"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.run_evaluation">[docs]</a>    <span class="k">def</span> <span class="nf">run_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1215,7 +1224,9 @@
         <span class="n">col</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">colocation_settings</span><span class="p">)</span>
         <span class="n">col</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_config</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
         <span class="c1">#col.update(**kwargs)</span>
+
         <span class="n">data</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">read_model_data</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="AerocomEvaluation.read_ungridded_obsdata"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.read_ungridded_obsdata">[docs]</a>    <span class="k">def</span> <span class="nf">read_ungridded_obsdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">vars_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1307,7 +1318,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">make_info_table_web</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_heatmap_json</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span> <span class="c1"># if no data is available for this experiment</span>
-            <span class="k">pass</span></div>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_dir</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AerocomEvaluation.update_menu"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.update_menu">[docs]</a>    <span class="k">def</span> <span class="nf">update_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates menu.json based on existing map json files&quot;&quot;&quot;</span>
@@ -1375,13 +1387,16 @@
              <span class="n">vert_code</span><span class="p">,</span>
              <span class="n">mod_name</span><span class="p">,</span> <span class="n">mod_var</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info_from_map_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
             <span class="n">remove</span><span class="o">=</span><span class="kc">False</span>
-            <span class="n">obs_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_obs_vars</span><span class="p">(</span><span class="n">obs_name</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">obs_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span> <span class="ow">and</span>
-                    <span class="n">mod_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span> <span class="ow">and</span>
-                    <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">:</span>
+                <span class="c1"># Obs dataset was removed</span>
                 <span class="n">remove</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">mod_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">mod_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">:</span>
+                <span class="c1"># Model dataset was removed</span>
+                <span class="n">remove</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_obs_vars</span><span class="p">(</span><span class="n">obs_name</span><span class="p">):</span>
+                <span class="n">remove</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">mcfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">[</span><span class="n">mod_name</span><span class="p">]</span>
                 <span class="k">if</span> <span class="s1">&#39;model_use_vars&#39;</span> <span class="ow">in</span> <span class="n">mcfg</span> <span class="ow">and</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">mcfg</span><span class="p">[</span><span class="s1">&#39;model_use_vars&#39;</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">mod_var</span> <span class="o">==</span> <span class="n">mcfg</span><span class="p">[</span><span class="s1">&#39;model_use_vars&#39;</span><span class="p">][</span><span class="n">obs_var</span><span class="p">]:</span>
@@ -1460,13 +1475,44 @@
                 <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">return</span> <span class="n">d</span></div>
 
-<div class="viewcode-block" id="AerocomEvaluation.to_json"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert configuration to json ini file&quot;&quot;&quot;</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-        <span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;cfg_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.json&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name_config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        File name of config file (without file ending specification)</span>
 
-        <span class="n">save_dict_json</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">out_name</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">d</span></div>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            name of config file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;cfg_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name_config_file_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        File name of config file (with json ending)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            name of config file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.json&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name_config_file</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AerocomEvaluation.to_json"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert analysis configuration to json file and save</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_dir : str</span>
+<span class="sd">            directory where the config json file is supposed to be stored</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="n">out_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_config_file_json</span>
+
+        <span class="n">save_dict_json</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">out_name</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="AerocomEvaluation.load_config"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proj_id</span><span class="p">,</span> <span class="n">exp_id</span><span class="p">,</span> <span class="n">config_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load configuration json file&quot;&quot;&quot;</span>

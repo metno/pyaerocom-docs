@@ -21,12 +21,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -345,8 +345,8 @@
     <span class="k">if</span> <span class="n">filter_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">filter_name</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">DEFAULT_REG_FILTER</span>
 
-    <span class="k">if</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">has_unit</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">harmonise_units</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">harmonise_units</span> <span class="ow">and</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">has_unit</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">convert_unit</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -476,13 +476,6 @@
             <span class="s1">&#39;min_num_obs&#39;</span>       <span class="p">:</span>   <span class="n">min_num_obs</span><span class="p">}</span>
 
     <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">regfilter</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#     if remove_outliers:</span>
-<span class="c1">#         if not var_keep_outliers:</span>
-<span class="c1">#             gridded_data.remove_outliers(low, high)</span>
-<span class="c1">#         if not var_ref_keep_outliers:</span>
-<span class="c1">#             gridded_data_ref.remove_outliers(low_ref, high_ref)</span>
-<span class="c1"># =============================================================================</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">data</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">):</span>
@@ -511,6 +504,13 @@
     <span class="n">data</span> <span class="o">=</span> <span class="n">ColocatedData</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span>
                          <span class="n">name</span><span class="o">=</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
 
+    <span class="c1"># add correct units for lat / lon dimensions</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;standard_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">standard_name</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
+    <span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;standard_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">standard_name</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">grid_ts_type</span> <span class="o">!=</span> <span class="n">ts_type</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="n">to_ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
                                   <span class="n">colocate_time</span><span class="o">=</span><span class="n">colocate_time</span><span class="p">,</span>
@@ -519,6 +519,79 @@
                                   <span class="n">how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span>
                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
+
+<span class="k">def</span> <span class="nf">_colocate_site_data_helper</span><span class="p">(</span><span class="n">stat_data</span><span class="p">,</span> <span class="n">stat_data_ref</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">var_ref</span><span class="p">,</span>
+                               <span class="n">ts_type</span><span class="p">,</span> <span class="n">resample_how</span><span class="p">,</span>
+                               <span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
+                               <span class="n">min_num_obs</span><span class="p">,</span>
+                               <span class="n">use_climatology_ref</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper method that colocates two timeseries from 2 StationData objects</span>
+
+<span class="sd">    Used in main loop of :func:`colocate_gridded_ungridded`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stat_data : StationData</span>
+<span class="sd">        first data object (usually the one that is to be compared with obs)</span>
+<span class="sd">    stat_data_ref : StationData</span>
+<span class="sd">        second data object (usually obs)</span>
+<span class="sd">    var : str</span>
+<span class="sd">        variable to be used from `stat_data`</span>
+<span class="sd">    var_ref : str</span>
+<span class="sd">        variable to be used from `stat_data_ref`</span>
+<span class="sd">    ts_type : str</span>
+<span class="sd">        output frequency</span>
+<span class="sd">    resample_how : str or dict</span>
+<span class="sd">        string specifying how data should be aggregated when resampling in time.</span>
+<span class="sd">        Default is &quot;mean&quot;. Can also be a nested dictionary, e.g.</span>
+<span class="sd">        resample_how={&#39;daily&#39;: {&#39;hourly&#39; : &#39;max&#39;}} would use the maximum value</span>
+<span class="sd">        to aggregate from hourly to daily, rather than the mean.</span>
+<span class="sd">    apply_time_resampling_constraints : bool, optional</span>
+<span class="sd">        if True, then time resampling constraints are applied as provided via</span>
+<span class="sd">        :attr:`min_num_obs` or if that one is unspecified, as defined in</span>
+<span class="sd">        :attr:`pyaerocom.const.OBS_MIN_NUM_RESAMPLE`. If None, than</span>
+<span class="sd">        :attr:`pyaerocom.const.OBS_APPLY_TIME_RESAMPLE_CONSTRAINTS` is used</span>
+<span class="sd">        (which defaults to True !!).</span>
+<span class="sd">    min_num_obs : int or dict, optional</span>
+<span class="sd">        minimum number of observations for resampling of time</span>
+<span class="sd">    use_climatology_ref : bool</span>
+<span class="sd">        if True, climatological timeseries are used from observations</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        dataframe containing the colocated input data (column names are</span>
+<span class="sd">        data and ref)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get grid and obs timeseries data (that may be sampled in arbitrary</span>
+    <span class="c1"># time resolution, particularly the obs data)</span>
+    <span class="n">grid_ts2</span> <span class="o">=</span> <span class="n">stat_data</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span>
+                <span class="n">var</span><span class="p">,</span>
+                <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
+                <span class="n">how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span>
+                <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
+                <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
+                <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="n">var</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">use_climatology_ref</span><span class="p">:</span>
+        <span class="n">obs_ts2</span> <span class="o">=</span> <span class="n">stat_data_ref</span><span class="o">.</span><span class="n">calc_climatology</span><span class="p">(</span>
+                <span class="n">var_ref</span><span class="p">,</span>
+                <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
+                <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">)[</span><span class="n">var_ref</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">obs_ts2</span> <span class="o">=</span> <span class="n">stat_data_ref</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span>
+                    <span class="n">var_ref</span><span class="p">,</span>
+                    <span class="n">ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
+                    <span class="n">how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span>
+                    <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
+                    <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
+                    <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="n">var_ref</span><span class="p">]</span>
+
+    <span class="c1"># fill up missing time stamps</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">obs_ts2</span><span class="p">,</span> <span class="n">grid_ts2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="colocate_gridded_ungridded"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation.colocate_gridded_ungridded">[docs]</a><span class="k">def</span> <span class="nf">colocate_gridded_ungridded</span><span class="p">(</span><span class="n">gridded_data</span><span class="p">,</span> <span class="n">ungridded_data</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filter_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -631,7 +704,7 @@
 <span class="sd">        if True, then no outliers will be removed from the reference dataset,</span>
 <span class="sd">        even if `remove_outliers` is True.</span>
 <span class="sd">    use_climatology_ref : bool</span>
-<span class="sd">        if true, climatological timeseries are used from observations</span>
+<span class="sd">        if True, climatological timeseries are used from observations</span>
 <span class="sd">    resample_how : str or dict</span>
 <span class="sd">        string specifying how data should be aggregated when resampling in time.</span>
 <span class="sd">        Default is &quot;mean&quot;. Can also be a nested dictionary, e.g.</span>
@@ -758,7 +831,7 @@
         <span class="n">gridded_data</span> <span class="o">=</span> <span class="n">_regrid_gridded</span><span class="p">(</span><span class="n">gridded_data</span><span class="p">,</span> <span class="n">regrid_scheme</span><span class="p">,</span>
                                        <span class="n">regrid_res_deg</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">remove_outliers</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">var_ref_keep_outliers</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">remove_outliers</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">var_ref_keep_outliers</span><span class="p">:</span> <span class="c1">#called twice if used via Colocator, this should go out here</span>
         <span class="n">ungridded_data</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">var_ref</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                        <span class="n">low</span><span class="o">=</span><span class="n">low_ref</span><span class="p">,</span>
                                        <span class="n">high</span><span class="o">=</span><span class="n">high_ref</span><span class="p">)</span>
@@ -777,18 +850,19 @@
     <span class="n">longitude</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">points</span>
     <span class="n">lat_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">latitude</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">latitude</span><span class="p">)]</span>
     <span class="n">lon_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">longitude</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">longitude</span><span class="p">)]</span>
-    <span class="n">ungridded_data</span> <span class="o">=</span> <span class="n">ungridded_data</span><span class="o">.</span><span class="n">filter_by_meta</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat_range</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">lon_range</span><span class="p">)</span>
+    <span class="n">ungridded_data</span> <span class="o">=</span> <span class="n">ungridded_data</span><span class="o">.</span><span class="n">filter_by_meta</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat_range</span><span class="p">,</span>
+                                                   <span class="n">longitude</span><span class="o">=</span><span class="n">lon_range</span><span class="p">)</span>
 
     <span class="c1"># get timeseries from all stations in provided time resolution</span>
     <span class="c1"># (time resampling is done below in main loop)</span>
     <span class="n">all_stats</span> <span class="o">=</span> <span class="n">ungridded_data</span><span class="o">.</span><span class="n">to_station_data_all</span><span class="p">(</span>
-
             <span class="n">vars_to_convert</span><span class="o">=</span><span class="n">var_ref</span><span class="p">,</span>
             <span class="n">start</span><span class="o">=</span><span class="n">obs_start</span><span class="p">,</span>
             <span class="n">stop</span><span class="o">=</span><span class="n">obs_stop</span><span class="p">,</span>
             <span class="n">by_station_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">ignore_index</span><span class="o">=</span><span class="n">ignore_station_names</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
 
     <span class="n">obs_stat_data</span> <span class="o">=</span> <span class="n">all_stats</span><span class="p">[</span><span class="s1">&#39;stats&#39;</span><span class="p">]</span>
     <span class="n">ungridded_lons</span> <span class="o">=</span> <span class="n">all_stats</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
@@ -828,6 +902,9 @@
 
     <span class="c1"># loop over all stations and append to colocated data object</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">obs_stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">obs_stat_data</span><span class="p">):</span>
+        <span class="c1"># ToDo: consider removing to keep ts_type_src_ref (this was probably</span>
+        <span class="c1"># introduced for EBAS were the original data frequency is not constant</span>
+        <span class="c1"># but can vary from site to site)</span>
         <span class="k">if</span> <span class="n">ts_type_src_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ts_type_src_ref</span> <span class="o">=</span> <span class="n">obs_stat</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">obs_stat</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ts_type_src_ref</span><span class="p">:</span>
@@ -853,7 +930,7 @@
         <span class="c1"># need to be updated, for details (or if errors occur), cf.</span>
         <span class="c1"># UngriddedData.to_station_data, where the conversion happens)</span>
 
-        <span class="c1"># get model data corresponding to station</span>
+        <span class="c1"># get model station data</span>
         <span class="n">grid_stat</span> <span class="o">=</span> <span class="n">grid_stat_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">harmonise_units</span><span class="p">:</span>
             <span class="n">grid_unit</span> <span class="o">=</span> <span class="n">grid_stat</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
@@ -875,36 +952,20 @@
             <span class="n">grid_stat</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span><span class="p">,</span>
                                       <span class="n">check_unit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="c1"># get grid and obs timeseries data (that may be sampled in arbitrary</span>
-        <span class="c1"># time resolution, particularly the obs data)</span>
-        <span class="n">grid_ts2</span> <span class="o">=</span> <span class="n">grid_stat</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span>
-                    <span class="n">var</span><span class="p">,</span>
-                    <span class="n">ts_type</span><span class="o">=</span><span class="n">col_freq</span><span class="p">,</span>
-                    <span class="n">how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span>
-                    <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
-                    <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
-                    <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="n">var</span><span class="p">]</span>
+        <span class="n">_df</span> <span class="o">=</span> <span class="n">_colocate_site_data_helper</span><span class="p">(</span>
 
-        <span class="k">if</span> <span class="n">use_climatology_ref</span><span class="p">:</span>
-            <span class="n">obs_ts2</span> <span class="o">=</span> <span class="n">obs_stat</span><span class="o">.</span><span class="n">calc_climatology</span><span class="p">(</span>
-                    <span class="n">var_ref</span><span class="p">,</span>
-                    <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
-                    <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">)[</span><span class="n">var_ref</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">obs_ts2</span> <span class="o">=</span> <span class="n">obs_stat</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span>
-                        <span class="n">var_ref</span><span class="p">,</span>
-                        <span class="n">ts_type</span><span class="o">=</span><span class="n">col_freq</span><span class="p">,</span>
-                        <span class="n">how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span>
-                        <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
-                        <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
-                        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="n">var_ref</span><span class="p">]</span>
-
-        <span class="c1"># fill up missing time stamps</span>
-        <span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">obs_ts2</span><span class="p">,</span> <span class="n">grid_ts2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">])</span>
+            <span class="n">stat_data</span><span class="o">=</span><span class="n">grid_stat</span><span class="p">,</span>
+            <span class="n">stat_data_ref</span><span class="o">=</span><span class="n">obs_stat</span><span class="p">,</span>
+            <span class="n">var</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">var_ref</span><span class="o">=</span><span class="n">var_ref</span><span class="p">,</span>
+            <span class="n">ts_type</span><span class="o">=</span><span class="n">col_freq</span><span class="p">,</span>
+            <span class="n">resample_how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span>
+            <span class="n">apply_time_resampling_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
+            <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
+            <span class="n">use_climatology_ref</span><span class="o">=</span><span class="n">use_climatology_ref</span><span class="p">)</span>
 
         <span class="c1"># assign the unified timeseries data to the colocated data array</span>
-        <span class="n">coldata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">coldata</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">coldata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="s1">&#39;ref&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">coldata</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
         <span class="n">lons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
         <span class="n">lats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
@@ -964,6 +1025,13 @@
     <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;data_source&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;station_name&#39;</span><span class="p">]</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">ColocatedData</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">coldata</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">,</span>
                          <span class="n">attrs</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
+
+    <span class="c1"># add correct units for lat / lon dimensions</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;standard_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">standard_name</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
+    <span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;standard_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">standard_name</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">col_freq</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ts_type</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="n">to_ts_type</span><span class="o">=</span><span class="n">ts_type</span><span class="p">,</span>
@@ -1085,38 +1153,12 @@
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
-    <span class="c1">#obsdata = pya.io.ReadGhost(&#39;GHOST.hourly&#39;).read(&#39;concpm25&#39;)</span>
-    <span class="n">obsdata</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;GHOST.hourly&#39;</span><span class="p">,</span> <span class="s1">&#39;conco3&#39;</span><span class="p">,</span>
-                                          <span class="n">only_cached</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">obsdata</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;EBASMC&#39;</span><span class="p">,</span> <span class="s1">&#39;ac550aer&#39;</span><span class="p">)</span>
 
-    <span class="n">obsdata</span><span class="o">.</span><span class="n">check_set_country</span><span class="p">()</span>
+    <span class="c1"># update unit to wrong unit</span>
+    <span class="n">obsdata</span><span class="o">.</span><span class="n">check_convert_var_units</span><span class="p">(</span><span class="s1">&#39;ac550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;m-1&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">obsdata</span> <span class="o">=</span> <span class="n">obsdata</span><span class="o">.</span><span class="n">filter_region</span><span class="p">(</span><span class="s1">&#39;Norway&#39;</span><span class="p">,</span> <span class="n">check_country_meta</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">model_id</span><span class="o">=</span><span class="s1">&#39;ENSEMBLE.cams61.day1&#39;</span>
-
-    <span class="n">mr</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
-    <span class="n">modeldata</span> <span class="o">=</span> <span class="n">mr</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;conco3&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2018</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="s1">&#39;Surface&#39;</span><span class="p">)</span>
-
-    <span class="c1">#modeldata.resample_time(&#39;yearly&#39;).quickplot_map()</span>
-
-    <span class="c1">#obsdata = pya.io.ReadUngridded().read(obs_id, &#39;concso4&#39;).set_flags_nan()</span>
-
-    <span class="n">rsh</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;daily&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hourly&#39;</span><span class="p">:</span> <span class="s1">&#39;max&#39;</span><span class="p">}}</span>
-
-    <span class="n">coldata_max</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">colocation</span><span class="o">.</span><span class="n">colocate_gridded_ungridded</span><span class="p">(</span><span class="n">modeldata</span><span class="p">,</span> <span class="n">obsdata</span><span class="p">,</span>
-                                                         <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
-                                                         <span class="n">var_ref</span><span class="o">=</span><span class="s1">&#39;conco3&#39;</span><span class="p">,</span>
-                                                         <span class="n">resample_how</span><span class="o">=</span><span class="n">rsh</span><span class="p">)</span>
-
-    <span class="n">coldata_mean</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">colocation</span><span class="o">.</span><span class="n">colocate_gridded_ungridded</span><span class="p">(</span><span class="n">modeldata</span><span class="p">,</span> <span class="n">obsdata</span><span class="p">,</span>
-                                                         <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
-                                                         <span class="n">var_ref</span><span class="o">=</span><span class="s1">&#39;conco3&#39;</span><span class="p">)</span>
-
-    <span class="n">pya</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">plot_nmb_map_colocateddata</span><span class="p">(</span><span class="n">coldata_max</span><span class="p">)</span>
-    <span class="n">pya</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">plot_nmb_map_colocateddata</span><span class="p">(</span><span class="n">coldata_mean</span><span class="p">)</span>
-    <span class="c1">#scoldata2.plot_scatter()</span>
-
-
+    <span class="n">obsdata</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="s1">&#39;ac550aer&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
            </div>

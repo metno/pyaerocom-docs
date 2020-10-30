@@ -21,12 +21,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
@@ -173,14 +173,15 @@
                                   <span class="n">UnitConversionError</span><span class="p">,</span> <span class="n">DataUnitError</span><span class="p">,</span>
                                   <span class="n">TemporalResolutionError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">dict_to_str</span><span class="p">,</span> <span class="n">list_to_shortstr</span><span class="p">,</span>
-                                         <span class="n">BrowseDict</span><span class="p">)</span>
+                                         <span class="n">BrowseDict</span><span class="p">,</span> <span class="n">merge_dicts</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="kn">import</span> <span class="n">StationMetaData</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.vertical_profile</span> <span class="kn">import</span> <span class="n">VerticalProfile</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.time_resampler</span> <span class="kn">import</span> <span class="n">TimeResampler</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.trends_engine</span> <span class="kn">import</span> <span class="n">TrendsEngine</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.trends_helpers</span> <span class="kn">import</span> <span class="n">_make_mobs_dataframe</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">isnumeric</span><span class="p">,</span> <span class="n">isrange</span><span class="p">,</span> <span class="n">calc_climatology</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">isnumeric</span><span class="p">,</span> <span class="n">isrange</span><span class="p">,</span> <span class="n">calc_climatology</span><span class="p">,</span>
+                               <span class="n">to_datetime64</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">convert_unit</span><span class="p">,</span> <span class="n">unit_conversion_fac</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.time_config</span> <span class="kn">import</span> <span class="n">PANDAS_FREQ_TO_TS_TYPE</span>
@@ -534,33 +535,14 @@
         <span class="k">if</span> <span class="n">_check_var</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;This feature does currently not work &#39;</span>
                                       <span class="s1">&#39;due to recent API changes&#39;</span><span class="p">)</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#             logger.debug(&quot;Performing quality check for coordinates&quot;)</span>
-<span class="c1">#             lat, dlat, dlon, dalt = (vals[&#39;latitude&#39;],</span>
-<span class="c1">#                                      stds[&#39;latitude&#39;],</span>
-<span class="c1">#                                      stds[&#39;longitude&#39;],</span>
-<span class="c1">#                                      stds[&#39;altitude&#39;])</span>
-<span class="c1">#             lat_len = 111e3 #approximate length of latitude degree in m</span>
-<span class="c1">#             if self.COORD_MAX_VAR[&#39;latitude&#39;] &lt; lat_len * dlat:</span>
-<span class="c1">#                 raise CoordinateError(&quot;Variation in station latitude is &quot;</span>
-<span class="c1">#                                       &quot;exceeding upper limit of {} m&quot;.format(</span>
-<span class="c1">#                                       self.COORD_MAX_VAR[&#39;latitude&#39;]))</span>
-<span class="c1">#             elif self.COORD_MAX_VAR[&#39;longitude&#39;] &lt; (lat_len *</span>
-<span class="c1">#                                                     np.cos(np.deg2rad(lat)) *</span>
-<span class="c1">#                                                     dlon):</span>
-<span class="c1">#                 raise CoordinateError(&quot;Variation in station longitude is &quot;</span>
-<span class="c1">#                                       &quot;exceeding upper limit of {} m&quot;.format(</span>
-<span class="c1">#                                       self.COORD_MAX_VAR[&#39;latitude&#39;]))</span>
-<span class="c1">#             elif self.COORD_MAX_VAR[&#39;altitude&#39;] &lt; dalt:</span>
-<span class="c1">#                 raise CoordinateError(&quot;Variation in station altitude is &quot;</span>
-<span class="c1">#                                       &quot;exceeding upper limit of {} m&quot;.format(</span>
-<span class="c1">#                                       self.COORD_MAX_VAR[&#39;latitude&#39;]))</span>
-<span class="c1"># =============================================================================</span>
         <span class="k">return</span> <span class="n">vals</span></div>
 
 <div class="viewcode-block" id="StationData.get_meta"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.get_meta">[docs]</a>    <span class="k">def</span> <span class="nf">get_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_single_value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quality_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">add_none_vals</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                 <span class="n">add_none_vals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_meta_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return meta-data as dictionary</span>
+
+<span class="sd">        By default, only default metadata keys are considered, use parameter</span>
+<span class="sd">        `add_meta_keys` to add additional metadata.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -573,6 +555,9 @@
 <span class="sd">            allowed in the local variation. The upper limits are specified</span>
 <span class="sd">            in attr. ``COORD_MAX_VAR``.</span>
 <span class="sd">        add_none_vals : bool</span>
+<span class="sd">            Add metadata keys which have value set to None.</span>
+<span class="sd">        add_meta_keys : str or list, optional</span>
+<span class="sd">            Add none-standard metadata.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -586,10 +571,22 @@
 <span class="sd">        MetaDataError</span>
 <span class="sd">            in case of consistencies in meta data between individual time-stamps</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_meta_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">add_meta_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">add_meta_keys</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_meta_keys</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">add_meta_keys</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_station_coords</span><span class="p">(</span><span class="n">force_single_value</span><span class="p">,</span> <span class="n">quality_check</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_META_KEYS</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_COORD_KEYS</span><span class="p">:</span> <span class="c1"># this has been handled above</span>
+        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_station_coords</span><span class="p">(</span><span class="n">force_single_value</span><span class="p">,</span>
+                                            <span class="n">quality_check</span><span class="p">))</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_META_KEYS</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">add_meta_keys</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No such key in StationData: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_COORD_KEYS</span><span class="p">:</span>
+                <span class="c1"># this has been handled above</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">add_none_vals</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No metadata available for key </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
@@ -607,37 +604,109 @@
 
         <span class="k">return</span> <span class="n">meta</span></div>
 
-    <span class="k">def</span> <span class="nf">_append_meta_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Add a metadata item&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">or</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_check_meta_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if metadata item is valid</span>
+
+<span class="sd">        Valid value types are dictionaries, lists, strings, numerical values</span>
+<span class="sd">        and datetetime objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Invalid metadata entry </span><span class="si">{}</span><span class="s1"> for key </span><span class="si">{}</span><span class="s1">.&#39;</span>
+                                    <span class="s1">&#39;Only 1d numpy arrays are supported...&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_datetime64</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Invalid metadata entry </span><span class="si">{}</span><span class="s1"> for key </span><span class="si">{}</span><span class="s1">.&#39;</span>
+                                    <span class="s1">&#39;Only dicts, lists, strings, numerical &#39;</span>
+                                    <span class="s1">&#39;values or datetime objects are supported&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_merge_meta_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Merge meta item into this object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key</span>
+<span class="sd">            key of metadata value</span>
+<span class="sd">        val</span>
+<span class="sd">            value to be added</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_val</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">same_type</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">same_type</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot merge meta item </span><span class="si">{}</span><span class="s1"> due to type &#39;</span>
                                      <span class="s1">&#39;mismatch&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-                <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)]</span>
-                <span class="n">vals_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)]</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_dicts</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
-                <span class="k">for</span> <span class="n">_val</span> <span class="ow">in</span> <span class="n">vals_in</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">_val</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;; </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_val</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot append metadata value that is &#39;</span>
-                                     <span class="s1">&#39;already a list or numpy array due to &#39;</span>
-                                     <span class="s1">&#39;potential ambiguities&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
-                        <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="n">val</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">val</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">same_type</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_val</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                            <span class="n">newval</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_val</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">newval</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot merge meta item </span><span class="si">{}</span><span class="s1"> due to type &#39;</span>
+                                         <span class="s1">&#39;mismatch&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="c1"># both are str that may be already merged with &quot;;&quot; -&gt; only</span>
+                    <span class="c1"># add new entries</span>
+                    <span class="n">vals_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)]</span>
+
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">vals_in</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">current_val</span><span class="p">:</span>
+                            <span class="n">current_val</span> <span class="o">+=</span> <span class="s1">&#39;;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_val</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">same_type</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">current_val</span><span class="p">:</span>
+                        <span class="n">current_val</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_val</span>
+
+            <span class="k">elif</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">current_val</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">current_val</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_val</span><span class="p">,</span> <span class="n">val</span><span class="p">]</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">current_val</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_val</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">current_val</span> <span class="o">!=</span> <span class="n">val</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_val</span><span class="p">,</span> <span class="n">val</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span> <span class="c1">#they shoul be the same</span>
+                <span class="k">assert</span> <span class="n">current_val</span> <span class="o">==</span> <span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="n">current_val</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Failed to merge metadata entries for key </span><span class="si">{}</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="s1">&#39;Value in current StationData: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="s1">&#39;Value to be merged: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="s1">&#39;Error: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">current_val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+
+
+
+    <span class="k">def</span> <span class="nf">_append_meta_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a metadata item&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">or</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_merge_meta_item</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
 <div class="viewcode-block" id="StationData.merge_meta_same_station"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.merge_meta_same_station">[docs]</a>    <span class="k">def</span> <span class="nf">merge_meta_same_station</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">coord_tol_km</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">check_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                <span class="o">**</span><span class="n">add_meta_keys</span><span class="p">):</span>
+                                <span class="n">add_meta_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Merge meta information from other object</span>
 
 <span class="sd">        Note</span>
@@ -662,17 +731,24 @@
 <span class="sd">            if True, the metadata from the other station is added to the</span>
 <span class="sd">            metadata of this station, else, a new station is returned with the</span>
 <span class="sd">            merged attributes.</span>
-<span class="sd">        **add_meta_keys</span>
+<span class="sd">        add_meta_keys : str or list, optional</span>
 <span class="sd">            additional non-standard metadata keys that are supposed to be</span>
 <span class="sd">            considered for merging.</span>
+<span class="sd">        raise_on_error : bool</span>
+<span class="sd">            if True, then an Exception will be raised in case one of the</span>
+<span class="sd">            metadata items cannot be merged, which is most often due to</span>
+<span class="sd">            unresolvable type differences of metadata values between the two</span>
+<span class="sd">            objects</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="n">station_name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">station_name</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Can only merged metadata from same station&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">add_meta_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">add_meta_keys</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_meta_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">add_meta_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">add_meta_keys</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span>
 
@@ -686,16 +762,25 @@
 
         <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_META_KEYS</span>
         <span class="n">keys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">add_meta_keys</span><span class="p">)</span>
-        <span class="c1"># remove station name from key list to be merged</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;station_name&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_COORD_KEYS</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
             <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span> <span class="ow">and</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">obj</span><span class="o">.</span><span class="n">_append_meta_item</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_check_meta_item</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                    <span class="n">other</span><span class="o">.</span><span class="n">_check_meta_item</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+                    <span class="n">obj</span><span class="o">.</span><span class="n">_append_meta_item</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">except</span> <span class="n">MetaDataError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;N/A_FAILED_TO_MERGE&#39;</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Failed to merge meta item </span><span class="si">{}</span><span class="s1">. Reason:</span><span class="si">{}</span><span class="s1">&#39;</span>
+                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="n">raise_on_error</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">obj</span></div>
 
@@ -941,7 +1026,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_vardata_2d</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StationData.merge_other"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.merge_other">[docs]</a>    <span class="k">def</span> <span class="nf">merge_other</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="o">**</span><span class="n">add_meta_keys</span><span class="p">):</span>
+<div class="viewcode-block" id="StationData.merge_other"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.merge_other">[docs]</a>    <span class="k">def</span> <span class="nf">merge_other</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">add_meta_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Merge other station data object</span>
 
 <span class="sd">        Todo</span>
@@ -957,6 +1042,9 @@
 <span class="sd">        var_name : str</span>
 <span class="sd">            variable name for which info is to be merged (needs to be both</span>
 <span class="sd">            available in this object and the provided other object)</span>
+<span class="sd">        add_meta_keys : str or list, optional</span>
+<span class="sd">            additional non-standard metadata keys that are supposed to be</span>
+<span class="sd">            considered for merging.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -965,7 +1053,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#self.merge_meta_same_station(other, **add_meta_keys)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">merge_vardata</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">merge_meta_same_station</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">add_meta_keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merge_meta_same_station</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">add_meta_keys</span><span class="o">=</span><span class="n">add_meta_keys</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -1579,10 +1667,6 @@
                                       <span class="n">apply_constraints</span><span class="o">=</span><span class="n">apply_constraints</span><span class="p">,</span>
                                       <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#             data = resample_timeseries(data, freq, how=resample_how,</span>
-<span class="c1">#                                        **kwargs)</span>
-<span class="c1"># =============================================================================</span>
 
         <span class="k">return</span> <span class="n">data</span></div>
 
@@ -1597,7 +1681,7 @@
 <span class="sd">        data - if it exists - will be plotted on top of the actual timeseries</span>
 <span class="sd">        using red colour and dashed line. As the overlapping data may be</span>
 <span class="sd">        identical with the actual data, you might want to increase the line</span>
-<span class="sd">        width of the actual timeseries using an additional input argumend</span>
+<span class="sd">        width of the actual timeseries using an additional input argument</span>
 <span class="sd">        ``lw=4``, or similar.</span>
 
 <span class="sd">        Parameters</span>
