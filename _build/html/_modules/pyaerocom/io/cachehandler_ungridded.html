@@ -1,0 +1,582 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyaerocom.io.cachehandler_ungridded &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyaerocom.io.cachehandler_ungridded</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyaerocom.io.cachehandler_ungridded</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Caching class for reading and writing of ungridded data Cache objects</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">pickle</span>
+
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.ungriddeddata</span> <span class="kn">import</span> <span class="n">UngriddedData</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AerocomConnectionError</span><span class="p">,</span> <span class="n">CacheReadError</span><span class="p">,</span>
+                                  <span class="n">CacheWriteError</span><span class="p">)</span>
+
+<span class="c1"># TODO: Write data attribute list contains_vars in header of pickled file and</span>
+<span class="c1"># check if variables match the request</span>
+<div class="viewcode-block" id="CacheHandlerUngridded"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.cachehandler_ungridded.CacheHandlerUngridded">[docs]</a><span class="k">class</span> <span class="nc">CacheHandlerUngridded</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interface for reading and writing of cache files</span>
+
+<span class="sd">    Cache filename mask is</span>
+
+<span class="sd">    &lt;dataset_to_read&gt;_&lt;var&gt;.pkl</span>
+
+<span class="sd">    e.g. EBASMC_scatc550aer.pkl</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reader : ReadUngriddedBase</span>
+<span class="sd">        reading class for dataset</span>
+<span class="sd">    loaded_data : dict</span>
+<span class="sd">        dictionary containing successfully loaded instances of single variable</span>
+<span class="sd">        :class:`UngriddedData` objects (keys are variable names)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;1.11&#39;</span>
+    <span class="c1">#: Directory of cache files</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">CACHE_DIR</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">CACHEDIR</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">CACHE_DIR</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Pyaerocom cache directory is not defined&#39;</span><span class="p">)</span>
+    <span class="c1">#: Cache file header keys that are checked (and required unchanged) when</span>
+    <span class="c1">#: reading a cache file</span>
+    <span class="n">CACHE_HEAD_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;pyaerocom_version&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;newest_file_in_read_dir&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;newest_file_date_in_read_dir&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;data_revision&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;reader_version&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;ungridded_data_version&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;cacher_version&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">reader</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loaded_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="o">=</span> <span class="n">cache_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instance of reader class&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;No reader class assigned to cache object&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span>
+
+    <span class="nd">@reader</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="kn">import</span> <span class="n">ReadUngriddedBase</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">ReadUngriddedBase</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">get_reader</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">ReadUngriddedBase</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid input for reader&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid input for reader&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loaded_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cache_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Directory where cache data objects are stored&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">CACHE_DIR</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_DIR</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;Cache directory does not exist: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_DIR</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">CACHE_DIR</span>
+
+    <span class="nd">@cache_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">cache_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;Input directory does not exist: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_dir</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dataset_to_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Data ID of the associated dataset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">dataset_to_read</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">src_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Data source directory of the associated dataset</span>
+
+<span class="sd">        Needed to check whether an existing cache file is outdated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">DATASET_PATH</span>
+
+<div class="viewcode-block" id="CacheHandlerUngridded.default_file_name"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.cachehandler_ungridded.CacheHandlerUngridded.default_file_name">[docs]</a>    <span class="k">def</span> <span class="nf">default_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;File name of cache file</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        var_name : str</span>
+<span class="sd">            name of variable to be cached.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            file name of pickle file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">var_name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.pkl&#39;</span></div>
+
+<div class="viewcode-block" id="CacheHandlerUngridded.file_path"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.cachehandler_ungridded.CacheHandlerUngridded.file_path">[docs]</a>    <span class="k">def</span> <span class="nf">file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_or_file_name</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;File path of cache file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        var_or_file_name : str</span>
+<span class="sd">            name of output filename or variable that is supposed to be stored.</span>
+<span class="sd">            Default usage is to provide variable and then</span>
+<span class="sd">            :func:`default_file_name` is used. Can be None if</span>
+<span class="sd">            input `data` contains only a single variable.</span>
+<span class="sd">        cache_dir : str, optional</span>
+<span class="sd">            output directory (default is pyaerocom cache dir accessed via</span>
+<span class="sd">            :func:`cache_dir`).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            output file path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">var_or_file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pkl&#39;</span><span class="p">):</span>
+            <span class="n">var_or_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_file_name</span><span class="p">(</span><span class="n">var_or_file_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cache_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cache_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;Specified output directory does not exist:&#39;</span>
+                                    <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">,</span> <span class="n">var_or_file_name</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_pkl_head_vs_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_handle</span><span class="p">):</span>
+
+        <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_meta_info</span><span class="p">()</span>
+
+        <span class="n">head</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">in_handle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CacheReadError</span><span class="p">(</span><span class="s1">&#39;Invalid cache file&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">head</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">current</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CacheReadError</span><span class="p">(</span><span class="s1">&#39;Invalid cache header key: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">v</span> <span class="o">==</span> <span class="n">current</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is outdated (value: </span><span class="si">{}</span><span class="s1">). Current &#39;</span>
+                                     <span class="s1">&#39;value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">current</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="CacheHandlerUngridded.cache_meta_info"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.cachehandler_ungridded.CacheHandlerUngridded.cache_meta_info">[docs]</a>    <span class="k">def</span> <span class="nf">cache_meta_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dictionary containing relevant caching meta-info&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">newestp</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">iglob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src_data_dir</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)),</span>
+                         <span class="n">key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getctime</span><span class="p">)</span>
+            <span class="n">newest_date</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getctime</span><span class="p">(</span><span class="n">newestp</span><span class="p">)</span>
+            <span class="n">newest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">newestp</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">newest</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">newest_date</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">data_revision</span>
+            <span class="n">reader_ver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">__version__</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">rev</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">reader_ver</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_HEAD_KEYS</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">__version__</span>
+
+        <span class="n">current</span><span class="p">[</span><span class="s1">&#39;pyaerocom_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">__version__</span>
+        <span class="n">current</span><span class="p">[</span><span class="s1">&#39;newest_file_in_read_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newest</span>
+        <span class="n">current</span><span class="p">[</span><span class="s1">&#39;newest_file_date_in_read_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newest_date</span>
+        <span class="n">current</span><span class="p">[</span><span class="s1">&#39;data_revision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rev</span>
+        <span class="n">current</span><span class="p">[</span><span class="s1">&#39;reader_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reader_ver</span>
+        <span class="n">current</span><span class="p">[</span><span class="s1">&#39;ungridded_data_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UngriddedData</span><span class="o">.</span><span class="n">__version__</span>
+        <span class="n">current</span><span class="p">[</span><span class="s1">&#39;cacher_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__version__</span>
+        <span class="k">return</span> <span class="n">current</span></div>
+
+<div class="viewcode-block" id="CacheHandlerUngridded.check_and_load"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.cachehandler_ungridded.CacheHandlerUngridded.check_and_load">[docs]</a>    <span class="k">def</span> <span class="nf">check_and_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_or_file_name</span><span class="p">,</span> <span class="n">force_use_outdated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">cache_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if cache file exists and load</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        If a cache file exists for this database, but cannot be loaded or is</span>
+<span class="sd">        outdated against pyaerocom updates, then it will be removed (the latter</span>
+<span class="sd">        only if :attr:`pyaerocom.const.RM_CACHE_OUTDATED` is True).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        var_or_file_name : str</span>
+<span class="sd">            name of output filename or variable that is supposed to be stored.</span>
+<span class="sd">            Default usage is to provide variable and then</span>
+<span class="sd">            :func:`default_file_name` is used. Can be None if</span>
+<span class="sd">            input `data` contains only a single variable.ead</span>
+<span class="sd">        force_use_outdated : bool</span>
+<span class="sd">            if True, read existing cache file even if it is not up to date or</span>
+<span class="sd">            pyaerocom version changed (not recommended to use)</span>
+<span class="sd">        cache_dir : str, optional</span>
+<span class="sd">            output directory (default is pyaerocom cache dir accessed via</span>
+<span class="sd">            :func:`cache_dir`).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True, if cache file exists and could be successfully loaded, else</span>
+<span class="sd">            False. Note: if import is successful, the corresponding data object</span>
+<span class="sd">            (instance of :class:`pyaerocom.UngriddedData` can be accessed via</span>
+<span class="sd">            :attr:`loaded_data&#39;</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            if cached file is not an instance of :class:`pyaerocom.UngriddedData`</span>
+<span class="sd">            class (which should not happen)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">(</span><span class="n">var_or_file_name</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="n">cache_dir</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Cache file does not exist: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">delete_existing</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">RM_CACHE_OUTDATED</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">force_use_outdated</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="n">in_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">force_use_outdated</span><span class="p">:</span>
+            <span class="n">last_meta</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">in_handle</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">last_meta</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_HEAD_KEYS</span><span class="p">)</span>
+            <span class="n">ok</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_pkl_head_vs_database</span><span class="p">(</span><span class="n">in_handle</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">ok</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">delete_existing</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;File error in cached data file </span><span class="si">{}</span><span class="s1">. File will &#39;</span>
+                                 <span class="s1">&#39;be removed and data reloaded&#39;</span>
+                                 <span class="s1">&#39;Error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="c1"># TODO: Should we delete the cache file if it is outdated ???</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Aborting reading cache file </span><span class="si">{}</span><span class="s1">. Aerocom database &#39;</span>
+                              <span class="s1">&#39;or pyaerocom version has changed compared to &#39;</span>
+                              <span class="s1">&#39;cached version&#39;</span>
+                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+            <span class="n">in_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">delete_existing</span><span class="p">:</span> <span class="c1">#something was wrong</span>
+                <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Deleting outdated cache file: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># everything is okay</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">in_handle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">UngriddedData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unexpected data type stored in cache file, need &#39;</span>
+                            <span class="s1">&#39;instance of UngriddedData, got </span><span class="si">{}</span><span class="s1">&#39;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loaded_data</span><span class="p">[</span><span class="n">var_or_file_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Successfully loaded cache file </span><span class="si">{}</span><span class="s1">&#39;</span>
+                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="CacheHandlerUngridded.delete_all_cache_files"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.cachehandler_ungridded.CacheHandlerUngridded.delete_all_cache_files">[docs]</a>    <span class="k">def</span> <span class="nf">delete_all_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes all pickled data objects in cache directory</span>
+
+<span class="sd">        If not set differently, the cache directory is the pyaerocom default,</span>
+<span class="sd">        accessible via :attr:`pyaerocom.const.CACHEDIR`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/*.pkl&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Deleted </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CacheHandlerUngridded.write"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.cachehandler_ungridded.CacheHandlerUngridded.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">var_or_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write single-variable instance of UngriddedData to cache</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : UngriddedData</span>
+<span class="sd">            object containing the data (possibly containing multiple variables)</span>
+<span class="sd">        var_or_file_name : str, optional</span>
+<span class="sd">            name of output filename or variable that is supposed to be stored.</span>
+<span class="sd">            Default usage is to provide variable and then</span>
+<span class="sd">            :func:`default_file_name` is used. Can be None if</span>
+<span class="sd">            input `data` contains only a single variable.</span>
+<span class="sd">        cache_dir : str, optional</span>
+<span class="sd">            output directory (default is pyaerocom cache dir accessed via</span>
+<span class="sd">            :func:`cache_dir`).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            output file path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_meta_info</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">UngriddedData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid input, need instance of UngriddedData, &#39;</span>
+                            <span class="s1">&#39;got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">var_or_file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pkl&#39;</span><span class="p">):</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="n">var_or_file_name</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">contains_datasets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CacheWriteError</span><span class="p">(</span><span class="s1">&#39;Input UngriddedData object contains &#39;</span>
+                                      <span class="s1">&#39;datasets: </span><span class="si">{}</span><span class="s1">. Can only write single &#39;</span>
+                                      <span class="s1">&#39;dataset objects&#39;</span>
+                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">contains_datasets</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">var_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">contains_vars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">CacheWriteError</span><span class="p">(</span><span class="s1">&#39;Input UngriddedData object for </span><span class="si">{}</span><span class="s1"> contains &#39;</span>
+                                          <span class="s1">&#39;more than one variable: </span><span class="si">{}</span><span class="s1">. Please &#39;</span>
+                                          <span class="s1">&#39;specify which variable should be &#39;</span>
+                                          <span class="s1">&#39;cached&#39;</span>
+                                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span>
+                                                  <span class="n">data</span><span class="o">.</span><span class="n">contains_vars</span><span class="p">))</span>
+                <span class="n">var_name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">contains_vars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">contains_vars</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CacheWriteError</span><span class="p">(</span><span class="s1">&#39;Cannot write cache file: variable </span><span class="si">{}</span><span class="s1"> does &#39;</span>
+                                      <span class="s1">&#39;not exist in input UngriddedData object&#39;</span>
+                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">contains_vars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">extract_var</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+
+        <span class="n">fp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">(</span><span class="n">var_or_file_name</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="n">cache_dir</span><span class="p">)</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing cache file: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># OutHandle = gzip.open(c__cache_file, &#39;wb&#39;) # takes too much time</span>
+        <span class="n">out_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># write cache header</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">out_handle</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+            <span class="c1"># write data</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">out_handle</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">print_log</span>
+            <span class="n">print_log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Failed to write cache: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="n">success</span><span class="o">=</span><span class="kc">False</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">out_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+        <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Wrote: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">fp</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;pyaerocom.CacheHandlerUngridded</span><span class="se">\n</span><span class="s1">Default cache dir: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">ch</span> <span class="o">=</span> <span class="n">CacheHandlerUngridded</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MET Norway
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -184,7 +184,7 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.colocateddata</span> <span class="kn">import</span> <span class="n">ColocatedData</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom.filter</span> <span class="kn">import</span> <span class="n">Filter</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="kn">import</span> <span class="n">ReadUngridded</span><span class="p">,</span> <span class="n">ReadGridded</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="kn">import</span> <span class="n">ReadUngridded</span><span class="p">,</span> <span class="n">ReadGridded</span><span class="p">,</span> <span class="n">ReadMscwCtm</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DataCoverageError</span><span class="p">,</span>
                                   <span class="n">VariableDefinitionError</span><span class="p">)</span>
@@ -397,6 +397,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_use_climatology</span> <span class="o">=</span> <span class="n">obs_use_climatology</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_add_meta</span> <span class="o">=</span> <span class="p">[]</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridded_reader_id</span> <span class="o">=</span> <span class="p">{</span>
+         <span class="s1">&#39;model&#39;</span> <span class="p">:</span> <span class="s1">&#39;ReadGridded&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;obs&#39;</span> <span class="p">:</span> <span class="s1">&#39;ReadGridded&#39;</span><span class="p">}</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="o">=</span> <span class="n">stop</span>
 
@@ -471,6 +475,13 @@
 <span class="sd">    as such. For attributes, please see base class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+
+    <span class="n">SUPPORTED_GRIDDED_READERS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ReadGridded&#39;</span> <span class="p">:</span> <span class="n">ReadGridded</span><span class="p">,</span>
+        <span class="s1">&#39;ReadMscwCtm&#39;</span> <span class="p">:</span> <span class="n">ReadMscwCtm</span>
+    <span class="p">}</span>
+
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Colocator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -533,6 +544,40 @@
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_close_log</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Colocator.instantiate_gridded_reader"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.instantiate_gridded_reader">[docs]</a>    <span class="k">def</span> <span class="nf">instantiate_gridded_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create reader for model or observational gridded data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        what : str</span>
+<span class="sd">            Type of reader. (&quot;model&quot; or &quot;obs&quot;)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Instance of reader class defined in self.SUPPORTED_GRIDDED_READERS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">what</span> <span class="o">==</span> <span class="s1">&#39;model&#39;</span><span class="p">:</span>
+            <span class="n">data_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span>
+            <span class="n">data_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_data_dir</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span>
+            <span class="n">data_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_data_dir</span>
+        <span class="n">reader_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_gridded_reader_class</span><span class="p">(</span><span class="n">what</span><span class="o">=</span><span class="n">what</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">reader_class</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="n">data_id</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="s1">&#39;filepath&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;filepath&#39;</span><span class="p">):</span>
+            <span class="n">reader</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span>
+        <span class="k">return</span> <span class="n">reader</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_gridded_reader_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the class of the reader for gridded data.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_GRIDDED_READERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gridded_reader_id</span><span class="p">[</span><span class="n">what</span><span class="p">]]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Reader </span><span class="si">{}</span><span class="s1"> is not supported: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span>
+                                      <span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gridded_reader_id</span><span class="p">[</span><span class="n">what</span><span class="p">],</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">reader</span>
 
 <div class="viewcode-block" id="Colocator.get_lowest_resolution"><a class="viewcode-back" href="../../api.html#pyaerocom.colocation_auto.Colocator.get_lowest_resolution">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_lowest_resolution</span><span class="p">(</span><span class="n">ts_type</span><span class="p">,</span> <span class="o">*</span><span class="n">ts_types</span><span class="p">):</span>
@@ -628,8 +673,7 @@
         <span class="k">if</span> <span class="s1">&#39;use_input_var&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">use_input_var</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;use_input_var&#39;</span><span class="p">)</span>
 
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
-                             <span class="n">data_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_data_dir</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instantiate_gridded_reader</span><span class="p">(</span><span class="n">what</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">use_input_var</span><span class="p">:</span>
             <span class="n">var</span> <span class="o">=</span> <span class="n">var_name</span>
         <span class="k">else</span><span class="p">:</span>
@@ -728,7 +772,7 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># set defaults if input was not specified explicitely</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ts_type_read</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span><span class="p">:</span>
                 <span class="n">ts_type_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts_type</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;vert_which&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;vert_which&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vert_which</span>
@@ -837,8 +881,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">yrs_avail</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">years_avail</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Input reader </span><span class="si">{}</span><span class="s1"> does not have attr. &#39;</span>
-                                 <span class="s1">&#39;years_avail&#39;</span><span class="p">)</span> <span class="c1"># not sure if ReadEMEP has...</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Input reader </span><span class="si">{</span><span class="n">reader</span><span class="si">}</span><span class="s1"> does not have attr. &#39;</span>
+                                 <span class="s1">&#39;years_avail&#39;</span><span class="p">)</span>
 
         <span class="n">first</span><span class="p">,</span> <span class="n">last</span> <span class="o">=</span> <span class="n">yrs_avail</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yrs_avail</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">first</span>
@@ -852,11 +896,8 @@
         <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;PREPARING colocation of </span><span class="si">{}</span><span class="s1"> vs. </span><span class="si">{}</span><span class="s1">&#39;</span>
                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">))</span>
 
-        <span class="n">model_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span>
-                                   <span class="n">data_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_data_dir</span><span class="p">)</span>
-
-        <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="n">datasets_to_read</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
-                                   <span class="n">data_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_data_dir</span><span class="p">)</span>
+        <span class="n">model_reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instantiate_gridded_reader</span><span class="p">(</span><span class="n">what</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
+        <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadUngridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_data_dir</span><span class="p">)</span>
 
         <span class="n">obs_vars</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">get_vars_supported</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
                                                  <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">)</span>
@@ -1048,8 +1089,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_infer_start_stop</span><span class="p">(</span><span class="n">model_reader</span><span class="p">)</span>
 
         <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">start_stop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
-        <span class="n">obs_reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="p">,</span>
-                                 <span class="n">data_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_data_dir</span><span class="p">)</span>
+        <span class="n">model_reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instantiate_gridded_reader</span><span class="p">(</span><span class="n">what</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
+        <span class="n">obs_reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instantiate_gridded_reader</span><span class="p">(</span><span class="n">what</span><span class="o">=</span><span class="s1">&#39;obs&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s1">&#39;obs_filters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="n">obs_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_obs_filters</span><span class="p">()</span>
@@ -1093,14 +1134,6 @@
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">continue</span>
-
-<span class="c1"># =============================================================================</span>
-<span class="c1">#             if not model_data.ts_type in all_ts_types:</span>
-<span class="c1">#                 raise TemporalResolutionError(&#39;Invalid temporal resolution {} &#39;</span>
-<span class="c1">#                                               &#39;in model {}&#39;</span>
-<span class="c1">#                                               .format(model_data.ts_type,</span>
-<span class="c1">#                                                       self.model_id))</span>
-<span class="c1"># =============================================================================</span>
 
             <span class="k">if</span> <span class="n">ts_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">ts_type</span> <span class="o">=</span> <span class="n">model_data</span><span class="o">.</span><span class="n">ts_type</span>
@@ -1322,10 +1355,6 @@
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">MODEL_ID</span><span class="p">][</span><span class="s1">&#39;od550aer&#39;</span><span class="p">]</span>
     <span class="n">data</span><span class="o">.</span><span class="n">plot_scatter</span><span class="p">(</span><span class="n">loglog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-
-
-
 </pre></div>
 
            </div>

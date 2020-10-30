@@ -922,6 +922,57 @@
         <span class="n">conc</span> <span class="o">*=</span> <span class="n">conversion_fac</span>
     <span class="k">return</span> <span class="n">conc</span></div>
 
+<div class="viewcode-block" id="concx_to_vmrx"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.concx_to_vmrx">[docs]</a><span class="k">def</span> <span class="nf">concx_to_vmrx</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">p_pascal</span><span class="p">,</span> <span class="n">T_kelvin</span><span class="p">,</span> <span class="n">conc_unit</span><span class="p">,</span> <span class="n">mmol_var</span><span class="p">,</span> <span class="n">mmol_air</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">to_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    WORK IN PROGRESS. DO NOT USE!</span>
+<span class="sd">    Convert mass concentration to volume mixing ratio (vmr)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : float or ndarray</span>
+<span class="sd">        array containing vmr values</span>
+<span class="sd">    p_pascal : float</span>
+<span class="sd">        pressure in Pa of input data</span>
+<span class="sd">    T_kelvin : float</span>
+<span class="sd">        temperature in K of input data</span>
+<span class="sd">    vmr_unit : str</span>
+<span class="sd">        unit of input data</span>
+<span class="sd">    mmol_var : float</span>
+<span class="sd">        molar mass of variable represented by input data</span>
+<span class="sd">    mmol_air : float, optional</span>
+<span class="sd">        Molar mass of air. Uses average density of dry air if None.</span>
+<span class="sd">        The default is None.</span>
+<span class="sd">    to_unit : str, optional</span>
+<span class="sd">        Unit to which output data is converted. If None, output unit is</span>
+<span class="sd">        kg m-3. The default is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float or ndarray</span>
+<span class="sd">        input data converted to volume mixing ratio</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mmol_air</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">pyaerocom.molmasses</span> <span class="kn">import</span> <span class="n">get_molmass</span>
+        <span class="n">mmol_air</span> <span class="o">=</span> <span class="n">get_molmass</span><span class="p">(</span><span class="s1">&#39;air_dry&#39;</span><span class="p">)</span>
+
+    <span class="n">Rspecific</span> <span class="o">=</span> <span class="mf">287.058</span> <span class="c1"># J kg-1 K-1</span>
+
+    <span class="n">conversion_fac</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">cf_units</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;kg m-3&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">conc_unit</span><span class="p">)</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#     if conversion_fac != 1:</span>
+<span class="c1">#         data *= conversion_fac #/ conversion_fac</span>
+<span class="c1"># =============================================================================</span>
+    <span class="n">airdensity</span> <span class="o">=</span> <span class="n">p_pascal</span><span class="o">/</span><span class="p">(</span><span class="n">Rspecific</span> <span class="o">*</span> <span class="n">T_kelvin</span><span class="p">)</span> <span class="c1"># kg m-3</span>
+    <span class="n">mulfac</span> <span class="o">=</span> <span class="n">mmol_var</span> <span class="o">/</span> <span class="n">mmol_air</span> <span class="o">*</span> <span class="n">airdensity</span> <span class="c1"># kg m-3</span>
+    <span class="n">vmr</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">mulfac</span> <span class="c1"># unitless</span>
+    <span class="k">if</span> <span class="n">to_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">conversion_fac</span> <span class="o">*=</span> <span class="n">cf_units</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;kg m-3&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">conversion_fac</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
+        <span class="n">vmr</span> <span class="o">*=</span> <span class="n">conversion_fac</span>
+    <span class="k">return</span> <span class="n">vmr</span></div>
+
 <div class="viewcode-block" id="exponent"><a class="viewcode-back" href="../../api.html#pyaerocom.mathutils.exponent">[docs]</a><span class="k">def</span> <span class="nf">exponent</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get exponent of input number</span>
 

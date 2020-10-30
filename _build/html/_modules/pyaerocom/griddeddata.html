@@ -232,10 +232,6 @@
 <span class="sd">        variable name that is extracted if `input` is a file path. Irrelevant</span>
 <span class="sd">        if `input` is preloaded Cube</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    grid</span>
-<span class="sd">        underlying data type (hopefully :class:`iris.cube.Cube` in most cases)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_grid</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_GRID_IO</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span>
@@ -2163,15 +2159,15 @@
         <span class="k">return</span> <span class="n">outpaths</span>
 
 <div class="viewcode-block" id="GriddedData.to_netcdf"><a class="viewcode-back" href="../../api.html#pyaerocom.griddeddata.GriddedData.to_netcdf">[docs]</a>    <span class="k">def</span> <span class="nf">to_netcdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">savename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Save as netcdf file</span>
+        <span class="sd">&quot;&quot;&quot;Save as NetCDF file</span>
 
-<span class="sd">        Paraemeters</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
 <span class="sd">        out_dir : str</span>
 <span class="sd">            output direcory (must exist)</span>
-<span class="sd">        savename : :obj:`str`, optional</span>
+<span class="sd">        savename : str, optional</span>
 <span class="sd">            name of file. If None, :func:`aerocom_savename` is used which is</span>
-<span class="sd">            generated automatically and may be modified via **kwargs</span>
+<span class="sd">            generated automatically and may be modified via `**kwargs`</span>
 <span class="sd">        **kwargs</span>
 <span class="sd">            keywords for name</span>
 
@@ -2200,18 +2196,17 @@
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        The input coordinates may also be provided using the input arg **coords</span>
-<span class="sd">        which provides a more intuitive option (e.g. input</span>
+<span class="sd">        The input coordinates may also be provided using the input arg</span>
+<span class="sd">        `**coords` which provides a more intuitive option (e.g. input</span>
 <span class="sd">        ``(sample_points=[(&quot;longitude&quot;, [10, 20]), (&quot;latitude&quot;, [1, 2])])``</span>
-<span class="sd">        is the same as input</span>
-<span class="sd">        ``(longitude=[10, 20], latitude=[1,2])``</span>
+<span class="sd">        is the same as input ``(longitude=[10, 20], latitude=[1,2])``</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        sample_points : list</span>
 <span class="sd">            sequence of coordinate pairs over which to interpolate</span>
 <span class="sd">        scheme : str or iris interpolator object</span>
-<span class="sd">            interpolation scheme, pyaerocom default is Nearest. If input is</span>
+<span class="sd">            interpolation scheme, pyaerocom default is nearest. If input is</span>
 <span class="sd">            string, it is converted into the corresponding iris Interpolator</span>
 <span class="sd">            object, see :func:`str_to_iris` for valid strings</span>
 <span class="sd">        collapse_scalar : bool</span>
@@ -2220,7 +2215,7 @@
 <span class="sd">        **coords</span>
 <span class="sd">            additional keyword args that may be used to provide the interpolation</span>
 <span class="sd">            coordinates in an easier way than using the ``Cube`` argument</span>
-<span class="sd">            :arg:`sample_points``. May also be a combination of both.</span>
+<span class="sd">            `sample_points`. May also be a combination of both.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2238,12 +2233,6 @@
 <span class="sd">            &gt;&gt;&gt; print(itp.shape)</span>
 <span class="sd">            (365, 1, 1)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#         if self._size_GB &gt; self._MAX_SIZE_GB:</span>
-<span class="c1">#             raise MemoryError(&#39;Data is too large (grid size: {}, file: {} GB) &#39;</span>
-<span class="c1">#                               &#39;for interpolation (which requires loading data &#39;</span>
-<span class="c1">#                               &#39;into memory)&#39;.format(self.shape, self._size_GB))</span>
-<span class="c1"># =============================================================================</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">scheme</span> <span class="o">=</span> <span class="n">str_to_iris</span><span class="p">(</span><span class="n">scheme</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sample_points</span><span class="p">:</span>

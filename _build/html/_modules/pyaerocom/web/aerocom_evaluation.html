@@ -297,7 +297,7 @@
 <span class="sd">    var_order_menu : list, optional</span>
 <span class="sd">        order of variables in menu</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">OUT_DIR_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;scat&#39;</span><span class="p">,</span> <span class="s1">&#39;hm&#39;</span><span class="p">,</span> <span class="s1">&#39;profiles&#39;</span><span class="p">]</span>
+    <span class="n">OUT_DIR_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;ts/dw&#39;</span><span class="p">,</span> <span class="s1">&#39;scat&#39;</span><span class="p">,</span> <span class="s1">&#39;hm&#39;</span><span class="p">,</span> <span class="s1">&#39;profiles&#39;</span><span class="p">]</span>
 
     <span class="c1">#: Vertical layer ranges</span>
     <span class="n">VERT_LAYERS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;0-2km&#39;</span>  <span class="p">:</span>   <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2000</span><span class="p">],</span>
@@ -676,11 +676,50 @@
 <span class="c1">#         &quot;&quot;&quot;Creates file regions.ini for web interface&quot;&quot;&quot;</span>
 <span class="c1">#         return make_regions_json()</span>
 <span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="AerocomEvaluation.get_diurnal_only"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.get_diurnal_only">[docs]</a>    <span class="k">def</span> <span class="nf">get_diurnal_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obs_name</span><span class="p">,</span><span class="n">colocated_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        obs_name : string</span>
+<span class="sd">            Name of observational subset</span>
+<span class="sd">        colocated_data : ColocatedData</span>
+<span class="sd">            A ColocatedData object that will be checked for the presence of</span>
+<span class="sd">            parameter &#39;diurnal_only&#39;.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Raised if colocated_data has &#39;diurnal_only&#39; set, but it is not a boolean</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            Raised if colocated_data has ts_type != &#39;hourly&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        diurnal_only : bool</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">diurnal_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">][</span><span class="s1">&#39;diurnal_only&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">diurnal_only</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">diurnal_only</span><span class="p">,</span><span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Need Boolean dirunal_only for </span><span class="si">{</span><span class="n">obs_name</span><span class="si">}</span><span class="s1">, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">diurnal_only</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">ts_type</span> <span class="o">=</span> <span class="n">colocated_data</span><span class="o">.</span><span class="n">ts_type</span>
+        <span class="k">if</span> <span class="n">diurnal_only</span> <span class="ow">and</span> <span class="n">ts_type</span> <span class="o">!=</span> <span class="s1">&#39;hourly&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;diurnal processing is only available for ColocatedData with ts_type=hourly. Got diurnal_only=</span><span class="si">{</span><span class="n">diurnal_only</span><span class="si">}</span><span class="s1"> for </span><span class="si">{</span><span class="n">obs_name</span><span class="si">}</span><span class="s1"> with ts_type </span><span class="si">{</span><span class="n">ts_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">diurnal_only</span></div>
 
 <div class="viewcode-block" id="AerocomEvaluation.compute_json_files_from_colocateddata"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.compute_json_files_from_colocateddata">[docs]</a>    <span class="k">def</span> <span class="nf">compute_json_files_from_colocateddata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coldata</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span>
                                               <span class="n">model_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates all json files for one ColocatedData object&quot;&quot;&quot;</span>
         <span class="n">vert_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vert_code</span><span class="p">(</span><span class="n">obs_name</span><span class="p">,</span> <span class="n">coldata</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">web_iface_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">][</span><span class="s1">&#39;web_interface_name&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">web_iface_name</span> <span class="o">=</span> <span class="n">obs_name</span>
+        <span class="n">diurnal_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_diurnal_only</span><span class="p">(</span><span class="n">obs_name</span><span class="p">,</span><span class="n">coldata</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_groups</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Filtering of grouped regions is not ready yet...&#39;</span><span class="p">)</span>
 
@@ -698,7 +737,9 @@
                 <span class="n">colocation_settings</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
                 <span class="n">out_dirs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dirs</span><span class="p">,</span>
                 <span class="n">regions_json</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regions_file</span><span class="p">,</span>
-                <span class="n">regions_how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regions_how</span><span class="p">)</span></div>
+                <span class="n">regions_how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regions_how</span><span class="p">,</span>
+                <span class="n">web_iface_name</span><span class="o">=</span><span class="n">web_iface_name</span><span class="p">,</span>
+                <span class="n">diurnal_only</span><span class="o">=</span><span class="n">diurnal_only</span><span class="p">)</span></div>
                 <span class="c1">#region_groups=self.region_groups)</span>
 
 <div class="viewcode-block" id="AerocomEvaluation.get_vert_code"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.get_vert_code">[docs]</a>    <span class="k">def</span> <span class="nf">get_vert_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">):</span>
@@ -843,6 +884,7 @@
         <span class="n">converted</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_coldata_files</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
+
 
         <span class="k">if</span> <span class="n">colocator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_process_colfiles</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">colocator</span><span class="p">)</span>
@@ -1064,6 +1106,27 @@
                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name_or_pattern</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
         <span class="k">return</span> <span class="n">matches</span></div>
 
+    <span class="k">def</span> <span class="nf">_check_and_get_iface_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">obs_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">)</span>
+        <span class="n">iface_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="n">obs_list</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">][</span><span class="s1">&#39;web_interface_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">][</span><span class="s1">&#39;web_interface_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">][</span><span class="s1">&#39;web_interface_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_name</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">][</span><span class="s1">&#39;web_interface_name&#39;</span><span class="p">],</span><span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid value for web_iface_name in </span><span class="si">{}</span><span class="s1">. Need str type&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_name</span><span class="p">))</span>
+            <span class="n">iface_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">[</span><span class="n">obs_name</span><span class="p">][</span><span class="s1">&#39;web_interface_name&#39;</span><span class="p">])</span>
+        <span class="n">iface_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">iface_names</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">iface_names</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">iface_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_and_get_iface_names</span><span class="p">()</span>
+
 <div class="viewcode-block" id="AerocomEvaluation.run_evaluation"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.run_evaluation">[docs]</a>    <span class="k">def</span> <span class="nf">run_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">update_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">reanalyse_existing</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1127,6 +1190,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">only_colocation</span> <span class="o">=</span> <span class="n">only_colocation</span>
         <span class="k">if</span> <span class="n">only_json</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">only_json</span> <span class="o">=</span> <span class="n">only_json</span>
+        <span class="c1">#self.iface_names = self._check_and_get_iface_names()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_existing_json</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clean_json_files</span><span class="p">()</span>
 
@@ -1250,6 +1314,7 @@
 
 <div class="viewcode-block" id="AerocomEvaluation.get_web_overview_table"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.get_web_overview_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_web_overview_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes overview table based on existing map files&quot;&quot;&quot;</span>
+        <span class="n">iface_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iface_names</span>
         <span class="n">tab</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_map_files</span><span class="p">:</span>
@@ -1263,7 +1328,7 @@
                     <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Found outdated json map file: </span><span class="si">{}</span><span class="s1">&#39;</span>
                                             <span class="s1">&#39;Will be ignored&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
                     <span class="k">continue</span>
-                <span class="k">elif</span> <span class="ow">not</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="n">iface_names</span><span class="p">:</span>
                     <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Found outdated json map file: </span><span class="si">{}</span><span class="s1">&#39;</span>
                                             <span class="s1">&#39;Will be ignored&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
                     <span class="k">continue</span>
@@ -1383,16 +1448,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_map_files</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">obs_name</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">,</span>
-             <span class="n">vert_code</span><span class="p">,</span>
-             <span class="n">mod_name</span><span class="p">,</span> <span class="n">mod_var</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info_from_map_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">obs_name</span><span class="p">,</span> <span class="n">obs_var</span><span class="p">,</span> <span class="n">vert_code</span><span class="p">,</span>
+            <span class="n">mod_name</span><span class="p">,</span> <span class="n">mod_var</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info_from_map_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
             <span class="n">remove</span><span class="o">=</span><span class="kc">False</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_config</span><span class="p">:</span>
-                <span class="c1"># Obs dataset was removed</span>
-                <span class="n">remove</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="n">mod_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">:</span>
-                <span class="c1"># Model dataset was removed</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">obs_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iface_names</span> <span class="ow">and</span>
+                    <span class="n">mod_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">):</span>
                 <span class="n">remove</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_valid_obs_vars</span><span class="p">(</span><span class="n">obs_name</span><span class="p">):</span>
                 <span class="n">remove</span> <span class="o">=</span> <span class="kc">True</span>

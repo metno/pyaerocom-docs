@@ -1,0 +1,798 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyaerocom.combine_vardata_ungridded &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyaerocom.combine_vardata_ungridded</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyaerocom.combine_vardata_ungridded</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">DataUnitError</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.obs_io</span> <span class="kn">import</span> <span class="n">ObsVarCombi</span>
+<span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">invalid_input_err_str</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.geodesy</span> <span class="kn">import</span> <span class="n">find_coord_indices_within_distance</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.stationdata</span> <span class="kn">import</span> <span class="n">StationData</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">sort_ts_types</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.colocation</span> <span class="kn">import</span> <span class="n">_colocate_site_data_helper</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">def</span> <span class="nf">_check_input_data_ids_and_vars</span><span class="p">(</span><span class="n">data_ids_and_vars</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_ids_and_vars</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data_ids_and_vars must be tuple or list&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_ids_and_vars</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Currently, only (and exactly) 2 datasets &#39;</span>
+                                  <span class="s1">&#39;can be combined...&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data_ids_and_vars</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Each entry in data_ids_and_vars must be tuple or list&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Each entry in data_ids_and_vars needs to contain exactly 3 &#39;</span>
+                <span class="s1">&#39;items.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;2nd and 3rd entries (data_id, var_name) in item &#39;</span>
+                             <span class="s1">&#39;need to be str&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_map_same_stations</span><span class="p">(</span><span class="n">stats_short</span><span class="p">,</span> <span class="n">stats_long</span><span class="p">,</span> <span class="n">match_stats_how</span><span class="p">,</span>
+                       <span class="n">match_stats_tol_km</span><span class="p">):</span>
+
+    <span class="n">long_coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">stats_long</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span> <span class="n">stats_long</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]))</span>
+
+    <span class="c1"># index matches and corresponding station name matches</span>
+    <span class="n">_index_short</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_index_long</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_statnames_short</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_statnames_long</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">long_sitenames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">stats_long</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stats_short</span><span class="p">[</span><span class="s1">&#39;stats&#39;</span><span class="p">]):</span>
+        <span class="n">statname</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">station_name</span>
+        <span class="n">lat0</span><span class="p">,</span> <span class="n">lon0</span> <span class="o">=</span> <span class="n">stats_short</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">stats_short</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">match_stats_how</span> <span class="o">==</span> <span class="s1">&#39;station_name&#39;</span><span class="p">:</span>
+            <span class="c1"># np.where returns tuple, first index contains array with index</span>
+            <span class="c1"># matches</span>
+            <span class="n">index_matches</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">long_sitenames</span><span class="o">==</span><span class="n">statname</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">index_matches</span> <span class="o">=</span> <span class="n">find_coord_indices_within_distance</span><span class="p">(</span>
+                <span class="n">latref</span><span class="o">=</span><span class="n">lat0</span><span class="p">,</span>
+                <span class="n">lonref</span><span class="o">=</span><span class="n">lon0</span><span class="p">,</span>
+                <span class="n">latlons</span><span class="o">=</span><span class="n">long_coords</span><span class="p">,</span>
+                <span class="n">radius</span><span class="o">=</span><span class="n">match_stats_tol_km</span><span class="p">)</span>
+
+        <span class="c1"># init which default index to use</span>
+        <span class="n">use_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index_matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">index_matches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">match_stats_how</span><span class="o">==</span><span class="s1">&#39;station_name&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unexpected error: each station_name should &#39;</span>
+                                <span class="s1">&#39;only occur once... (perhaps due to unforeseen &#39;</span>
+                                <span class="s1">&#39;API change sometime in the future)&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># more than one site was found in the surroundings of the</span>
+                <span class="c1"># current coordinate. Check and prefer same site name if</span>
+                <span class="c1"># possible, else, use closest</span>
+                <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">idx_match</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">index_matches</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">statname</span> <span class="o">==</span> <span class="n">stats_long</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">][</span><span class="n">idx_match</span><span class="p">]:</span>
+                        <span class="n">use_index</span> <span class="o">=</span> <span class="n">j</span>
+                        <span class="k">break</span>
+
+        <span class="n">idx_long</span> <span class="o">=</span> <span class="n">index_matches</span><span class="p">[</span><span class="n">use_index</span><span class="p">]</span>
+
+        <span class="c1"># make sure to colocate each site only once</span>
+        <span class="k">if</span> <span class="n">idx_long</span> <span class="ow">in</span> <span class="n">_index_long</span><span class="p">:</span>
+            <span class="n">statname_long</span> <span class="o">=</span> <span class="n">stats_long</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">][</span><span class="n">idx_long</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">statname</span> <span class="o">==</span> <span class="n">statname_long</span><span class="p">:</span>
+                <span class="c1"># rare case: the index match in long has already been assigned</span>
+                <span class="c1"># to another site in short which does not occur in long</span>
+                <span class="c1"># (e.g. AAOT site and Venise site in AERONET). In this case</span>
+                <span class="c1"># we want to use the one that matches the site name, so we</span>
+                <span class="c1"># have to remove the already registered index from the record</span>
+                <span class="n">rm_idx</span> <span class="o">=</span> <span class="n">_statnames_long</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">statname_long</span><span class="p">)</span>
+                <span class="n">_index_short</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">rm_idx</span><span class="p">)</span>
+                <span class="n">_index_long</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">rm_idx</span><span class="p">)</span>
+                <span class="n">_statnames_long</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">rm_idx</span><span class="p">)</span>
+                <span class="n">_statnames_short</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">rm_idx</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="n">_index_short</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">_index_long</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx_long</span><span class="p">)</span>
+        <span class="n">_statnames_short</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">statname</span><span class="p">)</span>
+        <span class="n">_statnames_long</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stats_long</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">][</span><span class="n">idx_long</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">_index_short</span><span class="p">,</span> <span class="n">_index_long</span><span class="p">,</span> <span class="n">_statnames_short</span><span class="p">,</span> <span class="n">_statnames_long</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_combine_2_sites</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">stat_other</span><span class="p">,</span> <span class="n">var_other</span><span class="p">,</span>
+                     <span class="n">merge_how</span><span class="p">,</span> <span class="n">merge_eval_fun</span><span class="p">,</span>
+                     <span class="n">match_stats_tol_km</span><span class="p">,</span> <span class="n">var_name_out</span><span class="p">,</span>
+                     <span class="n">data_id_out</span><span class="p">,</span> <span class="n">var_unit_out</span><span class="p">,</span> <span class="n">resample_how</span><span class="p">,</span>
+                     <span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
+                     <span class="n">min_num_obs</span><span class="p">,</span> <span class="n">prefer</span><span class="p">,</span> <span class="n">merge_info_vars</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combine two StationData objects for a given merge strategy</span>
+
+<span class="sd">    Private for now...  details should follow. Until then see</span>
+<span class="sd">    :func:`combine_vardata_ungridded` for details on input args</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    StationData</span>
+<span class="sd">        merged StationData instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">new</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
+    <span class="n">new</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">get_meta</span><span class="p">(</span><span class="n">force_single_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">quality_check</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+    <span class="n">new</span><span class="o">.</span><span class="n">merge_meta_same_station</span><span class="p">(</span>
+        <span class="n">other</span><span class="o">=</span><span class="n">stat_other</span><span class="p">,</span>
+        <span class="n">check_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1">#has already been done</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">raise_on_error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+    <span class="n">unit_other</span> <span class="o">=</span> <span class="n">stat_other</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">var_other</span><span class="p">)</span>
+
+    <span class="n">tstype</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">get_var_ts_type</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+    <span class="n">tstype_other</span> <span class="o">=</span> <span class="n">stat_other</span><span class="o">.</span><span class="n">get_var_ts_type</span><span class="p">(</span><span class="n">var_other</span><span class="p">)</span>
+
+    <span class="n">to_ts_type</span> <span class="o">=</span> <span class="n">sort_ts_types</span><span class="p">([</span><span class="n">tstype</span><span class="p">,</span> <span class="n">tstype_other</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">_colocate_site_data_helper</span><span class="p">(</span>
+        <span class="n">stat</span><span class="p">,</span> <span class="n">stat_other</span><span class="p">,</span>
+        <span class="n">var</span><span class="p">,</span> <span class="n">var_other</span><span class="p">,</span>
+        <span class="n">to_ts_type</span><span class="p">,</span>
+        <span class="n">resample_how</span><span class="o">=</span><span class="n">resample_how</span><span class="p">,</span>
+        <span class="n">apply_time_resampling_constraints</span><span class="o">=</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
+        <span class="n">min_num_obs</span><span class="o">=</span><span class="n">min_num_obs</span><span class="p">,</span>
+        <span class="n">use_climatology_ref</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># remove timestamps where both observations are NaN</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># NOTE: the dataframe returned by _colocate_site_data_helper has ref as first</span>
+    <span class="c1"># column and the first input data as 2nd!</span>
+    <span class="n">obsvar_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ObsVarCombi</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> <span class="n">var</span><span class="p">))</span>
+    <span class="n">obsvar_id_other</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ObsVarCombi</span><span class="p">(</span><span class="n">stat_other</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span> <span class="n">var_other</span><span class="p">))</span>
+
+    <span class="n">stat_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">stat_other</span><span class="p">,</span> <span class="n">stat</span><span class="p">]</span>
+    <span class="n">col_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">obsvar_id_other</span><span class="p">,</span> <span class="n">obsvar_id</span><span class="p">]</span>
+    <span class="n">col_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">var_other</span><span class="p">,</span> <span class="n">var</span><span class="p">]</span>
+    <span class="n">col_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="c1"># In case input variables are different, keep both of them in the</span>
+    <span class="c1"># output colocated StationData, in addition to potentially computed</span>
+    <span class="c1"># additional variables below. This is equivalent with using</span>
+    <span class="c1"># merge_how=&#39;combine&#39; and var1 != var2</span>
+    <span class="k">if</span> <span class="n">var</span> <span class="o">!=</span> <span class="n">var_other</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">colname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">col_names</span><span class="p">):</span>
+            <span class="n">_var</span> <span class="o">=</span> <span class="n">col_vars</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">_stat</span> <span class="o">=</span> <span class="n">stat_order</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span>
+            <span class="n">new</span><span class="p">[</span><span class="n">_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">ts</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">_stat</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">_var</span><span class="p">]</span>
+            <span class="n">vi</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_ts_type</span>
+            <span class="n">new</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">vi</span>
+
+    <span class="n">add_ts</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Merge timeseries if variables are the same and are supposed to be</span>
+    <span class="c1"># combined</span>
+    <span class="k">if</span> <span class="n">merge_how</span><span class="o">==</span><span class="s1">&#39;combine&#39;</span> <span class="ow">and</span> <span class="n">var</span><span class="o">==</span><span class="n">var_other</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">unit</span> <span class="o">!=</span> <span class="n">unit_other</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataUnitError</span><span class="p">(</span><span class="s1">&#39;Cannot combine </span><span class="si">{}</span><span class="s1"> data from 2 sites, since &#39;</span>
+                                <span class="s1">&#39;variable units are different&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+
+        <span class="n">prefer_col</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">[</span><span class="n">col_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">prefer</span><span class="p">)]</span>
+        <span class="n">dont_prefer</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">col_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">prefer_col</span><span class="p">)))]</span>
+        <span class="n">add_ts</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">prefer_col</span><span class="p">]</span><span class="o">.</span><span class="n">combine_first</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">dont_prefer</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">var_name_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">var</span>
+        <span class="k">if</span> <span class="n">var_unit_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var_unit_out</span> <span class="o">=</span> <span class="n">unit</span>
+
+    <span class="k">elif</span> <span class="n">merge_how</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="o">!=</span> <span class="n">var_other</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Averaging of site data is only &#39;</span>
+                                      <span class="s1">&#39;supported if input variables are the &#39;</span>
+                                      <span class="s1">&#39;same...&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">unit</span> <span class="o">!=</span> <span class="n">unit_other</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataUnitError</span><span class="p">(</span><span class="s1">&#39;Cannot average </span><span class="si">{}</span><span class="s1"> data from 2 sites, since &#39;</span>
+                                <span class="s1">&#39;variable units are different&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+        <span class="c1"># if it made it until here, then both sites have same variables and</span>
+        <span class="c1"># units</span>
+        <span class="k">if</span> <span class="n">var_name_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">var</span>
+        <span class="k">if</span> <span class="n">var_unit_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var_unit_out</span> <span class="o">=</span> <span class="n">unit</span>
+
+        <span class="n">add_ts</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">merge_how</span> <span class="o">==</span> <span class="s1">&#39;eval&#39;</span><span class="p">:</span>
+
+        <span class="n">func</span> <span class="o">=</span> <span class="n">merge_eval_fun</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">col_order</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">col_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">col_order</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">col_names</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;=&#39;</span> <span class="ow">in</span> <span class="n">merge_eval_fun</span><span class="p">:</span>
+            <span class="c1"># make sure variable name is not in merge_eval_fun anymore, otherwise</span>
+            <span class="c1"># the eval method will return a DataFrame instead of a Series</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">add_ts</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">var_name_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">merge_eval_fun</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">var_name_out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">data_id</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">var_name_out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stat_other</span><span class="o">.</span><span class="n">data_id</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">add_ts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">var_unit_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Missing specification of output unit for var </span><span class="si">{}</span><span class="s1">&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_unit_out</span><span class="p">))</span>
+
+        <span class="n">var_info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ts_type&#39;</span>   <span class="p">:</span> <span class="n">to_ts_type</span><span class="p">,</span>
+                    <span class="s1">&#39;units&#39;</span>     <span class="p">:</span> <span class="n">var_unit_out</span><span class="p">}</span>
+
+        <span class="n">var_info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">merge_info_vars</span><span class="p">)</span>
+
+        <span class="n">new</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="n">var_name_out</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_info</span>
+        <span class="n">new</span><span class="p">[</span><span class="n">var_name_out</span><span class="p">]</span> <span class="o">=</span> <span class="n">add_ts</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_id_out</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">new</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_id_out</span>
+
+    <span class="k">return</span> <span class="n">new</span>
+
+<div class="viewcode-block" id="combine_vardata_ungridded"><a class="viewcode-back" href="../../api.html#pyaerocom.combine_vardata_ungridded.combine_vardata_ungridded">[docs]</a><span class="k">def</span> <span class="nf">combine_vardata_ungridded</span><span class="p">(</span><span class="n">data_ids_and_vars</span><span class="p">,</span>
+                              <span class="n">match_stats_how</span><span class="o">=</span><span class="s1">&#39;closest&#39;</span><span class="p">,</span>
+                              <span class="n">match_stats_tol_km</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                              <span class="n">merge_how</span><span class="o">=</span><span class="s1">&#39;combine&#39;</span><span class="p">,</span>
+                              <span class="n">merge_eval_fun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">var_name_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">data_id_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">var_unit_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">resample_how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                              <span class="n">apply_time_resampling_constraints</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">min_num_obs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Combine and colocate different variables from UngriddedData</span>
+
+<span class="sd">    This method allows to combine different variable timeseries from different</span>
+<span class="sd">    ungridded observation records in multiple ways. The source data may be all</span>
+<span class="sd">    included in a single instance of `UngriddedData` or in multiple, for</span>
+<span class="sd">    details see first input parameter :param:`data_ids_and_vars`. Merging can</span>
+<span class="sd">    be done in flexible ways, e.g. by combining measurements of the same</span>
+<span class="sd">    variable from 2 different datasets or by computing new variables based</span>
+<span class="sd">    on 2 measured variables (e.g. concox=concno2+conco3). Doing this requires</span>
+<span class="sd">    colocation of site locations and timestamps of both input observation</span>
+<span class="sd">    records, which is done in this method.</span>
+
+<span class="sd">    It comprises 2 major steps:</span>
+
+<span class="sd">        1. Compute list of :class:`StationData` objects for both input \</span>
+<span class="sd">            data combinations (data_id1 &amp; var1; data_id2 &amp; var2) and based \</span>
+<span class="sd">            on these, find the coincident locations. Finding coincident \</span>
+<span class="sd">            sites can either be done based on site location name or based on</span>
+<span class="sd">            their lat/lon locations. The method to use can be specified via</span>
+<span class="sd">            input arg :param:`match_stats_how`.</span>
+<span class="sd">        2. For all coincident locations, a new instance of :class:`StationData` \</span>
+<span class="sd">            is computed that has merged the 2 timeseries in the way</span>
+<span class="sd">            that can be specified through input args :param:`merge_how` and</span>
+<span class="sd">            :param:`merge_eval_fun`. If the 2 original timeseries from both</span>
+<span class="sd">            sites come in different temporal resolutions, they will be</span>
+<span class="sd">            resampled to the lower of both resolutions. Resampling constraints</span>
+<span class="sd">            that are supposed to be applied in that case can be provided via</span>
+<span class="sd">            the respective input args for temporal resampling. Default is</span>
+<span class="sd">            pyaerocom default, which corresponds to ~25% coverage constraint</span>
+<span class="sd">            (as of 22.10.2020) for major resolution steps, such as</span>
+<span class="sd">            daily-&gt;monthly.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Currently, only 2 variables can be combined to a new one (e.g.</span>
+<span class="sd">    concox=conco3+concno2).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Be aware of unit conversion issues that may arise if your input data is</span>
+<span class="sd">    not in AeroCom default units. For details see below.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_ids_and_vars : list</span>
+<span class="sd">        list of 3 element tuples, each containing, in the following order</span>
+<span class="sd">        1. instance of :class:`UngriddedData`; 2. dataset ID (remember that</span>
+<span class="sd">        UngriddedData can contain more than one dataset); and 3. variable name.</span>
+<span class="sd">        Note that currently only 2 of such tuples can be combined.</span>
+<span class="sd">    match_stats_how : str, optional</span>
+<span class="sd">        String specifying how site locations are supposed to be matched.</span>
+<span class="sd">        The default is &#39;closest&#39;. Supported are &#39;closest&#39; and &#39;station_name&#39;.</span>
+<span class="sd">    match_stats_tol_km : float, optional</span>
+<span class="sd">        radius tolerance in km for matching site locations when using &#39;closest&#39;</span>
+<span class="sd">        for site location matching. The default is 1.</span>
+<span class="sd">    merge_how : str, optional</span>
+<span class="sd">        String specifying how to merge variable data at site locations.</span>
+<span class="sd">        The default is &#39;combine&#39;. If both input variables are the same and</span>
+<span class="sd">        `combine` is used, then the first input variable will be preferred over</span>
+<span class="sd">        the other. Supported are &#39;combine&#39;, &#39;mean&#39; and &#39;eval&#39;, for the latter,</span>
+<span class="sd">        `merge_eval_fun` needs to be specified explicitly.</span>
+<span class="sd">    merge_eval_fun : str, optional</span>
+<span class="sd">        String specifying how `var1` and `var2` data should be evaluated (only</span>
+<span class="sd">        relevant if `merge_how=&#39;eval&#39;` is used) . The default is None. E.g. if</span>
+<span class="sd">        one wants to retrieve the column aerosol fine mode fraction at 550nm</span>
+<span class="sd">        (fmf550aer) through AERONET, this could be done through the SDA product</span>
+<span class="sd">        by prodiding data_id1 and var1 are &#39;AeronetSDA&#39; and &#39;od550aer&#39; and</span>
+<span class="sd">        second input data_id2 and var2 are &#39;AeronetSDA&#39; and &#39;od550lt1aer&#39; and</span>
+<span class="sd">        merge_eval_fun could then be</span>
+<span class="sd">        &#39;fmf550aer=(AeronetSDA;od550lt1aer/AeronetSDA;od550aer)*100&#39;. Note that</span>
+<span class="sd">        the input variables will be converted to their AeroCom default units,</span>
+<span class="sd">        so the specification of `merge_eval_fun` should take that into account</span>
+<span class="sd">        in case the originally read obsdata is not in default units.</span>
+<span class="sd">    var_name_out : str, optional</span>
+<span class="sd">        Name of output variable. Default is None, in which case it is attempted</span>
+<span class="sd">        to be inferred.</span>
+<span class="sd">    data_id_out : str, optional</span>
+<span class="sd">        `data_id` set in output `StationData` objects. Default is None, in</span>
+<span class="sd">        which case it is inferred from input data_ids (e.g. in above example</span>
+<span class="sd">        of merge_eval_fun, the output data_id would be &#39;AeronetSDA&#39; since both</span>
+<span class="sd">        input IDs are the same.</span>
+<span class="sd">    var_unit_out : str</span>
+<span class="sd">        unit of output variable. Is only strictly needed if merge_how=&#39;eval&#39;,</span>
+<span class="sd">        otherwise, it will be attempted to be inferred or an Exception will</span>
+<span class="sd">        be raised.</span>
+<span class="sd">    resample_how : str, optional</span>
+<span class="sd">        String specifying how temporal resampling should be done. The default</span>
+<span class="sd">        is &#39;mean&#39;.</span>
+<span class="sd">    apply_time_resampling_constraints : bool, optional</span>
+<span class="sd">        Boolean specifying whether constraints should be applied for temporal</span>
+<span class="sd">        resampling (e.g. at least X daily values to get a monthly mean).</span>
+<span class="sd">        The default is False.</span>
+<span class="sd">    min_num_obs : int or dict, optional</span>
+<span class="sd">        Minimum number of observations for temporal resampling.</span>
+<span class="sd">        The default is None in which case pyaerocom default is used, which</span>
+<span class="sd">        is available via pyaerocom.const.OBS_MIN_NUM_RESAMPLE.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If input for `merge_how` or `match_stats_how` is invalid.</span>
+<span class="sd">    NotImplementedError</span>
+<span class="sd">        If one of the input UngriddedData objects contains more than one</span>
+<span class="sd">        dataset.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    merged_stats : list</span>
+<span class="sd">        list of `StationData` objects containing the colocated and combined</span>
+<span class="sd">        variable data.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_input_data_ids_and_vars</span><span class="p">(</span><span class="n">data_ids_and_vars</span><span class="p">)</span>
+    <span class="n">data1</span><span class="p">,</span> <span class="n">data_id1</span><span class="p">,</span> <span class="n">var1</span> <span class="o">=</span> <span class="n">data_ids_and_vars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data2</span><span class="p">,</span> <span class="n">data_id2</span><span class="p">,</span> <span class="n">var2</span> <span class="o">=</span> <span class="n">data_ids_and_vars</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">data2</span> <span class="ow">is</span> <span class="n">data1</span> <span class="ow">and</span> <span class="n">var2</span> <span class="o">==</span> <span class="n">var1</span> <span class="ow">and</span> <span class="n">data_id1</span><span class="o">==</span><span class="n">data_id2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;nothing to combine...&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_id1</span> <span class="ow">in</span> <span class="n">data1</span><span class="o">.</span><span class="n">contains_datasets</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No such data ID </span><span class="si">{}</span><span class="s1"> in </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_id1</span><span class="p">,</span> <span class="n">data1</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data1</span><span class="o">.</span><span class="n">contains_datasets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">data1</span> <span class="o">=</span> <span class="n">data1</span><span class="o">.</span><span class="n">extract_dataset</span><span class="p">(</span><span class="n">data_id1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_id2</span> <span class="ow">in</span> <span class="n">data2</span><span class="o">.</span><span class="n">contains_datasets</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No such data ID </span><span class="si">{}</span><span class="s1"> in </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_id2</span><span class="p">,</span> <span class="n">data2</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data2</span><span class="o">.</span><span class="n">contains_datasets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">data2</span> <span class="o">=</span> <span class="n">data2</span><span class="o">.</span><span class="n">extract_dataset</span><span class="p">(</span><span class="n">data_id2</span><span class="p">)</span>
+
+    <span class="n">id1</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ObsVarCombi</span><span class="p">(</span><span class="n">data_id1</span><span class="p">,</span> <span class="n">var1</span><span class="p">))</span>
+    <span class="n">id2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ObsVarCombi</span><span class="p">(</span><span class="n">data_id2</span><span class="p">,</span> <span class="n">var2</span><span class="p">))</span>
+
+    <span class="n">data1_stats</span> <span class="o">=</span> <span class="n">data1</span><span class="o">.</span><span class="n">to_station_data_all</span><span class="p">(</span><span class="n">var1</span><span class="p">)</span>
+    <span class="n">data1_stats</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var1</span>
+    <span class="n">data1_stats</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">id1</span>
+
+    <span class="n">data2_stats</span> <span class="o">=</span> <span class="n">data2</span><span class="o">.</span><span class="n">to_station_data_all</span><span class="p">(</span><span class="n">var2</span><span class="p">)</span>
+    <span class="n">data2_stats</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var2</span>
+    <span class="n">data2_stats</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">id2</span>
+
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data1_stats</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data2_stats</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]):</span> <span class="c1">#</span>
+        <span class="n">short</span> <span class="o">=</span> <span class="n">data1_stats</span>
+        <span class="n">long</span> <span class="o">=</span> <span class="n">data2_stats</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">short</span> <span class="o">=</span> <span class="n">data2_stats</span>
+        <span class="n">long</span> <span class="o">=</span> <span class="n">data1_stats</span>
+
+    <span class="n">match_stats_opts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span> <span class="s1">&#39;closest&#39;</span><span class="p">]</span>
+
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">match_stats_how</span> <span class="ow">in</span> <span class="n">match_stats_opts</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for match_stats_how </span><span class="si">{}</span><span class="s1">, choose from </span><span class="si">{}</span><span class="s1">&#39;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">match_stats_how</span><span class="p">,</span> <span class="n">match_stats_opts</span><span class="p">))</span>
+
+    <span class="n">merge_how_opts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;combine&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;eval&#39;</span><span class="p">]</span>
+
+    <span class="c1"># if e.g. merge_how is combine and var==var2, then the preferred</span>
+    <span class="c1"># dataset &amp; variable can be provided via this instance</span>
+    <span class="n">prefer</span> <span class="o">=</span> <span class="n">id1</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">merge_how</span> <span class="ow">in</span> <span class="n">merge_how_opts</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">invalid_input_err_str</span><span class="p">(</span>
+            <span class="s1">&#39;merge_how&#39;</span><span class="p">,</span> <span class="n">merge_how</span><span class="p">,</span> <span class="n">merge_how_opts</span><span class="p">))</span>
+
+    <span class="k">elif</span> <span class="n">merge_how</span> <span class="o">==</span> <span class="s1">&#39;eval&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">merge_eval_fun</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please specify evaluation function for mode eval&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">x</span> <span class="ow">in</span> <span class="n">merge_eval_fun</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">]]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;merge_eval_fun needs to include both input &#39;</span>
+                             <span class="s1">&#39;datasets;variables (e.g. </span><span class="si">{}</span><span class="s1"> + </span><span class="si">{}</span><span class="s1">&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s1">&#39;=&#39;</span> <span class="ow">in</span> <span class="n">merge_eval_fun</span><span class="p">:</span>
+            <span class="n">spl</span> <span class="o">=</span> <span class="n">merge_eval_fun</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;merge_eval_fun contains more than 1 equality &#39;</span>
+                                 <span class="s1">&#39;symbol...&#39;</span><span class="p">)</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">merge_eval_fun</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="n">var_name_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">merge_eval_fun</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">var_name_out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_id1</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">var_name_out</span> <span class="o">=</span> <span class="n">var_name_out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data_id2</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="n">merge_info_vars</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;merge_how&#39;</span> <span class="p">:</span> <span class="n">merge_how</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">merge_how</span> <span class="o">==</span> <span class="s1">&#39;combine&#39;</span> <span class="ow">and</span> <span class="n">var1</span><span class="o">==</span><span class="n">var2</span><span class="p">:</span>
+        <span class="n">merge_info_vars</span><span class="p">[</span><span class="s1">&#39;prefer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prefer</span>
+    <span class="k">elif</span> <span class="n">merge_how</span> <span class="o">==</span> <span class="s1">&#39;eval&#39;</span><span class="p">:</span>
+        <span class="n">merge_info_vars</span><span class="p">[</span><span class="s1">&#39;merge_eval_fun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_eval_fun</span>
+
+    <span class="p">(</span><span class="n">_index_short</span><span class="p">,</span>
+     <span class="n">_index_long</span><span class="p">,</span>
+     <span class="n">_statnames_short</span><span class="p">,</span>
+     <span class="n">_statnames_long</span><span class="p">)</span><span class="o">=</span><span class="n">_map_same_stations</span><span class="p">(</span><span class="n">short</span><span class="p">,</span> <span class="n">long</span><span class="p">,</span> <span class="n">match_stats_how</span><span class="p">,</span>
+                                         <span class="n">match_stats_tol_km</span><span class="p">)</span>
+
+
+    <span class="n">merged_stats</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">var_short</span><span class="p">,</span> <span class="n">var_long</span> <span class="o">=</span> <span class="n">short</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">],</span> <span class="n">long</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">idx_short</span><span class="p">,</span> <span class="n">idx_long</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">_index_short</span><span class="p">,</span> <span class="n">_index_long</span><span class="p">):</span>
+
+        <span class="n">stat_short</span> <span class="o">=</span> <span class="n">short</span><span class="p">[</span><span class="s1">&#39;stats&#39;</span><span class="p">][</span><span class="n">idx_short</span><span class="p">]</span>
+        <span class="n">stat_short</span><span class="o">.</span><span class="n">check_var_unit_aerocom</span><span class="p">(</span><span class="n">var_short</span><span class="p">)</span>
+        <span class="n">stat_long</span> <span class="o">=</span> <span class="n">long</span><span class="p">[</span><span class="s1">&#39;stats&#39;</span><span class="p">][</span><span class="n">idx_long</span><span class="p">]</span>
+        <span class="n">stat_long</span><span class="o">.</span><span class="n">check_var_unit_aerocom</span><span class="p">(</span><span class="n">var_long</span><span class="p">)</span>
+
+        <span class="c1"># prepare output StationData object (will contain colocated timeseries</span>
+        <span class="c1"># of both input variables as well as, additionally retrieved variable,</span>
+        <span class="c1"># if applicable)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">_combine_2_sites</span><span class="p">(</span><span class="n">stat_short</span><span class="p">,</span> <span class="n">var_short</span><span class="p">,</span> <span class="n">stat_long</span><span class="p">,</span> <span class="n">var_long</span><span class="p">,</span>
+                              <span class="n">merge_how</span><span class="p">,</span> <span class="n">merge_eval_fun</span><span class="p">,</span>
+                              <span class="n">match_stats_tol_km</span><span class="p">,</span> <span class="n">var_name_out</span><span class="p">,</span>
+                              <span class="n">data_id_out</span><span class="p">,</span> <span class="n">var_unit_out</span><span class="p">,</span> <span class="n">resample_how</span><span class="p">,</span>
+                              <span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
+                              <span class="n">min_num_obs</span><span class="p">,</span> <span class="n">prefer</span><span class="p">,</span> <span class="n">merge_info_vars</span><span class="p">)</span>
+
+        <span class="n">merged_stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">merged_stats</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+    <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">testing</span> <span class="k">as</span> <span class="n">npt</span>
+    <span class="kn">from</span> <span class="nn">pyaerocom.conftest</span> <span class="kn">import</span> <span class="n">TEST_PATHS</span>
+
+
+    <span class="c1"># Tests based on whole datasets</span>
+    <span class="n">fineaod</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;AeronetSDAV3Lev2.daily&#39;</span><span class="p">,</span> <span class="s1">&#39;od550lt1aer&#39;</span><span class="p">)</span>
+    <span class="n">aod</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
+
+    <span class="n">fmffun</span> <span class="o">=</span> <span class="s1">&#39;fmf550aer=(AeronetSDAV3Lev2.daily;od550lt1aer/AeronetSunV3Lev2.daily;od550aer)*100&#39;</span>
+
+    <span class="n">input_data</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">fineaod</span><span class="p">,</span> <span class="s1">&#39;AeronetSDAV3Lev2.daily&#39;</span><span class="p">,</span> <span class="s1">&#39;od550lt1aer&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">aod</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">stats_merged</span> <span class="o">=</span> <span class="n">combine_vardata_ungridded</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span>
+                                             <span class="n">merge_eval_fun</span><span class="o">=</span><span class="n">fmffun</span><span class="p">,</span>
+                                             <span class="n">var_unit_out</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span>
+                                             <span class="n">merge_how</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">)</span>
+    <span class="c1"># Tests based on testdata</span>
+    <span class="n">testdatadir</span> <span class="o">=</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">_TESTDATADIR</span><span class="p">)</span>
+    <span class="n">obs_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">testdatadir</span><span class="p">,</span> <span class="n">TEST_PATHS</span><span class="p">[</span><span class="s1">&#39;AeronetSunV3L2Subset.daily&#39;</span><span class="p">])</span>
+    <span class="n">obs_ref_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">testdatadir</span><span class="p">,</span> <span class="n">TEST_PATHS</span><span class="p">[</span><span class="s1">&#39;AeronetSDAV3L2Subset.daily&#39;</span><span class="p">])</span>
+
+    <span class="n">pya</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">add_ungridded_obs</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">,</span> <span class="n">obs_path</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadAeronetSunV3</span><span class="p">)</span>
+    <span class="n">pya</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">add_ungridded_obs</span><span class="p">(</span><span class="s1">&#39;AeronetSdaV3&#39;</span><span class="p">,</span> <span class="n">obs_ref_path</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadAeronetSdaV3</span><span class="p">)</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">)</span>
+    <span class="n">r_ref</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">(</span><span class="s1">&#39;AeronetSdaV3&#39;</span><span class="p">)</span>
+
+    <span class="n">sun_aod</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;od550aer&#39;</span><span class="p">],</span>
+                     <span class="n">common_meta</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ts_type&#39;</span><span class="p">:</span><span class="s1">&#39;daily&#39;</span><span class="p">})</span>
+    <span class="n">sun_ang</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">],</span>
+                     <span class="n">common_meta</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ts_type&#39;</span><span class="p">:</span><span class="s1">&#39;daily&#39;</span><span class="p">})</span>
+
+
+
+    <span class="c1"># TEST 1 (use &quot;combine with 2 different variables&quot;) using &quot;closest&quot; sites</span>
+    <span class="c1"># for matching site locations</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sun_aod</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="n">sun_ang</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">,</span> <span class="s1">&#39;ang4487aer&#39;</span><span class="p">)]</span>
+
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">combine_vardata_ungridded</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span>
+                                      <span class="n">match_stats_how</span><span class="o">=</span><span class="s1">&#39;closest&#39;</span><span class="p">,</span>
+                                      <span class="n">merge_how</span><span class="o">=</span><span class="s1">&#39;combine&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">UngriddedData</span><span class="o">.</span><span class="n">from_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">unique_station_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">18</span>
+    <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="s1">&#39;od550aer&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="s1">&#39;ang4487aer&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AeronetSunV3&#39;</span>
+
+    <span class="c1"># TEST 2 (use &quot;combine with 2 different variables&quot;) using station names</span>
+    <span class="c1"># for matching site locations</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sun_aod</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="n">sun_ang</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">,</span> <span class="s1">&#39;ang4487aer&#39;</span><span class="p">)]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">UngriddedData</span><span class="o">.</span><span class="n">from_station_data</span><span class="p">(</span><span class="n">combine_vardata_ungridded</span><span class="p">(</span>
+        <span class="n">input_data</span><span class="p">,</span>
+        <span class="n">match_stats_how</span><span class="o">=</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span>
+        <span class="n">data_id_out</span> <span class="o">=</span> <span class="s1">&#39;BLAAAAAA&#39;</span><span class="p">,</span>
+        <span class="n">merge_how</span><span class="o">=</span><span class="s1">&#39;combine&#39;</span><span class="p">))</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">unique_station_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">18</span>
+    <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="s1">&#39;od550aer&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="s1">&#39;ang4487aer&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;BLAAAAAA&#39;</span>
+
+    <span class="n">sda_aods</span> <span class="o">=</span> <span class="n">r_ref</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550lt1aer&#39;</span><span class="p">],</span>
+                         <span class="n">common_meta</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ts_type&#39;</span><span class="p">:</span><span class="s1">&#39;daily&#39;</span><span class="p">})</span>
+
+    <span class="c1"># TEST 3 (use &quot;combine with the same variables&quot;) using station names</span>
+    <span class="c1"># for matching site locations</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sun_aod</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="n">sda_aods</span><span class="p">,</span> <span class="s1">&#39;AeronetSdaV3&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">)]</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">UngriddedData</span><span class="o">.</span><span class="n">from_station_data</span><span class="p">(</span><span class="n">combine_vardata_ungridded</span><span class="p">(</span>
+        <span class="n">input_data</span><span class="p">,</span>
+        <span class="n">match_stats_how</span><span class="o">=</span><span class="s1">&#39;station_name&#39;</span><span class="p">,</span>
+        <span class="n">merge_how</span><span class="o">=</span><span class="s1">&#39;combine&#39;</span><span class="p">))</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">unique_station_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">13</span>
+    <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="s1">&#39;od550aer&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+        <span class="n">vi</span> <span class="o">=</span>  <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">][</span><span class="s1">&#39;od550aer&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="s1">&#39;merge_how&#39;</span> <span class="ow">in</span> <span class="n">vi</span>
+        <span class="k">assert</span> <span class="n">vi</span><span class="p">[</span><span class="s1">&#39;merge_how&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;combine&#39;</span>
+        <span class="k">assert</span> <span class="s1">&#39;prefer&#39;</span> <span class="ow">in</span> <span class="n">vi</span>
+        <span class="k">assert</span> <span class="n">vi</span><span class="p">[</span><span class="s1">&#39;prefer&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AeronetSunV3;od550aer&#39;</span>
+
+
+    <span class="c1"># TEST 4 (use &quot;eval to compute od500aer from od550aer and ang4487aer&quot;)</span>
+    <span class="c1"># using &quot;closest&quot; sites for matching site locations</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sun_aod</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">),</span>
+                  <span class="p">(</span><span class="n">sun_ang</span><span class="p">,</span> <span class="s1">&#39;AeronetSunV3&#39;</span><span class="p">,</span> <span class="s1">&#39;ang4487aer&#39;</span><span class="p">)]</span>
+
+    <span class="n">func</span> <span class="o">=</span> <span class="s1">&#39;od500aer=AeronetSunV3;od550aer*(500/550)**(-AeronetSunV3;ang4487aer)&#39;</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">UngriddedData</span><span class="o">.</span><span class="n">from_station_data</span><span class="p">(</span><span class="n">combine_vardata_ungridded</span><span class="p">(</span>
+        <span class="n">input_data</span><span class="p">,</span>
+        <span class="n">match_stats_how</span><span class="o">=</span><span class="s1">&#39;closest&#39;</span><span class="p">,</span>
+        <span class="n">merge_how</span><span class="o">=</span><span class="s1">&#39;eval&#39;</span><span class="p">,</span>
+        <span class="n">merge_eval_fun</span><span class="o">=</span><span class="n">func</span><span class="p">,</span>
+        <span class="n">var_unit_out</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">))</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">unique_station_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">18</span>
+
+    <span class="n">test_vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">test_vals_computed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="s1">&#39;od550aer&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="s1">&#39;ang4487aer&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="s1">&#39;od500aer&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+
+        <span class="n">od550aer</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">meta_idx</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;od550aer&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">_DATAINDEX</span><span class="p">]</span>
+        <span class="n">od500aer</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">meta_idx</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;od500aer&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">_DATAINDEX</span><span class="p">]</span>
+        <span class="n">ang4487aer</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">meta_idx</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;ang4487aer&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">_DATAINDEX</span><span class="p">]</span>
+
+        <span class="n">test_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">od500aer</span><span class="p">)</span>
+        <span class="n">test_vals_computed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">od550aer</span> <span class="o">*</span> <span class="p">(</span><span class="mi">500</span><span class="o">/</span><span class="mi">550</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">ang4487aer</span><span class="p">))</span>
+
+    <span class="n">npt</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">test_vals</span><span class="p">,</span> <span class="n">test_vals_computed</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MET Norway
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
