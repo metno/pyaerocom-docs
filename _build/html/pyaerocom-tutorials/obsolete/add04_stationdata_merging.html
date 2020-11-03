@@ -1,0 +1,1276 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Merging of several StationData objects into one &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Short tutorial showing how trends can be computed within pyaerocom" href="tut08_trends_computation.html" />
+    <link rel="prev" title="Colocation of model data with observations" href="tut07_intro_colocation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#getting-started">Getting started</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#outdated-tutorials">Outdated tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tut00_get_started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut01_intro_regions.html">AEROCOM default regions (class <code class="docutils literal notranslate"><span class="pre">Region</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut04_intro_class_GriddedData.html">The <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut05_intro_ungridded_reading.html">Reading of ungridded observation datasets in pyaerocom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut06_intro_UngriddedData_and_StationData_classes.html">Introduction into the UngriddedData class and the StationData class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut07_intro_colocation.html">Colocation of model data with observations</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Merging of several StationData objects into one</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Get-list-of-all-files-containing-scattering-data-for-EBAS-station-Jungfraujoch">Get list of all files containing scattering data for EBAS station Jungfraujoch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Comment-for-convenience….">Comment for convenience….</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#What-about-overlapping-data-??">What about overlapping data ??</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#How-to-prioritise-certain-stations-from-others,-when-deciding-what-goes-into-overlap-and-what-into-the-final-timeseries?">How to prioritise certain stations from others, when deciding what goes into overlap and what into the final timeseries?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tut08_trends_computation.html">Short tutorial showing how trends can be computed within pyaerocom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add03_ebas_database_browser.html">EBAS file query and database browser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add02_read_ebas_nasa_ames.html">Tutorial showing how to read EBAS NASA Ames files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Tutorials</a> &raquo;</li>
+        
+      <li>Merging of several StationData objects into one</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/pyaerocom-tutorials/obsolete/add04_stationdata_merging.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    min-width: 5ex;
+    padding-top: 0.3rem;
+    padding-right: 0.3rem;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 0.3rem;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Merging-of-several-StationData-objects-into-one">
+<h1>Merging of several StationData objects into one<a class="headerlink" href="#Merging-of-several-StationData-objects-into-one" title="Permalink to this headline">¶</a></h1>
+<p>This notebook illustrates to can merge several instances StationData objects into one objects. This merging only works for data from the same station and a typical case is if the data source files for one station are separated into many single files containing only parts of the data (e.g. if the files contain only one year of data).</p>
+<p>In the following, the example of the EBAS database is used for illustration. In particular, we will focus on the retrieval of the aerosol light scattering coefficients at 550 nm (<strong>scatc550aer</strong> in AEROCOM naming convention) for the station <strong>Jungfraujoch</strong>, located in Germany.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Initating pyaerocom configuration
+Checking database access...
+Checking access to: /lustre/storeA
+Access to lustre database: True
+Init data paths for lustre
+Expired time: 0.016 s
+</pre></div></div>
+</div>
+<div class="section" id="Get-list-of-all-files-containing-scattering-data-for-EBAS-station-Jungfraujoch">
+<h2>Get list of all files containing scattering data for EBAS station Jungfraujoch<a class="headerlink" href="#Get-list-of-all-files-containing-scattering-data-for-EBAS-station-Jungfraujoch" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadEbas</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span>
+                            <span class="n">datalevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">station_names</span><span class="o">=</span><span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Retrieving EBAS files for variables
+[&#39;scatc550aer&#39;]
+Reading files 1-3 of 28 (ReadEbas) | 18:10:51 (delta = 0 s&#39;)
+Reading files 3-5 of 28 (ReadEbas) | 18:10:52 (delta = 0 s&#39;)
+Reading files 5-7 of 28 (ReadEbas) | 18:10:52 (delta = 0 s&#39;)
+Reading files 7-9 of 28 (ReadEbas) | 18:10:53 (delta = 0 s&#39;)
+Reading files 9-11 of 28 (ReadEbas) | 18:10:53 (delta = 0 s&#39;)
+Reading files 11-13 of 28 (ReadEbas) | 18:10:54 (delta = 0 s&#39;)
+Reading files 13-15 of 28 (ReadEbas) | 18:10:55 (delta = 0 s&#39;)
+Reading files 15-17 of 28 (ReadEbas) | 18:10:55 (delta = 0 s&#39;)
+Reading files 17-19 of 28 (ReadEbas) | 18:10:56 (delta = 0 s&#39;)
+Reading files 19-21 of 28 (ReadEbas) | 18:10:57 (delta = 0 s&#39;)
+Reading files 21-23 of 28 (ReadEbas) | 18:10:58 (delta = 0 s&#39;)
+Reading files 23-25 of 28 (ReadEbas) | 18:10:59 (delta = 1 s&#39;)
+Reading files 25-27 of 28 (ReadEbas) | 18:11:00 (delta = 1 s&#39;)
+Reading files 27-29 of 28 (ReadEbas) | 18:11:01 (delta = 1 s&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom UngriddedData
+-----------------------
+Contains networks: [&#39;EBASMC&#39;]
+Contains variables: [&#39;scatc550aer&#39;]
+Contains instruments: [&#39;IN3563&#39;, &#39;TSI_3563_JFJ_dry&#39;, &#39;Ecotech_Aurora3000_JFJ_dry&#39;]
+Total no. of meta-blocks: 28
+Filters that were applied:
+ Filter time log: 20191003181051
+        prefer_statistics: [&#39;arithmetic mean&#39;, &#39;median&#39;]
+        wavelength_tol_nm: 50
+        datalevel: 2
+        station_names: Jungfraujoch
+ Filter time log: 20191003181102
+        Removed 0 metadata blocks that have no data assigned
+</pre></div></div>
+</div>
+<p>As you can see, the data has successfully been imported into an instance of the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> class. This class is organised <em>by file</em>, that is, for each of the 26 files that were imported, there is one metadata dictionary assigned. Let’s look at the metadata from the first file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+OrderedDict([(&#39;latitude&#39;, 46.5475),
+             (&#39;longitude&#39;, 7.985),
+             (&#39;altitude&#39;, 3578.0),
+             (&#39;filename&#39;,
+              &#39;CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas&#39;),
+             (&#39;station_id&#39;, &#39;CH0001G&#39;),
+             (&#39;station_name&#39;, &#39;Jungfraujoch&#39;),
+             (&#39;instrument_name&#39;, &#39;IN3563&#39;),
+             (&#39;PI&#39;, &#39;Baltensperger, Urs; Weingartner, Ernest&#39;),
+             (&#39;country&#39;, None),
+             (&#39;ts_type&#39;, &#39;hourly&#39;),
+             (&#39;data_id&#39;, &#39;EBASMC&#39;),
+             (&#39;dataset_name&#39;, None),
+             (&#39;data_product&#39;, None),
+             (&#39;data_version&#39;, None),
+             (&#39;data_level&#39;, 2),
+             (&#39;revision_date&#39;, numpy.datetime64(&#39;2018-10-31T00:00:00&#39;)),
+             (&#39;website&#39;, None),
+             (&#39;ts_type_src&#39;, None),
+             (&#39;stat_merge_pref_attr&#39;, None),
+             (&#39;data_revision&#39;, &#39;20190701&#39;),
+             (&#39;var_info&#39;,
+              OrderedDict([(&#39;scatc550aer&#39;,
+                            OrderedDict([(&#39;name&#39;,
+                                          &#39;aerosol_light_scattering_coefficient&#39;),
+                                         (&#39;units&#39;, &#39;1/Mm&#39;),
+                                         (&#39;wavelength&#39;, &#39;550.0 nm&#39;),
+                                         (&#39;method_ref&#39;, &#39;CH02L_scat_coef&#39;),
+                                         (&#39;matrix&#39;, &#39;aerosol&#39;),
+                                         (&#39;statistics&#39;,
+                                          &#39;arithmetic mean&#39;)]))])),
+             (&#39;variables&#39;, [&#39;scatc550aer&#39;])])
+</pre></div></div>
+</div>
+<p>And the last one:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">data</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+OrderedDict([(&#39;latitude&#39;, 46.5475),
+             (&#39;longitude&#39;, 7.985),
+             (&#39;altitude&#39;, 3580.0),
+             (&#39;filename&#39;,
+              &#39;CH0001G.20170101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas&#39;),
+             (&#39;station_id&#39;, &#39;CH0001G&#39;),
+             (&#39;station_name&#39;, &#39;Jungfraujoch&#39;),
+             (&#39;instrument_name&#39;, &#39;Ecotech_Aurora3000_JFJ_dry&#39;),
+             (&#39;PI&#39;, &#39;Bukowiecki, Nicolas; Baltensperger, Urs&#39;),
+             (&#39;country&#39;, None),
+             (&#39;ts_type&#39;, &#39;hourly&#39;),
+             (&#39;data_id&#39;, &#39;EBASMC&#39;),
+             (&#39;dataset_name&#39;, None),
+             (&#39;data_product&#39;, None),
+             (&#39;data_version&#39;, None),
+             (&#39;data_level&#39;, 2),
+             (&#39;revision_date&#39;, numpy.datetime64(&#39;2019-05-24T00:00:00&#39;)),
+             (&#39;website&#39;, None),
+             (&#39;ts_type_src&#39;, None),
+             (&#39;stat_merge_pref_attr&#39;, None),
+             (&#39;data_revision&#39;, &#39;20190701&#39;),
+             (&#39;var_info&#39;,
+              OrderedDict([(&#39;scatc550aer&#39;,
+                            OrderedDict([(&#39;name&#39;,
+                                          &#39;aerosol_light_scattering_coefficient&#39;),
+                                         (&#39;units&#39;, &#39;1/Mm&#39;),
+                                         (&#39;wavelength&#39;, &#39;525.0 nm&#39;),
+                                         (&#39;statistics&#39;, &#39;arithmetic mean&#39;),
+                                         (&#39;matrix&#39;, &#39;aerosol&#39;)]))])),
+             (&#39;variables&#39;, [&#39;scatc550aer&#39;])])
+</pre></div></div>
+</div>
+<p>As you can see, both files contain scattering data but do not share all the same metadata attributes (e.g. <code class="docutils literal notranslate"><span class="pre">instrument_name</span></code> is different, which might be due to technological updates over time).</p>
+<p>Let’s have a look at the respective time-series for both stations. First, convert into instance of <code class="docutils literal notranslate"><span class="pre">StationData</span></code> class and then plot.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">first_file</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="o">=</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">first_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom StationData
+---------------------
+var_info (BrowseDict):
+  scatc550aer (OrderedDict):
+    name: aerosol_light_scattering_coefficient
+    units: 1/Mm
+    wavelength: 550.0 nm
+    method_ref: CH02L_scat_coef
+    matrix: aerosol
+    statistics: arithmetic mean
+    overlap: False
+station_coords (dict):
+  latitude: 46.5475
+  longitude: 7.985
+  altitude: 3578.0
+data_err (BrowseDict): &lt;empty_dict&gt;
+overlap (BrowseDict): &lt;empty_dict&gt;
+data_flagged (BrowseDict):
+  scatc550aer (ndarray, 8760 items): [1.00, 1.00, ..., 0.0, 0.0]
+filename: CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas
+station_id: CH0001G
+station_name: Jungfraujoch
+instrument_name: IN3563
+PI: Baltensperger, Urs; Weingartner, Ernest
+country: None
+ts_type: hourly
+latitude: 46.5475
+longitude: 7.985
+altitude: 3578.0
+data_id: EBASMC
+dataset_name: None
+data_product: None
+data_version: None
+data_level: 2
+revision_date: 2018-10-31T00:00:00
+website: None
+ts_type_src: hourly
+stat_merge_pref_attr: None
+data_revision: 20190701
+
+Data arrays
+.................
+dtime (ndarray, 8760 items): [1995-01-01T00:30:00.000000000, 1995-01-01T01:29:59.000000000, ..., 1995-12-31T22:29:59.000000000, 1995-12-31T23:29:59.000000000]
+Pandas Series
+.................
+scatc550aer (Series, 8760 items)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">last_file</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">last_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom StationData
+---------------------
+var_info (BrowseDict):
+  scatc550aer (OrderedDict):
+    name: aerosol_light_scattering_coefficient
+    units: 1/Mm
+    wavelength: 525.0 nm
+    statistics: arithmetic mean
+    matrix: aerosol
+    overlap: False
+station_coords (dict):
+  latitude: 46.5475
+  longitude: 7.985
+  altitude: 3580.0
+data_err (BrowseDict): &lt;empty_dict&gt;
+overlap (BrowseDict): &lt;empty_dict&gt;
+data_flagged (BrowseDict):
+  scatc550aer (ndarray, 8760 items): [1.00, 1.00, ..., 1.00, 0.0]
+filename: CH0001G.20170101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas
+station_id: CH0001G
+station_name: Jungfraujoch
+instrument_name: Ecotech_Aurora3000_JFJ_dry
+PI: Bukowiecki, Nicolas; Baltensperger, Urs
+country: None
+ts_type: hourly
+latitude: 46.5475
+longitude: 7.985
+altitude: 3580.0
+data_id: EBASMC
+dataset_name: None
+data_product: None
+data_version: None
+data_level: 2
+revision_date: 2019-05-24T00:00:00
+website: None
+ts_type_src: hourly
+stat_merge_pref_attr: None
+data_revision: 20190701
+
+Data arrays
+.................
+dtime (ndarray, 8760 items): [2017-01-01T00:30:00.000000000, 2017-01-01T01:29:59.000000000, ..., 2017-12-31T22:29:59.000000000, 2017-12-31T23:29:59.000000000]
+Pandas Series
+.................
+scatc550aer (Series, 8760 items)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">first_file</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_11_0.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_11_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">last_file</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_12_0.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_12_0.png" />
+</div>
+</div>
+<p>As you can see, the files contain data from different years. Now, how can we get these objects into one object that contains the timeseries of both files from this station?</p>
+<p>This is actually very easy:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">merged</span> <span class="o">=</span> <span class="n">first_file</span><span class="o">.</span><span class="n">merge_other</span><span class="p">(</span><span class="n">last_file</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom StationData
+---------------------
+var_info (BrowseDict):
+  scatc550aer (OrderedDict):
+    name: aerosol_light_scattering_coefficient
+    units: 1/Mm
+    wavelength: 550.0 nm;525.0 nm
+    method_ref: CH02L_scat_coef
+    matrix: aerosol
+    statistics: arithmetic mean
+    overlap: False
+    ts_type: hourly
+    apply_constraints: False
+    min_num_obs: None
+station_coords (dict):
+  latitude: 46.5475
+  longitude: 7.985
+  altitude: 3578.0
+data_err (BrowseDict): &lt;empty_dict&gt;
+overlap (BrowseDict): &lt;empty_dict&gt;
+data_flagged (BrowseDict):
+  scatc550aer (ndarray, 8760 items): [1.00, 1.00, ..., 0.0, 0.0]
+filename: CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.20170101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas
+station_id: CH0001G
+station_name: Jungfraujoch
+instrument_name: IN3563; Ecotech_Aurora3000_JFJ_dry
+PI: Baltensperger, Urs; Weingartner, Ernest; Bukowiecki, Nicolas
+country: None
+ts_type: hourly
+latitude: 46.5475
+longitude: 7.985
+altitude: 3578.0
+data_id: EBASMC
+dataset_name: None
+data_product: None
+data_version: None
+data_level: 2
+revision_date (list, 2 items): [numpy.datetime64(&#39;2018-10-31T00:00:00&#39;), numpy.datetime64(&#39;2019-05-24T00:00:00&#39;)]
+website: None
+ts_type_src: hourly
+stat_merge_pref_attr: None
+data_revision: 20190701
+
+Data arrays
+.................
+dtime (ndarray, 9794 items): [1995-07-08T23:00:00.000000000, 1995-07-09T00:00:00.000000000, ..., 2017-12-24T19:00:00.000000000, 2017-12-31T23:00:00.000000000]
+Pandas Series
+.................
+scatc550aer (Series, 9794 items)
+</pre></div></div>
+</div>
+<p>As you can see in the output, the merging comprises not only the data arrays but also registers any differences in the assoicated metdadata (cf. e.g., sampling wavelength 550 nm vs. 525 nm, instrument name, PI)</p>
+<p>Now, have a look at the merged timeseries data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">merged</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_17_0.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_17_0.png" />
+</div>
+</div>
+<p>Looks okay. Let’s merge all 26 files and see if we get a nice long time series.</p>
+<p>Retrieve list of <code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">merge_if_multi</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of StationData objects retrieved: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stats</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of StationData objects retrieved: 28
+</pre></div></div>
+</div>
+<p>Now merge them into one long time series:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">merged</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom StationData
+---------------------
+var_info (BrowseDict):
+  scatc550aer (OrderedDict):
+    name: aerosol_light_scattering_coefficient
+    units: 1/Mm
+    wavelength: 550.0 nm;525.0 nm
+    statistics: arithmetic mean
+    matrix: aerosol
+    overlap: False
+    ts_type: hourly
+    apply_constraints: False
+    min_num_obs: None
+    method_ref: CH02L_scat_coef
+station_coords (dict):
+  latitude: 46.5475
+  longitude: 7.985
+  altitude: 3580.0
+data_err (BrowseDict): &lt;empty_dict&gt;
+overlap (BrowseDict):
+  scatc550aer: 2015-01-01 01:00:00    0.255198
+2015-01-01 02:00:00   -0.284809
+2015-01-01 03:00:00    0.123830
+2015-01-01 04:00:00    0.127599
+2015-01-01 05:00:00    0.052224
+                         ...
+2018-12-31 19:00:00   -0.030204
+2018-12-31 20:00:00    0.625988
+2018-12-31 21:00:00    0.178854
+2018-12-31 22:00:00    0.175893
+2018-12-31 23:00:00    0.329280
+Length: 25787, dtype: float64
+data_flagged (BrowseDict):
+  scatc550aer (ndarray, 8760 items): [0.0, 0.0, ..., 0.0, 0.0]
+filename: CH0001G.20010101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20100101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20060101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20180101000000.20190520125514.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas; CH0001G.20040101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20180101000000.20190520124723.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20080101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20050101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20070101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20110101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20030101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20150101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas; CH0001G.20170101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20160101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20000101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.20140101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20020101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20090101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20120101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20130101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.19980101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.19960101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.20170101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas; CH0001G.19990101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.20150101000000.20190524142901.nephelometer..aerosol.1y.1h.CH02L_TSI_3563_JFJ_dry.CH02L_Neph_3563.lev2.nas; CH0001G.20160101000000.20190524143212.nephelometer..aerosol.1y.1h.CH02L_Ecotech_Aurora3000_JFJ_dry.CH02L_Neph_Aurora3000.lev2.nas; CH0001G.19970101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas; CH0001G.19950101000000.20181031145000.nephelometer..aerosol.1y.1h.CH02L_IN3563.CH02L_backscat_coef.lev2.nas
+station_id: CH0001G
+station_name: Jungfraujoch
+instrument_name: TSI_3563_JFJ_dry; Ecotech_Aurora3000_JFJ_dry; IN3563
+PI: Baltensperger, Urs; Weingartner, Ernest; Bukowiecki, Nicolas
+country: None
+ts_type: hourly
+latitude: 46.5475
+longitude: 7.985
+altitude: 3580.0
+data_id: EBASMC
+dataset_name: None
+data_product: None
+data_version: None
+data_level: 2
+revision_date (list, 3 items): [numpy.datetime64(&#39;2019-05-24T00:00:00&#39;), numpy.datetime64(&#39;2019-05-20T00:00:00&#39;), numpy.datetime64(&#39;2018-10-31T00:00:00&#39;)]
+website: None
+ts_type_src: hourly
+stat_merge_pref_attr: None
+data_revision: 20190701
+
+Data arrays
+.................
+dtime (ndarray, 205849 items): [1995-07-08T23:00:00.000000000, 1995-07-09T00:00:00.000000000, ..., 2018-12-31T22:00:00.000000000, 2018-12-31T23:00:00.000000000]
+Pandas Series
+.................
+scatc550aer (Series, 205849 items)
+</pre></div></div>
+</div>
+<p>And plot…</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+<span class="n">merged</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">merged</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">merged</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;yearly&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_23_0.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_23_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Comment-for-convenience….">
+<h2>Comment for convenience….<a class="headerlink" href="#Comment-for-convenience…." title="Permalink to this headline">¶</a></h2>
+<p>Actually, in the default setup you do not really need to think about all this. As you might have recognised, when creating the list of <code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects from the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> object (using method <code class="docutils literal notranslate"><span class="pre">to_station_data</span></code>) we parsed the argument <code class="docutils literal notranslate"><span class="pre">merge_if_multi=False</span></code>.</p>
+<p>The default here is <code class="docutils literal notranslate"><span class="pre">True</span></code>, so you can just go ahead and do:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f9d348975f8&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_25_1.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_25_1.png" />
+</div>
+</div>
+<p>What’s happening here is, that <code class="docutils literal notranslate"><span class="pre">to_station_data</span></code> internally creates a list of <code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects and uses the above illustrated method <code class="docutils literal notranslate"><span class="pre">merge_station_data</span></code> at the end if the input argument <code class="docutils literal notranslate"><span class="pre">merge_if_multi=True</span></code>.</p>
+</div>
+<div class="section" id="What-about-overlapping-data-??">
+<h2>What about overlapping data ??<a class="headerlink" href="#What-about-overlapping-data-??" title="Permalink to this headline">¶</a></h2>
+<p>In some situations, there may be overlapping conflicts when merging multiple time series into one long time-series. In the following, we illustrate how these overlaps are handled if they occur.</p>
+<p>The method <code class="docutils literal notranslate"><span class="pre">merge_station_data</span></code> that is illustrated above has some features to handle overlapping data and in any case, all overlaps that were detected are stored in the <code class="docutils literal notranslate"><span class="pre">overlap</span></code> attribute of the merged <code class="docutils literal notranslate"><span class="pre">StationData</span></code> object. Let’s check first if there are any overlaps in the Jungfraujoch data:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">merged</span><span class="o">.</span><span class="n">overlap</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+BrowseDict([(&#39;scatc550aer&#39;, 2015-01-01 01:00:00    0.255198
+             2015-01-01 02:00:00   -0.284809
+             2015-01-01 03:00:00    0.123830
+             2015-01-01 04:00:00    0.127599
+             2015-01-01 05:00:00    0.052224
+                                      ...
+             2018-12-31 19:00:00   -0.030204
+             2018-12-31 20:00:00    0.625988
+             2018-12-31 21:00:00    0.178854
+             2018-12-31 22:00:00    0.175893
+             2018-12-31 23:00:00    0.329280
+             Length: 25787, dtype: float64)])
+</pre></div></div>
+</div>
+<p>Apparently, there is. You can check out these data (in comparison with the retrieved time series) as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">merged</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">add_overlaps</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_30_0.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_30_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="How-to-prioritise-certain-stations-from-others,-when-deciding-what-goes-into-overlap-and-what-into-the-final-timeseries?">
+<h2>How to prioritise certain stations from others, when deciding what goes into overlap and what into the final timeseries?<a class="headerlink" href="#How-to-prioritise-certain-stations-from-others,-when-deciding-what-goes-into-overlap-and-what-into-the-final-timeseries?" title="Permalink to this headline">¶</a></h2>
+<p>The method <code class="docutils literal notranslate"><span class="pre">merge_station_data</span></code> provides a bunch of options to handle that. Things do not be written twice so please read the docstring of the method:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">help</span><span class="p">(</span><span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">merge_station_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Help on function merge_station_data in module pyaerocom.helpers:
+
+merge_station_data(stats, var_name, pref_attr=None, sort_by_largest=True, fill_missing_nan=True, **add_meta_keys)
+    Merge multiple StationData objects (from one station) into one instance
+
+    Note
+    ----
+    - all input :class:`StationData` objects need to have same attributes       ``station_name``, ``latitude``, ``longitude`` and ``altitude``
+
+    Parameters
+    ----------
+    stats : list
+        list containing :class:`StationData` objects (note: all of these
+        objects must contain variable data for the specified input variable)
+    var_name : str
+        data variable name that is to be merged
+    pref_attr
+        optional argument that may be used to specify a metadata attribute
+        that is available in all input :class:`StationData` objects and that
+        is used to order the input stations by relevance. The associated values
+        of this attribute need to be sortable (e.g. revision_date). This is
+        only relevant in case overlaps occur. If unspecified the relevance of
+        the stations is sorted based on the length of the associated data
+        arrays.
+    sort_by_largest : bool
+        if True, the result from the sorting is inverted. E.g. if
+        ``pref_attr`` is unspecified, then the stations will be sorted based on
+        the length of the data vectors, starting with the shortest, ending with
+        the longest. This sorting result will then be inverted, if
+        ``sort_by_largest=True``, so that the longest time series get&#39;s highest
+        importance. If, e.g. ``pref_attr=&#39;revision_date&#39;``, then the stations
+        are sorted by the associated revision date value, starting with the
+        earliest, ending with the latest (which will also be inverted if
+        this argument is set to True)
+    fill_missing_nan : bool
+        if True, the resulting time series is filled with NaNs. NOTE: this
+        requires that information about the temporal resolution (ts_type) of
+        the data is available in each of the StationData objects.
+
+</pre></div></div>
+</div>
+<p>In particular, <code class="docutils literal notranslate"><span class="pre">pref_attr</span></code> and <code class="docutils literal notranslate"><span class="pre">sort_by_largest</span></code> are relevant here.</p>
+<p><strong>NOTE</strong>: if <code class="docutils literal notranslate"><span class="pre">pref_attr</span></code> is unspecified, then the stations are sorted based on the number of valid measurement points for the input variable. This was done in the merged time series that we retrieved above.</p>
+<p>Now, in the following, let’s not use the number of available data points (to sort the stations by relevance) but prefer stations that have a more recent data revision date.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">merged_pref_awesomeness</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">pref_attr</span><span class="o">=</span><span class="s1">&#39;awesomeness&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">pya</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">MetaDataError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failed merging, error: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Failed merging, error: MetaDataError(&#39;Cannot sort station relevance by attribute awesomeness. At least one of the input stations does not contain this attribute&#39;)
+</pre></div></div>
+</div>
+<p>Unfortunately, the <code class="docutils literal notranslate"><span class="pre">StationData</span></code> objects do not contain an attribute <code class="docutils literal notranslate"><span class="pre">awesomeness</span></code> by which we could sort. Let’s go with <code class="docutils literal notranslate"><span class="pre">revision_date</span></code> instead:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># recompute stations, since we overwrote one above</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="s1">&#39;Jungfraujoch&#39;</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">merge_if_multi</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">merged_pref_recent_revision</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">merge_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">pref_attr</span><span class="o">=</span><span class="s1">&#39;revision_date&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">merged_pref_recent_revision</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">,</span> <span class="n">add_overlaps</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f9d341f8d68&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_37_1.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_37_1.png" />
+</div>
+</div>
+<p>Let’s see if there is any difference to the previous method (resample to daily resolution):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Overlaps (prefer longer timeseries)&#39;</span><span class="p">,</span>
+                                                             <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="n">merged_pref_recent_revision</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span>
+                                                                             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Overlaps (prefer more recent)&#39;</span><span class="p">,</span>
+                                                                             <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_39_0.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_39_0.png" />
+</div>
+</div>
+<p>As you can see, the merging strategy can make an impact and it is important to define a reasonable strategy. In this case, it is certainly more reliable to use the data with the more recent revision date.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">merged_pref_recent_revision</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">],</span>
+                 <span class="n">merged</span><span class="o">.</span><span class="n">overlap</span><span class="p">[</span><span class="s1">&#39;scatc550aer&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_41_0.png" src="../../_images/pyaerocom-tutorials_obsolete_add04_stationdata_merging_41_0.png" />
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tut08_trends_computation.html" class="btn btn-neutral float-right" title="Short tutorial showing how trends can be computed within pyaerocom" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tut07_intro_colocation.html" class="btn btn-neutral float-left" title="Colocation of model data with observations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MET Norway
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

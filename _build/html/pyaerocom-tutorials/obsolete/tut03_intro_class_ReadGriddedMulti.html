@@ -1,0 +1,804 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Reading data from multiple models: the ReadGriddedMulti class &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>Reading data from multiple models: the ReadGriddedMulti class</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/pyaerocom-tutorials/obsolete/tut03_intro_class_ReadGriddedMulti.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    min-width: 5ex;
+    padding-top: 0.3rem;
+    padding-right: 0.3rem;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 0.3rem;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Reading-data-from-multiple-models:-the-ReadGriddedMulti-class">
+<h1>Reading data from multiple models: the ReadGriddedMulti class<a class="headerlink" href="#Reading-data-from-multiple-models:-the-ReadGriddedMulti-class" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyaerocom.ReadGriddedMulti</span></code> class provides an interface to import multiple variables for an arbitrary number of gridded datasets (e.g. model data, level 2 satellite data) and within a specific time interval. It makes large use of the <code class="docutils literal notranslate"><span class="pre">ReadGridded</span></code> class that provides an interface for importing results from a single dataset (and that does the actual reading).</p>
+<p><strong>Note</strong>: This is not strictly relevant for the following tutorials. You might skip this tutorial if it is not of particular interest for you to read multiple models at once.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Initating pyaerocom configuration
+Checking database access...
+Checking access to: /lustre/storeA
+Access to lustre database: True
+Init data paths for lustre
+Expired time: 0.020 s
+</pre></div></div>
+</div>
+<p>Let’s find some NorESM models</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pya</span><span class="o">.</span><span class="n">browse_database</span><span class="p">(</span><span class="s1">&#39;*Noresm*&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: NORESM.T2.1_CTL.v3
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/NORESM.T2.1_CTL.v3/renamed
+Available experiments: [&#39;CTL.v3&#39;]
+Available years: [2008, 2009]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;abs440aer&#39;, &#39;abs500aer&#39;, &#39;abs5503Daer&#39;, &#39;abs550aer&#39;, &#39;abs550aercs&#39;, &#39;abs550bc&#39;, &#39;abs550dryaer&#39;, &#39;abs550dust&#39;, &#39;abs550oa&#39;, &#39;abs550so4&#39;, &#39;abs550ss&#39;, &#39;abs670aer&#39;, &#39;abs870aer&#39;, &#39;airmass&#39;, &#39;area&#39;, &#39;asy3Daer&#39;, &#39;bs5503Daer&#39;, &#39;cheaqpso4&#39;, &#39;chegpso4&#39;, &#39;chep3Dsoa&#39;, &#39;chepmsa&#39;, &#39;chepsoa&#39;, &#39;clh&#39;, &#39;cll&#39;, &#39;clm&#39;, &#39;clt&#39;, &#39;clt3D&#39;, &#39;conccnacc&#39;, &#39;conccnaer&#39;, &#39;conccnait&#39;, &#39;conccnbcacc&#39;, &#39;conccnbcait&#39;, &#39;conccnbccoa&#39;, &#39;conccncoa&#39;, &#39;conccndustacc&#39;, &#39;conccndustait&#39;, &#39;conccndustcoa&#39;, &#39;conccnoaacc&#39;, &#39;conccnoaait&#39;, &#39;conccnoacoa&#39;, &#39;conccnso4acc&#39;, &#39;conccnso4ait&#39;, &#39;conccnso4coa&#39;, &#39;conccnssacc&#39;, &#39;conccnssait&#39;, &#39;conccnsscoa&#39;, &#39;drybc&#39;, &#39;drydepvelhno3&#39;, &#39;drydepvelno2&#39;, &#39;drydepvelo3&#39;, &#39;drydepvelpan&#39;, &#39;drydms&#39;, &#39;drydust&#39;, &#39;dryhno3&#39;, &#39;drynh3&#39;, &#39;drynh4&#39;, &#39;dryno2&#39;, &#39;drynoy&#39;, &#39;dryo3&#39;, &#39;dryoa&#39;, &#39;dryso2&#39;, &#39;dryso4&#39;, &#39;dryss&#39;, &#39;ec5503Daer&#39;, &#39;ec550aer&#39;, &#39;ec550dryaer&#39;, &#39;emibc&#39;, &#39;emidms&#39;, &#39;emidust&#39;, &#39;emioa&#39;, &#39;emiso2&#39;, &#39;emiso4&#39;, &#39;emiss&#39;, &#39;hus&#39;, &#39;jno2&#39;, &#39;jo3o1d&#39;, &#39;landf&#39;, &#39;lightningnox&#39;, &#39;loadbc&#39;, &#39;loaddust&#39;, &#39;loadno3&#39;, &#39;loadoa&#39;, &#39;loadsigmabc&#39;, &#39;loadsigmadust&#39;, &#39;loadsigmano3&#39;, &#39;loadsigmaoa&#39;, &#39;loadsigmaso4&#39;, &#39;loadsigmass&#39;, &#39;loadso4&#39;, &#39;loadss&#39;, &#39;lossch4&#39;, &#39;lossco&#39;, &#39;losso3&#39;, &#39;mcu&#39;, &#39;mmraerh2o&#39;, &#39;mmrbc&#39;, &#39;mmrdms&#39;, &#39;mmrdu&#39;, &#39;mmrnh4&#39;, &#39;mmrno3&#39;, &#39;mmroa&#39;, &#39;mmrso2&#39;, &#39;mmrso4&#39;, &#39;mmrss&#39;, &#39;nucpn&#39;, &#39;od440aer&#39;, &#39;od500aer&#39;, &#39;od550aer&#39;, &#39;od550aercs&#39;, &#39;od550aerh2o&#39;, &#39;od550bc&#39;, &#39;od550dust&#39;, &#39;od550lt1aer&#39;, &#39;od550lt1dust&#39;, &#39;od550oa&#39;, &#39;od550so4&#39;, &#39;od550ss&#39;, &#39;od670aer&#39;, &#39;od870aer&#39;, &#39;orog&#39;, &#39;precip&#39;, &#39;pressure&#39;, &#39;prodO1D&#39;, &#39;prodOH&#39;, &#39;prodo3&#39;, &#39;prodo3viaCH3O2&#39;, &#39;prodo3viaHO2&#39;, &#39;prodo3viaRO2&#39;, &#39;ps&#39;, &#39;rlds&#39;, &#39;rlus&#39;, &#39;rlut&#39;, &#39;rlutcs&#39;, &#39;rsds&#39;, &#39;rsdscs&#39;, &#39;rsdt&#39;, &#39;rsus&#39;, &#39;rsut&#39;, &#39;sad&#39;, &#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcno3&#39;, &#39;sconcoa&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;, &#39;tamax&#39;, &#39;tamin&#39;, &#39;temp&#39;, &#39;vmrc2h6&#39;, &#39;vmrc3h8&#39;, &#39;vmrch3cho&#39;, &#39;vmrch3oh&#39;, &#39;vmrch3ooh&#39;, &#39;vmrch4&#39;, &#39;vmrchoh&#39;, &#39;vmrco&#39;, &#39;vmrdms&#39;, &#39;vmrethanol&#39;, &#39;vmrh2o&#39;, &#39;vmrh2o2&#39;, &#39;vmrhno3&#39;, &#39;vmrho2&#39;, &#39;vmrisop&#39;, &#39;vmrno&#39;, &#39;vmrno2&#39;, &#39;vmrno3&#39;, &#39;vmro3&#39;, &#39;vmroh&#39;, &#39;vmrpan&#39;, &#39;vmrsigmac2h6&#39;, &#39;vmrsigmac3h8&#39;, &#39;vmrsigmach3cho&#39;, &#39;vmrsigmach3oh&#39;, &#39;vmrsigmach3ooh&#39;, &#39;vmrsigmach4&#39;, &#39;vmrsigmachoh&#39;, &#39;vmrsigmaco&#39;, &#39;vmrsigmaethanol&#39;, &#39;vmrsigmah2o2&#39;, &#39;vmrsigmahno3&#39;, &#39;vmrsigmaho2&#39;, &#39;vmrsigmaisop&#39;, &#39;vmrsigmano&#39;, &#39;vmrsigmano2&#39;, &#39;vmrsigmano3&#39;, &#39;vmrsigmao3&#39;, &#39;vmrsigmaoh&#39;, &#39;vmrsigmapan&#39;, &#39;vmrsigmaterpenes&#39;, &#39;vmrso2&#39;, &#39;vmrterpenes&#39;, &#39;wetbc&#39;, &#39;wetdms&#39;, &#39;wetdust&#39;, &#39;wethno3&#39;, &#39;wetnh3&#39;, &#39;wetnh4&#39;, &#39;wetnoy&#39;, &#39;wetoa&#39;, &#39;wetso2&#39;, &#39;wetso4&#39;, &#39;wetss&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test92f19_f19_0003_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test92f19_f19_0003_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test111f19_f19_0002_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test111f19_f19_0002_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: NORESM.T2.1_CTL
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/NORESM.T2.1_CTL/renamed
+Available experiments: [&#39;CTL&#39;]
+Available years: [2008, 2009]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;abs440aer&#39;, &#39;abs500aer&#39;, &#39;abs5503Daer&#39;, &#39;abs550aer&#39;, &#39;abs550aercs&#39;, &#39;abs550bc&#39;, &#39;abs550dryaer&#39;, &#39;abs550dust&#39;, &#39;abs550oa&#39;, &#39;abs550so4&#39;, &#39;abs550ss&#39;, &#39;abs670aer&#39;, &#39;abs870aer&#39;, &#39;airmass&#39;, &#39;area&#39;, &#39;asy3Daer&#39;, &#39;bs5503Daer&#39;, &#39;cheaqpso4&#39;, &#39;chegpso4&#39;, &#39;chep3Dsoa&#39;, &#39;chepmsa&#39;, &#39;chepsoa&#39;, &#39;clt&#39;, &#39;clt3D&#39;, &#39;conccnacc&#39;, &#39;conccnaer&#39;, &#39;conccnait&#39;, &#39;conccnbcacc&#39;, &#39;conccnbcait&#39;, &#39;conccnbccoa&#39;, &#39;conccncoa&#39;, &#39;conccndustacc&#39;, &#39;conccndustait&#39;, &#39;conccndustcoa&#39;, &#39;conccnoaacc&#39;, &#39;conccnoaait&#39;, &#39;conccnoacoa&#39;, &#39;conccnso4acc&#39;, &#39;conccnso4ait&#39;, &#39;conccnso4coa&#39;, &#39;conccnssacc&#39;, &#39;conccnssait&#39;, &#39;conccnsscoa&#39;, &#39;drybc&#39;, &#39;drydepvelhno3&#39;, &#39;drydepvelno2&#39;, &#39;drydepvelo3&#39;, &#39;drydepvelpan&#39;, &#39;drydms&#39;, &#39;drydust&#39;, &#39;dryhno3&#39;, &#39;drynh3&#39;, &#39;drynh4&#39;, &#39;dryno2&#39;, &#39;drynoy&#39;, &#39;dryo3&#39;, &#39;dryoa&#39;, &#39;dryso2&#39;, &#39;dryso4&#39;, &#39;dryss&#39;, &#39;ec5503Daer&#39;, &#39;ec550aer&#39;, &#39;ec550dryaer&#39;, &#39;emibc&#39;, &#39;emidms&#39;, &#39;emidust&#39;, &#39;emioa&#39;, &#39;emiso2&#39;, &#39;emiso4&#39;, &#39;emiss&#39;, &#39;hus&#39;, &#39;jno2&#39;, &#39;jo3o1d&#39;, &#39;landf&#39;, &#39;lightningnox&#39;, &#39;loadbc&#39;, &#39;loaddust&#39;, &#39;loadno3&#39;, &#39;loadoa&#39;, &#39;loadsigmabc&#39;, &#39;loadsigmadust&#39;, &#39;loadsigmano3&#39;, &#39;loadsigmaoa&#39;, &#39;loadsigmaso4&#39;, &#39;loadsigmass&#39;, &#39;loadso4&#39;, &#39;loadss&#39;, &#39;lossch4&#39;, &#39;lossco&#39;, &#39;losso3&#39;, &#39;mcu&#39;, &#39;mmraerh2o&#39;, &#39;mmrbc&#39;, &#39;mmrdms&#39;, &#39;mmrdu&#39;, &#39;mmrnh4&#39;, &#39;mmrno3&#39;, &#39;mmroa&#39;, &#39;mmrso2&#39;, &#39;mmrso4&#39;, &#39;mmrss&#39;, &#39;nucpn&#39;, &#39;od440aer&#39;, &#39;od500aer&#39;, &#39;od550aer&#39;, &#39;od550aercs&#39;, &#39;od550aerh2o&#39;, &#39;od550bc&#39;, &#39;od550dust&#39;, &#39;od550lt1aer&#39;, &#39;od550lt1dust&#39;, &#39;od550oa&#39;, &#39;od550so4&#39;, &#39;od550ss&#39;, &#39;od670aer&#39;, &#39;od870aer&#39;, &#39;orog&#39;, &#39;precip&#39;, &#39;pressure&#39;, &#39;prodO1D&#39;, &#39;prodOH&#39;, &#39;prodo3&#39;, &#39;prodo3viaCH3O2&#39;, &#39;prodo3viaHO2&#39;, &#39;prodo3viaRO2&#39;, &#39;ps&#39;, &#39;rlds&#39;, &#39;rlus&#39;, &#39;rlut&#39;, &#39;rlutcs&#39;, &#39;rsds&#39;, &#39;rsdscs&#39;, &#39;rsdt&#39;, &#39;rsus&#39;, &#39;rsut&#39;, &#39;sad&#39;, &#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcno3&#39;, &#39;sconcoa&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;, &#39;tamax&#39;, &#39;tamin&#39;, &#39;temp&#39;, &#39;vmrc2h6&#39;, &#39;vmrc3h8&#39;, &#39;vmrch3cho&#39;, &#39;vmrch3oh&#39;, &#39;vmrch3ooh&#39;, &#39;vmrch4&#39;, &#39;vmrchoh&#39;, &#39;vmrco&#39;, &#39;vmrdms&#39;, &#39;vmrethanol&#39;, &#39;vmrh2o&#39;, &#39;vmrh2o2&#39;, &#39;vmrhno3&#39;, &#39;vmrho2&#39;, &#39;vmrisop&#39;, &#39;vmrno&#39;, &#39;vmrno2&#39;, &#39;vmrno3&#39;, &#39;vmro3&#39;, &#39;vmroh&#39;, &#39;vmrpan&#39;, &#39;vmrsigmac2h6&#39;, &#39;vmrsigmac3h8&#39;, &#39;vmrsigmach3cho&#39;, &#39;vmrsigmach3oh&#39;, &#39;vmrsigmach3ooh&#39;, &#39;vmrsigmach4&#39;, &#39;vmrsigmaco&#39;, &#39;vmrsigmaethanol&#39;, &#39;vmrsigmah2o2&#39;, &#39;vmrsigmahno3&#39;, &#39;vmrsigmaho2&#39;, &#39;vmrsigmaisop&#39;, &#39;vmrsigmano&#39;, &#39;vmrsigmano2&#39;, &#39;vmrsigmano3&#39;, &#39;vmrsigmao3&#39;, &#39;vmrsigmaoh&#39;, &#39;vmrsigmapan&#39;, &#39;vmrsigmaterpenes&#39;, &#39;vmrso2&#39;, &#39;vmrterpenes&#39;, &#39;wetbc&#39;, &#39;wetdms&#39;, &#39;wetdust&#39;, &#39;wethno3&#39;, &#39;wetnh3&#39;, &#39;wetnh4&#39;, &#39;wetnoy&#39;, &#39;wetoa&#39;, &#39;wetso2&#39;, &#39;wetso4&#39;, &#39;wetss&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: hiatus.NorESM1.model1.i1.pd
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/hiatus.NorESM1.model1.i1.pd/renamed
+Available experiments: [&#39;NorESM1.model1.i1.pd&#39;]
+Available years: [1990, 1995, 2000, 2005, 2010]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcno3&#39;, &#39;sconcpm2p5&#39;, &#39;sconcpom&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: hiatus.NorESM1.model2c.i1.pd
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/hiatus.NorESM1.model2c.i1.pd/renamed
+Available experiments: [&#39;NorESM1.model2c.i1.pd&#39;]
+Available years: [1990, 1995, 2000, 2005, 2010]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcpm2p5&#39;, &#39;sconcpom&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test120f19_f19_0002_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test120f19_f19_0002_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test112f19_f19_0002_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test112f19_f19_0002_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: hiatus.NorESM1.model2m.i1.pd
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/hiatus.NorESM1.model2m.i1.pd/renamed
+Available experiments: [&#39;NorESM1.model2m.i1.pd&#39;]
+Available years: [1990, 1995, 2000, 2005, 2010]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcno3&#39;, &#39;sconcpom&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test116f19_f19_0002_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test116f19_f19_0002_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM1.T6.4.cle_2006_2015
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM1.T6.4.cle_2006_2015/renamed
+Available experiments: [&#39;2015&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcno3&#39;, &#39;sconco3&#39;, &#39;sconcpm2p5&#39;, &#39;sconcpom&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;, &#39;vmr3do3&#39;, &#39;vmro3&#39;, &#39;vmro32m&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test121f19_f19_0002_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test121f19_f19_0002_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test91f19_f19_0003_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test91f19_f19_0003_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test114f19_f19_0002_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test114f19_f19_0002_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test111f19_f19_0003_0008
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test111f19_f19_0003_0008/renamed
+Available experiments: [&#39;0008&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test113f19_f19_0002_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test113f19_f19_0002_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: NORESM.T2.1_CTL.v2
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/NORESM.T2.1_CTL.v2/renamed
+Available experiments: [&#39;CTL.v2&#39;]
+Available years: [2008, 2009]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;abs440aer&#39;, &#39;abs500aer&#39;, &#39;abs5503Daer&#39;, &#39;abs550aer&#39;, &#39;abs550aercs&#39;, &#39;abs550bc&#39;, &#39;abs550dryaer&#39;, &#39;abs550dust&#39;, &#39;abs550oa&#39;, &#39;abs550so4&#39;, &#39;abs550ss&#39;, &#39;abs670aer&#39;, &#39;abs870aer&#39;, &#39;absc550aer&#39;, &#39;airmass&#39;, &#39;area&#39;, &#39;asy3Daer&#39;, &#39;bs5503Daer&#39;, &#39;cheaqpso4&#39;, &#39;chegpso4&#39;, &#39;chep3Dsoa&#39;, &#39;chepmsa&#39;, &#39;chepsoa&#39;, &#39;clt&#39;, &#39;clt3D&#39;, &#39;conccnacc&#39;, &#39;conccnaer&#39;, &#39;conccnait&#39;, &#39;conccnbcacc&#39;, &#39;conccnbcait&#39;, &#39;conccnbccoa&#39;, &#39;conccncoa&#39;, &#39;conccndustacc&#39;, &#39;conccndustait&#39;, &#39;conccndustcoa&#39;, &#39;conccnoaacc&#39;, &#39;conccnoaait&#39;, &#39;conccnoacoa&#39;, &#39;conccnso4acc&#39;, &#39;conccnso4ait&#39;, &#39;conccnso4coa&#39;, &#39;conccnssacc&#39;, &#39;conccnssait&#39;, &#39;conccnsscoa&#39;, &#39;drybc&#39;, &#39;drydepvelhno3&#39;, &#39;drydepvelno2&#39;, &#39;drydepvelo3&#39;, &#39;drydepvelpan&#39;, &#39;drydms&#39;, &#39;drydust&#39;, &#39;dryhno3&#39;, &#39;drynh3&#39;, &#39;drynh4&#39;, &#39;dryno2&#39;, &#39;drynoy&#39;, &#39;dryo3&#39;, &#39;dryoa&#39;, &#39;dryso2&#39;, &#39;dryso4&#39;, &#39;dryss&#39;, &#39;ec5503Daer&#39;, &#39;ec550aer&#39;, &#39;ec550dryaer&#39;, &#39;emibc&#39;, &#39;emidms&#39;, &#39;emidust&#39;, &#39;emioa&#39;, &#39;emiso2&#39;, &#39;emiso4&#39;, &#39;emiss&#39;, &#39;hus&#39;, &#39;jno2&#39;, &#39;jo3o1d&#39;, &#39;landf&#39;, &#39;lightningnox&#39;, &#39;loadbc&#39;, &#39;loaddust&#39;, &#39;loadno3&#39;, &#39;loadoa&#39;, &#39;loadsigmabc&#39;, &#39;loadsigmadust&#39;, &#39;loadsigmano3&#39;, &#39;loadsigmaoa&#39;, &#39;loadsigmaso4&#39;, &#39;loadsigmass&#39;, &#39;loadso4&#39;, &#39;loadss&#39;, &#39;lossch4&#39;, &#39;lossco&#39;, &#39;losso3&#39;, &#39;mcu&#39;, &#39;mmraerh2o&#39;, &#39;mmrbc&#39;, &#39;mmrdms&#39;, &#39;mmrdu&#39;, &#39;mmrnh4&#39;, &#39;mmrno3&#39;, &#39;mmroa&#39;, &#39;mmrso2&#39;, &#39;mmrso4&#39;, &#39;mmrss&#39;, &#39;nucpn&#39;, &#39;od440aer&#39;, &#39;od500aer&#39;, &#39;od550aer&#39;, &#39;od550aercs&#39;, &#39;od550aerh2o&#39;, &#39;od550bc&#39;, &#39;od550dust&#39;, &#39;od550lt1aer&#39;, &#39;od550lt1dust&#39;, &#39;od550oa&#39;, &#39;od550so4&#39;, &#39;od550ss&#39;, &#39;od670aer&#39;, &#39;od870aer&#39;, &#39;orog&#39;, &#39;precip&#39;, &#39;pressure&#39;, &#39;prodO1D&#39;, &#39;prodOH&#39;, &#39;prodo3&#39;, &#39;prodo3viaCH3O2&#39;, &#39;prodo3viaHO2&#39;, &#39;prodo3viaRO2&#39;, &#39;ps&#39;, &#39;rlds&#39;, &#39;rlus&#39;, &#39;rlut&#39;, &#39;rlutcs&#39;, &#39;rsds&#39;, &#39;rsdscs&#39;, &#39;rsdt&#39;, &#39;rsus&#39;, &#39;rsut&#39;, &#39;sad&#39;, &#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcno3&#39;, &#39;sconcoa&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;, &#39;tamax&#39;, &#39;tamin&#39;, &#39;temp&#39;, &#39;vmrc2h6&#39;, &#39;vmrc3h8&#39;, &#39;vmrch3cho&#39;, &#39;vmrch3oh&#39;, &#39;vmrch3ooh&#39;, &#39;vmrch4&#39;, &#39;vmrchoh&#39;, &#39;vmrco&#39;, &#39;vmrdms&#39;, &#39;vmrethanol&#39;, &#39;vmrh2o&#39;, &#39;vmrh2o2&#39;, &#39;vmrhno3&#39;, &#39;vmrho2&#39;, &#39;vmrisop&#39;, &#39;vmrno&#39;, &#39;vmrno2&#39;, &#39;vmrno3&#39;, &#39;vmro3&#39;, &#39;vmroh&#39;, &#39;vmrpan&#39;, &#39;vmrsigmac2h6&#39;, &#39;vmrsigmac3h8&#39;, &#39;vmrsigmach3cho&#39;, &#39;vmrsigmach3oh&#39;, &#39;vmrsigmach3ooh&#39;, &#39;vmrsigmach4&#39;, &#39;vmrsigmaco&#39;, &#39;vmrsigmaethanol&#39;, &#39;vmrsigmah2o2&#39;, &#39;vmrsigmahno3&#39;, &#39;vmrsigmaho2&#39;, &#39;vmrsigmaisop&#39;, &#39;vmrsigmano&#39;, &#39;vmrsigmano2&#39;, &#39;vmrsigmano3&#39;, &#39;vmrsigmao3&#39;, &#39;vmrsigmaoh&#39;, &#39;vmrsigmapan&#39;, &#39;vmrsigmaterpenes&#39;, &#39;vmrso2&#39;, &#39;vmrterpenes&#39;, &#39;wetbc&#39;, &#39;wetdms&#39;, &#39;wetdust&#39;, &#39;wethno3&#39;, &#39;wetnh3&#39;, &#39;wetnh4&#39;, &#39;wetnoy&#39;, &#39;wetoa&#39;, &#39;wetso2&#39;, &#39;wetso4&#39;, &#39;wetss&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: eclipse.NorESM2.Test122f19_f19_0002_0004
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECLIPSE/eclipse.NorESM2.Test122f19_f19_0002_0004/renamed
+Available experiments: [&#39;0004&#39;]
+Available years: [9999]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;sconcnh4&#39;, &#39;sconcno3&#39;, &#39;sconcso4&#39;]
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: NorESM2-CPL_HIST
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/AEROCOM-PHASE-III-2019/NorESM2-CPL_HIST/renamed
+Available experiments: [&#39;HIST&#39;]
+Available years: [2010]
+Available frequencies [&#39;monthly&#39;]
+Available variables: [&#39;abs5503Daer&#39;, &#39;abs550aer&#39;, &#39;absc550aer&#39;, &#39;airmass&#39;, &#39;bs5503Daer&#39;, &#39;bs550aer&#39;, &#39;chepsoa&#39;, &#39;dms&#39;, &#39;drybc&#39;, &#39;drydust&#39;, &#39;dryoa&#39;, &#39;dryso2&#39;, &#39;dryso4&#39;, &#39;dryss&#39;, &#39;ec5503Daer&#39;, &#39;ec550aer&#39;, &#39;ec550dryaer&#39;, &#39;emibc&#39;, &#39;emidms&#39;, &#39;emidust&#39;, &#39;emiisop&#39;, &#39;emimono&#39;, &#39;emioa&#39;, &#39;emiso2&#39;, &#39;emiso4&#39;, &#39;emiss&#39;, &#39;hfls&#39;, &#39;hfss&#39;, &#39;hur&#39;, &#39;hus&#39;, &#39;huss&#39;, &#39;isop&#39;, &#39;loadbc&#39;, &#39;loaddust&#39;, &#39;loadoa&#39;, &#39;loadso4&#39;, &#39;loadss&#39;, &#39;mmrbc&#39;, &#39;mmrdust&#39;, &#39;mmroa&#39;, &#39;mmrso4&#39;, &#39;mmrsoa&#39;, &#39;mmrss&#39;, &#39;mono&#39;, &#39;od440aer&#39;, &#39;od550aer&#39;, &#39;od550bc&#39;, &#39;od550csaer&#39;, &#39;od550dust&#39;, &#39;od550oa&#39;, &#39;od550so4&#39;, &#39;od550ss&#39;, &#39;od870aer&#39;, &#39;prc&#39;, &#39;prsn&#39;, &#39;ps&#39;, &#39;psl&#39;, &#39;rlds&#39;, &#39;rlus&#39;, &#39;rlut&#39;, &#39;rlutcs&#39;, &#39;rsds&#39;, &#39;rsdscs&#39;, &#39;rsus&#39;, &#39;rsuscs&#39;, &#39;rsut&#39;, &#39;sfcWind&#39;, &#39;so2&#39;, &#39;ta&#39;, &#39;tas&#39;, &#39;wetbc&#39;, &#39;wetdust&#39;, &#39;wetoa&#39;, &#39;wetso2&#39;, &#39;wetso4&#39;, &#39;wetss&#39;]
+</pre></div></div>
+</div>
+<p>From the output, select some model runs to read and put in list:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NORESM.T2.1_CTL.v3&#39;</span><span class="p">,</span> <span class="s1">&#39;NORESM.T2.1_CTL.v2&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Now create and initiate <code class="docutils literal notranslate"><span class="pre">ReadGriddedMulti</span></code> class. The directory for each model as well as all valid files in the model directories are searched on initiation of the instance. Valid here means, that the files belong to the corresponding model. Subsetting of the time interval is done in a later process.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">read</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGriddedMulti</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">read</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+ReadGriddedMulti class is deprecated and will not be further developed. Please use ReadGridded.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom ReadGriddedMulti
+--------------------------
+Data-IDs: [&#39;NORESM.T2.1_CTL.v3&#39;, &#39;NORESM.T2.1_CTL.v2&#39;]
+
+</pre></div></div>
+</div>
+<p>As you can see, the 3 different instances of the <code class="docutils literal notranslate"><span class="pre">ReadGridded</span></code> class were created (which was introduced in the previous tutorial), one for each of the 3 requested datasets. These can be used to access the data for each of the datasets.</p>
+<p>Let’s define a bunch of test variables that are supposed to be loaded for each model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">test_var</span> <span class="o">=</span> <span class="s2">&quot;od550aer&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>Read AOD for all input models:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">result_dict</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">test_var</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2008</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">result_dict</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;NORESM.T2.1_CTL.v3&#39;: {&#39;od550aer&#39;: pyaerocom.GriddedData
+  Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 550nm / (1) (time: 12; latitude: 96; longitude: 144)&gt;},
+ &#39;NORESM.T2.1_CTL.v2&#39;: {&#39;od550aer&#39;: pyaerocom.GriddedData
+  Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 550nm / (1) (time: 12; latitude: 96; longitude: 144)&gt;}}
+</pre></div></div>
+</div>
+<p>Compare maps:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">result_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">test_var</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">test_var</span><span class="p">]</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;yearly&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">()</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_tut03_intro_class_ReadGriddedMulti_14_0.png" src="../../_images/pyaerocom-tutorials_obsolete_tut03_intro_class_ReadGriddedMulti_14_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_tut03_intro_class_ReadGriddedMulti_14_1.png" src="../../_images/pyaerocom-tutorials_obsolete_tut03_intro_class_ReadGriddedMulti_14_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">data</span><span class="p">[</span><span class="n">test_var</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.6088489
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MET Norway
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

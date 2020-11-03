@@ -1,0 +1,1641 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial showing how to read EBAS NASA Ames files &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="API" href="../../api.html" />
+    <link rel="prev" title="EBAS file query and database browser" href="add03_ebas_database_browser.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#getting-started">Getting started</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#outdated-tutorials">Outdated tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tut00_get_started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut01_intro_regions.html">AEROCOM default regions (class <code class="docutils literal notranslate"><span class="pre">Region</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut04_intro_class_GriddedData.html">The <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut05_intro_ungridded_reading.html">Reading of ungridded observation datasets in pyaerocom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut06_intro_UngriddedData_and_StationData_classes.html">Introduction into the UngriddedData class and the StationData class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut07_intro_colocation.html">Colocation of model data with observations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add04_stationdata_merging.html">Merging of several StationData objects into one</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tut08_trends_computation.html">Short tutorial showing how trends can be computed within pyaerocom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="add03_ebas_database_browser.html">EBAS file query and database browser</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Tutorial showing how to read EBAS NASA Ames files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Data-array">Data array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Column-information">Column information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Access-flag-information">Access flag information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Convert-object-to-pandas-Dataframe">Convert object to pandas Dataframe</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Tutorials</a> &raquo;</li>
+        
+      <li>Tutorial showing how to read EBAS NASA Ames files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/pyaerocom-tutorials/obsolete/add02_read_ebas_nasa_ames.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    min-width: 5ex;
+    padding-top: 0.3rem;
+    padding-right: 0.3rem;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 0.3rem;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Tutorial-showing-how-to-read-EBAS-NASA-Ames-files">
+<h1>Tutorial showing how to read EBAS NASA Ames files<a class="headerlink" href="#Tutorial-showing-how-to-read-EBAS-NASA-Ames-files" title="Permalink to this headline">¶</a></h1>
+<p>This low-level tutorial shows how to read an EBAS NASA Ames file using the class <a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=ebasnasaamesfile#pyaerocom.io.ebas_nasa_ames.EbasNasaAmesFile">EbasNasaAmesFile</a> of pyaerocom and how to access the import data and metadata.</p>
+<p><strong>NOTE</strong>: variable names and names of metadata attributes below use the EBAS conventions and <strong>not the AeroCom naming conventions</strong>, since the purpose of the <code class="docutils literal notranslate"><span class="pre">EbasNasaAmesFile</span></code> reading routine is to solely import the content of the original data files (provided by EBAS) into a python interface. If you intend to use EBAS data for AeroCom purposes (e.g. model intercomparison), please use the <a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=readebas#pyaerocom.io.read_ebas.ReadEbas">ReadEbas</a>
+routine (or the <a class="reference external" href="https://pyaerocom.met.no/api.html?highlight=readebas#module-pyaerocom.io.readungridded">ReadUngridded</a> factory class) which is doing the mapping to AeroCom naming conventions.</p>
+<p>Please see <a class="reference external" href="https://ebas-submit.nilu.no/Submit-Data/Getting-started">here</a> for information related to the EBAS NASA Ames file format.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Initating pyaerocom configuration
+Checking database access...
+Checking access to: /lustre/storeA
+Access to lustre database: True
+Init data paths for lustre
+Expired time: 0.022 s
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ebasdir</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">EBASMC_DATA_DIR</span>
+<span class="n">ebasdir</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/EBASMultiColumn/data/data/&#39;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">DE0043G*2010*nephelometer*lev2.nas&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ebasdir</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No. of files found: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+No. of files found: 2
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/EBASMultiColumn/data/data/DE0043G.20100201000000.20150304123917.nephelometer..pm10.11mo.1h.DE09L_TSI_Neph_3563.DE09L_scatt_NEPH.lev2.nas&#39;
+</pre></div></div>
+</div>
+<p>Read the first file that was found:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">EbasNasaAmesFile</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                             <span class="n">only_head</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>          <span class="c1">#set True if you only want to import header</span>
+                             <span class="n">replace_invalid_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1">#replace invalid values with NaNs</span>
+                             <span class="n">convert_timestamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1">#compute datetime64 timestamps from numerical values</span>
+                             <span class="n">decode_flags</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>        <span class="c1">#decode all flags (e.g. 0.111222333 -&gt; 111 222 333)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">mc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Pyaerocom EbasNasaAmesFile
+--------------------------
+
+num_head_lines: 91
+num_head_fmt: 1001
+data_originator: Flentje, Harald
+sponsor_organisation: DE09L, Deutscher Wetterdienst, DWD, Met. Obs., Hohenspeissenberg, , 82283, Hohenspeissenberg, Germany
+submitter: Flentje, Harald
+project_association: ACTRIS EMEP GAW-WDCA
+vol_num: 1
+vol_totnum: 1
+ref_date: 2010-01-01T00:00:00
+revision_date: 2015-03-04T00:00:00
+freq: 0.041667
+descr_time_unit: days from file reference point
+num_cols_dependent: 23
+mul_factors (list, 23 items): [1.00, 1.00, ..., 1.00, 1.00]
+vals_invalid (list, 23 items): [1000, 9999.0, ..., 9999.999999, 10.00]
+descr_first_col: end_time of measurement, days from the file reference point
+
+   Column variable definitions
+   -------------------------------
+   EbasColDef: name=starttime, unit=days, is_var=False, is_flag=False, flag_col=23,
+   EbasColDef: name=endtime, unit=days, is_var=False, is_flag=False, flag_col=23,
+   EbasColDef: name=pressure, unit=hPa, is_var=True, is_flag=False, flag_col=23, location=instrument internal, statistics=arithmetic mean, matrix=instrument, detection_limit=, detection_limit_expl.=, measurement_uncertainty=, measurement_uncertainty_expl.=,
+   EbasColDef: name=relative_humidity, unit=%, is_var=True, is_flag=False, flag_col=23, location=instrument internal, statistics=arithmetic mean, matrix=instrument, detection_limit=, detection_limit_expl.=, measurement_uncertainty=, measurement_uncertainty_expl.=,
+   EbasColDef: name=temperature, unit=K, is_var=True, is_flag=False, flag_col=23, location=instrument internal, statistics=arithmetic mean, matrix=instrument, detection_limit=, detection_limit_expl.=, measurement_uncertainty=, measurement_uncertainty_expl.=,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=450.0 nm, statistics=arithmetic mean,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=450.0 nm, statistics=percentile:15.87,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=450.0 nm, statistics=percentile:84.13,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=550.0 nm, statistics=arithmetic mean,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=550.0 nm, statistics=percentile:15.87,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=550.0 nm, statistics=percentile:84.13,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=700.0 nm, statistics=arithmetic mean,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=700.0 nm, statistics=percentile:15.87,
+   EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=700.0 nm, statistics=percentile:84.13,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=450.0 nm, statistics=arithmetic mean,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=450.0 nm, statistics=percentile:15.87,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=450.0 nm, statistics=percentile:84.13,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=550.0 nm, statistics=arithmetic mean,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=550.0 nm, statistics=percentile:15.87,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=550.0 nm, statistics=percentile:84.13,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=700.0 nm, statistics=arithmetic mean,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=700.0 nm, statistics=percentile:15.87,
+   EbasColDef: name=aerosol_light_scattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=700.0 nm, statistics=percentile:84.13,
+   EbasColDef: name=numflag, unit=no unit, is_var=False, is_flag=True, flag_col=None,
+
+   EBAS meta data
+   ------------------
+decode_flags: True
+data_definition: EBAS_1.1
+set_type_code: TU
+timezone: UTC
+file_name: DE0043G.20100201000000.20150304123917.nephelometer..pm10.11mo.1h.DE09L_TSI_Neph_3563.DE09L_scatt_NEPH.lev2.nas
+file_creation: 20190701194839
+startdate: 20100201000000
+revision_date: 20150304123917
+version: 1
+version_description: initial revision
+data_level: 2
+period_code: 11mo
+resolution_code: 1h
+sample_duration: 1h
+orig._time_res.: 10mn
+station_code: DE0043G
+platform_code: DE0043S
+station_name: Hohenpeissenberg
+station_wdca-id: GAWADE__HPB
+station_gaw-id: HPB
+station_gaw-name: Hohenpeissenberg
+station_land_use: Grassland
+station_setting: Mountain
+station_gaw_type: G
+station_wmo_region: 6
+station_latitude: 47.8014984131
+station_longitude: 11.0096197128
+station_altitude: 985.0 m
+measurement_height: 15.0 m
+regime: IMG
+component:
+unit: 1/Mm
+matrix: pm10
+laboratory_code: DE09L
+instrument_type: nephelometer
+instrument_name: TSI_Neph_3563
+instrument_manufacturer: TSI
+instrument_model: 3563
+method_ref: DE09L_scatt_NEPH
+standard_method: cal-gas=CO2+AIR_truncation-correction=Anderson1998
+inlet_type: Impactor--direct
+inlet_description: PM10 at ambient humidity inlet, Digitel, flow 170 l/min
+humidity/temperature_control: Nafion dryer
+volume_std._temperature: 273.15 K
+volume_std._pressure: 1013.25 hPa
+detection_limit: 0.3 1/Mm
+detection_limit_expl.: Determined only by instrument counting statistics, no detection limit flag used
+measurement_uncertainty: 0.3 1/Mm
+measurement_uncertainty_expl.: Determined only by instrument counting statistics, no detection limit flag used
+zero/negative_values: Zero values may appear due to statistical variations at very low concentrations
+originator: Flentje, Harald, Harald.Flentje@dwd.de, , , , , , , ,
+submitter: Flentje, Harald, Harald.Flentje@dwd.de, , , , , , , ,
+acknowledgement: Request acknowledgement details from data originator
+comment: Angstrom-based Anderson &amp; Ogren 1998 corr used for truncation correction
+
+   Data
+   --------
+[[3.10000000e+01 3.10416660e+01            nan ...            nan
+             nan 9.99000000e-01]
+ [3.10416670e+01 3.10833330e+01            nan ...            nan
+             nan 9.99000000e-01]
+ [3.10833330e+01 3.11249990e+01            nan ...            nan
+             nan 9.99000000e-01]
+ ...
+ [3.64875000e+02 3.64916666e+02 9.04000000e+02 ... 1.35433110e+01
+  1.62446480e+01 1.00000000e-01]
+ [3.64916667e+02 3.64958333e+02 9.04000000e+02 ... 1.13367710e+01
+  1.42932090e+01 1.00000000e-01]
+ [3.64958333e+02 3.64999999e+02 9.03000000e+02 ... 1.13635590e+01
+  1.40839410e+01 1.00000000e-01]]
+Colnum: 24
+Timestamps: 8016
+</pre></div></div>
+</div>
+<p>The NASA Ames files are strucured in the same way as they are represented by in the instance of the EbasNasaAmesFile class.</p>
+<ul class="simple">
+<li><p>A header with global metadata</p></li>
+<li><p>One row that specifies multiplication factors for each data column (<code class="docutils literal notranslate"><span class="pre">mul_factors</span></code>)</p></li>
+<li><p>One row that specifies NaN-equivalent values for each data column (<code class="docutils literal notranslate"><span class="pre">vals_invalid</span></code>)</p></li>
+<li><p>A number of rows specifying metainformation for each data column in the file (i.e. 12 rows, if the data has 12 columns)</p></li>
+<li><p>Dataset specific metadata</p></li>
+<li><p>Data block: rows are timestamps, columns are different columns specified in the header (cf. 2 points above)</p>
+<ul>
+<li><p>Represented by 2D numpy array (<code class="docutils literal notranslate"><span class="pre">data</span></code> attribute) where first index is row and second index is column</p></li>
+</ul>
+</li>
+</ul>
+<p>For details related to the file format <a class="reference external" href="https://ebas-submit.nilu.no/Submit-Data/Data-Reporting/Templates/Category/Aerosol/Aerosol-Optical-Depth">see here</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(8016, 24)
+</pre></div></div>
+</div>
+<div class="section" id="Data-array">
+<h2>Data array<a class="headerlink" href="#Data-array" title="Permalink to this headline">¶</a></h2>
+<p>The data is imported as a 2D numpy array which is accessible via the <code class="docutils literal notranslate"><span class="pre">data</span></code> attribute:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[3.10000000e+01, 3.10416660e+01,            nan, ...,
+                   nan,            nan, 9.99000000e-01],
+       [3.10416670e+01, 3.10833330e+01,            nan, ...,
+                   nan,            nan, 9.99000000e-01],
+       [3.10833330e+01, 3.11249990e+01,            nan, ...,
+                   nan,            nan, 9.99000000e-01],
+       ...,
+       [3.64875000e+02, 3.64916666e+02, 9.04000000e+02, ...,
+        1.35433110e+01, 1.62446480e+01, 1.00000000e-01],
+       [3.64916667e+02, 3.64958333e+02, 9.04000000e+02, ...,
+        1.13367710e+01, 1.42932090e+01, 1.00000000e-01],
+       [3.64958333e+02, 3.64999999e+02, 9.03000000e+02, ...,
+        1.13635590e+01, 1.40839410e+01, 1.00000000e-01]])
+</pre></div></div>
+</div>
+<p>The first index corresponds to the individual measurements (rows in file) and the second index corresponds to the individual columns that are stored in the file.</p>
+</div>
+<div class="section" id="Column-information">
+<h2>Column information<a class="headerlink" href="#Column-information" title="Permalink to this headline">¶</a></h2>
+<p>Detailed information about each column can be accessed via the <code class="docutils literal notranslate"><span class="pre">var_defs</span></code> attribute, the first two columns are always the start and stop timestamps:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbasColDef: name=starttime, unit=days, is_var=False, is_flag=False, flag_col=23,
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbasColDef: name=endtime, unit=days, is_var=False, is_flag=False, flag_col=23,
+</pre></div></div>
+</div>
+<p>After the start / stop columns follow the individual data columns.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbasColDef: name=pressure, unit=hPa, is_var=True, is_flag=False, flag_col=23, location=instrument internal, statistics=arithmetic mean, matrix=instrument, detection_limit=, detection_limit_expl.=, measurement_uncertainty=, measurement_uncertainty_expl.=,
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbasColDef: name=relative_humidity, unit=%, is_var=True, is_flag=False, flag_col=23, location=instrument internal, statistics=arithmetic mean, matrix=instrument, detection_limit=, detection_limit_expl.=, measurement_uncertainty=, measurement_uncertainty_expl.=,
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbasColDef: name=temperature, unit=K, is_var=True, is_flag=False, flag_col=23, location=instrument internal, statistics=arithmetic mean, matrix=instrument, detection_limit=, detection_limit_expl.=, measurement_uncertainty=, measurement_uncertainty_expl.=,
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbasColDef: name=aerosol_light_backscattering_coefficient, unit=1/Mm, is_var=True, is_flag=False, flag_col=23, wavelength=450.0 nm, statistics=arithmetic mean,
+</pre></div></div>
+</div>
+<p>In addition to the data columns in the files (such as time stamps, or measured values of a certain variable) there is <strong>at least one</strong> flag column in the data array and each data column has assigned one flag column (cf. output above where the index of the flag column for each data column is provided <code class="docutils literal notranslate"><span class="pre">flag_col=23</span></code>, i.e. column 23 is the flag column assigned to each of the 5 data columns that were displayed exemplary above:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbasColDef: name=numflag, unit=no unit, is_var=False, is_flag=True, flag_col=None,
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">is_var</span></code> attribute specifies, whether this column contains actual variable data or if it is a flag column. A NASA Ames file can have one or more flag columns that can be used to identify valid or invalid measurments. Each flag in a flag column comprises a floating point number that has encoded up to 3 3-digit numerical flags which are specified here:</p>
+<p><a class="reference external" href="https://github.com/metno/pyaerocom/blob/master/pyaerocom/data/ebas_flags.csv">https://github.com/metno/pyaerocom/blob/master/pyaerocom/data/ebas_flags.csv</a></p>
+<p>More info about the flags follows below. You can see, that the column 4 printed above has assigned column 12 (index 11) as flag column.</p>
+<p>If you want to see an overview of all available columns in the file you may use the following command:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mc</span><span class="o">.</span><span class="n">print_col_info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Column 0
+Pyaerocom EbasColDef
+--------------------
+name: starttime
+unit: days
+is_var: False
+is_flag: False
+flag_col: 23
+
+Column 1
+Pyaerocom EbasColDef
+--------------------
+name: endtime
+unit: days
+is_var: False
+is_flag: False
+flag_col: 23
+
+Column 2
+Pyaerocom EbasColDef
+--------------------
+name: pressure
+unit: hPa
+is_var: True
+is_flag: False
+flag_col: 23
+location: instrument internal
+statistics: arithmetic mean
+matrix: instrument
+detection_limit:
+detection_limit_expl.:
+measurement_uncertainty:
+measurement_uncertainty_expl.:
+
+Column 3
+Pyaerocom EbasColDef
+--------------------
+name: relative_humidity
+unit: %
+is_var: True
+is_flag: False
+flag_col: 23
+location: instrument internal
+statistics: arithmetic mean
+matrix: instrument
+detection_limit:
+detection_limit_expl.:
+measurement_uncertainty:
+measurement_uncertainty_expl.:
+
+Column 4
+Pyaerocom EbasColDef
+--------------------
+name: temperature
+unit: K
+is_var: True
+is_flag: False
+flag_col: 23
+location: instrument internal
+statistics: arithmetic mean
+matrix: instrument
+detection_limit:
+detection_limit_expl.:
+measurement_uncertainty:
+measurement_uncertainty_expl.:
+
+Column 5
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 450.0 nm
+statistics: arithmetic mean
+
+Column 6
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 450.0 nm
+statistics: percentile:15.87
+
+Column 7
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 450.0 nm
+statistics: percentile:84.13
+
+Column 8
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 550.0 nm
+statistics: arithmetic mean
+
+Column 9
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 550.0 nm
+statistics: percentile:15.87
+
+Column 10
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 550.0 nm
+statistics: percentile:84.13
+
+Column 11
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 700.0 nm
+statistics: arithmetic mean
+
+Column 12
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 700.0 nm
+statistics: percentile:15.87
+
+Column 13
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_backscattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 700.0 nm
+statistics: percentile:84.13
+
+Column 14
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 450.0 nm
+statistics: arithmetic mean
+
+Column 15
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 450.0 nm
+statistics: percentile:15.87
+
+Column 16
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 450.0 nm
+statistics: percentile:84.13
+
+Column 17
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 550.0 nm
+statistics: arithmetic mean
+
+Column 18
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 550.0 nm
+statistics: percentile:15.87
+
+Column 19
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 550.0 nm
+statistics: percentile:84.13
+
+Column 20
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 700.0 nm
+statistics: arithmetic mean
+
+Column 21
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 700.0 nm
+statistics: percentile:15.87
+
+Column 22
+Pyaerocom EbasColDef
+--------------------
+name: aerosol_light_scattering_coefficient
+unit: 1/Mm
+is_var: True
+is_flag: False
+flag_col: 23
+wavelength: 700.0 nm
+statistics: percentile:84.13
+
+Column 23
+Pyaerocom EbasColDef
+--------------------
+name: numflag
+unit: no unit
+is_var: False
+is_flag: True
+flag_col: None
+
+</pre></div></div>
+</div>
+<p>You can see that all variable columns were assigned the same flag column, since there is only one flag column at the end (index 23). This would be different if there were multiple flag columns (e.g. one for each variable).</p>
+</div>
+<div class="section" id="Access-flag-information">
+<h2>Access flag information<a class="headerlink" href="#Access-flag-information" title="Permalink to this headline">¶</a></h2>
+<p>You can access the flags for each column using the <code class="docutils literal notranslate"><span class="pre">flag_col_info</span></code> attribute of the file (and the key of the respective flag column, that you want to access, here-&gt;11).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flagcol</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">flag_col_info</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span>
+<span class="n">flagcol</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyaerocom.io.ebas_nasa_ames.EbasFlagCol at 0x7f11494eb2b0&gt;
+</pre></div></div>
+</div>
+<p>The raw flags can be accessed via:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flagcol</span><span class="o">.</span><span class="n">raw_data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([0.999, 0.999, 0.999, ..., 0.1  , 0.1  , 0.1  ])
+</pre></div></div>
+</div>
+<p>And the processed flags are in stored in a (Nx3) numpy array where N is the total number of timestamps.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flagcol</span><span class="o">.</span><span class="n">decoded</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[999,   0,   0],
+       [999,   0,   0],
+       [999,   0,   0],
+       ...,
+       [100,   0,   0],
+       [100,   0,   0],
+       [100,   0,   0]])
+</pre></div></div>
+</div>
+<p>For instance, access the flags of the 5 timestamp:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flagcol</span><span class="o">.</span><span class="n">decoded</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([999,   0,   0])
+</pre></div></div>
+</div>
+<p>This timestamp contains 1 (of the possible up to 3) flags: 999.</p>
+<p>Validity of a combination of the flags can be directly accessed via:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flagcol</span><span class="o">.</span><span class="n">valid</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+False
+</pre></div></div>
+</div>
+<p>This flag (999) evaluates to an invalid measurement. Looking into <a class="reference external" href="https://github.com/metno/pyaerocom/blob/master/pyaerocom/data/ebas_flags.csv">the flag definition file</a> we see that these two flags have the following meaning:</p>
+<ul class="simple">
+<li><p>999,‘Missing measurement, unspecified reason’,‘M’</p></li>
+</ul>
+<p>where the last string specifies if this flag is valid (V) or invalid (I) or missing (M).</p>
+</div>
+<div class="section" id="Convert-object-to-pandas-Dataframe">
+<h2>Convert object to pandas Dataframe<a class="headerlink" href="#Convert-object-to-pandas-Dataframe" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>starttime_days</th>
+      <th>endtime_days</th>
+      <th>pressure_hPa_instrument_arithmetic mean</th>
+      <th>relative_humidity_%_instrument_arithmetic mean</th>
+      <th>temperature_K_instrument_arithmetic mean</th>
+      <th>aerosol_light_backscattering_coefficient_1/Mm_450.0nm_arithmetic mean</th>
+      <th>aerosol_light_backscattering_coefficient_1/Mm_450.0nm_percentile:15.87</th>
+      <th>aerosol_light_backscattering_coefficient_1/Mm_450.0nm_percentile:84.13</th>
+      <th>aerosol_light_backscattering_coefficient_1/Mm_550.0nm_arithmetic mean</th>
+      <th>aerosol_light_backscattering_coefficient_1/Mm_550.0nm_percentile:15.87</th>
+      <th>...</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_450.0nm_arithmetic mean</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_450.0nm_percentile:15.87</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_450.0nm_percentile:84.13</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_550.0nm_arithmetic mean</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_550.0nm_percentile:15.87</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_550.0nm_percentile:84.13</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_700.0nm_arithmetic mean</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_700.0nm_percentile:15.87</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_700.0nm_percentile:84.13</th>
+      <th>numflag_no unit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2010-02-01 00:29:59</td>
+      <td>31.000000</td>
+      <td>31.041666</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.999</td>
+    </tr>
+    <tr>
+      <td>2010-02-01 01:29:59</td>
+      <td>31.041667</td>
+      <td>31.083333</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.999</td>
+    </tr>
+    <tr>
+      <td>2010-02-01 02:29:59</td>
+      <td>31.083333</td>
+      <td>31.124999</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.999</td>
+    </tr>
+    <tr>
+      <td>2010-02-01 03:29:59</td>
+      <td>31.125000</td>
+      <td>31.166666</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.999</td>
+    </tr>
+    <tr>
+      <td>2010-02-01 04:29:59</td>
+      <td>31.166667</td>
+      <td>31.208333</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.999</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 24 columns</p>
+</div></div>
+</div>
+<div class="section" id="You-may-also-apply-selection-constraints-when-converting-to-a-DataFrame">
+<h3>You may also apply selection constraints when converting to a DataFrame<a class="headerlink" href="#You-may-also-apply-selection-constraints-when-converting-to-a-DataFrame" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">scattering</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="s1">&#39;aerosol_light_scattering_coefficient&#39;</span><span class="p">,</span> <span class="n">statistics</span><span class="o">=</span><span class="s1">&#39;arithmetic mean&#39;</span><span class="p">)</span>
+<span class="n">scattering</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_450.0nm_arithmetic mean</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_550.0nm_arithmetic mean</th>
+      <th>aerosol_light_scattering_coefficient_1/Mm_700.0nm_arithmetic mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2010-02-01 00:29:59</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>2010-02-01 01:29:59</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>2010-02-01 02:29:59</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>2010-02-01 03:29:59</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>2010-02-01 04:29:59</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <td>2010-12-31 19:29:59</td>
+      <td>29.312950</td>
+      <td>19.707840</td>
+      <td>13.09690</td>
+    </tr>
+    <tr>
+      <td>2010-12-31 20:29:59</td>
+      <td>28.166000</td>
+      <td>19.270330</td>
+      <td>11.51522</td>
+    </tr>
+    <tr>
+      <td>2010-12-31 21:29:59</td>
+      <td>36.854919</td>
+      <td>25.116589</td>
+      <td>14.89398</td>
+    </tr>
+    <tr>
+      <td>2010-12-31 22:29:59</td>
+      <td>30.724499</td>
+      <td>21.249210</td>
+      <td>12.81499</td>
+    </tr>
+    <tr>
+      <td>2010-12-31 23:29:59</td>
+      <td>28.431919</td>
+      <td>20.387381</td>
+      <td>12.72375</td>
+    </tr>
+  </tbody>
+</table>
+<p>8016 rows × 3 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">scattering</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f11494752e8&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_add02_read_ebas_nasa_ames_40_1.png" src="../../_images/pyaerocom-tutorials_obsolete_add02_read_ebas_nasa_ames_40_1.png" />
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="add03_ebas_database_browser.html" class="btn btn-neutral float-left" title="EBAS file query and database browser" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MET Norway
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

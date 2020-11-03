@@ -1,0 +1,1670 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Reading of gridded data - the ReadGridded class &mdash; pyaerocom  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyaerocom
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyaerocom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>Reading of gridded data - the <em>ReadGridded</em> class</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/pyaerocom-tutorials/obsolete/tut02_intro_class_ReadGridded.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    min-width: 5ex;
+    padding-top: 0.3rem;
+    padding-right: 0.3rem;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 0.3rem;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Reading-of-gridded-data---the-ReadGridded-class">
+<h1>Reading of gridded data - the <em>ReadGridded</em> class<a class="headerlink" href="#Reading-of-gridded-data---the-ReadGridded-class" title="Permalink to this headline">¶</a></h1>
+<p>This notebook introduces the <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#pyaerocom.io.readgridded.ReadGridded">ReadGridded</a> class of pyaerocom, a flexible interface for importing model results from a single model, based on variable name (e.g. <em>od550aer</em>, <em>od550bc</em>), start / stop time stamps and temporal resolution (e.g. <em>hourly, 3hourly, daily, monthly</em>).</p>
+<p>The class is part of the <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.io.readgridded">readgridded</a> module of pyaerocom.</p>
+<p>In the following, we create an instance of the the <code class="docutils literal notranslate"><span class="pre">ReadGridded</span></code> class and use this object to find and import data files containing the aerosol optical depth at 550 nm (<em>od550aer</em>) from the ECMWF CAMS reanalysis dataset (<em>ECMWF_CAMS_REAN</em>) for the years 2003-2007 and in daily resolution. The files will be temporally merged and put into a single instance of the <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> class.</p>
+<p>We start with creating a reading object, that will take care of finding the model directory for us (based on the model ID) and all valid NetCDF files on initialisation. Use the <code class="docutils literal notranslate"><span class="pre">print</span></code> commant to preview the string representation of <code class="docutils literal notranslate"><span class="pre">ReadGridded</span></code> object, which provides useful information about what is in there.</p>
+<div class="section" id="Remark-on-reading-of-gridded-data">
+<h2>Remark on reading of gridded data<a class="headerlink" href="#Remark-on-reading-of-gridded-data" title="Permalink to this headline">¶</a></h2>
+<p>Since model data files can be large (too large for in-memory operations), gridded data in pyaerocom (e.g. model data or satellite data) is generally read and represented as <em>lazy data</em>. That means, that the actual N-dimensional data array is not loaded into memory before needed. Lazy data is represented as [dask array] as pyaerocom data objects rely either on the Python <a class="reference external" href="https://scitools.org.uk/iris/docs/latest/index.html">iris</a> library or
+<a class="reference external" href="http://xarray.pydata.org/en/stable/index.html">xarray</a> (which both use dask for representing lazy data and for out of core computation). For more information on lazy data, see e.g. <a class="reference external" href="https://scitools.org.uk/iris/docs/latest/userguide/real_and_lazy_data.html">https://scitools.org.uk/iris/docs/latest/userguide/real_and_lazy_data.html</a>.</p>
+<p><strong>Example</strong>: Consider one year of daily model data in 1x1 resolution with 30 vertical layers, stored as 64 bit floating point numbers. Loading such a file into memory, would require a RAM of at least:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="s1">&#39;</span><span class="si">{:.1f}</span><span class="s1"> GB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">64</span> <span class="o">*</span> <span class="p">(</span><span class="mi">360</span> <span class="o">*</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">/</span> <span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">9</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;5.7 GB&#39;
+</pre></div></div>
+</div>
+<p>Or the same in hourly resolution:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="s1">&#39;</span><span class="si">{:.1f}</span><span class="s1"> GB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">64</span> <span class="o">*</span> <span class="p">(</span><span class="mi">360</span> <span class="o">*</span> <span class="mi">180</span><span class="p">)</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">/</span> <span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">9</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;136.2 GB&#39;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+<span class="n">pya</span><span class="o">.</span><span class="n">change_verbosity</span><span class="p">(</span><span class="s1">&#39;critical&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Initating pyaerocom configuration
+Checking database access...
+Checking access to: /lustre/storeA
+Access to lustre database: True
+Init data paths for lustre
+Expired time: 0.022 s
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Create-instance-of-ReadGridded-class">
+<h2>Create instance of <code class="docutils literal notranslate"><span class="pre">ReadGridded</span></code> class<a class="headerlink" href="#Create-instance-of-ReadGridded-class" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="s2">&quot;ECMWF_CAMS_REAN&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: ECMWF_CAMS_REAN
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed
+Available experiments: [&#39;&#39;, &#39;REAN&#39;]
+Available years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 9999]
+Available frequencies [&#39;daily&#39; &#39;monthly&#39;]
+Available variables: [&#39;ang4487aer&#39;, &#39;bscatc532aerboa&#39;, &#39;bscatc532aertoa&#39;, &#39;ec532aer&#39;, &#39;ec532dryaer&#39;, &#39;od440aer&#39;, &#39;od550aer&#39;, &#39;od550bc&#39;, &#39;od550dust&#39;, &#39;od550oa&#39;, &#39;od550so4&#39;, &#39;od550ss&#39;, &#39;od865aer&#39;, &#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcoa&#39;, &#39;sconcpm10&#39;, &#39;sconcpm25&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;, &#39;time&#39;, &#39;z&#39;]
+</pre></div></div>
+</div>
+<p>The output contains information about all variables that were found and all corresponding years. These information is extracted from the filenames, which have to follow the AEROCOM file naming conventions.</p>
+<p><strong>Please note</strong> that at this point, no data is actually imported but only the paths are set that contain data for this model. In order to read one variable, call the <code class="docutils literal notranslate"><span class="pre">read_var</span></code> function with a valid variable name. You can check available variables using the <code class="docutils literal notranslate"><span class="pre">vars</span></code> attribute (or by printing the string representation, as shown in the cell above).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">reader</span><span class="o">.</span><span class="n">vars</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;ang4487aer&#39;,
+ &#39;bscatc532aerboa&#39;,
+ &#39;bscatc532aertoa&#39;,
+ &#39;ec532aer&#39;,
+ &#39;ec532dryaer&#39;,
+ &#39;od440aer&#39;,
+ &#39;od550aer&#39;,
+ &#39;od550bc&#39;,
+ &#39;od550dust&#39;,
+ &#39;od550oa&#39;,
+ &#39;od550so4&#39;,
+ &#39;od550ss&#39;,
+ &#39;od865aer&#39;,
+ &#39;sconcbc&#39;,
+ &#39;sconcdust&#39;,
+ &#39;sconcoa&#39;,
+ &#39;sconcpm10&#39;,
+ &#39;sconcpm25&#39;,
+ &#39;sconcso4&#39;,
+ &#39;sconcss&#39;,
+ &#39;time&#39;,
+ &#39;z&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;od550aer&quot;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">&quot;1-1-2003&quot;</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="s2">&quot;31-12-2007&quot;</span><span class="p">)</span>
+<span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pyaerocom.GriddedData
+Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 550 nm / (1) (time: 1826; latitude: 161; longitude: 320)&gt;
+</pre></div></div>
+</div>
+<p>The returned data object is of type <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#pyaerocom.griddeddata.GriddedData">GriddedData</a> class, which will be introduced in more detail later. This data object is returned by the <code class="docutils literal notranslate"><span class="pre">read_var</span></code> method and can also be accessed from the instance of the reading class using:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">d</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;od550aer&quot;</span><span class="p">]</span>
+<span class="n">d</span> <span class="ow">is</span> <span class="n">data</span> <span class="c1">#?</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+</pre></div></div>
+</div>
+<p>We may also import other variables using either the above used method <code class="docutils literal notranslate"><span class="pre">read_var</span></code> or the more general <code class="docutils literal notranslate"><span class="pre">read</span></code> method which can read single or multiple variables on the run.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">([</span><span class="s1">&#39;od550bc&#39;</span><span class="p">,</span> <span class="s1">&#39;od550dust&#39;</span><span class="p">,</span> <span class="s1">&#39;od550oa&#39;</span><span class="p">,</span> <span class="s1">&#39;od550so4&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+ECMWF_CAMS_REAN.daily.od550bc.2019.nc
+ECMWF_CAMS_REAN.daily.od550dust.2019.nc
+ECMWF_CAMS_REAN.daily.od550oa.2019.nc
+ECMWF_CAMS_REAN.daily.od550so4.2019.nc
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(pyaerocom.GriddedData
+ Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 550 nm / (1) (time: 6209; latitude: 161; longitude: 320)&gt;,
+ pyaerocom.GriddedData
+ Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 550 nm / (1) (time: 6209; latitude: 161; longitude: 320)&gt;,
+ pyaerocom.GriddedData
+ Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 550 nm / (1) (time: 6209; latitude: 161; longitude: 320)&gt;,
+ pyaerocom.GriddedData
+ Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 550 nm / (1) (time: 6209; latitude: 161; longitude: 320)&gt;)
+</pre></div></div>
+</div>
+<p>Now let’s double check if all variables have been imported.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Pyaerocom ReadGridded
+---------------------
+Data ID: ECMWF_CAMS_REAN
+Data directory: /lustre/storeA/project/aerocom/aerocom-users-database/ECMWF/ECMWF_CAMS_REAN/renamed
+Available experiments: [&#39;&#39;, &#39;REAN&#39;]
+Available years: [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 9999]
+Available frequencies [&#39;daily&#39; &#39;monthly&#39;]
+Available variables: [&#39;ang4487aer&#39;, &#39;bscatc532aerboa&#39;, &#39;bscatc532aertoa&#39;, &#39;ec532aer&#39;, &#39;ec532dryaer&#39;, &#39;od440aer&#39;, &#39;od550aer&#39;, &#39;od550bc&#39;, &#39;od550dust&#39;, &#39;od550oa&#39;, &#39;od550so4&#39;, &#39;od550ss&#39;, &#39;od865aer&#39;, &#39;sconcbc&#39;, &#39;sconcdust&#39;, &#39;sconcoa&#39;, &#39;sconcpm10&#39;, &#39;sconcpm25&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;, &#39;time&#39;, &#39;z&#39;]
+
+Loaded GriddedData objects:
+ID: ECMWF_CAMS_REAN, Var: od550aer
+ID: ECMWF_CAMS_REAN, Var: od550bc
+ID: ECMWF_CAMS_REAN, Var: od550dust
+ID: ECMWF_CAMS_REAN, Var: od550oa
+ID: ECMWF_CAMS_REAN, Var: od550so4
+</pre></div></div>
+</div>
+<p>In the following we continue with the <code class="docutils literal notranslate"><span class="pre">od550aer</span></code> data object that was loaded first and that was assigned the name <code class="docutils literal notranslate"><span class="pre">data</span></code> above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">The data object is of type </span><span class="si">%s</span><span class="s2"> and contains </span><span class="si">%d</span><span class="s2"> time stamps&quot;</span> <span class="o">%</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+The data object is of type &lt;class &#39;pyaerocom.griddeddata.GriddedData&#39;&gt; and contains 1826 time stamps
+</pre></div></div>
+</div>
+<p>The returned <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#pyaerocom.griddeddata.GriddedData">GriddedData</a> object contains 1826 time stamps. Given that the defined period of 5 years includes one leap year, we should expect that we imported data for each day of the five years?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="mi">1826</span> <span class="o">==</span> <span class="mi">5</span><span class="o">*</span><span class="mi">365</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+</pre></div></div>
+</div>
+<div class="section" id="Other-options-for-reading">
+<h3>Other options for reading<a class="headerlink" href="#Other-options-for-reading" title="Permalink to this headline">¶</a></h3>
+<p>The reading query can be further customised with respect to the temporal resolution that is requested. Let’s have a look at the available AOD data at 550 nm:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">reader</span><span class="o">.</span><span class="n">filter_files</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>var_name</th>
+      <th>year</th>
+      <th>ts_type</th>
+      <th>vert_code</th>
+      <th>data_id</th>
+      <th>name</th>
+      <th>meteo</th>
+      <th>experiment</th>
+      <th>is_at_stations</th>
+      <th>3D</th>
+      <th>filename</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>15</td>
+      <td>od550aer</td>
+      <td>2003</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2003.nc</td>
+    </tr>
+    <tr>
+      <td>144</td>
+      <td>od550aer</td>
+      <td>2003</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2003.nc</td>
+    </tr>
+    <tr>
+      <td>85</td>
+      <td>od550aer</td>
+      <td>2004</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2004.nc</td>
+    </tr>
+    <tr>
+      <td>110</td>
+      <td>od550aer</td>
+      <td>2004</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2004.nc</td>
+    </tr>
+    <tr>
+      <td>236</td>
+      <td>od550aer</td>
+      <td>2005</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2005.nc</td>
+    </tr>
+    <tr>
+      <td>82</td>
+      <td>od550aer</td>
+      <td>2005</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2005.nc</td>
+    </tr>
+    <tr>
+      <td>215</td>
+      <td>od550aer</td>
+      <td>2006</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2006.nc</td>
+    </tr>
+    <tr>
+      <td>179</td>
+      <td>od550aer</td>
+      <td>2006</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2006.nc</td>
+    </tr>
+    <tr>
+      <td>157</td>
+      <td>od550aer</td>
+      <td>2007</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2007.nc</td>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>od550aer</td>
+      <td>2007</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2007.nc</td>
+    </tr>
+    <tr>
+      <td>191</td>
+      <td>od550aer</td>
+      <td>2008</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2008.nc</td>
+    </tr>
+    <tr>
+      <td>72</td>
+      <td>od550aer</td>
+      <td>2009</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2009.nc</td>
+    </tr>
+    <tr>
+      <td>201</td>
+      <td>od550aer</td>
+      <td>2010</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>od550aer</td>
+      <td>2011</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2011.nc</td>
+    </tr>
+    <tr>
+      <td>152</td>
+      <td>od550aer</td>
+      <td>2012</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2012.nc</td>
+    </tr>
+    <tr>
+      <td>200</td>
+      <td>od550aer</td>
+      <td>2013</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2013.nc</td>
+    </tr>
+    <tr>
+      <td>138</td>
+      <td>od550aer</td>
+      <td>2014</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2014.nc</td>
+    </tr>
+    <tr>
+      <td>145</td>
+      <td>od550aer</td>
+      <td>2015</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2015.nc</td>
+    </tr>
+    <tr>
+      <td>243</td>
+      <td>od550aer</td>
+      <td>2016</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2016.nc</td>
+    </tr>
+    <tr>
+      <td>93</td>
+      <td>od550aer</td>
+      <td>2017</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2017.nc</td>
+    </tr>
+    <tr>
+      <td>104</td>
+      <td>od550aer</td>
+      <td>2018</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2018.nc</td>
+    </tr>
+    <tr>
+      <td>187</td>
+      <td>od550aer</td>
+      <td>2019</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>False</td>
+      <td>False</td>
+      <td>ECMWF_CAMS_REAN.daily.od550aer.2019.nc</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>As you can see, there are both daily and monthly files. The monthly, however only covers the years 2003-2007, while the daily has data until 2018:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">reader</span><span class="o">.</span><span class="n">filter_files</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>var_name</th>
+      <th>year</th>
+      <th>ts_type</th>
+      <th>vert_code</th>
+      <th>data_id</th>
+      <th>name</th>
+      <th>meteo</th>
+      <th>experiment</th>
+      <th>is_at_stations</th>
+      <th>3D</th>
+      <th>filename</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>144</td>
+      <td>od550aer</td>
+      <td>2003</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2003.nc</td>
+    </tr>
+    <tr>
+      <td>110</td>
+      <td>od550aer</td>
+      <td>2004</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2004.nc</td>
+    </tr>
+    <tr>
+      <td>82</td>
+      <td>od550aer</td>
+      <td>2005</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2005.nc</td>
+    </tr>
+    <tr>
+      <td>179</td>
+      <td>od550aer</td>
+      <td>2006</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2006.nc</td>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>od550aer</td>
+      <td>2007</td>
+      <td>monthly</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.monthly.od550aer.2007.nc</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">reader</span><span class="o">.</span><span class="n">filter_files</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>var_name</th>
+      <th>year</th>
+      <th>ts_type</th>
+      <th>vert_code</th>
+      <th>data_id</th>
+      <th>name</th>
+      <th>meteo</th>
+      <th>experiment</th>
+      <th>is_at_stations</th>
+      <th>3D</th>
+      <th>filename</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>15</td>
+      <td>od550aer</td>
+      <td>2003</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2003.nc</td>
+    </tr>
+    <tr>
+      <td>85</td>
+      <td>od550aer</td>
+      <td>2004</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2004.nc</td>
+    </tr>
+    <tr>
+      <td>236</td>
+      <td>od550aer</td>
+      <td>2005</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2005.nc</td>
+    </tr>
+    <tr>
+      <td>215</td>
+      <td>od550aer</td>
+      <td>2006</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2006.nc</td>
+    </tr>
+    <tr>
+      <td>157</td>
+      <td>od550aer</td>
+      <td>2007</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2007.nc</td>
+    </tr>
+    <tr>
+      <td>191</td>
+      <td>od550aer</td>
+      <td>2008</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2008.nc</td>
+    </tr>
+    <tr>
+      <td>72</td>
+      <td>od550aer</td>
+      <td>2009</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2009.nc</td>
+    </tr>
+    <tr>
+      <td>201</td>
+      <td>od550aer</td>
+      <td>2010</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2010.nc</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>od550aer</td>
+      <td>2011</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2011.nc</td>
+    </tr>
+    <tr>
+      <td>152</td>
+      <td>od550aer</td>
+      <td>2012</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2012.nc</td>
+    </tr>
+    <tr>
+      <td>200</td>
+      <td>od550aer</td>
+      <td>2013</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2013.nc</td>
+    </tr>
+    <tr>
+      <td>138</td>
+      <td>od550aer</td>
+      <td>2014</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2014.nc</td>
+    </tr>
+    <tr>
+      <td>145</td>
+      <td>od550aer</td>
+      <td>2015</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2015.nc</td>
+    </tr>
+    <tr>
+      <td>243</td>
+      <td>od550aer</td>
+      <td>2016</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2016.nc</td>
+    </tr>
+    <tr>
+      <td>93</td>
+      <td>od550aer</td>
+      <td>2017</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2017.nc</td>
+    </tr>
+    <tr>
+      <td>104</td>
+      <td>od550aer</td>
+      <td>2018</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td>REAN</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom.ECMWF_CAMS_REAN.daily.od550aer.2018.nc</td>
+    </tr>
+    <tr>
+      <td>187</td>
+      <td>od550aer</td>
+      <td>2019</td>
+      <td>daily</td>
+      <td></td>
+      <td>ECMWF_CAMS_REAN</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>False</td>
+      <td>False</td>
+      <td>ECMWF_CAMS_REAN.daily.od550aer.2019.nc</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Now, when it comes to reading a data object, these information can be specified as input:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">aod_monthly</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">aod_monthly</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">aod_monthly</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">aod_monthly</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2003-01-01T00:00:00.000000 2007-12-31T23:59:59.999999 monthly
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">aod_daily</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">aod_daily</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">aod_daily</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">aod_daily</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+ECMWF_CAMS_REAN.daily.od550aer.2019.nc
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2003-01-01T00:00:00.000000 2019-12-31T23:59:59.999999 daily
+</pre></div></div>
+</div>
+<p>However, what about a situation where you write a script that processes many models and you don’t really know, in what resolution the model data comes, but 1. you prefer monthly where available (keyword <code class="docutils literal notranslate"><span class="pre">flex_ts_type</span></code>), and 2. you want to have the longest available timeseries (keyword <code class="docutils literal notranslate"><span class="pre">prefer_longer</span></code>).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">aod_inferred</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prefer_longer</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">aod_inferred</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">aod_inferred</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">aod_inferred</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+ECMWF_CAMS_REAN.daily.od550aer.2019.nc
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2003-01-01T00:00:00.000000 2019-12-31T23:59:59.999999 daily
+</pre></div></div>
+</div>
+<p>As you can see, the reading routine has automatically identified, that the daily dataset has a better time coverage and has thus, preferred that one over the specified ts_type of monthly.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">aod_inferred_monthly</span> <span class="o">=</span> <span class="n">aod_inferred</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+<span class="n">aod_inferred_monthly</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pyaerocom.GriddedData
+Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 550 nm / (1) (time: 204; latitude: 161; longitude: 320)&gt;
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Remark-on-time-definition">
+<h3>Remark on time definition<a class="headerlink" href="#Remark-on-time-definition" title="Permalink to this headline">¶</a></h3>
+<p>If the time dimension is not properly defined in a NetCDF data file, Pyaerocom can correct for this on data import by:</p>
+<ol class="arabic simple">
+<li><p>First checking if the time dimension in the NetCDF file is correct according to CF convention (<a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#pyaerocom.io.helpers.check_time_coord">see here for details on the implementation</a> and if a problem is detected, then …</p></li>
+<li><p>the time axis is redefined based on the year and time resolution (<em>ts_type</em>) that is provided in the filename. The latter requires that the file follows one of the <a class="reference external" href="http://aerocom.met.no/pyaerocom/config_files.html#file-conventions">pyaerocom file conventions</a>.</p></li>
+</ol>
+</div>
+<div class="section" id="A-very-brief-introduction-into-the-GriddedData-class">
+<h3>A very brief introduction into the GriddedData class<a class="headerlink" href="#A-very-brief-introduction-into-the-GriddedData-class" title="Permalink to this headline">¶</a></h3>
+<p>Now as a final step, we briefly introduce some of the features of the <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> class by computing and plotting a time series of the global weighted average aerosol optical density as well as the same time series at the coordinates in the city of Leipzig, Germany.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#extract AODs at the position of Leipzig</span>
+<span class="n">lon_leipzig</span> <span class="o">=</span> <span class="mf">12.44</span>
+<span class="n">lat_leipzig</span> <span class="o">=</span> <span class="mf">51.35</span>
+
+<span class="c1"># the method to_time_series is designed to handle more than one coordinate (i.e. a list of station coordinates)</span>
+<span class="n">data_leipzig</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_time_series</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat_leipzig</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">lon_leipzig</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">global_mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_area_weighted_timeseries</span><span class="p">()</span>
+<span class="n">europe_mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_area_weighted_timeseries</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="s1">&#39;EUROPE&#39;</span><span class="p">)</span>
+<span class="n">india_mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_area_weighted_timeseries</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="s1">&#39;INDIA&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Interpolating data of shape (1826, 161, 320). This may take a while.
+Successfully interpolated cube
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Plot-timeseries">
+<h3>Plot timeseries<a class="headerlink" href="#Plot-timeseries" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span>  <span class="n">data_leipzig</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Leipzig&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">global_mean</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean (global)&#39;</span><span class="p">)</span>
+<span class="n">europe_mean</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean (Europe)&#39;</span><span class="p">)</span>
+<span class="n">india_mean</span><span class="o">.</span><span class="n">plot_timeseries</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean (India)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">tit</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;ECMWF Reanalysis (monthly averages)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Trying to infer ts_type in StationData ECMWF_CAMS_REAN for variable od550aer
+Trying to infer ts_type in StationData ECMWF_CAMS_REAN for variable od550aer
+Trying to infer ts_type in StationData ECMWF_CAMS_REAN for variable od550aer
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/pyaerocom-tutorials_obsolete_tut02_intro_class_ReadGridded_37_1.png" src="../../_images/pyaerocom-tutorials_obsolete_tut02_intro_class_ReadGridded_37_1.png" />
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MET Norway
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
