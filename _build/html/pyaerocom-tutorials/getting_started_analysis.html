@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting started &mdash; pyaerocom  documentation</title>
+  <title>Diving deeper into the analysis and API &mdash; pyaerocom  documentation</title>
   
 
   
@@ -96,11 +96,19 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html#getting-started">Getting started</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="getting_started_setup.html">Checking pyaerocom installation and access to data</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Getting started</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#Prerequisites">Prerequisites</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Reading-of-and-working-with-gridded-model-data-(ReadGridded-and-GriddedData-classes)">Reading of and working with <em>gridded</em> model data (<code class="docutils literal notranslate"><span class="pre">ReadGridded</span></code> and <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> classes)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Reading-of-and-working-with-ungridded-data-(ReadUngridded-and-UngriddedData-classes)">Reading of and working with ungridded data (<code class="docutils literal notranslate"><span class="pre">ReadUngridded</span></code> and <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> classes)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Colocation-of-model-and-obsdata">Colocation of model and obsdata</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Diving deeper into the analysis and API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Check-access-to-testdata">Check access to testdata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Rectangular-regions">Rectangular regions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Binary-region-masks">Binary region masks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Filtering-of-time">Filtering of time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Data-aggregation">Data aggregation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Caching-of-UngriddedData">Caching of UngriddedData</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Read-Aeronet-Sun-v3-level-2-data">Read Aeronet Sun v3 level 2 data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Plot-all-station-coordinates">Plot all station coordinates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Access-of-individual-stations">Access of individual stations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#You-can-also-plot-the-time-series-directly">You can also plot the time-series directly</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Colocation-with-satellite-AODs-from-MODIS">Colocation with satellite AODs from MODIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Remark-on-the-ColocatedData-object">Remark on the ColocatedData object</a></li>
 </ul>
 </li>
 </ul>
@@ -156,7 +164,7 @@
         
           <li><a href="index.html">Tutorials</a> &raquo;</li>
         
-      <li>Getting started</li>
+      <li>Diving deeper into the analysis and API</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -417,8 +425,19 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
-<div class="section" id="Getting-started">
-<h1>Getting started<a class="headerlink" href="#Getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># ignore warnings</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">filterwarnings</span>
+<span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Diving-deeper-into-the-analysis-and-API">
+<h1>Diving deeper into the analysis and API<a class="headerlink" href="#Diving-deeper-into-the-analysis-and-API" title="Permalink to this headline">¶</a></h1>
 <p>This notebook is meant to give a quick introduction into the main features and workflows of <a class="reference external" href="http://aerocom.met.no/pyaerocom/">pyaerocom</a>.</p>
 <p>This includes brief introductions into the following features:</p>
 <ul class="simple">
@@ -430,19 +449,36 @@ div.rendered_html tbody tr:hover {
 <li><p>Retrieving and working with data from individual stations (<code class="docutils literal notranslate"><span class="pre">StationData</span></code> class).</p></li>
 <li><p><strong>Colocation</strong> of model data with all stations from an observation network.</p></li>
 </ul>
-<p>It ends with a colocation of CAM53-Oslo model AODs both all-sky and clear-sky with Aeronet Sun V3 level 2 data.</p>
-<div class="section" id="Prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#Prerequisites" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>In order to run this notebook, you need to be connected to the AeroCom post processing servers (PPI).</p></li>
-<li><p>If you have PPI (/lustre/) mounted on your local machine you need to update the basic data directory after importing pyaerocom as follows: <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pyaerocom</span> <span class="pre">as</span> <span class="pre">pya</span>&#160; <span class="pre">pya.const.BASEDIR</span> <span class="pre">=</span> <span class="pre">&lt;path_where_lustre_is_mounted&gt;</span></code></p></li>
-</ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+<span class="n">pya</span><span class="o">.</span><span class="n">__version__</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;0.10.0rc2&#39;
+</pre></div></div>
+</div>
+<p>Should be at least 0.10.X</p>
+<div class="section" id="Check-access-to-testdata">
+<h2>Check access to testdata<a class="headerlink" href="#Check-access-to-testdata" title="Permalink to this headline">¶</a></h2>
+<p><strong>NOTE</strong>: details regarding testdata access and intialization are covered in tutorial notebook <em>getting_started_setup.ipynb</em>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pyaerocom.testdata_access</span> <span class="kn">import</span> <span class="n">initialise</span>
+<span class="n">initialise</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -451,54 +487,32 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Initating pyaerocom configuration
-Checking database access...
-Checking access to: /lustre/storeA
-Access to lustre database: True
-Init data paths for lustre
-Expired time: 0.021 s
+Adding data search directory /home/jonasg/MyPyaerocom/testdata-minimal/modeldata.
+Adding data search directory /home/jonasg/MyPyaerocom/testdata-minimal/obsdata.
+Adding data search directory /home/jonasg/MyPyaerocom/testdata-minimal/config.
+Adding ungridded dataset AeronetSunV3L2Subset.daily located at /home/jonasg/MyPyaerocom/testdata-minimal/obsdata/AeronetSunV3Lev2.daily/renamed.Reader: &lt;class &#39;pyaerocom.io.read_aeronet_sunv3.ReadAeronetSunV3&#39;&gt;
+Adding ungridded dataset AeronetSDAV3L2Subset.daily located at /home/jonasg/MyPyaerocom/testdata-minimal/obsdata/AeronetSDAV3Lev2.daily/renamed.Reader: &lt;class &#39;pyaerocom.io.read_aeronet_sdav3.ReadAeronetSdaV3&#39;&gt;
+Adding ungridded dataset AeronetInvV3L2Subset.daily located at /home/jonasg/MyPyaerocom/testdata-minimal/obsdata/AeronetInvV3Lev2.daily/renamed.Reader: &lt;class &#39;pyaerocom.io.read_aeronet_invv3.ReadAeronetInvV3&#39;&gt;
+Adding ungridded dataset EBASSubset located at /home/jonasg/MyPyaerocom/testdata-minimal/obsdata/EBASMultiColumn.Reader: &lt;class &#39;pyaerocom.io.read_ebas.ReadEbas&#39;&gt;
+pyaerocom-testdata is ready to be used. The data is available at /home/jonasg/MyPyaerocom/testdata-minimal
 </pre></div></div>
-</div>
-<div class="section" id="Check-data-directory">
-<h3>Check data directory<a class="headerlink" href="#Check-data-directory" title="Permalink to this headline">¶</a></h3>
-<p>By default, pyaerocom assumes that the AEROCOM database can be accessed (cf. top of flowchart), that is, it initiates all data query paths relative to the database server path names.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pya</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">BASEDIR</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-&#39;/lustre/storeA/project/aerocom&#39;
-</pre></div></div>
-</div>
-<p><strong>NOTE</strong>: Execution of the following lines will only work if you are connected to the AEROCOM data server or if you have access to the pyaerocom testdataset. The latter can be retrieved upon request (please contact <a class="reference external" href="mailto:jonasg&#37;&#52;&#48;met&#46;no">jonasg<span>&#64;</span>met<span>&#46;</span>no</a>).</p>
-</div>
 </div>
 <div class="section" id="Reading-of-and-working-with-gridded-model-data-(ReadGridded-and-GriddedData-classes)">
-<h2>Reading of and working with <em>gridded</em> model data (<code class="docutils literal notranslate"><span class="pre">ReadGridded</span></code> and <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> classes)<a class="headerlink" href="#Reading-of-and-working-with-gridded-model-data-(ReadGridded-and-GriddedData-classes)" title="Permalink to this headline">¶</a></h2>
+<h3>Reading of and working with <em>gridded</em> model data (<code class="docutils literal notranslate"><span class="pre">ReadGridded</span></code> and <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> classes)<a class="headerlink" href="#Reading-of-and-working-with-gridded-model-data-(ReadGridded-and-GriddedData-classes)" title="Permalink to this headline">¶</a></h3>
 <p>This section illustrates the reading of gridded data as well as some features of the <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> class of <em>pyaerocom</em>. First, however, we have to find a valid model ID for the reading (cf. flow chart).</p>
 <div class="section" id="Find-model-data">
-<h3>Find model data<a class="headerlink" href="#Find-model-data" title="Permalink to this headline">¶</a></h3>
+<h4>Find model data<a class="headerlink" href="#Find-model-data" title="Permalink to this headline">¶</a></h4>
 <p>The database contains data from the CAM53-Oslo model, which is used in the following. You can use the <code class="docutils literal notranslate"><span class="pre">browse_database</span></code> function of pyaerocom to find model ID’s (which can be quite cryptic sometimes) using wildcard pattern search.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pya</span><span class="o">.</span><span class="n">browse_database</span><span class="p">(</span><span class="s1">&#39;CAM53*-Oslo*UNTUNED*&#39;</span><span class="p">)</span>
+<span></span><span class="n">pya</span><span class="o">.</span><span class="n">browse_database</span><span class="p">(</span><span class="s1">&#39;*TM5*&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
@@ -506,40 +520,38 @@ Expired time: 0.021 s
 
 Pyaerocom ReadGridded
 ---------------------
-Data ID: CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PI_UNTUNED
-Data directory: /lustre/storeA/project/aerocom/aerocom2/NorESM_SVN_TEST/CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PI_UNTUNED/renamed
-Available experiments: [&#39;UNTUNED&#39;]
-Available years: [9999]
-Available frequencies [&#39;monthly&#39;]
-Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer&#39;, &#39;abs5503Daer&#39;, &#39;abs550aer&#39;, &#39;abs550bc&#39;, &#39;abs550dryaer&#39;, &#39;abs550dust&#39;, &#39;abs550oa&#39;, &#39;abs550so4&#39;, &#39;abs550ss&#39;, &#39;abs670aer&#39;, &#39;abs870aer&#39;, &#39;airmass&#39;, &#39;area&#39;, &#39;asy3Daer&#39;, &#39;bc5503Daer&#39;, &#39;cheaqpso4&#39;, &#39;chegpso4&#39;, &#39;chepso2&#39;, &#39;cl3D&#39;, &#39;clt&#39;, &#39;drybc&#39;, &#39;drydms&#39;, &#39;drydust&#39;, &#39;dryoa&#39;, &#39;dryso2&#39;, &#39;dryso4&#39;, &#39;dryss&#39;, &#39;ec5503Daer&#39;, &#39;ec550dryaer&#39;, &#39;emibc&#39;, &#39;emidms&#39;, &#39;emidust&#39;, &#39;emioa&#39;, &#39;emiso2&#39;, &#39;emiso4&#39;, &#39;emiss&#39;, &#39;hus&#39;, &#39;landf&#39;, &#39;loadbc&#39;, &#39;loaddms&#39;, &#39;loaddust&#39;, &#39;loadoa&#39;, &#39;loadso2&#39;, &#39;loadso4&#39;, &#39;loadss&#39;, &#39;mmraerh2o&#39;, &#39;mmrbc&#39;, &#39;mmrdu&#39;, &#39;mmroa&#39;, &#39;mmrso4&#39;, &#39;mmrss&#39;, &#39;od440aer&#39;, &#39;od440csaer&#39;, &#39;od550aer&#39;, &#39;od550aerh2o&#39;, &#39;od550bc&#39;, &#39;od550csaer&#39;, &#39;od550dust&#39;, &#39;od550lt1aer&#39;, &#39;od550lt1dust&#39;, &#39;od550oa&#39;, &#39;od550so4&#39;, &#39;od550ss&#39;, &#39;od670aer&#39;, &#39;od870aer&#39;, &#39;od870csaer&#39;, &#39;orog&#39;, &#39;precip&#39;, &#39;pressure&#39;, &#39;ps&#39;, &#39;rlds&#39;, &#39;rlus&#39;, &#39;rlut&#39;, &#39;rlutcs&#39;, &#39;rsds&#39;, &#39;rsdscs&#39;, &#39;rsdt&#39;, &#39;rsus&#39;, &#39;rsut&#39;, &#39;sconcbc&#39;, &#39;sconcdms&#39;, &#39;sconcdust&#39;, &#39;sconcoa&#39;, &#39;sconcso2&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;, &#39;temp&#39;, &#39;vmrdms&#39;, &#39;vmrso2&#39;, &#39;wetbc&#39;, &#39;wetdms&#39;, &#39;wetdust&#39;, &#39;wetoa&#39;, &#39;wetso2&#39;, &#39;wetso4&#39;, &#39;wetss&#39;]
-
-Pyaerocom ReadGridded
----------------------
-Data ID: CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED
-Data directory: /lustre/storeA/project/aerocom/aerocom2/NorESM_SVN_TEST/CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED/renamed
-Available experiments: [&#39;UNTUNED&#39;]
-Available years: [2004, 2005, 2006, 2007, 2008, 2009, 2010, 9999]
-Available frequencies [&#39;monthly&#39;]
-Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer&#39;, &#39;abs5503Daer&#39;, &#39;abs550aer&#39;, &#39;abs550aercs&#39;, &#39;abs550bc&#39;, &#39;abs550dryaer&#39;, &#39;abs550dust&#39;, &#39;abs550oa&#39;, &#39;abs550so4&#39;, &#39;abs550ss&#39;, &#39;abs670aer&#39;, &#39;abs870aer&#39;, &#39;airmass&#39;, &#39;ang4487aer&#39;, &#39;ang4487csaer&#39;, &#39;area&#39;, &#39;asy3Daer&#39;, &#39;bc5503Daer&#39;, &#39;cheaqpso4&#39;, &#39;chegpso4&#39;, &#39;chepso2&#39;, &#39;cl3D&#39;, &#39;clt&#39;, &#39;drybc&#39;, &#39;drydms&#39;, &#39;drydust&#39;, &#39;dryoa&#39;, &#39;dryso2&#39;, &#39;dryso4&#39;, &#39;dryss&#39;, &#39;ec5503Daer&#39;, &#39;ec550dryaer&#39;, &#39;emibc&#39;, &#39;emidms&#39;, &#39;emidust&#39;, &#39;emioa&#39;, &#39;emiso2&#39;, &#39;emiso4&#39;, &#39;emiss&#39;, &#39;hus&#39;, &#39;landf&#39;, &#39;loadbc&#39;, &#39;loaddms&#39;, &#39;loaddust&#39;, &#39;loadoa&#39;, &#39;loadso2&#39;, &#39;loadso4&#39;, &#39;loadss&#39;, &#39;mmraerh2o&#39;, &#39;mmrbc&#39;, &#39;mmrdu&#39;, &#39;mmroa&#39;, &#39;mmrso4&#39;, &#39;mmrss&#39;, &#39;od440aer&#39;, &#39;od440csaer&#39;, &#39;od550aer&#39;, &#39;od550aerh2o&#39;, &#39;od550bc&#39;, &#39;od550csaer&#39;, &#39;od550dust&#39;, &#39;od550lt1aer&#39;, &#39;od550lt1dust&#39;, &#39;od550oa&#39;, &#39;od550so4&#39;, &#39;od550ss&#39;, &#39;od670aer&#39;, &#39;od870aer&#39;, &#39;od870csaer&#39;, &#39;orog&#39;, &#39;precip&#39;, &#39;pressure&#39;, &#39;ps&#39;, &#39;rlds&#39;, &#39;rlus&#39;, &#39;rlut&#39;, &#39;rlutcs&#39;, &#39;rsds&#39;, &#39;rsdscs&#39;, &#39;rsdt&#39;, &#39;rsus&#39;, &#39;rsut&#39;, &#39;sconcbc&#39;, &#39;sconcdms&#39;, &#39;sconcdust&#39;, &#39;sconcoa&#39;, &#39;sconcso2&#39;, &#39;sconcso4&#39;, &#39;sconcss&#39;, &#39;temp&#39;, &#39;vmrdms&#39;, &#39;vmrso2&#39;, &#39;wetbc&#39;, &#39;wetdms&#39;, &#39;wetdust&#39;, &#39;wetoa&#39;, &#39;wetso2&#39;, &#39;wetso4&#39;, &#39;wetss&#39;]
+Data ID: TM5-met2010_CTRL-TEST
+Data directory: /home/jonasg/MyPyaerocom/testdata-minimal/modeldata/TM5-met2010_CTRL-TEST/renamed
+Available experiments: [&#39;AP3&#39;]
+Available years: [2010]
+Available frequencies [&#39;daily&#39; &#39;monthly&#39;]
+Available variables: [&#39;abs550aer&#39;, &#39;od550aer&#39;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;TM5-met2010_CTRL-TEST&#39;]
 </pre></div></div>
 </div>
 </div>
-<div class="section" id="Initiate-reader-class-for-the-present-day-(PD)-dataset">
-<h3>Initiate reader class for the present day (PD) dataset<a class="headerlink" href="#Initiate-reader-class-for-the-present-day-(PD)-dataset" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="Initiate-reader-class">
+<h4>Initiate reader class<a class="headerlink" href="#Initiate-reader-class" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED&#39;</span><span class="p">)</span>
+<span></span><span class="n">reader</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;TM5-met2010_CTRL-TEST&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <p>You can have a look at the individual files and corresponding metadata using the <code class="docutils literal notranslate"><span class="pre">file_info</span></code> attribute:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -548,7 +560,7 @@ Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -578,6 +590,7 @@ Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer
       <th>name</th>
       <th>meteo</th>
       <th>experiment</th>
+      <th>perturbation</th>
       <th>is_at_stations</th>
       <th>3D</th>
       <th>filename</th>
@@ -585,167 +598,72 @@ Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer
   </thead>
   <tbody>
     <tr>
-      <td>345</td>
-      <td>abs440aer</td>
-      <td>2004</td>
-      <td>monthly</td>
+      <th>0</th>
+      <td>abs550aer</td>
+      <td>2010</td>
+      <td>daily</td>
       <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
+      <td>TM5-met2010_CTRL-TEST</td>
+      <td>TM5</td>
+      <td>met2010</td>
+      <td>AP3</td>
+      <td>CTRL2019</td>
       <td>False</td>
       <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
+      <td>aerocom3_TM5-met2010_AP3-CTRL2019_abs550aer_Co...</td>
     </tr>
     <tr>
-      <td>506</td>
-      <td>abs440aer</td>
-      <td>2005</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>340</td>
-      <td>abs440aer</td>
-      <td>2006</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>12</td>
-      <td>abs440aer</td>
-      <td>2007</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>685</td>
-      <td>abs440aer</td>
-      <td>2008</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <td>169</td>
-      <td>wetss</td>
-      <td>2007</td>
-      <td>monthly</td>
-      <td>Surface</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>213</td>
-      <td>wetss</td>
-      <td>2008</td>
-      <td>monthly</td>
-      <td>Surface</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>36</td>
-      <td>wetss</td>
-      <td>2009</td>
-      <td>monthly</td>
-      <td>Surface</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>129</td>
-      <td>wetss</td>
+      <th>3</th>
+      <td>abs550aer</td>
       <td>2010</td>
       <td>monthly</td>
-      <td>Surface</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
+      <td>Column</td>
+      <td>TM5-met2010_CTRL-TEST</td>
+      <td>TM5</td>
+      <td>met2010</td>
+      <td>AP3</td>
+      <td>CTRL2019</td>
       <td>False</td>
       <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
+      <td>aerocom3_TM5-met2010_AP3-CTRL2019_abs550aer_Co...</td>
     </tr>
     <tr>
-      <td>454</td>
-      <td>wetss</td>
-      <td>9999</td>
+      <th>1</th>
+      <td>od550aer</td>
+      <td>2010</td>
+      <td>daily</td>
+      <td>Column</td>
+      <td>TM5-met2010_CTRL-TEST</td>
+      <td>TM5</td>
+      <td>met2010</td>
+      <td>AP3</td>
+      <td>CTRL2019</td>
+      <td>False</td>
+      <td>False</td>
+      <td>aerocom3_TM5-met2010_AP3-CTRL2019_od550aer_Col...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>od550aer</td>
+      <td>2010</td>
       <td>monthly</td>
-      <td>Surface</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
+      <td>Column</td>
+      <td>TM5-met2010_CTRL-TEST</td>
+      <td>TM5</td>
+      <td></td>
+      <td>AP3</td>
+      <td>CTRL2016</td>
       <td>False</td>
       <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
+      <td>aerocom3_TM5_AP3-CTRL2016_od550aer_Column_2010...</td>
     </tr>
   </tbody>
 </table>
-<p>808 rows × 11 columns</p>
 </div></div>
 </div>
-<p>If this contains too much information (as is the case here), you can also filter this attribute based on what you are interested in. E.g.:</p>
+<p>You can also filter this attribute based on what you are interested in. E.g.:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -754,7 +672,7 @@ Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -784,6 +702,7 @@ Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer
       <th>name</th>
       <th>meteo</th>
       <th>experiment</th>
+      <th>perturbation</th>
       <th>is_at_stations</th>
       <th>3D</th>
       <th>filename</th>
@@ -791,129 +710,752 @@ Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer
   </thead>
   <tbody>
     <tr>
-      <td>199</td>
+      <th>1</th>
       <td>od550aer</td>
-      <td>2004</td>
-      <td>monthly</td>
+      <td>2010</td>
+      <td>daily</td>
       <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
+      <td>TM5-met2010_CTRL-TEST</td>
+      <td>TM5</td>
+      <td>met2010</td>
+      <td>AP3</td>
+      <td>CTRL2019</td>
       <td>False</td>
       <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
+      <td>aerocom3_TM5-met2010_AP3-CTRL2019_od550aer_Col...</td>
     </tr>
     <tr>
-      <td>414</td>
-      <td>od550aer</td>
-      <td>2005</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>44</td>
-      <td>od550aer</td>
-      <td>2006</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>333</td>
-      <td>od550aer</td>
-      <td>2007</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>46</td>
-      <td>od550aer</td>
-      <td>2008</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>679</td>
-      <td>od550aer</td>
-      <td>2009</td>
-      <td>monthly</td>
-      <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
-      <td>False</td>
-      <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
-    </tr>
-    <tr>
-      <td>352</td>
+      <th>2</th>
       <td>od550aer</td>
       <td>2010</td>
       <td>monthly</td>
       <td>Column</td>
-      <td>CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_P...</td>
-      <td>CAM53</td>
-      <td>Oslo</td>
-      <td>UNTUNED</td>
+      <td>TM5-met2010_CTRL-TEST</td>
+      <td>TM5</td>
+      <td></td>
+      <td>AP3</td>
+      <td>CTRL2016</td>
       <td>False</td>
       <td>False</td>
-      <td>aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK...</td>
+      <td>aerocom3_TM5_AP3-CTRL2016_od550aer_Column_2010...</td>
     </tr>
   </tbody>
 </table>
 </div></div>
 </div>
 </div>
-<div class="section" id="Read-Aerosol-optical-depth-at-550-nm">
-<h3>Read Aerosol optical depth at 550 nm<a class="headerlink" href="#Read-Aerosol-optical-depth-at-550-nm" title="Permalink to this headline">¶</a></h3>
-<p>Import both clear-sky (<em>cs</em> in variable name) and all-sky data.</p>
+<div class="section" id="Read-Aerosol-optical-depth-at-550-nm-(od550aer)">
+<h4>Read Aerosol optical depth at 550 nm (od550aer)<a class="headerlink" href="#Read-Aerosol-optical-depth-at-550-nm-(od550aer)" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">od550aer</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
-<span class="n">od550csaer</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550csaer&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>Both data objects are instances of class <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.griddeddata">GriddedData</a> which is based on the <a class="reference external" href="https://scitools.org.uk/iris/docs/v1.9.0/html/iris/iris/cube.html#iris.cube.Cube">Cube</a> class (<a class="reference external" href="https://scitools.org.uk/iris/docs/v1.9.0/html/index.html">iris library</a>) and features very similar functionality and more.</p>
-<p>Some of these features are introduced below.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">od550aer</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_18_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_18_0.png" />
+</div>
+</div>
+<p>Ups, this looks rather incomplete. The reason is that pyaerocom picked the available <em>daily</em> dataset, which is cropped in the <em>minimal</em> testdataset for storage purpose. Let’s try monthly.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">od550aer_tm5</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+<span class="n">od550aer_tm5</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_20_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_20_0.png" />
+</div>
+</div>
+<p>Looking better. You may wonder why only January is displayed here. This is because <code class="docutils literal notranslate"><span class="pre">quickplot_map</span></code> picks the first available timestamp in the dataset, you may specify that explicitly.</p>
+<p>Under the hood <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.griddeddata">pyaerocom.GriddedData</a> is based on the <a class="reference external" href="https://scitools.org.uk/iris/docs/v1.9.0/html/iris/iris/cube.html#iris.cube.Cube">iris.Cube object</a> class (<a class="reference external" href="https://scitools.org.uk/iris/docs/v1.9.0/html/index.html">iris library</a>) and features very similar functionality (and more).</p>
+<p>The loaded <code class="docutils literal notranslate"><span class="pre">Cube</span></code> instance can be accessed via:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">od550aer_tm5</span><span class="o">.</span><span class="n">cube</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<style>
+  a.iris {
+      text-decoration: none !important;
+  }
+  table.iris {
+      white-space: pre;
+      border: 1px solid;
+      border-color: #9c9c9c;
+      font-family: monaco, monospace;
+  }
+  th.iris {
+      background: #303f3f;
+      color: #e0e0e0;
+      border-left: 1px solid;
+      border-color: #9c9c9c;
+      font-size: 1.05em;
+      min-width: 50px;
+      max-width: 125px;
+  }
+  tr.iris :first-child {
+      border-right: 1px solid #9c9c9c !important;
+  }
+  td.iris-title {
+      background: #d5dcdf;
+      border-top: 1px solid #9c9c9c;
+      font-weight: bold;
+  }
+  .iris-word-cell {
+      text-align: left !important;
+      white-space: pre;
+  }
+  .iris-subheading-cell {
+      padding-left: 2em !important;
+  }
+  .iris-inclusion-cell {
+      padding-right: 1em !important;
+  }
+  .iris-panel-body {
+      padding-top: 0px;
+  }
+  .iris-panel-title {
+      padding-left: 3em;
+  }
+  .iris-panel-title {
+      margin-top: 7px;
+  }
+</style>
+<table class="iris" id="140428149271568">
+    <tr class="iris">
+<th class="iris iris-word-cell">Atmosphere Optical Thickness Due To Ambient Aerosol (1)</th>
+<th class="iris iris-word-cell">time</th>
+<th class="iris iris-word-cell">latitude</th>
+<th class="iris iris-word-cell">longitude</th>
+</tr>
+    <tr class="iris">
+<td class="iris-word-cell iris-subheading-cell">Shape</td>
+<td class="iris iris-inclusion-cell">12</td>
+<td class="iris iris-inclusion-cell">90</td>
+<td class="iris iris-inclusion-cell">120</td>
+</td>
+    <tr class="iris">
+    <td class="iris-title iris-word-cell">Dimension coordinates</td>
+    <td class="iris-title"></td>
+    <td class="iris-title"></td>
+    <td class="iris-title"></td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        time</td>
+    <td class="iris-inclusion-cell">x</td>
+    <td class="iris-inclusion-cell">-</td>
+    <td class="iris-inclusion-cell">-</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        latitude</td>
+    <td class="iris-inclusion-cell">-</td>
+    <td class="iris-inclusion-cell">x</td>
+    <td class="iris-inclusion-cell">-</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        longitude</td>
+    <td class="iris-inclusion-cell">-</td>
+    <td class="iris-inclusion-cell">-</td>
+    <td class="iris-inclusion-cell">x</td>
+</tr>
+<tr class="iris">
+    <td class="iris-title iris-word-cell">Attributes</td>
+    <td class="iris-title"></td>
+    <td class="iris-title"></td>
+    <td class="iris-title"></td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        Conventions</td>
+    <td class="iris-word-cell" colspan="3">CF-1.6</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        computed</td>
+    <td class="iris-word-cell" colspan="3">False</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        concatenated</td>
+    <td class="iris-word-cell" colspan="3">False</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        contact</td>
+    <td class="iris-word-cell" colspan="3">Twan van Noije (noije@knmi.nl)</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        data_id</td>
+    <td class="iris-word-cell" colspan="3">TM5-met2010_CTRL-TEST</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        experiment</td>
+    <td class="iris-word-cell" colspan="3">AP3</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        experiment_id</td>
+    <td class="iris-word-cell" colspan="3">AP3-CTRL2016</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        from_files</td>
+    <td class="iris-word-cell" colspan="3">['/home/jonasg/MyPyaerocom/testdata-minimal/modeldata/TM5-met2010_CTRL...</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        institute_id</td>
+    <td class="iris-word-cell" colspan="3">KNMI</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        institution</td>
+    <td class="iris-word-cell" colspan="3">Royal Netherlands Meteorological Institute, De Bilt, The Netherlands</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        meteo</td>
+    <td class="iris-word-cell" colspan="3"></td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        model_id</td>
+    <td class="iris-word-cell" colspan="3">TM5</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        outliers_removed</td>
+    <td class="iris-word-cell" colspan="3">False</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        perturbation</td>
+    <td class="iris-word-cell" colspan="3">CTRL2016</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        project_id</td>
+    <td class="iris-word-cell" colspan="3">AeroCom Phase 3</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        reader</td>
+    <td class="iris-word-cell" colspan="3">None</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        references</td>
+    <td class="iris-word-cell" colspan="3">Van Noije, T.P.C., et al. (Geosci. Model Dev., 7, 2435-2475, 2014); Van...</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        region</td>
+    <td class="iris-word-cell" colspan="3">None</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        regridded</td>
+    <td class="iris-word-cell" colspan="3">False</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        source</td>
+    <td class="iris-word-cell" colspan="3">TM5-mp: CTM ERA-Interim 3x2 34L</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        title</td>
+    <td class="iris-word-cell" colspan="3">TM5 model output prepared for AeroCom Phase 3</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        ts_type</td>
+    <td class="iris-word-cell" colspan="3">monthly</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        var_name_read</td>
+    <td class="iris-word-cell" colspan="3">n/d</td>
+</tr>
+<tr class="iris">
+    <td class="iris-title iris-word-cell">Cell methods</td>
+    <td class="iris-title"></td>
+    <td class="iris-title"></td>
+    <td class="iris-title"></td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        point</td>
+    <td class="iris-word-cell" colspan="3">longitude, latitude</td>
+</tr>
+<tr class="iris">
+    <td class="iris-word-cell iris-subheading-cell">        mean</td>
+    <td class="iris-word-cell" colspan="3">time</td>
+</tr>
+</table></div>
+</div>
+</div>
+<div class="section" id="Conversion-to-xarray">
+<h4>Conversion to xarray<a class="headerlink" href="#Conversion-to-xarray" title="Permalink to this headline">¶</a></h4>
+<p>If you have not heard of xarray, you should <a class="reference external" href="http://xarray.pydata.org/en/stable/">check it out</a>. If you have heard of it (or maybe even used it already) you may convert a <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> object to an <code class="docutils literal notranslate"><span class="pre">xarray.DataArray</span></code> via:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">xarr</span> <span class="o">=</span> <span class="n">od550aer_tm5</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+<span class="n">xarr</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<title>Show/Hide data repr</title>
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<title>Show/Hide attributes</title>
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+.xr-wrap {
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt, dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><div class='xr-wrap'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'od550aer'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 12</li><li><span class='xr-has-index'>lat</span>: 90</li><li><span class='xr-has-index'>lon</span>: 120</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-995794ec-c909-4789-9ebd-30cf2d14d7e7' class='xr-array-in' type='checkbox' ><label for='section-995794ec-c909-4789-9ebd-30cf2d14d7e7' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(12, 90, 61), meta=np.ndarray&gt;</span></div><pre class='xr-array-data'><table>
+<tr>
+<td>
+<table>
+  <thead>
+    <tr><td> </td><th> Array </th><th> Chunk </th></tr>
+  </thead>
+  <tbody>
+    <tr><th> Bytes </th><td> 518.40 kB </td> <td> 263.52 kB </td></tr>
+    <tr><th> Shape </th><td> (12, 90, 120) </td> <td> (12, 90, 61) </td></tr>
+    <tr><th> Count </th><td> 10 Tasks </td><td> 2 Chunks </td></tr>
+    <tr><th> Type </th><td> float32 </td><td> numpy.ndarray </td></tr>
+  </tbody>
+</table>
+</td>
+<td>
+<svg width="202" height="162" style="stroke:rgb(0,0,0);stroke-width:1" >
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="32" y2="22" style="stroke-width:2" />
+  <line x1="10" y1="90" x2="32" y2="112" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="10" y2="90" style="stroke-width:2" />
+  <line x1="32" y1="22" x2="32" y2="112" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 32.70403708005059,22.70403708005059 32.70403708005059,112.7040370800506 10.0,90.0" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2" />
+  <line x1="32" y1="22" x2="152" y2="22" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="10" y1="0" x2="32" y2="22" style="stroke-width:2" />
+  <line x1="71" y1="0" x2="93" y2="22" />
+  <line x1="130" y1="0" x2="152" y2="22" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="10.0,0.0 130.0,0.0 152.7040370800506,22.70403708005059 32.70403708005059,22.70403708005059" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Horizontal lines -->
+  <line x1="32" y1="22" x2="152" y2="22" style="stroke-width:2" />
+  <line x1="32" y1="112" x2="152" y2="112" style="stroke-width:2" />
+
+  <!-- Vertical lines -->
+  <line x1="32" y1="22" x2="32" y2="112" style="stroke-width:2" />
+  <line x1="93" y1="22" x2="93" y2="112" />
+  <line x1="152" y1="22" x2="152" y2="112" style="stroke-width:2" />
+
+  <!-- Colored Rectangle -->
+  <polygon points="32.70403708005059,22.70403708005059 152.7040370800506,22.70403708005059 152.7040370800506,112.7040370800506 32.70403708005059,112.7040370800506" style="fill:#ECB172A0;stroke-width:0"/>
+
+  <!-- Text -->
+  <text x="92.704037" y="132.704037" font-size="1.0rem" font-weight="100" text-anchor="middle" >120</text>
+  <text x="172.704037" y="67.704037" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(0,172.704037,67.704037)">90</text>
+  <text x="11.352019" y="121.352019" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,11.352019,121.352019)">12</text>
+</svg>
+</td>
+</tr>
+</table></pre></div></li><li class='xr-section-item'><input id='section-b5f640ee-6460-4e9b-a8f8-71866a58ab3f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b5f640ee-6460-4e9b-a8f8-71866a58ab3f' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>object</div><div class='xr-var-preview xr-preview'>2010-01-15 12:00:00 ... 2010-12-15 12:00:00</div><input id='attrs-725e7a12-9f4d-4cc8-ad52-147f6f142fdb' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-725e7a12-9f4d-4cc8-ad52-147f6f142fdb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e35ecf4b-8d61-499f-85dd-c69013c161ad' class='xr-var-data-in' type='checkbox'><label for='data-e35ecf4b-8d61-499f-85dd-c69013c161ad' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>time</dd><dt><span>long_name :</span></dt><dd>Time</dd></dl></div><pre class='xr-var-data'>array([cftime.DatetimeJulian(2010, 1, 15, 12, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 2, 14, 0, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 3, 15, 12, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 4, 15, 0, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 5, 15, 12, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 6, 15, 0, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 7, 15, 12, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 8, 15, 12, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 9, 15, 0, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 10, 15, 12, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 11, 15, 0, 0, 0, 0),
+       cftime.DatetimeJulian(2010, 12, 15, 12, 0, 0, 0)], dtype=object)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lat</span></div><div class='xr-var-dims'>(lat)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-89.0 -87.0 -85.0 ... 87.0 89.0</div><input id='attrs-c70ef8a1-11d6-422b-a988-aa3339f200b1' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-c70ef8a1-11d6-422b-a988-aa3339f200b1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fbc31447-5743-4fb2-b79f-fffa71ab8cd3' class='xr-var-data-in' type='checkbox'><label for='data-fbc31447-5743-4fb2-b79f-fffa71ab8cd3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>latitude</dd><dt><span>long_name :</span></dt><dd>Center coordinates for latitudes</dd><dt><span>units :</span></dt><dd>degrees</dd></dl></div><pre class='xr-var-data'>array([-89., -87., -85., -83., -81., -79., -77., -75., -73., -71., -69., -67.,
+       -65., -63., -61., -59., -57., -55., -53., -51., -49., -47., -45., -43.,
+       -41., -39., -37., -35., -33., -31., -29., -27., -25., -23., -21., -19.,
+       -17., -15., -13., -11.,  -9.,  -7.,  -5.,  -3.,  -1.,   1.,   3.,   5.,
+         7.,   9.,  11.,  13.,  15.,  17.,  19.,  21.,  23.,  25.,  27.,  29.,
+        31.,  33.,  35.,  37.,  39.,  41.,  43.,  45.,  47.,  49.,  51.,  53.,
+        55.,  57.,  59.,  61.,  63.,  65.,  67.,  69.,  71.,  73.,  75.,  77.,
+        79.,  81.,  83.,  85.,  87.,  89.])</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lon</span></div><div class='xr-var-dims'>(lon)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-181.5 -178.5 ... 172.5 175.5</div><input id='attrs-6ed89e02-cd51-4377-8610-c39aeadb4e66' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-6ed89e02-cd51-4377-8610-c39aeadb4e66' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6d03fb7a-7445-4b65-ae74-14d01ed08426' class='xr-var-data-in' type='checkbox'><label for='data-6d03fb7a-7445-4b65-ae74-14d01ed08426' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>longitude</dd><dt><span>long_name :</span></dt><dd>Center coordinates for longitudes</dd><dt><span>units :</span></dt><dd>degrees</dd></dl></div><pre class='xr-var-data'>array([-181.5, -178.5, -175.5, -172.5, -169.5, -166.5, -163.5, -160.5, -157.5,
+       -154.5, -151.5, -148.5, -145.5, -142.5, -139.5, -136.5, -133.5, -130.5,
+       -127.5, -124.5, -121.5, -118.5, -115.5, -112.5, -109.5, -106.5, -103.5,
+       -100.5,  -97.5,  -94.5,  -91.5,  -88.5,  -85.5,  -82.5,  -79.5,  -76.5,
+        -73.5,  -70.5,  -67.5,  -64.5,  -61.5,  -58.5,  -55.5,  -52.5,  -49.5,
+        -46.5,  -43.5,  -40.5,  -37.5,  -34.5,  -31.5,  -28.5,  -25.5,  -22.5,
+        -19.5,  -16.5,  -13.5,  -10.5,   -7.5,   -4.5,   -1.5,    1.5,    4.5,
+          7.5,   10.5,   13.5,   16.5,   19.5,   22.5,   25.5,   28.5,   31.5,
+         34.5,   37.5,   40.5,   43.5,   46.5,   49.5,   52.5,   55.5,   58.5,
+         61.5,   64.5,   67.5,   70.5,   73.5,   76.5,   79.5,   82.5,   85.5,
+         88.5,   91.5,   94.5,   97.5,  100.5,  103.5,  106.5,  109.5,  112.5,
+        115.5,  118.5,  121.5,  124.5,  127.5,  130.5,  133.5,  136.5,  139.5,
+        142.5,  145.5,  148.5,  151.5,  154.5,  157.5,  160.5,  163.5,  166.5,
+        169.5,  172.5,  175.5])</pre></li></ul></div></li><li class='xr-section-item'><input id='section-72a0619a-b3b7-4172-9d5d-52817e0b61e7' class='xr-section-summary-in' type='checkbox'  ><label for='section-72a0619a-b3b7-4172-9d5d-52817e0b61e7' class='xr-section-summary' >Attributes: <span>(24)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>atmosphere_optical_thickness_due_to_ambient_aerosol</dd><dt><span>long_name :</span></dt><dd>Ambient Aerosol Optical Thickness at 550 nm</dd><dt><span>institution :</span></dt><dd>Royal Netherlands Meteorological Institute, De Bilt, The Netherlands</dd><dt><span>institute_id :</span></dt><dd>KNMI</dd><dt><span>source :</span></dt><dd>TM5-mp: CTM ERA-Interim 3x2 34L</dd><dt><span>model_id :</span></dt><dd>TM5</dd><dt><span>references :</span></dt><dd>Van Noije, T.P.C., et al. (Geosci. Model Dev., 7, 2435-2475, 2014); Van Noije, T.P.C., et al. (manuscript in preparation)</dd><dt><span>experiment_id :</span></dt><dd>AP3-CTRL2016</dd><dt><span>project_id :</span></dt><dd>AeroCom Phase 3</dd><dt><span>title :</span></dt><dd>TM5 model output prepared for AeroCom Phase 3</dd><dt><span>Conventions :</span></dt><dd>CF-1.6</dd><dt><span>contact :</span></dt><dd>Twan van Noije (noije@knmi.nl)</dd><dt><span>from_files :</span></dt><dd>[&#x27;/home/jonasg/MyPyaerocom/testdata-minimal/modeldata/TM5-met2010_CTRL-TEST/renamed/aerocom3_TM5_AP3-CTRL2016_od550aer_Column_2010_monthly.nc&#x27;]</dd><dt><span>data_id :</span></dt><dd>TM5-met2010_CTRL-TEST</dd><dt><span>var_name_read :</span></dt><dd>n/d</dd><dt><span>ts_type :</span></dt><dd>monthly</dd><dt><span>regridded :</span></dt><dd>False</dd><dt><span>outliers_removed :</span></dt><dd>False</dd><dt><span>computed :</span></dt><dd>False</dd><dt><span>concatenated :</span></dt><dd>False</dd><dt><span>meteo :</span></dt><dd></dd><dt><span>experiment :</span></dt><dd>AP3</dd><dt><span>perturbation :</span></dt><dd>CTRL2016</dd><dt><span>cell_methods :</span></dt><dd>longitude: latitude: point time: mean</dd></dl></div></li></ul></div></div></div>
+</div>
 </div>
 <div class="section" id="Overview-of-what-is-in-the-data">
-<h3>Overview of what is in the data<a class="headerlink" href="#Overview-of-what-is-in-the-data" title="Permalink to this headline">¶</a></h3>
+<h4>Overview of what is in the data<a class="headerlink" href="#Overview-of-what-is-in-the-data" title="Permalink to this headline">¶</a></h4>
 <p>Simply print the object.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -926,93 +1468,46 @@ Available variables: [&#39;abs440aer&#39;, &#39;abs440aercs&#39;, &#39;abs500aer
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-pyaerocom.GriddedData: CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED
-Grid data: Aerosol optical depth at 500nm / (1) (time: 84; latitude: 192; longitude: 288)
+pyaerocom.GriddedData: TM5-met2010_CTRL-TEST
+Grid data: atmosphere_optical_thickness_due_to_ambient_aerosol / (1) (time: 365; latitude: 11; longitude: 11)
      Dimension coordinates:
-          time                            x             -               -
-          latitude                        -             x               -
-          longitude                       -             -               x
+          time                                                 x              -              -
+          latitude                                             -              x              -
+          longitude                                            -              -              x
      Attributes:
-          Conventions: CF-1.0
-          NCO: 4.3.7
-          Version: $Name$
-          case: 53OSLO_PD_UNTUNED
+          Conventions: CF-1.6
+          NCO: 4.7.2
           computed: False
-          concatenated: True
-          data_id: CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED
-          from_files: [&#39;/lustre/storeA/project/aerocom/aerocom2/NorESM_SVN_TEST/CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED/renamed/aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED_od550aer_Column_2004_monthly.nc&#39;,...
-          history: Thu Feb  9 11:05:21 2017: ncatted -O -a units,od550aer,o,c,1 /projects/NS2345K/CAM-Oslo/DO_AEROCOM/CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED/renamed/aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED_od550aer_Column_2004_monthly.nc
-Thu...
-          host: hexagon-2
-          initial_file: /work/shared/noresm/inputdata/atm/cam/inic/fv/cami-mam3_0000-01-01_0.9...
-          logname: ihkarset
-          nco_openmp_thread_number: 1
+          concatenated: False
+          contact: Twan van Noije (noije@knmi.nl)
+          data_id: TM5-met2010_CTRL-TEST
+          experiment: AP3
+          experiment_id: AP3-CTRL2019
+          from_files: [&#39;/home/jonasg/MyPyaerocom/testdata-minimal/modeldata/TM5-met2010_CTRL...
+          history: Wed Jul  8 10:31:53 2020: ncks -d lat,20,30 -d lon,20,30 raw/aerocom3_TM5-met2010_AP3-CTRL2019_od550aer_Column_2010_daily.nc...
+          institute_id: KNMI
+          institution: Royal Netherlands Meteorological Institute, De Bilt, The Netherlands
+          meteo: met2010
+          model_id: TM5
           outliers_removed: False
+          perturbation: CTRL2019
+          project_id: AeroCom Phase 3
           reader: None
+          references: Van Noije, T.P.C., et al. (Geosci. Model Dev., 7, 2435-2475, 2014); Bergman,...
           region: None
           regridded: False
-          revision_Id: $Id$
-          source: CAM
-          title: UNSET
-          topography_file: /work/shared/noresm/inputdata/noresm-only/inputForNudging/ERA_f09f09_3...
-          ts_type: monthly
+          source: TM5-mp, r1058: CTM ERA-Interim 3x2 34L
+          title: TM5 model output prepared for AeroCom Phase 3
+          ts_type: daily
           var_name_read: n/d
      Cell methods:
-          mean: time
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">od550csaer</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-pyaerocom.GriddedData: CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED
-Grid data: Clear air Aerosol optical depth at 550nm / (1) (time: 84; latitude: 192; longitude: 288)
-     Dimension coordinates:
-          time                                      x             -               -
-          latitude                                  -             x               -
-          longitude                                 -             -               x
-     Attributes:
-          Conventions: CF-1.0
-          NCO: 4.3.7
-          Version: $Name$
-          case: 53OSLO_PD_UNTUNED
-          computed: False
-          concatenated: True
-          data_id: CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED
-          from_files: [&#39;/lustre/storeA/project/aerocom/aerocom2/NorESM_SVN_TEST/CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED/renamed/aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED_od550csaer_Column_2004_monthly.nc&#39;,...
-          history: Thu Feb  9 11:05:16 2017: ncatted -O -a units,od550csaer,o,c,1 /projects/NS2345K/CAM-Oslo/DO_AEROCOM/CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED/renamed/aerocom3_CAM53-Oslo_7310_MG15CLM45_5feb2017IHK_53OSLO_PD_UNTUNED_od550csaer_Column_2004_monthly.nc
-Thu...
-          host: hexagon-2
-          initial_file: /work/shared/noresm/inputdata/atm/cam/inic/fv/cami-mam3_0000-01-01_0.9...
-          logname: ihkarset
-          nco_openmp_thread_number: 1
-          outliers_removed: False
-          reader: None
-          region: None
-          regridded: False
-          revision_Id: $Id$
-          source: CAM
-          title: UNSET
-          topography_file: /work/shared/noresm/inputdata/noresm-only/inputForNudging/ERA_f09f09_3...
-          ts_type: monthly
-          var_name_read: n/d
-     Cell methods:
+          point: longitude, latitude
           mean: time
 </pre></div></div>
 </div>
 </div>
 <div class="section" id="Access-time-stamps">
-<h3>Access time stamps<a class="headerlink" href="#Access-time-stamps" title="Permalink to this headline">¶</a></h3>
+<h4>Access time stamps<a class="headerlink" href="#Access-time-stamps" title="Permalink to this headline">¶</a></h4>
 <p>Time stamps are represented as numerical values with respect to a reference date and frequency, according to the CF conventions. They can be accessed via the <code class="docutils literal notranslate"><span class="pre">time</span></code> attribute of the data class.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
@@ -1063,39 +1558,36 @@ array([&#39;2004-01-01T00:00:00.000000&#39;, &#39;2004-02-01T00:00:00.000000&#39
 </div>
 </div>
 <div class="section" id="Plotting-maps">
-<h3>Plotting maps<a class="headerlink" href="#Plotting-maps" title="Permalink to this headline">¶</a></h3>
-<p>Maps of individual time stamps can be plotted using the quickplot_map method.</p>
+<h4>Plotting maps<a class="headerlink" href="#Plotting-maps" title="Permalink to this headline">¶</a></h4>
+<p>As introduced above, maps of individual time stamps can be plotted using the quickplot_map method. Above we used the default call, which chooses the first available timestamp. You may also specify which date you are interested in:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">fig1</span> <span class="o">=</span> <span class="n">od550aer</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">(</span><span class="s1">&#39;2009-3-15&#39;</span><span class="p">)</span>
-<span class="n">fig2</span> <span class="o">=</span> <span class="n">od550csaer</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">(</span><span class="s1">&#39;2009-3-15&#39;</span><span class="p">)</span>
+<span></span><span class="n">od550aer_tm5</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">(</span><span class="s1">&#39;2010-10&#39;</span><span class="p">);</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_26_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_26_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_26_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_26_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_33_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_33_0.png" />
 </div>
 </div>
 </div>
-<div class="section" id="Filtering">
-<h3>Filtering<a class="headerlink" href="#Filtering" title="Permalink to this headline">¶</a></h3>
-<p>Regional filtering can be performed using the <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.filter">Filter</a> class (cf. flowchart above).</p>
-<p>An overview of available default regions can be accessed via:</p>
+<div class="section" id="Regional-filtering">
+<h4>Regional filtering<a class="headerlink" href="#Regional-filtering" title="Permalink to this headline">¶</a></h4>
+<p>Regional filtering can be performed using the <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.filter">Filter</a> class.</p>
+</div>
+</div>
+</div>
+<div class="section" id="Rectangular-regions">
+<h2>Rectangular regions<a class="headerlink" href="#Rectangular-regions" title="Permalink to this headline">¶</a></h2>
+<p>An overview of rectangular AeroCom default regions can be accessed via:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1108,53 +1600,51 @@ array([&#39;2004-01-01T00:00:00.000000&#39;, &#39;2004-02-01T00:00:00.000000&#39
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[&#39;WORLD&#39;, &#39;EUROPE&#39;, &#39;ASIA&#39;, &#39;AUSTRALIA&#39;, &#39;CHINA&#39;, &#39;INDIA&#39;, &#39;NAFRICA&#39;, &#39;SAFRICA&#39;, &#39;SAMERICA&#39;, &#39;NAMERICA&#39;]
+[&#39;WORLD&#39;, &#39;ASIA&#39;, &#39;AUSTRALIA&#39;, &#39;CHINA&#39;, &#39;EUROPE&#39;, &#39;INDIA&#39;, &#39;NAFRICA&#39;, &#39;SAFRICA&#39;, &#39;SAMERICA&#39;, &#39;NAMERICA&#39;]
 </pre></div></div>
 </div>
-<p>Now let’s go for north Africa. Create instance of Filter class:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<p>Let’s choose north Africa as an example. Create instance of Filter class:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">f</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="s1">&#39;NAFRICA&#39;</span><span class="p">)</span>
-<span class="n">f</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Filter([(&#39;_name&#39;, &#39;NAFRICA-wMOUNTAINS&#39;),
-        (&#39;_region&#39;,
-         Region NAFRICA Region([(&#39;_name&#39;, &#39;NAFRICA&#39;), (&#39;lon_range&#39;, [-20, 50]), (&#39;lat_range&#39;, [0, 40]), (&#39;lon_range_plot&#39;, [-20, 50]), (&#39;lat_range_plot&#39;, [0, 40]), (&#39;lon_ticks&#39;, None), (&#39;lat_ticks&#39;, None)])),
-        (&#39;lon_range&#39;, [-20, 50]),
-        (&#39;lat_range&#39;, [0, 40]),
-        (&#39;alt_range&#39;, None)])
-</pre></div></div>
-</div>
-<p>… and apply to the two data objects (this can be done by calling the filter with the corresponding data class as input parameter):</p>
+<p>You can print its <code class="docutils literal notranslate"><span class="pre">region</span></code> attribute to see the edges:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">od550aer_nafrica</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">od550aer</span><span class="p">)</span>
-<span class="n">od550csaer_nafrica</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">od550csaer</span><span class="p">)</span>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
+<div class="output_area docutils container">
 <div class="highlight"><pre>
-Applying regional cropping in GriddedData using Filter class. Note that this does not yet include potential cropping in the vertical dimension. Coming soon...
-Applying regional cropping in GriddedData using Filter class. Note that this does not yet include potential cropping in the vertical dimension. Coming soon...
+pyaeorocom Region
+Name: NAFRICA
+Longitude range: [-17, 50]
+Latitude range: [0, 40]
+Longitude range (plots): [-17, 50]
+Latitude range (plots): [0, 40]
 </pre></div></div>
+</div>
+<p>Now apply to the model data object:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">od550aer_nafrica</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">od550aer_tm5</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <p>Compare shapes:</p>
 <div class="nbinput docutils container">
@@ -1177,110 +1667,138 @@ Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 500nm / (1) (time
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">od550aer</span>
+<span></span><span class="n">od550aer_tm5</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 pyaerocom.GriddedData
-Grid data: &lt;iris &#39;Cube&#39; of Aerosol optical depth at 500nm / (1) (time: 84; latitude: 192; longitude: 288)&gt;
+Grid data: &lt;iris &#39;Cube&#39; of atmosphere_optical_thickness_due_to_ambient_aerosol / (1) (time: 12; latitude: 90; longitude: 120)&gt;
 </pre></div></div>
 </div>
-<p>As you can see, the filtered object is reduced in the longitude and latitude dimension. Let’s plot the two new objects:</p>
+<p>As you can see, the filtered object is reduced in the longitude and latitude dimension. Let’s have a look:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax1</span> <span class="o">=</span> <span class="n">od550aer_nafrica</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">(</span><span class="s1">&#39;2009-3-15&#39;</span><span class="p">)</span>
-<span class="n">ax2</span> <span class="o">=</span> <span class="n">od550csaer_nafrica</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">(</span><span class="s1">&#39;2009-3-15&#39;</span><span class="p">)</span>
+<span></span><span class="n">od550aer_nafrica</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">(</span><span class="s1">&#39;March 2010&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_46_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_46_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Binary-region-masks">
+<h2>Binary region masks<a class="headerlink" href="#Binary-region-masks" title="Permalink to this headline">¶</a></h2>
+<p>Available <a class="reference external" href="http://www.htap.org/">HTAP</a> binary filter masks can be accessed via:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">pya</span><span class="o">.</span><span class="n">const</span><span class="o">.</span><span class="n">HTAP_REGIONS</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;PAN&#39;, &#39;EAS&#39;, &#39;NAF&#39;, &#39;MDE&#39;, &#39;LAND&#39;, &#39;SAS&#39;, &#39;SPO&#39;, &#39;OCN&#39;, &#39;SEA&#39;, &#39;RBU&#39;, &#39;EEUROPE&#39;, &#39;NAM&#39;, &#39;WEUROPE&#39;, &#39;SAF&#39;, &#39;USA&#39;, &#39;SAM&#39;, &#39;EUR&#39;, &#39;NPO&#39;, &#39;MCA&#39;]
+</pre></div></div>
+</div>
+<p>And they are handled in the same way as the rectangular regions:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pya</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="s1">&#39;OCN&#39;</span><span class="p">)(</span><span class="n">od550aer_tm5</span><span class="p">)</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_37_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_37_0.png" />
-</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Failed to compute / add area weighted mean. Reason: ValueError(&#39;Format specifier missing precision&#39;)
+</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_37_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_37_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_50_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_50_1.png" />
 </div>
 </div>
+<p>As you can see the provided HTAP region masks are only valid within 60<span class="math notranslate nohighlight">\(^\circ\)</span>S to 60<span class="math notranslate nohighlight">\(^\circ\)</span>N.</p>
 </div>
 <div class="section" id="Filtering-of-time">
-<h3>Filtering of time<a class="headerlink" href="#Filtering-of-time" title="Permalink to this headline">¶</a></h3>
+<h2>Filtering of time<a class="headerlink" href="#Filtering-of-time" title="Permalink to this headline">¶</a></h2>
 <p>Filtering of time is not yet included in the Filter class but can be easily performed from the <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> object directly. If you know the indices of the time stamps you want to crop, you can simply use numpy indexing syntax (remember that we have a 3D array containing time, latitude and lonfgitude).</p>
-<p>Let’s say we want to filter the <strong>year 2009</strong>.</p>
-<p>Since the time dimension corresponds the first index in the 3D data (time, lat, lon), and since we know, that we have monthly data from 2008-2010 (see above), we may use</p>
+<p>Let’s say we want to filter the june to august.</p>
+<p>Since the time dimension corresponds the first index in the 3D data (time, lat, lon), and since we know, that we have monthly 2010 data (see above), we may use:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">od550aer_nafrica_2009</span> <span class="o">=</span> <span class="n">od550aer_nafrica</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">24</span><span class="p">]</span>
+<span></span><span class="n">od550aer_nafrica_2009</span> <span class="o">=</span> <span class="n">od550aer_nafrica</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span>
 <span class="n">od550aer_nafrica_2009</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-array([&#39;2005-01-01T00:00:00.000000&#39;, &#39;2005-02-01T00:00:00.000000&#39;,
-       &#39;2005-03-01T00:00:00.000000&#39;, &#39;2005-04-01T00:00:00.000000&#39;,
-       &#39;2005-05-01T00:00:00.000000&#39;, &#39;2005-06-01T00:00:00.000000&#39;,
-       &#39;2005-07-01T00:00:00.000000&#39;, &#39;2005-08-01T00:00:00.000000&#39;,
-       &#39;2005-09-01T00:00:00.000000&#39;, &#39;2005-10-01T00:00:00.000000&#39;,
-       &#39;2005-11-01T00:00:00.000000&#39;, &#39;2005-12-01T00:00:00.000000&#39;],
-      dtype=&#39;datetime64[us]&#39;)
+array([&#39;2010-06-15T00:00:00.000000&#39;, &#39;2010-07-15T12:00:00.000000&#39;,
+       &#39;2010-08-15T12:00:00.000000&#39;], dtype=&#39;datetime64[us]&#39;)
 </pre></div></div>
 </div>
-<p>in order to extract the year 2009.</p>
-<p>However, this methodology might not always be handy (imagine you have a 10 year dataset of <code class="docutils literal notranslate"><span class="pre">3hourly</span></code> sampled data and want to extract three months in the 6th year …). In that case, you can perform the cropping using the actual timestamps (for comparibility, let’s stick to 2009 here):</p>
+<p>However, this methodology might not always be handy (imagine you have a 10 year dataset of <code class="docutils literal notranslate"><span class="pre">3hourly</span></code> sampled data and want to extract three months in the 6th year …). In that case, you can perform the cropping using the actual timestamps:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">od550aer_nafrica_2009_alt</span> <span class="o">=</span> <span class="n">od550aer_nafrica</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">time_range</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;1-1-2009&#39;</span><span class="p">,</span> <span class="s1">&#39;1-1-2010&#39;</span><span class="p">))</span>
+<span></span><span class="n">od550aer_nafrica_2009_alt</span> <span class="o">=</span> <span class="n">od550aer_nafrica</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">time_range</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;6-2010&#39;</span><span class="p">,</span> <span class="s1">&#39;9-2010&#39;</span><span class="p">))</span>
 <span class="n">od550aer_nafrica_2009</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-array([&#39;2005-01-01T00:00:00.000000&#39;, &#39;2005-02-01T00:00:00.000000&#39;,
-       &#39;2005-03-01T00:00:00.000000&#39;, &#39;2005-04-01T00:00:00.000000&#39;,
-       &#39;2005-05-01T00:00:00.000000&#39;, &#39;2005-06-01T00:00:00.000000&#39;,
-       &#39;2005-07-01T00:00:00.000000&#39;, &#39;2005-08-01T00:00:00.000000&#39;,
-       &#39;2005-09-01T00:00:00.000000&#39;, &#39;2005-10-01T00:00:00.000000&#39;,
-       &#39;2005-11-01T00:00:00.000000&#39;, &#39;2005-12-01T00:00:00.000000&#39;],
-      dtype=&#39;datetime64[us]&#39;)
+array([&#39;2010-06-15T00:00:00.000000&#39;, &#39;2010-07-15T12:00:00.000000&#39;,
+       &#39;2010-08-15T12:00:00.000000&#39;], dtype=&#39;datetime64[us]&#39;)
 </pre></div></div>
 </div>
 </div>
 <div class="section" id="Data-aggregation">
-<h3>Data aggregation<a class="headerlink" href="#Data-aggregation" title="Permalink to this headline">¶</a></h3>
+<h2>Data aggregation<a class="headerlink" href="#Data-aggregation" title="Permalink to this headline">¶</a></h2>
 <p>Let’s say we want to compute yearly means for each of the 3 years. In this case we can simply call the <code class="docutils literal notranslate"><span class="pre">downscale_time</span></code> method:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
@@ -1305,28 +1823,25 @@ This method is deprecated. Please use new name resample_time
 </pre></div>
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_44_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_44_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_57_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_57_1.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_44_2.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_44_2.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_57_2.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_57_2.png" />
 </div>
 </div>
 <p><strong>Note</strong>: seasonal aggregation is not yet implemented in pyaerocom but will follow soon.</p>
 <p>In the following section the reading of ungridded data is illustrated based on the example of AERONET version 3 (level 2) data. The test dataset contains a randomly picked subset of 100 Aeronet stations. Aeronet provides different products,</p>
-</div>
-</div>
-<div class="section" id="Reading-of-and-working-with-ungridded-data-(ReadUngridded-and-UngriddedData-classes)">
-<h2>Reading of and working with ungridded data (<code class="docutils literal notranslate"><span class="pre">ReadUngridded</span></code> and <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> classes)<a class="headerlink" href="#Reading-of-and-working-with-ungridded-data-(ReadUngridded-and-UngriddedData-classes)" title="Permalink to this headline">¶</a></h2>
 <p>Ungridded data in pyaerocom refers to data that is available in the form of <em>files per station</em> and that is not sampled in a manner that it would make sense to translate into a rgular gridded format such as the previously introduced <code class="docutils literal notranslate"><span class="pre">GriddedData</span></code> class.</p>
 <p>Data from the AERONET network (that is introduced in the following), for instance, is provided in the form of column seperated text files per measurement station, where columns correspond to different variables and data rows to individual time stamps. Needless to say that the time stamps (or the covered periods) vary from station to station.</p>
 <p>The basic workflow for reading of ungridded data, such as Aeronet data, is very similar to the reading of gridded data (comprising a reading class that handles a query and returns a data class, here <a class="reference external" href="http://aerocom.met.no/pyaerocom/api.html#module-pyaerocom.ungriddeddata">UngriddedData</a> (see also flow chart above).</p>
 <p>Before we can continue with the data import, some things need to be said related to the caching of <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> objects.</p>
+</div>
 <div class="section" id="Caching-of-UngriddedData">
-<h3>Caching of UngriddedData<a class="headerlink" href="#Caching-of-UngriddedData" title="Permalink to this headline">¶</a></h3>
+<h2>Caching of UngriddedData<a class="headerlink" href="#Caching-of-UngriddedData" title="Permalink to this headline">¶</a></h2>
 <p>Reading of ungridded data is often rather time-consuming. Therefore, pyaerocom uses a caching strategy that stores loaded instances of the <code class="docutils literal notranslate"><span class="pre">UngriddedData</span></code> class as pickle files in a cache directory (illustrated in the left hand side of the flowchart shown above). The loaction of the cache directory can be accessed via:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
@@ -1364,8 +1879,6 @@ This method is deprecated. Please use new name resample_time
 Caching is active? True
 </pre></div></div>
 </div>
-<div class="section" id="Deactivate-/-Activate-caching">
-<h4>Deactivate / Activate caching<a class="headerlink" href="#Deactivate-/-Activate-caching" title="Permalink to this headline">¶</a></h4>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
@@ -1386,9 +1899,8 @@ Caching is active? True
 </div>
 <p><strong>Note</strong>: if caching is active, make sure you have enough disk quota or change location where the files are stored.</p>
 </div>
-</div>
 <div class="section" id="Read-Aeronet-Sun-v3-level-2-data">
-<h3>Read Aeronet Sun v3 level 2 data<a class="headerlink" href="#Read-Aeronet-Sun-v3-level-2-data" title="Permalink to this headline">¶</a></h3>
+<h2>Read Aeronet Sun v3 level 2 data<a class="headerlink" href="#Read-Aeronet-Sun-v3-level-2-data" title="Permalink to this headline">¶</a></h2>
 <p>As illustrated in the flowchart above, ungridded observation data can be imported using the <code class="docutils literal notranslate"><span class="pre">ReadUngridded</span></code> class. The reading class requires an ID for the observation network that is supposed to be read. Let’s find the right ID for these data:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
@@ -1500,7 +2012,7 @@ Filters that were applied:
 </div>
 </div>
 <div class="section" id="Plot-all-station-coordinates">
-<h3>Plot all station coordinates<a class="headerlink" href="#Plot-all-station-coordinates" title="Permalink to this headline">¶</a></h3>
+<h2>Plot all station coordinates<a class="headerlink" href="#Plot-all-station-coordinates" title="Permalink to this headline">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
@@ -1514,12 +2026,12 @@ Filters that were applied:
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_66_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_66_0.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_79_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_79_0.png" />
 </div>
 </div>
 </div>
 <div class="section" id="Access-of-individual-stations">
-<h3>Access of individual stations<a class="headerlink" href="#Access-of-individual-stations" title="Permalink to this headline">¶</a></h3>
+<h2>Access of individual stations<a class="headerlink" href="#Access-of-individual-stations" title="Permalink to this headline">¶</a></h2>
 <p>Get all station names:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
@@ -1655,7 +2167,7 @@ od550aer (Series, 6363 items)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_74_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_74_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_87_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_87_1.png" />
 </div>
 </div>
 <p>You can also retrieve the <code class="docutils literal notranslate"><span class="pre">StationData</span></code> with specifying more constraints using <code class="docutils literal notranslate"><span class="pre">to_station_data</span></code> (e.g. in monthly resolution and only for the year 2010). And you can overlay different curves, by passing the axes instance returned by the plotting method:</p>
@@ -1689,12 +2201,12 @@ Text(0.5, 1.0, &#39;Leipzig AODs 2010&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_76_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_76_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_89_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_89_1.png" />
 </div>
 </div>
 </div>
 <div class="section" id="You-can-also-plot-the-time-series-directly">
-<h3>You can also plot the time-series directly<a class="headerlink" href="#You-can-also-plot-the-time-series-directly" title="Permalink to this headline">¶</a></h3>
+<h2>You can also plot the time-series directly<a class="headerlink" href="#You-can-also-plot-the-time-series-directly" title="Permalink to this headline">¶</a></h2>
 <p>For instance, if you want to do an air-quality check for you next bouldering trip, you may call:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
@@ -1796,14 +2308,10 @@ Text(0.5, 1.0, &#39;AOD in Fontainebleau, 2006&#39;)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_79_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_79_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_92_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_92_1.png" />
 </div>
 </div>
 <p>Seems like November is a good time (maybe a bit rainy though)</p>
-</div>
-</div>
-<div class="section" id="Colocation-of-model-and-obsdata">
-<h2>Colocation of model and obsdata<a class="headerlink" href="#Colocation-of-model-and-obsdata" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have different data objects loaded we can continue with colocation. In the following, both the all-sky and the clear-sky data from CAM53-Oslo will be colocated with the subset of Aeronet stations that we just loaded.</p>
 <p>The colocation will be performed for the year of 2010 and two scatter plots will be created.</p>
 <p>You have also the option to apply a certain filter when colocating using a valid filter name. Here, we use global data and exclude mountain sides.</p>
@@ -1888,7 +2396,7 @@ pyaerocom.colocateddata.ColocatedData
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_86_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_86_0.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_99_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_99_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -1905,7 +2413,7 @@ pyaerocom.colocateddata.ColocatedData
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_87_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_87_0.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_100_0.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_100_0.png" />
 </div>
 </div>
 <p>… or for EUROPE:</p>
@@ -1936,11 +2444,12 @@ Successfully interpolated cube
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_89_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_89_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_102_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_102_1.png" />
+</div>
 </div>
 </div>
 <div class="section" id="Colocation-with-satellite-AODs-from-MODIS">
-<h3>Colocation with satellite AODs from MODIS<a class="headerlink" href="#Colocation-with-satellite-AODs-from-MODIS" title="Permalink to this headline">¶</a></h3>
+<h2>Colocation with satellite AODs from MODIS<a class="headerlink" href="#Colocation-with-satellite-AODs-from-MODIS" title="Permalink to this headline">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
 </pre></div>
@@ -1963,7 +2472,7 @@ Overwriting unit unknown in cube od550aer with value &#34;1&#34;
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_91_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_91_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_104_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_104_1.png" />
 </div>
 </div>
 <p>Colocation is straight forward as shown below. The data will be regridded to 5x5 degrees resolution during the colocation.</p>
@@ -2014,7 +2523,7 @@ Setting od550aer outlier upper lim: 10.00
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_94_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_94_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_107_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_107_1.png" />
 </div>
 </div>
 <p>You may also change the plot style, to adapt better to the large amount of data points here in these satellite products:</p>
@@ -2040,12 +2549,12 @@ Setting od550aer outlier upper lim: 10.00
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_96_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_96_1.png" />
+<img alt="../_images/pyaerocom-tutorials_getting_started_analysis_109_1.png" src="../_images/pyaerocom-tutorials_getting_started_analysis_109_1.png" />
 </div>
 </div>
 </div>
 <div class="section" id="Remark-on-the-ColocatedData-object">
-<h3>Remark on the ColocatedData object<a class="headerlink" href="#Remark-on-the-ColocatedData-object" title="Permalink to this headline">¶</a></h3>
+<h2>Remark on the ColocatedData object<a class="headerlink" href="#Remark-on-the-ColocatedData-object" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">ColocatedData</span></code> object has not many features and methods implemented yet. But it builds a good basis for further analysis using features of the underlying data-structure, which is an instance of the <a class="reference external" href="http://xarray.pydata.org/en/stable/generated/xarray.DataArray.html">xarray.DataArray</a> class and can be accessed via the <code class="docutils literal notranslate"><span class="pre">data</span></code> attribute if the <code class="docutils literal notranslate"><span class="pre">ColocatedData</span></code> object:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
@@ -2067,7 +2576,6 @@ xarray.core.dataarray.DataArray
 </pre></div></div>
 </div>
 <p>You may want to read more about it <a class="reference external" href="http://xarray.pydata.org/en/stable/data-structures.html">here</a>.</p>
-</div>
 </div>
 </div>
 
