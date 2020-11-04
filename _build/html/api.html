@@ -16258,11 +16258,14 @@ then -180 -&gt; 180 is assumed, else 0 -&gt; 360</p></li>
 
 <dl class="py function">
 <dt id="pyaerocom.helpers.get_lat_rng_constraint">
-<code class="sig-prename descclassname">pyaerocom.helpers.</code><code class="sig-name descname">get_lat_rng_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat_range</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/helpers.html#get_lat_rng_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.helpers.get_lat_rng_constraint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyaerocom.helpers.</code><code class="sig-name descname">get_lat_rng_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">low</span></em>, <em class="sig-param"><span class="n">high</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/helpers.html#get_lat_rng_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.helpers.get_lat_rng_constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create latitude constraint based on input range</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>lat_range</strong> (<em>tuple</em>) – 2-element tuple specifying latitude range</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>low</strong> (<em>float</em><em> or </em><em>int</em>) – lower latitude coordinate</p></li>
+<li><p><strong>high</strong> (<em>float</em><em> or </em><em>int</em>) – upper latitude coordinate</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>the corresponding iris.Constraint instance</p>
@@ -16275,12 +16278,13 @@ then -180 -&gt; 180 is assumed, else 0 -&gt; 360</p></li>
 
 <dl class="py function">
 <dt id="pyaerocom.helpers.get_lon_rng_constraint">
-<code class="sig-prename descclassname">pyaerocom.helpers.</code><code class="sig-name descname">get_lon_rng_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lon_range</span></em>, <em class="sig-param"><span class="n">meridian_centre</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/helpers.html#get_lon_rng_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.helpers.get_lon_rng_constraint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyaerocom.helpers.</code><code class="sig-name descname">get_lon_rng_constraint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">low</span></em>, <em class="sig-param"><span class="n">high</span></em>, <em class="sig-param"><span class="n">meridian_centre</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyaerocom/helpers.html#get_lon_rng_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyaerocom.helpers.get_lon_rng_constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create longitude constraint based on input range</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lon_range</strong> (<em>tuple</em>) – 2-element tuple containing from left -&gt; right end of range</p></li>
+<li><p><strong>low</strong> (<em>float</em><em> or </em><em>int</em>) – left longitude coordinate</p></li>
+<li><p><strong>high</strong> (<em>float</em><em> or </em><em>int</em>) – right longitude coordinate</p></li>
 <li><p><strong>meridian_centre</strong> (<em>bool</em>) – specifies the coordinate definition range of longitude array of the
 data to be cropped. If True, then -180 -&gt; 180 is assumed, else 0 -&gt; 360</p></li>
 </ul>
@@ -16299,20 +16303,6 @@ data to be cropped. If True, then -180 -&gt; 180 is assumed, else 0 -&gt; 360</p
 </ul>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyaerocom.io.testfiles</span> <span class="kn">import</span> <span class="n">get</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">GriddedData</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">files</span> <span class="o">=</span> <span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">][</span><span class="s1">&#39;aatsr_su_v4.3&#39;</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;od550aer&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">get_lon_rng_constraint</span><span class="p">(</span><span class="n">lon_range</span><span class="o">=</span><span class="p">(</span><span class="mi">170</span><span class="p">,</span> <span class="o">-</span><span class="mi">160</span><span class="p">),</span> <span class="n">meridian_centre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
- <span class="c">...</span>
-<span class="gr">ValueError</span>: <span class="n">Left coordinate must exceed right coordinate</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">get_lon_rng_constraint</span><span class="p">(</span><span class="n">lon_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="n">meridian_centre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data_crop</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">data_crop</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">366</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">

@@ -1555,7 +1555,7 @@
         <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dimcoord_vals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">is_rng</span> <span class="o">=</span> <span class="n">isrange</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">is_rng</span><span class="p">:</span>
-                <span class="n">c</span> <span class="o">=</span> <span class="n">rng_funs</span><span class="p">[</span><span class="n">dim</span><span class="p">](</span><span class="n">val</span><span class="p">)</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">rng_funs</span><span class="p">[</span><span class="n">dim</span><span class="p">](</span><span class="o">*</span><span class="n">val</span><span class="p">)</span>
                 <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="s1">&#39;time&#39;</span><span class="p">:</span>
@@ -2802,16 +2802,13 @@
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
-
+    <span class="n">pya</span><span class="o">.</span><span class="n">initialise_testdata</span><span class="p">()</span>
     <span class="c1"># print(&quot;uses last changes &quot;)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;ECMWF_CAMS_REAN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
-                                                          <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;yearly&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadGridded</span><span class="p">(</span><span class="s1">&#39;TM5-met2010_CTRL-TEST&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span>
+                                                                <span class="n">start</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
+                                                                <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
 
-
-    <span class="n">data1</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-    <span class="n">data</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">()</span>
-    <span class="n">data1</span><span class="o">.</span><span class="n">quickplot_map</span><span class="p">()</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">time</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;6/2010&#39;</span><span class="p">,</span> <span class="s1">&#39;10/2010&#39;</span><span class="p">))</span>
 </pre></div>
 
            </div>

@@ -1595,9 +1595,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">lon_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_lon_rng_constraint</span><span class="p">(</span><span class="n">lon_range</span><span class="p">,</span> <span class="n">meridian_centre</span><span class="p">))</span>
+        <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_lon_rng_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">lon_range</span><span class="p">,</span> <span class="n">meridian_centre</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">lat_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_lat_rng_constraint</span><span class="p">(</span><span class="n">lat_range</span><span class="p">))</span>
+        <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_lat_rng_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">lat_range</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">time_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_time_rng_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">time_range</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1606,13 +1606,15 @@
             <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">&amp;</span> <span class="n">cadd</span>
     <span class="k">return</span> <span class="n">c</span></div>
 
-<div class="viewcode-block" id="get_lat_rng_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_lat_rng_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_lat_rng_constraint</span><span class="p">(</span><span class="n">lat_range</span><span class="p">):</span>
+<div class="viewcode-block" id="get_lat_rng_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_lat_rng_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_lat_rng_constraint</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create latitude constraint based on input range</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    lat_range : tuple</span>
-<span class="sd">        2-element tuple specifying latitude range</span>
+<span class="sd">    low : float or int</span>
+<span class="sd">        lower latitude coordinate</span>
+<span class="sd">    high : float or int</span>
+<span class="sd">        upper latitude coordinate</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1620,15 +1622,17 @@
 <span class="sd">        the corresponding iris.Constraint instance</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">iris</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="n">lat_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">iris</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="get_lon_rng_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_lon_rng_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_lon_rng_constraint</span><span class="p">(</span><span class="n">lon_range</span><span class="p">,</span> <span class="n">meridian_centre</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="get_lon_rng_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_lon_rng_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_lon_rng_constraint</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">meridian_centre</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create longitude constraint based on input range</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    lon_range : tuple</span>
-<span class="sd">        2-element tuple containing from left -&gt; right end of range</span>
+<span class="sd">    low : float or int</span>
+<span class="sd">        left longitude coordinate</span>
+<span class="sd">    high : float or int</span>
+<span class="sd">        right longitude coordinate</span>
 <span class="sd">    meridian_centre : bool</span>
 <span class="sd">        specifies the coordinate definition range of longitude array of the</span>
 <span class="sd">        data to be cropped. If True, then -180 -&gt; 180 is assumed, else 0 -&gt; 360</span>
@@ -1645,34 +1649,19 @@
 <span class="sd">    LongitudeConstraintError</span>
 <span class="sd">        if the input implies cropping over border of longitude array</span>
 <span class="sd">        (e.g. 160 -&gt; - 160 if -180 &lt;= lon &lt;= 180).</span>
-
-<span class="sd">    Example</span>
-<span class="sd">    -------</span>
-<span class="sd">    &gt;&gt;&gt; from pyaerocom.io.testfiles import get</span>
-<span class="sd">    &gt;&gt;&gt; from pyaerocom import GriddedData</span>
-<span class="sd">    &gt;&gt;&gt; files = get()</span>
-<span class="sd">    &gt;&gt;&gt; data = GriddedData(files[&#39;models&#39;][&#39;aatsr_su_v4.3&#39;], var_name=&quot;od550aer&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; c = get_lon_rng_constraint(lon_range=(170, -160), meridian_centre=True)</span>
-<span class="sd">    Traceback (most recent call last):</span>
-<span class="sd">     ...</span>
-<span class="sd">    ValueError: Left coordinate must exceed right coordinate</span>
-<span class="sd">    &gt;&gt;&gt; c = get_lon_rng_constraint(lon_range=(-30, 30), meridian_centre=True)</span>
-<span class="sd">    &gt;&gt;&gt; data_crop = data.extract(c)</span>
-<span class="sd">    &gt;&gt;&gt; assert data_crop.grid.shape == (366, 180, 60)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">lon_range</span>
-    <span class="k">if</span> <span class="n">left</span> <span class="o">==</span> <span class="n">right</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">low</span> <span class="o">==</span> <span class="n">high</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;the specified values are equal&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">left</span> <span class="o">&gt;</span> <span class="n">right</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">low</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Left coordinate must exceed right coordinate&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">meridian_centre</span><span class="p">:</span>
-        <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span><span class="o">+</span><span class="mi">180</span><span class="p">)</span><span class="o">%</span><span class="mi">360</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="p">(</span><span class="n">right</span><span class="o">+</span><span class="mi">180</span><span class="p">)</span><span class="o">%</span><span class="mi">360</span><span class="o">-</span><span class="mi">180</span>
+        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="p">(</span><span class="n">low</span><span class="o">+</span><span class="mi">180</span><span class="p">)</span><span class="o">%</span><span class="mi">360</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="p">(</span><span class="n">high</span><span class="o">+</span><span class="mi">180</span><span class="p">)</span><span class="o">%</span><span class="mi">360</span><span class="o">-</span><span class="mi">180</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">left</span><span class="o">%</span><span class="mi">360</span><span class="p">,</span> <span class="n">right</span><span class="o">%</span><span class="mi">360</span>
-    <span class="k">if</span> <span class="n">left</span> <span class="o">&gt;</span> <span class="n">right</span><span class="p">:</span>
+        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">low</span><span class="o">%</span><span class="mi">360</span><span class="p">,</span> <span class="n">high</span><span class="o">%</span><span class="mi">360</span>
+    <span class="k">if</span> <span class="n">low</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Cannot crop over right border of longitude range&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">LongitudeConstraintError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">iris</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">longitude</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">left</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="n">right</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">iris</span><span class="o">.</span><span class="n">Constraint</span><span class="p">(</span><span class="n">longitude</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="get_time_rng_constraint"><a class="viewcode-back" href="../../api.html#pyaerocom.helpers.get_time_rng_constraint">[docs]</a><span class="k">def</span> <span class="nf">get_time_rng_constraint</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create iris.Constraint for data extraction along time axis</span>
@@ -1718,6 +1707,9 @@
                                  <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2010-10-15&#39;</span><span class="p">)]))</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="n">varlist_aerocom</span><span class="p">([</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550csaer&#39;</span><span class="p">]))</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">get_lon_rng_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">rng</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
            </div>
