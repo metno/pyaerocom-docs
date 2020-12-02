@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -823,6 +820,16 @@
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">remaining</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="n">ignore_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_station_names</span>
+        <span class="k">if</span> <span class="n">ignore_stats</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;ignore_station_names&#39;</span> <span class="ow">in</span> <span class="n">remaining</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="s1">&#39;ignore_station_names is defined multiple times in &#39;</span>
+                    <span class="s1">&#39;corresponding Colocator attr and as entry in &#39;</span>
+                    <span class="s1">&#39;Colocator.obs_filters ...&#39;</span>
+                <span class="p">)</span>
+            <span class="n">remaining</span><span class="p">[</span><span class="s1">&#39;ignore_station_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_stats</span>
+
         <span class="k">return</span> <span class="n">remaining</span>
 
     <span class="k">def</span> <span class="nf">_save_coldata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coldata</span><span class="p">,</span> <span class="n">savename</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">model_var</span><span class="p">,</span> <span class="n">model_data</span><span class="p">,</span>
@@ -920,11 +927,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_var_outlier_ranges</span><span class="p">(</span><span class="n">var_matches</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ropts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ropts</span> <span class="o">=</span> <span class="p">{}</span>
-
         <span class="n">data_objs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_infer_start_stop</span><span class="p">(</span><span class="n">model_reader</span><span class="p">)</span>
@@ -965,15 +967,6 @@
                 <span class="c1"># if colocation frequency is not specified</span>
                 <span class="n">ts_type</span> <span class="o">=</span> <span class="n">ts_type_src</span>
 
-            <span class="n">ignore_stats</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_station_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">ignore_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_station_names</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ignore_stats</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">obs_var</span> <span class="ow">in</span> <span class="n">ignore_stats</span><span class="p">:</span>
-                        <span class="n">ignore_stats</span> <span class="o">=</span> <span class="n">ignore_stats</span><span class="p">[</span><span class="n">obs_var</span><span class="p">]</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">ignore_stats</span> <span class="o">=</span> <span class="kc">None</span>
-
             <span class="c1">#ts_type_src = model_data.ts_type</span>
             <span class="k">if</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type_src</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type</span><span class="p">):</span><span class="c1"># &lt; all_ts_types.index(ts_type_src):</span>
                 <span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating ts_type from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1"> (highest &#39;</span>
@@ -1011,22 +1004,34 @@
                     <span class="n">really_do_reanalysis</span> <span class="o">=</span> <span class="kc">True</span>
 
             <span class="k">if</span> <span class="n">really_do_reanalysis</span><span class="p">:</span>
-                <span class="c1">#Reading obs data only if the co-located data file does</span>
-                <span class="c1">#not already exist.</span>
-                <span class="c1">#This part of the method has been changed by @hansbrenna to work better with</span>
-                <span class="c1">#large observational data sets. Only one variable is loaded into</span>
+                <span class="c1"># Reading obs data only if the co-located data file does</span>
+                <span class="c1"># not already exist.</span>
+                <span class="c1"># This part of the method has been changed by @hansbrenna to work better with</span>
+                <span class="c1"># large observational data sets. Only one variable is loaded into</span>
                 <span class="c1"># the UngriddedData object at a time. Currently the variable is</span>
-                <span class="c1">#re-read a lot of times, which is a weakness.</span>
+                <span class="c1"># re-read a lot of times, which is a weakness.</span>
+
+                <span class="c1"># everything under read_opts_ungridded is additional input</span>
+                <span class="c1"># applied during the actual reading of data. This will</span>
+                <span class="c1"># deactivate caching in most cases. Better way is probably to</span>
+                <span class="c1"># provide filtering of ungridded observations &quot;after&quot; reading</span>
+                <span class="c1"># (and caching) via obs_filters.</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">readobs_filters_pre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">readobs_filters_pre</span> <span class="o">=</span> <span class="p">{}</span>
+
+                <span class="c1"># ToDo: consider removing outliers already here.</span>
+                <span class="k">if</span> <span class="s1">&#39;obs_filters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="n">readobs_filters_post</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_obs_filters</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">readobs_filters_post</span> <span class="o">=</span> <span class="kc">None</span>
+
                 <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
                     <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">obs_var</span><span class="p">,</span>
                     <span class="n">only_cached</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_obs_cache_only</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">ropts</span><span class="p">)</span>
-
-                        <span class="c1"># ToDo: consider removing outliers already here.</span>
-                <span class="k">if</span> <span class="s1">&#39;obs_filters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-                    <span class="n">remaining_filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_obs_filters</span><span class="p">()</span>
-                    <span class="n">obs_data</span> <span class="o">=</span> <span class="n">obs_data</span><span class="o">.</span><span class="n">apply_filters</span><span class="p">(</span><span class="o">**</span><span class="n">remaining_filters</span><span class="p">)</span>
-
+                    <span class="n">filter_post</span><span class="o">=</span><span class="n">readobs_filters_post</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">readobs_filters_pre</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">by</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">update_baseyear_gridded</span>
@@ -1050,7 +1055,6 @@
                         <span class="n">var_outlier_ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_outlier_ranges</span><span class="p">,</span>
                         <span class="n">var_ref_outlier_ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_ref_outlier_ranges</span><span class="p">,</span>
                         <span class="n">update_baseyear_gridded</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
-                        <span class="n">ignore_station_names</span><span class="o">=</span><span class="n">ignore_stats</span><span class="p">,</span>
                         <span class="n">apply_time_resampling_constraints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apply_time_resampling_constraints</span><span class="p">,</span>
                         <span class="n">min_num_obs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_num_obs</span><span class="p">,</span>
                         <span class="n">colocate_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colocate_time</span><span class="p">,</span>
@@ -1156,13 +1160,6 @@
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">continue</span>
-
-<span class="c1"># =============================================================================</span>
-<span class="c1">#             if not obs_data.ts_type in all_ts_types:</span>
-<span class="c1">#                 raise TemporalResolutionError(&#39;Invalid temporal resolution {} &#39;</span>
-<span class="c1">#                                               &#39;in obs {}&#39;.format(obs_data.ts_type,</span>
-<span class="c1">#                                                                  self.model_id))</span>
-<span class="c1"># =============================================================================</span>
 
             <span class="c1"># update colocation ts_type, based on the available resolution in</span>
             <span class="c1"># model and obs.</span>

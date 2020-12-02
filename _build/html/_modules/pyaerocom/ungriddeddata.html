@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -181,6 +178,8 @@
                                <span class="n">start_stop</span><span class="p">,</span> <span class="n">merge_station_data</span><span class="p">,</span>
                                <span class="n">isnumeric</span><span class="p">)</span>
 
+<span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="kn">import</span> <span class="n">STANDARD_META_KEYS</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">get_unit_conversion_fac</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="kn">import</span> <span class="n">StationMetaData</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers_landsea_masks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">load_region_mask_xr</span><span class="p">,</span>
@@ -274,7 +273,7 @@
     <span class="n">_LOCATION_PRECISION</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">_LAT_OFFSET</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">90.</span><span class="p">)</span>
 
-    <span class="n">STANDARD_META_KEYS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">STANDARD_META_KEYS</span> <span class="o">=</span> <span class="n">STANDARD_META_KEYS</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_ROWNO</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -361,11 +360,6 @@
                 <span class="k">assert</span> <span class="n">var_idx_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">vars_avail</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="p">(</span><span class="s1">&#39;Mismatch between variable &#39;</span>
                           <span class="s1">&#39;index assigned in data and var_idx for </span><span class="si">{}</span><span class="s1"> in meta-block&#39;</span>
                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]:</span>
-                <span class="k">assert</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_avail</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;Detected variable </span><span class="si">{}</span><span class="s1"> in var_info &#39;</span>
-                                           <span class="s1">&#39;of meta block </span><span class="si">{}</span><span class="s1">. This variable is &#39;</span>
-                                           <span class="s1">&#39;not registered in attr. var_idx&#39;</span>
-                                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
 
 <div class="viewcode-block" id="UngriddedData.from_station_data"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.from_station_data">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_station_data</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
@@ -900,6 +894,7 @@
                         <span class="n">merge_if_multi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">merge_pref_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">merge_sort_by_largest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">insert_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">allow_wildcards_station_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">add_meta_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert data from one station to :class:`StationData`</span>
 
@@ -979,13 +974,16 @@
             <span class="n">meta_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">meta_idx</span><span class="p">]</span>
 
         <span class="n">stats</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># ToDo: check consistency, consider using methods in helpers.py</span>
+        <span class="c1"># check also Hans&#39; issue on the topic</span>
         <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">meta_idx</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metablock_to_stationdata</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span>
                                                       <span class="n">vars_to_convert</span><span class="p">,</span>
-                                                      <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+                                                      <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span>
+                                                      <span class="n">add_meta_keys</span><span class="p">)</span>
                 <span class="n">stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
             <span class="k">except</span> <span class="p">(</span><span class="n">VarNotAvailableError</span><span class="p">,</span> <span class="n">DataCoverageError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping meta index </span><span class="si">{}</span><span class="s1">. Reason: </span><span class="si">{}</span><span class="s1">&#39;</span>
@@ -1057,51 +1055,59 @@
     <span class="c1">### TODO: check if both `variables` and `var_info` attrs are required in</span>
     <span class="c1">### metdatda blocks</span>
     <span class="k">def</span> <span class="nf">_metablock_to_stationdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta_idx</span><span class="p">,</span> <span class="n">vars_to_convert</span><span class="p">,</span>
-                                  <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                                  <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">add_meta_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert one metadata index to StationData (helper method)</span>
 
 <span class="sd">        See :func:`to_station_data` for input parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># may or may not be defined in metadata block</span>
-        <span class="n">check_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;instrument_name&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="s1">&#39;revision_date&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;station_name_orig&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">add_meta_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">add_meta_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_meta_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">add_meta_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">add_meta_keys</span><span class="p">]</span>
 
         <span class="n">sd</span> <span class="o">=</span> <span class="n">StationData</span><span class="p">()</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">meta_idx</span><span class="p">]</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">meta_idx</span><span class="p">]</span>
 
         <span class="c1"># TODO: make sure in reading classes that data_revision is assigned</span>
         <span class="c1"># to each metadata block and not only in self.data_revision</span>
         <span class="n">rev</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s1">&#39;data_revision&#39;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-            <span class="n">rev</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;data_revision&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;data_revision&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="n">rev</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_revision&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">rev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_revision</span><span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]]</span>
+                <span class="n">rev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_revision</span><span class="p">[</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]]</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Data revision could not be accessed&#39;</span><span class="p">)</span>
         <span class="n">sd</span><span class="o">.</span><span class="n">data_revision</span> <span class="o">=</span> <span class="n">rev</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">vars_avail</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">vars_avail</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;variables&#39;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">or</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;variables&#39;</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">or</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">[]):</span>
                 <span class="k">raise</span> <span class="n">VarNotAvailableError</span><span class="p">(</span><span class="s1">&#39;Metablock does not contain variable &#39;</span>
                                            <span class="s1">&#39;information&#39;</span><span class="p">)</span>
-            <span class="n">vars_avail</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span>
+            <span class="n">vars_avail</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">check_keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-                <span class="n">sd</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_META_KEYS</span> <span class="o">+</span> <span class="n">add_meta_keys</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sd</span><span class="o">.</span><span class="n">PROTECTED_KEYS</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;skipping protected key: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
 
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_META_KEYS</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-                <span class="n">sd</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;ts_type&#39;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-            <span class="n">sd</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sd</span><span class="p">[</span><span class="s1">&#39;ts_type_src&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ts_type&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
 
         <span class="c1"># assign station coordinates explicitely</span>
         <span class="k">for</span> <span class="n">ck</span> <span class="ow">in</span> <span class="n">sd</span><span class="o">.</span><span class="n">STANDARD_COORD_KEYS</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">ck</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-                <span class="n">sd</span><span class="o">.</span><span class="n">station_coords</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sd</span><span class="o">.</span><span class="n">station_coords</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
 
         <span class="c1"># if no input variables are provided, use the ones that are available</span>
         <span class="c1"># for this metadata block</span>
@@ -1175,8 +1181,8 @@
             <span class="n">FOUND_ONE</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="c1"># check if there is information about altitude (then relevant 3D</span>
             <span class="c1"># variables and parameters are included too)</span>
-            <span class="k">if</span> <span class="s1">&#39;var_info&#39;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
-                <span class="n">vi</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;var_info&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+                <span class="n">vi</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">vi</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">altitude</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
@@ -1332,28 +1338,94 @@
         <span class="n">result</span><span class="p">[</span><span class="s1">&#39;num_stats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_stats</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
-    <span class="k">def</span> <span class="nf">_check_filter_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">str_f</span><span class="p">,</span> <span class="n">list_f</span><span class="p">,</span> <span class="n">range_f</span><span class="p">,</span> <span class="n">val_f</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_check_str_filter_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">negate</span><span class="p">,</span> <span class="n">str_f</span><span class="p">):</span>
+        <span class="c1"># Check string equality for input meta data and filters. Supports</span>
+        <span class="c1"># wildcard matching</span>
+        <span class="k">for</span> <span class="n">metakey</span><span class="p">,</span> <span class="n">filterval</span> <span class="ow">in</span> <span class="n">str_f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># key does not exist in this specific meta_block</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">metakey</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="c1"># check if this key is in negate list (then result will be True</span>
+            <span class="c1"># for all that do not match the specified filter input value(s))</span>
+            <span class="n">neg</span> <span class="o">=</span> <span class="n">metakey</span> <span class="ow">in</span> <span class="n">negate</span>
+
+            <span class="c1"># actual value of this key in input metadata</span>
+            <span class="n">metaval</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="n">metakey</span><span class="p">]</span>
+
+            <span class="c1"># check equality of values</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">metaval</span> <span class="o">==</span> <span class="n">filterval</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span> <span class="c1"># direct match found</span>
+                <span class="k">if</span> <span class="n">neg</span><span class="p">:</span> <span class="c1"># key is flagged in negate -&gt; no match</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1"># no direct match found</span>
+                <span class="c1"># check wildcard match</span>
+                <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">filterval</span><span class="p">:</span> <span class="c1"># no wildcard in</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">metaval</span><span class="p">,</span> <span class="n">filterval</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">neg</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">neg</span><span class="p">:</span> <span class="c1"># no match, no wildcard match and not inverted</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_check_filter_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">negate</span><span class="p">,</span> <span class="n">str_f</span><span class="p">,</span> <span class="n">list_f</span><span class="p">,</span> <span class="n">range_f</span><span class="p">,</span> <span class="n">val_f</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Helper method that checks if station meta item matches filters</span>
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
 <span class="sd">        This method is used in :func:`apply_filter`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">str_f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">meta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_str_filter_match</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">negate</span><span class="p">,</span> <span class="n">str_f</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">metakey</span><span class="p">,</span> <span class="n">filterval</span> <span class="ow">in</span> <span class="n">list_f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">metakey</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">neg</span> <span class="o">=</span> <span class="n">metakey</span> <span class="ow">in</span> <span class="n">negate</span>
+            <span class="n">metaval</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="n">metakey</span><span class="p">]</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">metaval</span> <span class="o">==</span> <span class="n">filterval</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span> <span class="c1"># lists are identical</span>
+                <span class="k">if</span> <span class="n">neg</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># value in metadata block is different from filter value</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">metaval</span> <span class="ow">in</span> <span class="n">filterval</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">neg</span><span class="p">:</span>
                         <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">list_f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">meta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="c1"># current metavalue is not equal the filterlist and is also</span>
+                    <span class="c1"># not contained in the filterlist. However, one or more</span>
+                    <span class="c1"># entries in the filterlist may be wildcard</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metaval</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">filterval</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
+                                <span class="n">match</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">metaval</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                                    <span class="k">if</span> <span class="n">neg</span><span class="p">:</span>
+                                        <span class="k">return</span> <span class="kc">False</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">neg</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># range filter</span>
+        <span class="k">for</span> <span class="n">metakey</span><span class="p">,</span> <span class="n">filterval</span> <span class="ow">in</span> <span class="n">range_f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">metakey</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">range_f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">in_range</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">neg</span> <span class="o">=</span> <span class="n">metakey</span> <span class="ow">in</span> <span class="n">negate</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">in_range</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">metakey</span><span class="p">],</span> <span class="n">filterval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">filterval</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">neg</span> <span class="ow">and</span> <span class="n">match</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">neg</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">match</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val_f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">meta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">metakey</span><span class="p">,</span> <span class="n">filterval</span> <span class="ow">in</span> <span class="n">val_f</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">metakey</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">neg</span> <span class="o">=</span> <span class="n">metakey</span> <span class="ow">in</span> <span class="n">negate</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="n">metakey</span><span class="p">]</span> <span class="o">==</span> <span class="n">filterval</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">neg</span> <span class="ow">and</span> <span class="n">match</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">neg</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">match</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
@@ -1416,7 +1488,7 @@
 <div class="viewcode-block" id="UngriddedData.check_convert_var_units"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.check_convert_var_units">[docs]</a>    <span class="k">def</span> <span class="nf">check_convert_var_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">to_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                     <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">unit_conversion_fac</span>
+
 
         <span class="c1"># get the unit</span>
         <span class="k">if</span> <span class="n">to_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1435,7 +1507,7 @@
                     <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Failed to access unit information for &#39;</span>
                                         <span class="s1">&#39;variable </span><span class="si">{}</span><span class="s1"> in metadata block </span><span class="si">{}</span><span class="s1">. </span><span class="si">{}</span><span class="s1">&#39;</span>
                                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">add_str</span><span class="p">))</span>
-                <span class="n">fac</span> <span class="o">=</span> <span class="n">unit_conversion_fac</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
+                <span class="n">fac</span> <span class="o">=</span> <span class="n">get_unit_conversion_fac</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">fac</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">meta_idx</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">meta_idx</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">var_name</span><span class="p">]</span>
                     <span class="n">current</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">meta_idx</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">_DATAINDEX</span><span class="p">]</span>
@@ -1460,7 +1532,6 @@
 <span class="sd">        MetaDataError</span>
 <span class="sd">            if unit information is not accessible for input variable name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">unit_conversion_fac</span>
         <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">unit</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
 
@@ -1485,9 +1556,9 @@
                                 <span class="s1">&#39;variable </span><span class="si">{}</span><span class="s1">. Expected unit </span><span class="si">{}</span><span class="s1">&#39;</span>
                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">unit</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">units</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">unit_conversion_fac</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span><span class="s1">&#39;Invalid unit </span><span class="si">{}</span><span class="s1"> detected (expected </span><span class="si">{}</span><span class="s1">)&#39;</span>
-                                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">unit</span><span class="p">))</span></div>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">get_unit_conversion_fac</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MetaDataError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Invalid unit </span><span class="si">{</span><span class="n">u</span><span class="si">}</span><span class="s1"> detected (expected </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="UngriddedData.set_flags_nan"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.set_flags_nan">[docs]</a>    <span class="k">def</span> <span class="nf">set_flags_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set all flagged datapoints to NaN</span>
@@ -1657,18 +1728,39 @@
                 <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">d</span>
 
-    <span class="k">def</span> <span class="nf">_find_meta_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">filters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_find_meta_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">filters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find meta matches for input attributes</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        negate : list or str, optional</span>
+<span class="sd">            specified meta key(s) provided in `*filters` that are</span>
+<span class="sd">            supposed to be treated as &#39;not valid&#39;. E.g. if</span>
+<span class="sd">            `station_name=&quot;bad_site&quot;` is input in `filter_attributes` and if</span>
+<span class="sd">            `station_name` is listed in `negate`, then all metadata blocks</span>
+<span class="sd">            containing &quot;bad_site&quot; as station_name will be excluded in output</span>
+<span class="sd">            data object.</span>
+<span class="sd">        *filters</span>
+<span class="sd">            list of filters to be applied</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list</span>
+<span class="sd">        tuple</span>
 <span class="sd">            list of metadata indices that match input filter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">negate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">negate</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">negate</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">negate</span> <span class="o">=</span> <span class="p">[</span><span class="n">negate</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">negate</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid input for negate </span><span class="si">{</span><span class="n">negate</span><span class="si">}</span><span class="s1">, &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;need list or str or None&#39;</span><span class="p">)</span>
         <span class="n">meta_matches</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">totnum</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">meta_idx</span><span class="p">,</span> <span class="n">meta</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_filter_match</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="o">*</span><span class="n">filters</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_filter_match</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span>
+                                        <span class="n">negate</span><span class="p">,</span>
+                                        <span class="o">*</span><span class="n">filters</span><span class="p">):</span>
                 <span class="n">meta_matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">meta_idx</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;var_info&#39;</span><span class="p">]:</span>
                     <span class="k">try</span><span class="p">:</span>
@@ -1848,11 +1940,18 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">filter_region</span><span class="p">(</span><span class="n">region_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="UngriddedData.filter_by_meta"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.filter_by_meta">[docs]</a>    <span class="k">def</span> <span class="nf">filter_by_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">filter_attributes</span><span class="p">):</span>
+<div class="viewcode-block" id="UngriddedData.filter_by_meta"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.filter_by_meta">[docs]</a>    <span class="k">def</span> <span class="nf">filter_by_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">filter_attributes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Flexible method to filter these data based on input meta specs</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        negate : list or str, optional</span>
+<span class="sd">            specified meta key(s) provided via `filter_attributes` that are</span>
+<span class="sd">            supposed to be treated as &#39;not valid&#39;. E.g. if</span>
+<span class="sd">            `station_name=&quot;bad_site&quot;` is input in `filter_attributes` and if</span>
+<span class="sd">            `station_name` is listed in `negate`, then all metadata blocks</span>
+<span class="sd">            containing &quot;bad_site&quot; as station_name will be excluded in output</span>
+<span class="sd">            data object.</span>
 <span class="sd">        **filter_attributes</span>
 <span class="sd">            valid meta keywords that are supposed to be filtered and the</span>
 <span class="sd">            corresponding filter values (or value ranges)</span>
@@ -1890,10 +1989,12 @@
         <span class="n">filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_meta_filters</span><span class="p">(</span><span class="o">**</span><span class="n">filter_attributes</span><span class="p">)</span>
 
         <span class="c1"># find all metadata blocks that match the filters</span>
-        <span class="n">meta_matches</span><span class="p">,</span> <span class="n">totnum_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_meta_matches</span><span class="p">(</span><span class="o">*</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">meta_matches</span><span class="p">,</span> <span class="n">totnum_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_meta_matches</span><span class="p">(</span><span class="n">negate</span><span class="p">,</span>
+                                                           <span class="o">*</span><span class="n">filters</span><span class="p">,</span>
+                                                           <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta_matches</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">):</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Input filters </span><span class="si">{}</span><span class="s1"> result in unchanged data &#39;</span>
-                                 <span class="s1">&#39;object&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_attributes</span><span class="p">))</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Input filters </span><span class="si">{}</span><span class="s1"> result in unchanged data &#39;</span>
+                              <span class="s1">&#39;object&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_attributes</span><span class="p">))</span>
             <span class="k">return</span> <span class="bp">self</span>
         <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_from_meta_blocks</span><span class="p">(</span><span class="n">meta_matches</span><span class="p">,</span> <span class="n">totnum_new</span><span class="p">)</span>
         <span class="n">time_str</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">%H%M%S&#39;</span><span class="p">)</span>
@@ -2119,26 +2220,6 @@
         <span class="k">if</span> <span class="n">check_index</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">_check_index</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span></div>
-
-    <span class="k">def</span> <span class="nf">_station_to_json_trends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">station_name</span><span class="p">,</span>
-                                <span class="n">freq</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert station data to json file for trends interface</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        var_name : str</span>
-<span class="sd">            variable name (e.g. od550aer)</span>
-<span class="sd">        station_name : str</span>
-<span class="sd">            name (or wildcard pattern) that specifies station</span>
-<span class="sd">        freq : str</span>
-<span class="sd">            temporal resolution</span>
-<span class="sd">        **kwargs</span>
-<span class="sd">            further input arguments that are passed to :func:`to_station_data`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">station_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Require station name (or pattern) as string&#39;</span><span class="p">)</span>
-        <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_station_data</span><span class="p">(</span><span class="n">station_name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UngriddedData.code_lat_lon_in_float"><a class="viewcode-back" href="../../api.html#pyaerocom.ungriddeddata.UngriddedData.code_lat_lon_in_float">[docs]</a>    <span class="k">def</span> <span class="nf">code_lat_lon_in_float</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;method to code lat and lon in a single number so that we can use np.unique to</span>
@@ -2701,7 +2782,6 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
             <span class="kn">from</span> <span class="nn">pyaerocom.plot.config</span> <span class="kn">import</span> <span class="n">FIGSIZE_DEFAULT</span>
             <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FIGSIZE_DEFAULT</span><span class="p">)</span>
 
@@ -3106,14 +3186,44 @@
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-    <span class="n">empty</span> <span class="o">=</span> <span class="n">UngriddedData</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
-    <span class="n">data1</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;AeronetInvV3Lev2.daily&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
+    <span class="n">OBS_LOCAL</span> <span class="o">=</span> <span class="s1">&#39;/home/jonasg/MyPyaerocom/data/obsdata/&#39;</span>
 
-    <span class="n">data2</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">colocate_vardata</span><span class="p">(</span><span class="n">var1</span><span class="o">=</span><span class="s1">&#39;od550aer&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">data1</span><span class="p">)</span>
+    <span class="n">GHOST_EEA_LOCAL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OBS_LOCAL</span><span class="p">,</span> <span class="s1">&#39;GHOST/data/EEA_AQ_eReporting/daily&#39;</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="n">data2</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pya</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ReadUngridded</span><span class="p">(</span><span class="s1">&#39;GHOST.EEA.daily&#39;</span><span class="p">,</span>
+                                <span class="n">data_dir</span><span class="o">=</span><span class="n">GHOST_EEA_LOCAL</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">vars_to_retrieve</span><span class="o">=</span><span class="s1">&#39;vmro3&#39;</span><span class="p">)</span>
+
+
+    <span class="n">MBlandforms_to_include</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;high altitude plains&#39;</span><span class="p">,</span><span class="s1">&#39;water&#39;</span><span class="p">,</span> <span class="s1">&#39;very low plateaus&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;plains&#39;</span><span class="p">,</span> <span class="s1">&#39;rugged lowlands&#39;</span><span class="p">,</span><span class="s1">&#39;hills&#39;</span><span class="p">,</span><span class="s1">&#39;high altitude plateaus&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;mid altitude plateaus&#39;</span><span class="p">,</span> <span class="s1">&#39;nan&#39;</span><span class="p">,</span><span class="s1">&#39;lowlands&#39;</span><span class="p">,</span> <span class="s1">&#39;mid altitude plains&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;low plateaus&#39;</span><span class="p">,]</span>
+
+    <span class="n">EEA_rural_station_types_to_include</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;background&#39;</span><span class="p">]</span>
+    <span class="n">EEA_rural_area_types_to_include</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;rural&#39;</span><span class="p">,</span><span class="s1">&#39;rural-near_city&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;rural-regional&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;rural-remote&#39;</span><span class="p">]</span>
+
+
+    <span class="c1">#Define filters for the obs subsets</span>
+
+    <span class="n">standard_filter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;set_flags_nan&#39;</span>  <span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                       <span class="s1">&#39;station_name&#39;</span>   <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Innsbr*&#39;</span><span class="p">],</span>
+                       <span class="s1">&#39;negate&#39;</span>         <span class="p">:</span> <span class="s1">&#39;station_name&#39;</span><span class="p">}</span>
+
+    <span class="n">rural_filter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;standardised_network_provided_station_classification&#39;</span><span class="p">:</span>
+                    <span class="n">EEA_rural_station_types_to_include</span><span class="p">,</span>
+                    <span class="s1">&#39;standardised_network_provided_area_classification&#39;</span><span class="p">:</span>
+                        <span class="n">EEA_rural_area_types_to_include</span>
+                    <span class="p">}</span>
+
+    <span class="n">mountain_filter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;altitude&#39;</span><span class="p">:[</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="mi">1500</span><span class="p">],</span>
+                       <span class="s1">&#39;ESDAC_Meybeck_landform_classification&#39;</span> <span class="p">:</span>
+                           <span class="n">MBlandforms_to_include</span>
+                      <span class="p">}</span>
+    <span class="n">obs_filters</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">standard_filter</span><span class="p">,</span><span class="o">**</span><span class="n">rural_filter</span><span class="p">,</span><span class="o">**</span><span class="n">mountain_filter</span><span class="p">}</span>
+
+    <span class="n">filtered</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply_filters</span><span class="p">(</span><span class="o">**</span><span class="n">obs_filters</span><span class="p">)</span>
 </pre></div>
 
            </div>

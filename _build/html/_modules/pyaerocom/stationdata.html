@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -174,7 +171,7 @@
                                   <span class="n">TemporalResolutionError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">dict_to_str</span><span class="p">,</span> <span class="n">list_to_shortstr</span><span class="p">,</span>
                                          <span class="n">BrowseDict</span><span class="p">,</span> <span class="n">merge_dicts</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="kn">import</span> <span class="n">StationMetaData</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="kn">import</span> <span class="n">StationMetaData</span><span class="p">,</span> <span class="n">STANDARD_META_KEYS</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.vertical_profile</span> <span class="kn">import</span> <span class="n">VerticalProfile</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.time_resampler</span> <span class="kn">import</span> <span class="n">TimeResampler</span>
@@ -183,7 +180,7 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">isnumeric</span><span class="p">,</span> <span class="n">isrange</span><span class="p">,</span> <span class="n">calc_climatology</span><span class="p">,</span>
                                <span class="n">to_datetime64</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">convert_unit</span><span class="p">,</span> <span class="n">unit_conversion_fac</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">convert_unit</span><span class="p">,</span> <span class="n">get_unit_conversion_fac</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.time_config</span> <span class="kn">import</span> <span class="n">PANDAS_FREQ_TO_TS_TYPE</span>
 
 <div class="viewcode-block" id="StationData"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData">[docs]</a><span class="k">class</span> <span class="nc">StationData</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">):</span>
@@ -221,10 +218,13 @@
     <span class="c1">#: maximum numerical distance between coordinates associated with this</span>
     <span class="c1">#: station</span>
     <span class="n">_COORD_MAX_VAR</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1">#km</span>
-    <span class="n">STANDARD_META_KEYS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">STANDARD_META_KEYS</span> <span class="o">=</span> <span class="n">STANDARD_META_KEYS</span>
 
     <span class="n">VALID_TS_TYPES</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span>
 
+    <span class="c1">#: Keys that are ignored when accessing metadata</span>
+    <span class="n">PROTECTED_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">,</span><span class="s1">&#39;var_info&#39;</span><span class="p">,</span> <span class="s1">&#39;station_coords&#39;</span><span class="p">,</span> <span class="s1">&#39;data_err&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;overlap&#39;</span><span class="p">,</span> <span class="s1">&#39;numobs&#39;</span><span class="p">,</span><span class="s1">&#39;data_flagged&#39;</span><span class="p">]</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">meta_info</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dtime</span> <span class="o">=</span> <span class="p">[]</span>
@@ -382,9 +382,8 @@
         <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">unit</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">units</span>
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">unit_conversion_fac</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataUnitError</span><span class="p">(</span><span class="s1">&#39;Invalid unit </span><span class="si">{}</span><span class="s1"> (expected </span><span class="si">{}</span><span class="s1">)&#39;</span>
-                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">unit</span><span class="p">))</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">get_unit_conversion_fac</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataUnitError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid unit </span><span class="si">{</span><span class="n">u</span><span class="si">}</span><span class="s1"> (expected </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StationData.convert_unit"><a class="viewcode-back" href="../../api.html#pyaerocom.stationdata.StationData.convert_unit">[docs]</a>    <span class="k">def</span> <span class="nf">convert_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Try to convert unit of data</span>
@@ -414,9 +413,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">convert_unit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">from_unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="o">=</span><span class="n">to_unit</span><span class="p">,</span>
                             <span class="n">var_name</span><span class="o">=</span><span class="n">var_name</span><span class="p">)</span>
-        <span class="c1">#conv_fac = unit_conversion_fac(unit, to_unit)</span>
 
-        <span class="c1">#data *= conv_fac</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">var_info</span><span class="p">[</span><span class="n">var_name</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_unit</span>
         <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Successfully converted unit of variable </span><span class="si">{}</span><span class="s1"> in </span><span class="si">{}</span><span class="s1"> &#39;</span>
@@ -585,6 +582,9 @@
                 <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No such key in StationData: </span><span class="si">{}</span><span class="s1">&#39;</span>
                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
                 <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROTECTED_KEYS</span><span class="p">:</span>
+                <span class="c1"># this is not metadata...</span>
+                <span class="k">continue</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_COORD_KEYS</span><span class="p">:</span>
                 <span class="c1"># this has been handled above</span>
                 <span class="k">continue</span>
@@ -676,7 +676,9 @@
                 <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_val</span>
 
             <span class="k">elif</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">current_val</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">current_val</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">current_val</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">elif</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">current_val</span><span class="p">:</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_val</span><span class="p">,</span> <span class="n">val</span><span class="p">]</span>
 
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -766,7 +768,8 @@
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STANDARD_COORD_KEYS</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROTECTED_KEYS</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other</span> <span class="ow">and</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_check_meta_item</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>

@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -163,20 +160,22 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">re</span>
-
-<span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.time_config</span> <span class="kn">import</span> <span class="p">(</span><span class="n">PANDAS_FREQ_TO_TS_TYPE</span><span class="p">,</span>
                                    <span class="n">TS_TYPE_TO_PANDAS_FREQ</span><span class="p">,</span>
                                    <span class="n">TS_TYPE_TO_NUMPY_FREQ</span><span class="p">,</span>
-                                   <span class="n">PANDAS_RESAMPLE_OFFSETS</span><span class="p">)</span>
+                                   <span class="n">PANDAS_RESAMPLE_OFFSETS</span><span class="p">,</span>
+                                   <span class="n">TS_TYPE_TO_SI</span><span class="p">,</span>
+                                   <span class="n">TS_TYPES</span><span class="p">)</span>
+
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">TemporalResolutionError</span>
 
 <div class="viewcode-block" id="TsType"><a class="viewcode-back" href="../../api.html#pyaerocom.tstype.TsType">[docs]</a><span class="k">class</span> <span class="nc">TsType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">VALID</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">TS_TYPES</span>
+    <span class="n">VALID</span> <span class="o">=</span> <span class="n">TS_TYPES</span>
     <span class="n">FROM_PANDAS</span> <span class="o">=</span> <span class="n">PANDAS_FREQ_TO_TS_TYPE</span>
     <span class="n">TO_PANDAS</span> <span class="o">=</span> <span class="n">TS_TYPE_TO_PANDAS_FREQ</span>
     <span class="n">TO_NUMPY</span> <span class="o">=</span>  <span class="n">TS_TYPE_TO_NUMPY_FREQ</span>
     <span class="n">RS_OFFSETS</span> <span class="o">=</span> <span class="n">PANDAS_RESAMPLE_OFFSETS</span>
+    <span class="n">TO_SI</span> <span class="o">=</span> <span class="n">TS_TYPE_TO_SI</span>
 
     <span class="n">TS_MAX_VALS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;hourly&#39;</span> <span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
                    <span class="s1">&#39;daily&#39;</span>  <span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
@@ -224,6 +223,9 @@
 
     <span class="nd">@val</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span>
+                <span class="s1">&#39;Invalid input, please provide valid frequency string...&#39;</span><span class="p">)</span>
         <span class="n">ival</span><span class="o">=</span><span class="mi">1</span>
         <span class="k">if</span> <span class="n">val</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid input for TsType: </span><span class="si">{}</span><span class="s1">&#39;</span>
@@ -334,6 +336,15 @@
             <span class="k">return</span> <span class="n">freq</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mulfac</span><span class="p">,</span> <span class="n">freq</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="TsType.to_si"><a class="viewcode-back" href="../../api.html#pyaerocom.tstype.TsType.to_si">[docs]</a>    <span class="k">def</span> <span class="nf">to_si</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert to SI conform string (e.g. used for unit conversion)&quot;&quot;&quot;</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">base</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TO_SI</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot convert </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s1"> to SI unit string...&#39;</span><span class="p">)</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TO_SI</span><span class="p">[</span><span class="n">base</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">si</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mulfac</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mulfac</span><span class="si">}{</span><span class="n">si</span><span class="si">}</span><span class="s1">&#39;</span></div>
+
+
     <span class="k">def</span> <span class="nf">_from_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">FROM_PANDAS</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">TemporalResolutionError</span><span class="p">(</span><span class="s1">&#39;Invalid input: </span><span class="si">{}</span><span class="s1">, need pandas &#39;</span>
@@ -356,6 +367,8 @@
         <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__lt__</span><span class="p">(</span><span class="n">other</span><span class="p">))</span> <span class="k">else</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

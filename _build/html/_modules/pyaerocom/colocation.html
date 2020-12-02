@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -167,22 +164,31 @@
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">pya_ver</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">isnumeric</span>
+
+<span class="kn">from</span> <span class="nn">pyaerocom.colocateddata</span> <span class="kn">import</span> <span class="n">ColocatedData</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ColocationError</span><span class="p">,</span>
                                   <span class="n">DataUnitError</span><span class="p">,</span>
                                   <span class="n">DimensionOrderError</span><span class="p">,</span>
                                   <span class="n">MetaDataError</span><span class="p">,</span>
                                   <span class="n">TimeMatchError</span><span class="p">,</span>
                                   <span class="n">VarNotAvailableError</span><span class="p">)</span>
-
-<span class="c1">#from pyaerocom.time_config import TS_TYPE_TO_PANDAS_FREQ</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.filter</span> <span class="kn">import</span> <span class="n">Filter</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">to_pandas_timestamp</span><span class="p">,</span>
                                <span class="n">to_datestring_YYYYMMDD</span><span class="p">,</span>
-                               <span class="n">make_datetime_index</span><span class="p">)</span>
+                               <span class="n">make_datetime_index</span><span class="p">,</span>
+                               <span class="n">isnumeric</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
 
-<span class="kn">from</span> <span class="nn">pyaerocom.filter</span> <span class="kn">import</span> <span class="n">Filter</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.colocateddata</span> <span class="kn">import</span> <span class="n">ColocatedData</span>
+<span class="k">def</span> <span class="nf">_check_var_registered</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">aerocom_var</span><span class="p">,</span> <span class="n">gridded_data</span><span class="p">):</span>
+    <span class="n">vars_avail</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="o">.</span><span class="n">all_vars</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">x</span> <span class="ow">in</span> <span class="n">vars_avail</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">var</span><span class="p">,</span> <span class="n">aerocom_var</span><span class="p">]]):</span>
+        <span class="n">newvar</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">var_name</span><span class="o">=</span><span class="n">var</span><span class="p">,</span>
+                          <span class="n">standard_name</span><span class="o">=</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">standard_name</span><span class="p">,</span>
+                          <span class="n">long_name</span><span class="o">=</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span>
+                          <span class="n">units</span><span class="o">=</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+
+        <span class="n">const</span><span class="o">.</span><span class="n">VARS</span><span class="o">.</span><span class="n">add_var</span><span class="p">(</span><span class="n">newvar</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_regrid_gridded</span><span class="p">(</span><span class="n">gridded</span><span class="p">,</span> <span class="n">regrid_scheme</span><span class="p">,</span> <span class="n">regrid_res_deg</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -346,7 +352,7 @@
     <span class="k">if</span> <span class="n">filter_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">filter_name</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">DEFAULT_REG_FILTER</span>
 
-    <span class="k">if</span> <span class="n">harmonise_units</span> <span class="ow">and</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_info</span><span class="o">.</span><span class="n">has_unit</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">harmonise_units</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">convert_unit</span><span class="p">(</span><span class="n">gridded_data</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
@@ -358,6 +364,9 @@
                                             <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">units</span><span class="p">))</span>
 
     <span class="n">var</span><span class="p">,</span> <span class="n">var_ref</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">gridded_data_ref</span><span class="o">.</span><span class="n">var_name</span>
+    <span class="n">aerocom_var</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_name_aerocom</span>
+    <span class="n">_check_var_registered</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">aerocom_var</span><span class="p">,</span> <span class="n">gridded_data</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">remove_outliers</span><span class="p">:</span>
         <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">low_ref</span><span class="p">,</span> <span class="n">high_ref</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_outlier_ranges</span><span class="p">:</span>
@@ -748,6 +757,9 @@
 
     <span class="n">var</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_name</span>
     <span class="n">aerocom_var</span> <span class="o">=</span> <span class="n">gridded_data</span><span class="o">.</span><span class="n">var_name_aerocom</span>
+
+    <span class="n">_check_var_registered</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">aerocom_var</span><span class="p">,</span> <span class="n">gridded_data</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">var_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">aerocom_var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">var_ref</span> <span class="o">=</span> <span class="n">aerocom_var</span>

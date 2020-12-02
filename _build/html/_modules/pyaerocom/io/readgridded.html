@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -190,12 +187,13 @@
 <span class="c1">#along with this program; if not, write to the Free Software</span>
 <span class="c1">#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,</span>
 <span class="c1">#MA 02110-1301, USA</span>
+<span class="kn">from</span> <span class="nn">cf_units</span> <span class="kn">import</span> <span class="n">Unit</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
 
 <span class="kn">import</span> <span class="nn">fnmatch</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -214,14 +212,17 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">to_pandas_timestamp</span><span class="p">,</span>
                                <span class="n">sort_ts_types</span><span class="p">,</span>
                                <span class="n">get_highest_resolution</span><span class="p">,</span>
-                               <span class="n">isnumeric</span><span class="p">)</span>
+                               <span class="n">isnumeric</span><span class="p">,</span>
+                               <span class="n">resample_time_dataarray</span><span class="p">)</span>
 
+<span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">UALIASES</span><span class="p">,</span> <span class="n">get_unit_conversion_fac</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DataCoverageError</span><span class="p">,</span>
                                   <span class="n">DataQueryError</span><span class="p">,</span>
                                   <span class="n">DataSourceError</span><span class="p">,</span>
                                   <span class="n">FileConventionError</span><span class="p">,</span>
                                   <span class="n">IllegalArgumentError</span><span class="p">,</span>
                                   <span class="n">TemporalResolutionError</span><span class="p">,</span>
+                                  <span class="n">UnitConversionError</span><span class="p">,</span>
                                   <span class="n">VarNotAvailableError</span><span class="p">,</span>
                                   <span class="n">VariableDefinitionError</span><span class="p">)</span>
 
@@ -230,6 +231,210 @@
 <span class="kn">from</span> <span class="nn">pyaerocom.io.iris_io</span> <span class="kn">import</span> <span class="n">load_cubes_custom</span><span class="p">,</span> <span class="n">concatenate_iris_cubes</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="kn">import</span> <span class="n">add_file_to_log</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.griddeddata</span> <span class="kn">import</span> <span class="n">GriddedData</span>
+
+<span class="n">WDEP_IMPLICIT_UNITS</span> <span class="o">=</span> <span class="p">[</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;mg N m-2&#39;</span><span class="p">),</span> <span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;mg S m-2&#39;</span><span class="p">)]</span>
+<span class="n">PR_IMPLICIT_UNITS</span> <span class="o">=</span> <span class="p">[</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;mm&#39;</span><span class="p">)]</span>
+
+<span class="n">DEP_TEST_UNIT</span> <span class="o">=</span> <span class="s1">&#39;kg m-2 s-1&#39;</span>
+<span class="n">DEP_TEST_NONSI_ATOMS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">_check_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">test_unit</span><span class="p">,</span> <span class="n">non_si_info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">non_si_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">non_si_info</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">get_unit_conversion_fac</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">DEP_TEST_UNIT</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="n">UnitConversionError</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">substr</span> <span class="ow">in</span> <span class="n">non_si_info</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">substr</span> <span class="ow">in</span> <span class="n">unit</span><span class="p">:</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">substr</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">_check_unit</span><span class="p">(</span><span class="n">check</span><span class="p">,</span> <span class="n">test_unit</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="check_wdep_units"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.check_wdep_units">[docs]</a><span class="k">def</span> <span class="nf">check_wdep_units</span><span class="p">(</span><span class="n">gridded</span><span class="p">):</span>
+
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">gridded</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">gridded</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+    <span class="n">freq_si</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">to_si</span><span class="p">()</span>
+
+    <span class="c1"># check if unit is implicit and change if possible</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">unit</span> <span class="o">==</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">WDEP_IMPLICIT_UNITS</span><span class="p">]):</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span><span class="p">)</span>
+        <span class="n">gridded</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">unit</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_check_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">DEP_TEST_UNIT</span><span class="p">,</span> <span class="n">DEP_TEST_NONSI_ATOMS</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot handle wet deposition unit </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check if frequency in unit corresponds to sampling frequency (e.g.</span>
+    <span class="c1"># ug m-2 h-1 for hourly data).</span>
+    <span class="n">freq_si_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span>
+    <span class="n">freq_si_str_alt</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span class="n">freq_si</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">if</span> <span class="n">freq_si_str_alt</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">):</span>
+        <span class="c1"># make sure frequencey is denoted as e.g. m s-1 instead of m/s</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">freq_si_str_alt</span><span class="p">,</span>
+                                 <span class="n">freq_si_str</span><span class="p">)</span>
+
+        <span class="n">gridded</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">unit</span>
+
+    <span class="c1"># for now, raise NotImplementedError if wdep unit is, e.g. ug m-2 s-1 but</span>
+    <span class="c1"># ts_type is hourly (later, use units_helpers.implicit_to_explicit_rates)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">freq_si_str</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot yet handle wdep in </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1"> but &#39;</span>
+                                  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s1"> sampling frequency&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gridded</span></div>
+
+<div class="viewcode-block" id="check_pr_units"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.check_pr_units">[docs]</a><span class="k">def</span> <span class="nf">check_pr_units</span><span class="p">(</span><span class="n">gridded</span><span class="p">):</span>
+
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">gridded</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">gridded</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+    <span class="n">freq_si</span> <span class="o">=</span> <span class="n">freq</span><span class="o">.</span><span class="n">to_si</span><span class="p">()</span>
+
+    <span class="c1"># check if precip unit is implicit</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">unit</span> <span class="o">==</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">PR_IMPLICIT_UNITS</span><span class="p">]):</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span>
+        <span class="n">gridded</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">unit</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot handle precip unit </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Check if frequency in unit corresponds to sampling frequency (e.g.</span>
+    <span class="c1"># ug m-2 h-1 for hourly data).</span>
+    <span class="n">freq_si_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span>
+    <span class="n">freq_si_str_alt</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span class="n">freq_si</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">if</span> <span class="n">freq_si_str_alt</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">):</span>
+        <span class="c1"># make sure frequencey is denoted as e.g. m s-1 instead of m/s</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">freq_si_str_alt</span><span class="p">,</span>
+                                 <span class="n">freq_si_str</span><span class="p">)</span>
+
+        <span class="n">gridded</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">unit</span>
+
+    <span class="c1"># for now, raise NotImplementedError if wdep unit is, e.g. ug m-2 s-1 but</span>
+    <span class="c1"># ts_type is hourly (later, use units_helpers.implicit_to_explicit_rates)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">freq_si_str</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot yet handle wdep in </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1"> but &#39;</span>
+                                  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s1"> sampling frequency&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gridded</span></div>
+
+<span class="k">def</span> <span class="nf">_apply_prlim_wdep</span><span class="p">(</span><span class="n">wdeparr</span><span class="p">,</span> <span class="n">prarr</span><span class="p">,</span> <span class="n">prlim</span><span class="p">,</span> <span class="n">prlim_unit</span><span class="p">,</span> <span class="n">prlim_set_under</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">prlim_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Please provide prlim_unit for prlim=</span><span class="si">{</span><span class="n">prlim</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">prlim_set_under</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Please provide prlim_set_under for prlim=</span><span class="si">{</span><span class="n">prlim</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">isnumeric</span><span class="p">(</span><span class="n">prlim_set_under</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Please provide a numerical value or np.nan for &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;prlim_set_under, got </span><span class="si">{</span><span class="n">prlim_set_under</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">prmask</span> <span class="o">=</span> <span class="n">prarr</span><span class="o">.</span><span class="n">data</span> <span class="o">&lt;</span> <span class="n">prlim</span>
+    <span class="n">wdeparr</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">prmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">prlim_set_under</span>
+
+    <span class="k">return</span> <span class="n">wdeparr</span><span class="p">,</span> <span class="n">prmask</span>
+
+<div class="viewcode-block" id="compute_concprcp_from_pr_and_wetdep"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.compute_concprcp_from_pr_and_wetdep">[docs]</a><span class="k">def</span> <span class="nf">compute_concprcp_from_pr_and_wetdep</span><span class="p">(</span><span class="n">wdep</span><span class="p">,</span> <span class="n">pr</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">prlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prlim_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">prlim_set_under</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">ts_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ts_type</span> <span class="o">=</span> <span class="n">wdep</span><span class="o">.</span><span class="n">ts_type</span>
+
+    <span class="c1"># get units from deposition input and precipitation; sometimes, they are</span>
+    <span class="c1"># defined implicit, e.g. mm for precipitation, which is then already</span>
+    <span class="c1"># accumulated over the provided time resolution in the data, that is, if</span>
+    <span class="c1"># the data is hourly and precip is in units of mm, then it means the the</span>
+    <span class="c1"># unit is mm/h. In addition, wet deposition units may be in mass of main</span>
+    <span class="c1"># atom (e.g. N, or S) which are not SI and thus, not handled properly by</span>
+    <span class="c1"># CF units.</span>
+    <span class="n">wdep</span> <span class="o">=</span> <span class="n">check_wdep_units</span><span class="p">(</span><span class="n">wdep</span><span class="p">)</span>
+    <span class="n">pr</span> <span class="o">=</span> <span class="n">check_pr_units</span><span class="p">(</span><span class="n">pr</span><span class="p">)</span>
+
+    <span class="c1"># get temporal resolution of wet deposition and convert to SI conform str</span>
+    <span class="n">wdep_unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">wdep</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    <span class="n">freq_wdep</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">wdep</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+
+    <span class="c1"># repeat the unit check steps done for wet deposition</span>
+    <span class="n">pr_unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+    <span class="n">freq_pr</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">ts_type</span><span class="p">)</span>
+    <span class="n">freq_pr_si</span> <span class="o">=</span> <span class="n">freq_pr</span><span class="o">.</span><span class="n">to_si</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">freq_wdep</span> <span class="o">==</span> <span class="n">freq_pr</span><span class="p">:</span>
+        <span class="c1"># ToDo: this can probably fixed via time resampling with how=&#39;sum&#39;</span>
+        <span class="c1"># for the higher resolution dataset, but for this first draft, this</span>
+        <span class="c1"># is not allowed.</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input precipitation and wetdeposition fields &#39;</span>
+                         <span class="s1">&#39;need to be in the same frequency...&#39;</span><span class="p">)</span>
+
+    <span class="c1"># assign input frequency (just for making the code better readable)</span>
+    <span class="n">from_freq</span> <span class="o">=</span> <span class="n">freq_wdep</span>
+    <span class="n">from_freq_si</span> <span class="o">=</span> <span class="n">freq_pr_si</span>
+
+    <span class="c1"># convert data objects to xarray to do modifications and computation of</span>
+    <span class="c1"># output variable</span>
+    <span class="n">prarr</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+    <span class="n">wdeparr</span> <span class="o">=</span> <span class="n">wdep</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+
+    <span class="c1"># Make sure precip unit is correct for concprcp=wdep/pr</span>
+    <span class="n">pr_unit_calc</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;m </span><span class="si">{</span><span class="n">from_freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span>
+
+    <span class="c1"># unit conversion factor for precip</span>
+    <span class="n">mulfac_pr</span> <span class="o">=</span> <span class="n">get_unit_conversion_fac</span><span class="p">(</span><span class="n">pr_unit</span><span class="p">,</span> <span class="n">pr_unit_calc</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mulfac_pr</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">prarr</span> <span class="o">*=</span> <span class="n">mulfac_pr</span>
+        <span class="n">pr_unit</span> <span class="o">=</span> <span class="n">pr_unit_calc</span>
+
+    <span class="c1"># Make sure wdep unit is correct for concprcp=wdep/pr</span>
+    <span class="n">wdep_unit_check_calc</span> <span class="o">=</span> <span class="n">wdep_unit</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">wdep_unit_calc</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;ug m-2 </span><span class="si">{</span><span class="n">from_freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span>
+    <span class="n">mulfac_wdep</span> <span class="o">=</span> <span class="n">get_unit_conversion_fac</span><span class="p">(</span><span class="n">wdep_unit_check_calc</span><span class="p">,</span> <span class="n">wdep_unit_calc</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mulfac_wdep</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">wdeparr</span> <span class="o">*=</span> <span class="n">mulfac_wdep</span>
+        <span class="k">if</span> <span class="s1">&#39;N&#39;</span> <span class="ow">in</span> <span class="n">wdep_unit</span><span class="p">:</span>
+            <span class="n">wdep_unit_calc</span> <span class="o">=</span> <span class="n">wdep_unit_calc</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;ug&#39;</span><span class="p">,</span> <span class="s1">&#39;ug N&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;S&#39;</span> <span class="ow">in</span> <span class="n">wdep_unit</span><span class="p">:</span>
+            <span class="n">wdep_unit_calc</span> <span class="o">=</span> <span class="n">wdep_unit_calc</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;ug&#39;</span><span class="p">,</span> <span class="s1">&#39;ug S&#39;</span><span class="p">)</span>
+        <span class="n">wdep_unit</span> <span class="o">=</span> <span class="n">wdep_unit_calc</span>
+
+    <span class="c1"># apply prlim filter if applicable</span>
+    <span class="n">prlim_applied</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">prlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">Unit</span><span class="p">(</span><span class="n">prlim_unit</span><span class="p">)</span> <span class="o">==</span> <span class="n">Unit</span><span class="p">(</span><span class="n">pr_unit</span><span class="p">):</span>
+        <span class="n">wdeparr</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">_apply_prlim_wdep</span><span class="p">(</span><span class="n">wdeparr</span><span class="p">,</span> <span class="n">prarr</span><span class="p">,</span> <span class="n">prlim</span><span class="p">,</span> <span class="n">prlim_unit</span><span class="p">,</span>
+                                      <span class="n">prlim_set_under</span><span class="p">)</span>
+        <span class="n">prlim_applied</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">to_freq</span> <span class="o">=</span> <span class="n">TsType</span><span class="p">(</span><span class="n">ts_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">from_freq</span> <span class="o">==</span> <span class="n">to_freq</span><span class="p">:</span>
+        <span class="n">to_freq_pd</span> <span class="o">=</span> <span class="n">to_freq</span><span class="o">.</span><span class="n">to_pandas_freq</span><span class="p">()</span>
+        <span class="n">to_freq_si</span> <span class="o">=</span> <span class="n">to_freq</span><span class="o">.</span><span class="n">to_si</span><span class="p">()</span>
+
+        <span class="n">wdeparr</span> <span class="o">=</span> <span class="n">resample_time_dataarray</span><span class="p">(</span><span class="n">wdeparr</span><span class="p">,</span>
+                                          <span class="n">to_freq_pd</span><span class="p">,</span>
+                                          <span class="n">how</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+        <span class="n">wdep_unit</span> <span class="o">=</span> <span class="n">wdep_unit</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">from_freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span><span class="p">,</span>
+                                      <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">to_freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span><span class="p">)</span>
+        <span class="n">prarr</span> <span class="o">=</span> <span class="n">resample_time_dataarray</span><span class="p">(</span><span class="n">prarr</span><span class="p">,</span>
+                                        <span class="n">to_freq_pd</span><span class="p">,</span>
+                                        <span class="n">how</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+        <span class="n">pr_unit</span> <span class="o">=</span> <span class="n">pr_unit</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">from_freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span><span class="p">,</span>
+                                  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">to_freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">prlim_applied</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">prlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">Unit</span><span class="p">(</span><span class="n">pr_unit</span><span class="p">)</span> <span class="o">==</span> <span class="n">Unit</span><span class="p">(</span><span class="n">prlim_unit</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid input for prlim_unit: </span><span class="si">{</span><span class="n">prlim_unit</span><span class="si">}</span><span class="s1">. Unit &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;does not match with data unit </span><span class="si">{</span><span class="n">pr_unit</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">wdeparr</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">_apply_prlim_wdep</span><span class="p">(</span><span class="n">wdeparr</span><span class="p">,</span> <span class="n">prarr</span><span class="p">,</span>
+                                          <span class="n">prlim</span><span class="p">,</span> <span class="n">prlim_unit</span><span class="p">,</span>
+                                          <span class="n">prlim_set_under</span><span class="p">)</span>
+
+    <span class="c1"># set PR=0 to NaN (as we divide py PR)</span>
+    <span class="n">prarr</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">prarr</span><span class="o">.</span><span class="n">data</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="n">concprcparr</span> <span class="o">=</span> <span class="n">wdeparr</span> <span class="o">/</span> <span class="n">prarr</span>
+
+    <span class="n">cube</span> <span class="o">=</span> <span class="n">concprcparr</span><span class="o">.</span><span class="n">to_iris</span><span class="p">()</span>
+    <span class="c1"># infer output unit of concentration variable (should be ug m-3 or ug N m-3 or ug S m-3)</span>
+    <span class="n">conc_unit_out</span> <span class="o">=</span> <span class="n">wdep_unit</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;m-2&#39;</span><span class="p">,</span> <span class="s1">&#39;m-3&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">to_freq_si</span><span class="si">}</span><span class="s1">-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">cube</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">conc_unit_out</span>
+    <span class="k">return</span> <span class="n">cube</span></div>
 
 <div class="viewcode-block" id="ReadGridded"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded">[docs]</a><span class="k">class</span> <span class="nc">ReadGridded</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for reading gridded files based on network or model ID</span>
@@ -308,7 +513,9 @@
                     <span class="s1">&#39;sc550dryaer&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;ec550dryaer&#39;</span><span class="p">,</span> <span class="s1">&#39;ac550dryaer&#39;</span><span class="p">),</span>
                     <span class="s1">&#39;concox&#39;</span>        <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;concno2&#39;</span><span class="p">,</span> <span class="s1">&#39;conco3&#39;</span><span class="p">),</span>
                     <span class="s1">&#39;vmrox&#39;</span>         <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;vmrno2&#39;</span><span class="p">,</span> <span class="s1">&#39;vmro3&#39;</span><span class="p">),</span>
-                    <span class="s1">&#39;fmf550aer&#39;</span>     <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;od550lt1aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">)</span>
+                    <span class="s1">&#39;fmf550aer&#39;</span>     <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;od550lt1aer&#39;</span><span class="p">,</span> <span class="s1">&#39;od550aer&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;concno3&#39;</span>       <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;concno3c&#39;</span><span class="p">,</span> <span class="s1">&#39;concno3f&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;concprcpoxn&#39;</span>   <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;wetoxn&#39;</span><span class="p">,</span> <span class="s1">&#39;pr&#39;</span><span class="p">)</span>
                     <span class="c1">#&#39;mec550*&#39;       : [&#39;od550*&#39;, &#39;load*&#39;],</span>
                     <span class="c1">#&#39;tau*&#39;          : [&#39;load*&#39;, &#39;wet*&#39;, &#39;dry*&#39;] #DOES NOT WORK POINT BY POINT</span>
                     <span class="p">}</span>
@@ -326,10 +533,21 @@
                 <span class="s1">&#39;conc*&#39;</span>         <span class="p">:</span>   <span class="n">multiply_cubes</span><span class="p">,</span>
                 <span class="s1">&#39;concox&#39;</span>        <span class="p">:</span>   <span class="n">add_cubes</span><span class="p">,</span>
                 <span class="s1">&#39;vmrox&#39;</span>         <span class="p">:</span>   <span class="n">add_cubes</span><span class="p">,</span>
-                <span class="s1">&#39;fmf550aer&#39;</span>     <span class="p">:</span>   <span class="n">divide_cubes</span>
+                <span class="s1">&#39;fmf550aer&#39;</span>     <span class="p">:</span>   <span class="n">divide_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;concno3&#39;</span>       <span class="p">:</span>   <span class="n">add_cubes</span><span class="p">,</span>
+                <span class="s1">&#39;concprcpoxn&#39;</span>   <span class="p">:</span>   <span class="n">compute_concprcp_from_pr_and_wetdep</span>
                 <span class="c1">#&#39;mec550*&#39;      :    divide_cubes,</span>
                 <span class="c1">#&#39;tau*&#39;         :    lifetime_from_load_and_dep</span>
                 <span class="p">}</span>
+
+    <span class="c1">#: Additional arguments passed to computation methods for auxiliary data</span>
+    <span class="c1">#: This is optional and defined per-variable like in AUX_FUNS</span>
+    <span class="n">AUX_ADD_ARGS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;concprcpoxn&#39;</span>   <span class="p">:</span>   <span class="nb">dict</span><span class="p">(</span><span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                                 <span class="n">prlim</span><span class="o">=</span><span class="mf">0.1e-3</span><span class="p">,</span>
+                                 <span class="n">prlim_unit</span><span class="o">=</span><span class="s1">&#39;m d-1&#39;</span><span class="p">,</span>
+                                 <span class="n">prlim_set_under</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="p">}</span>
 
     <span class="n">_data_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
@@ -590,7 +808,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># the variable might be updated in _check_var_avail</span>
                 <span class="n">vars_to_read</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_var_avail</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
-            <span class="k">except</span> <span class="n">VarNotAvailableError</span><span class="p">:</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">VarNotAvailableError</span><span class="p">,</span> <span class="n">VariableDefinitionError</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">vars_to_read</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">vars_req</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -641,7 +859,7 @@
                     <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_found</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="n">vars_to_read</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_var_avail</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
-                        <span class="k">except</span> <span class="n">VarNotAvailableError</span><span class="p">:</span>
+                        <span class="k">except</span> <span class="p">(</span><span class="n">VarNotAvailableError</span><span class="p">,</span> <span class="n">VariableDefinitionError</span><span class="p">):</span>
                             <span class="n">all_ok</span> <span class="o">=</span> <span class="kc">False</span>
                             <span class="k">break</span>
 
@@ -1003,8 +1221,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">file_info</span> <span class="o">=</span> <span class="n">df</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="s1">&#39;No files could be found for data </span><span class="si">{}</span><span class="s1"> and &#39;</span>
-                                    <span class="s1">&#39;years range </span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">))</span></div>
+            <span class="k">raise</span> <span class="n">DataCoverageError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No files could be found for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ReadGridded.filter_files"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.filter_files">[docs]</a>    <span class="k">def</span> <span class="nf">filter_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_at_stations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1286,6 +1503,7 @@
 <div class="viewcode-block" id="ReadGridded.compute_var"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readgridded.ReadGridded.compute_var">[docs]</a>    <span class="k">def</span> <span class="nf">compute_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ts_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">experiment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vert_which</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">prefer_longer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">vars_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aux_fun</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">try_convert_units</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aux_add_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute auxiliary variable</span>
 
@@ -1318,6 +1536,13 @@
 <span class="sd">            if True and applicable, the ts_type resulting in the longer time</span>
 <span class="sd">            coverage will be preferred over other possible frequencies that</span>
 <span class="sd">            match the query.</span>
+<span class="sd">        try_convert_units : bool</span>
+<span class="sd">            if True, units of GriddedData objects are attempted to be converted</span>
+<span class="sd">            to AeroCom default. This applies both to the GriddedData objects</span>
+<span class="sd">            being read for computation as well as the variable computed from</span>
+<span class="sd">            the forme objects. This is, for instance, useful when computing</span>
+<span class="sd">            concentration in precipitation from wet deposition and precipitation</span>
+<span class="sd">            amount.</span>
 <span class="sd">        **kwargs</span>
 <span class="sd">            additional keyword args passed to :func:`_load_var`</span>
 
@@ -1329,7 +1554,8 @@
         <span class="k">if</span> <span class="n">vars_to_read</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_aux_compute</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">vars_to_read</span><span class="p">,</span> <span class="n">aux_fun</span><span class="p">)</span>
         <span class="n">vars_to_read</span><span class="p">,</span> <span class="n">aux_fun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_aux_vars_and_fun</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
-
+        <span class="k">if</span> <span class="n">aux_add_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">aux_add_args</span><span class="o">=</span><span class="p">{}</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># all variables that are required need to be in the same temporal</span>
         <span class="c1"># resolution</span>
@@ -1355,15 +1581,27 @@
                                       <span class="n">vert_which</span><span class="o">=</span><span class="n">vert_which</span><span class="p">,</span>
                                       <span class="n">flex_ts_type</span><span class="o">=</span><span class="n">flex_ts_type</span><span class="p">,</span>
                                       <span class="n">prefer_longer</span><span class="o">=</span><span class="n">prefer_longer</span><span class="p">,</span>
+                                      <span class="n">try_convert_units</span><span class="o">=</span><span class="n">try_convert_units</span><span class="p">,</span>
                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aux_data</span><span class="p">)</span>
 
-        <span class="n">cube</span> <span class="o">=</span> <span class="n">aux_fun</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUX_ADD_ARGS</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">AUX_ADD_ARGS</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">aux_add_args</span><span class="p">:</span>
+                    <span class="n">aux_add_args</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aux_add_args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cube</span> <span class="o">=</span> <span class="n">aux_fun</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">aux_add_args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cube</span> <span class="o">=</span> <span class="n">aux_fun</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">)</span>
+
         <span class="n">cube</span><span class="o">.</span><span class="n">var_name</span> <span class="o">=</span> <span class="n">var_name</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">GriddedData</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">data_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span>
-                           <span class="c1">#ts_type=data[0].ts_type,</span>
-                           <span class="n">computed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                           <span class="n">computed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">convert_unit_on_init</span><span class="o">=</span><span class="n">try_convert_units</span><span class="p">,</span>
+                           <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
         <span class="n">data</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="n">data</span></div>
 
@@ -1811,7 +2049,8 @@
                                     <span class="n">experiment</span><span class="o">=</span><span class="n">experiment</span><span class="p">,</span>
                                     <span class="n">vert_which</span><span class="o">=</span><span class="n">vert_which</span><span class="p">,</span>
                                     <span class="n">flex_ts_type</span><span class="o">=</span><span class="n">flex_ts_type</span><span class="p">,</span>
-                                    <span class="n">prefer_longer</span><span class="o">=</span><span class="n">prefer_longer</span><span class="p">)</span>
+                                    <span class="n">prefer_longer</span><span class="o">=</span><span class="n">prefer_longer</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">var_to_read</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_var_to_read</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
@@ -1832,7 +2071,8 @@
                                         <span class="n">experiment</span><span class="o">=</span><span class="n">experiment</span><span class="p">,</span>
                                         <span class="n">vert_which</span><span class="o">=</span><span class="n">vert_which</span><span class="p">,</span>
                                         <span class="n">flex_ts_type</span><span class="o">=</span><span class="n">flex_ts_type</span><span class="p">,</span>
-                                        <span class="n">prefer_longer</span><span class="o">=</span><span class="n">prefer_longer</span><span class="p">)</span>
+                                        <span class="n">prefer_longer</span><span class="o">=</span><span class="n">prefer_longer</span><span class="p">,</span>
+                                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># this input variable was explicitely set to be computed, in which</span>
         <span class="c1"># case reading of that variable is ignored even if a file exists for</span>
         <span class="c1"># that</span>
@@ -1938,13 +2178,32 @@
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_check_correct_units_cube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cube</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check for units that have been invalidated by iris</span>
+
+<span class="sd">        iris lib relies on CF conventions and if the unit in the NetCDF file</span>
+<span class="sd">        is invalid, it will set the variable unit to UNKNOWN and put the</span>
+<span class="sd">        actually provided unit into the attributes. pyaerocom can handle</span>
+<span class="sd">        some of these invalid units, which is checked here and updated</span>
+<span class="sd">        accordingly</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cube : iris.cube.Cube</span>
+<span class="sd">            loaded instance of data Cube</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        iris.cube.Cube</span>
+<span class="sd">            input cube that has been checked for supported units and updated</span>
+<span class="sd">            if applicable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;invalid_units&#39;</span> <span class="ow">in</span> <span class="n">cube</span><span class="o">.</span><span class="n">attributes</span> <span class="ow">and</span>
-            <span class="n">cube</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;invalid_units&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">UNITS_ALIASES</span><span class="p">):</span>
+            <span class="n">cube</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;invalid_units&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">UALIASES</span><span class="p">):</span>
 
             <span class="n">from_unit</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;invalid_units&#39;</span><span class="p">]</span>
-            <span class="n">to_unit</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">GRID_IO</span><span class="o">.</span><span class="n">UNITS_ALIASES</span><span class="p">[</span><span class="n">from_unit</span><span class="p">]</span>
-            <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating invalid unit in </span><span class="si">{}</span><span class="s1"> from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span>
-                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">cube</span><span class="p">),</span> <span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">))</span>
+            <span class="n">to_unit</span> <span class="o">=</span> <span class="n">UALIASES</span><span class="p">[</span><span class="n">from_unit</span><span class="p">]</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating invalid unit in </span><span class="si">{}</span><span class="s1"> from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">cube</span><span class="p">),</span> <span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">))</span>
 
             <span class="n">cube</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">to_unit</span>
         <span class="k">return</span> <span class="n">cube</span>
@@ -2019,11 +2278,16 @@
 
         <span class="n">perts</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">perturbation</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
         <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;perturbation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">perts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">perts</span><span class="p">)</span>
+
+        <span class="n">vertcodes</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">vert_code</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;vert_code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vertcodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertcodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">vertcodes</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">meta</span>
 
     <span class="k">def</span> <span class="nf">_load_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span>
                   <span class="n">experiment</span><span class="p">,</span> <span class="n">vert_which</span><span class="p">,</span> <span class="n">flex_ts_type</span><span class="p">,</span>
-                  <span class="n">prefer_longer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                  <span class="n">prefer_longer</span><span class="p">,</span> <span class="n">try_convert_units</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Find files corresponding to input specs and load into GriddedData</span>
 
 <span class="sd">        Note</span>
@@ -2059,6 +2323,7 @@
                            <span class="n">from_files</span><span class="o">=</span><span class="n">from_files</span><span class="p">,</span>
                            <span class="n">data_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_id</span><span class="p">,</span>
                            <span class="n">concatenated</span><span class="o">=</span><span class="n">is_concat</span><span class="p">,</span>
+                           <span class="n">convert_unit_on_init</span><span class="o">=</span><span class="n">try_convert_units</span><span class="p">,</span>
                            <span class="o">**</span><span class="n">meta</span><span class="p">)</span>
         <span class="n">data</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="c1"># crop cube in time (if applicable)</span>
@@ -2318,9 +2583,6 @@
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
 
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
-    <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">()</span>
 </pre></div>
 
            </div>

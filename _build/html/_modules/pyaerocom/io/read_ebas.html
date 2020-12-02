@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -181,7 +178,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">od</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">unit_conversion_fac</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.units_helpers</span> <span class="kn">import</span> <span class="n">get_unit_conversion_fac</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">compute_sc550dryaer</span><span class="p">,</span>
                                  <span class="n">compute_sc440dryaer</span><span class="p">,</span>
                                  <span class="n">compute_sc700dryaer</span><span class="p">,</span>
@@ -287,7 +284,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1">#: version log of this class (for caching)</span>
-    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.36_&quot;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.38_&quot;</span> <span class="o">+</span> <span class="n">ReadUngriddedBase</span><span class="o">.</span><span class="n">__baseversion__</span>
 
     <span class="c1">#: Name of dataset (OBS_ID)</span>
     <span class="n">DATA_ID</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">EBAS_MULTICOLUMN_NAME</span>
@@ -354,7 +351,7 @@
     <span class="n">IGNORE_WAVELENGTH</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;conceqbc&#39;</span><span class="p">]</span>
 
     <span class="n">ASSUME_AAE_SHIFT_WVL</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">ASSUME_AE_SHIFT_WVL</span> <span class="o">=</span> <span class="mf">1.5</span>
+    <span class="n">ASSUME_AE_SHIFT_WVL</span> <span class="o">=</span> <span class="mi">1</span><span class="c1">#.5</span>
 
     <span class="n">IGNORE_FILES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CA0420G.20100101000000.20190125102503.filter_absorption_photometer.aerosol_absorption_coefficient.aerosol.1y.1h.CA01L_Magee_AE31_ALT.CA01L_aethalometer.lev2.nas&#39;</span><span class="p">]</span>
     <span class="c1"># list of all available resolution codes (extracted from SQLite database)</span>
@@ -654,9 +651,11 @@
                 <span class="k">if</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IGNORE_FILES</span><span class="p">:</span>
                     <span class="n">const</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Ignoring flagged file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
                     <span class="k">continue</span>
-                <span class="n">fp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filedir</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
-                    <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+                <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filedir</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1">#                 if os.path.exists(fp):</span>
+<span class="c1">#                     paths.append(fp)</span>
+<span class="c1"># =============================================================================</span>
             <span class="n">files_vars</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
             <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
             <span class="n">totnum</span> <span class="o">+=</span> <span class="n">num</span>
@@ -849,7 +848,7 @@
             <span class="n">matrix_matches</span> <span class="o">=</span> <span class="n">cols</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix_matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">matrix_matches</span>
+            <span class="k">return</span> <span class="n">matrix_matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">preferred_statistics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefer_statistics</span>
         <span class="n">idx_best_statistics_found</span> <span class="o">=</span> <span class="mi">9999</span>
@@ -887,7 +886,7 @@
                 <span class="k">for</span> <span class="n">colnum</span> <span class="ow">in</span> <span class="n">result_col</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">from_unit</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">var_defs</span><span class="p">[</span><span class="n">colnum</span><span class="p">]</span><span class="o">.</span><span class="n">units</span>
-                        <span class="n">unit_conversion_fac</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
+                        <span class="n">get_unit_conversion_fac</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
                         <span class="n">_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colnum</span><span class="p">)</span>
                     <span class="k">except</span> <span class="n">UnitConversionError</span><span class="p">:</span>
                         <span class="k">continue</span>
@@ -908,6 +907,7 @@
         <span class="n">meta</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">meta</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;;&#39;</span><span class="p">)</span>
 
+        <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;framework&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">project_association</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;data_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span>
         <span class="n">data_out</span><span class="p">[</span><span class="s1">&#39;PI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;data_originator&#39;</span><span class="p">]</span>
@@ -1481,13 +1481,6 @@
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">data_obj</span><span class="o">.</span><span class="n">metadata</span>
         <span class="n">meta_idx</span> <span class="o">=</span> <span class="n">data_obj</span><span class="o">.</span><span class="n">meta_idx</span>
 
-<span class="c1"># =============================================================================</span>
-<span class="c1">#         num_files = len(files)</span>
-<span class="c1">#         disp_each = int(num_files*0.1)</span>
-<span class="c1">#         if disp_each &lt; 1:</span>
-<span class="c1">#             disp_each = 1</span>
-<span class="c1"># =============================================================================</span>
-
         <span class="c1"># counter that is updated whenever a new variable appears during read</span>
         <span class="c1"># (is used for attr. var_idx in UngriddedData object)</span>
         <span class="n">var_count_glob</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -1495,12 +1488,6 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))):</span>
             <span class="n">_file</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">contains</span> <span class="o">=</span> <span class="n">files_contain</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-<span class="c1"># =============================================================================</span>
-<span class="c1">#             if i%disp_each == 0:</span>
-<span class="c1">#                 last_t = _print_read_info(i, disp_each, num_files,</span>
-<span class="c1">#                                           last_t, type(self).__name__,</span>
-<span class="c1">#                                           const.print_log)</span>
-<span class="c1"># =============================================================================</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">station_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">_file</span><span class="p">,</span>
                                               <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">contains</span><span class="p">)</span>
@@ -1613,7 +1600,12 @@
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 
-    <span class="n">r</span> <span class="o">=</span> <span class="n">ReadEbas</span><span class="p">()</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadEbas</span><span class="p">()</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="s1">&#39;/lustre/storeA/project/aerocom/aerocom1/AEROCOM_OBSDATA/EBASMultiColumn/data/data/AM0001R.20090101180000.20190424085012.precip_gauge..precip.1y.1d.AM01L_pg_01.AM01L_IC.lev2.nas&#39;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s1">&#39;concprcpno3&#39;</span><span class="p">)</span>
+
+    <span class="c1">#data.plot_timeseries(&#39;concs&#39;)</span>
+    <span class="c1">#data = r.read(&#39;concso4&#39;)</span>
 
     <span class="c1">#data = r.read(&#39;sc550dryaer&#39;)</span>
 

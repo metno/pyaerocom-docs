@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -543,6 +540,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1">#data block</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">time_stamps</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_meas</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_meas</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">flag_col_info</span> <span class="o">=</span> <span class="n">od</span><span class="p">()</span>
 
@@ -870,8 +869,59 @@
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numarr_to_datetime64</span><span class="p">(</span><span class="n">offs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">mulfac</span><span class="p">)</span>
         <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numarr_to_datetime64</span><span class="p">(</span><span class="n">offs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">mulfac</span><span class="p">)</span>
 
+
+        <span class="c1"># mid timestamps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_stamps</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">*.</span><span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_meas</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_meas</span> <span class="o">=</span> <span class="n">stop</span>
+
         <span class="k">return</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EbasNasaAmesFile.get_time_gaps_meas"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_nasa_ames.EbasNasaAmesFile.get_time_gaps_meas">[docs]</a>    <span class="k">def</span> <span class="nf">get_time_gaps_meas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_freq</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get array with time gaps between individual measurements</span>
+
+<span class="sd">        This is computed based on start and stop timestamps, e.g.</span>
+<span class="sd">        `=dt[0] = start[1] - stop[0]`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        np_freq : str</span>
+<span class="sd">            string specifying output frequency of gap values</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            array with time-differences as floating point number in specified</span>
+<span class="sd">            input resolution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_time_stamps</span><span class="p">()</span> <span class="c1"># assigns start / stop attrs.</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span>
+        <span class="n">gaps</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">stop</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;timedelta64[</span><span class="si">{</span><span class="n">np_freq</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">gaps</span></div>
+
+<div class="viewcode-block" id="EbasNasaAmesFile.get_time_differences_meas"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.ebas_nasa_ames.EbasNasaAmesFile.get_time_differences_meas">[docs]</a>    <span class="k">def</span> <span class="nf">get_time_differences_meas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_freq</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get array with time between individual measurements</span>
+
+<span class="sd">        This is computed based on start and timestamps, e.g.</span>
+<span class="sd">        `=dt[0] = start[1] - start[0]`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        np_freq : str</span>
+<span class="sd">            string specifying output frequency of gap values</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            array with time-differences as floating point number in specified</span>
+<span class="sd">            input resolution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_time_stamps</span><span class="p">()</span> <span class="c1"># assigns start / stop attrs.</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
+        <span class="n">dts</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">start</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;timedelta64[</span><span class="si">{</span><span class="n">np_freq</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dts</span></div>
 
     <span class="k">def</span> <span class="nf">_quality_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">msgs</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>

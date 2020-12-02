@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -170,6 +167,7 @@
 <span class="kn">from</span> <span class="nn">traceback</span> <span class="kn">import</span> <span class="n">format_exc</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">BrowseDict</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.metastandards</span> <span class="kn">import</span> <span class="n">DataSource</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">InitialisationError</span>
 
 <div class="viewcode-block" id="ObsConfigEval"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.ObsConfigEval">[docs]</a><span class="k">class</span> <span class="nc">ObsConfigEval</span><span class="p">(</span><span class="n">BrowseDict</span><span class="p">):</span>
@@ -208,22 +206,31 @@
 <span class="sd">        `obs_vert_type=dict(od550aer=&#39;Column&#39;, ec550aer=&#39;ModelLevel&#39;)`),</span>
 <span class="sd">        information is extracted variable specific, for those who are defined</span>
 <span class="sd">        in the dictionary, for all others, `None` is used.</span>
+<span class="sd">    obs_aux_requires : dict, optional</span>
+<span class="sd">        information about required datasets / variables for auxiliary</span>
+<span class="sd">        variables.</span>
+<span class="sd">    instr_vert_loc : str, optional</span>
+<span class="sd">        vertical location code of observation instrument. This is used in</span>
+<span class="sd">        the web interface for separating different categories of measurements</span>
+<span class="sd">        such as &quot;ground&quot;, &quot;space&quot; or &quot;airborne&quot;.</span>
 <span class="sd">    read_opts_ungridded : :obj:`dict`, optional</span>
 <span class="sd">        dictionary that specifies reading constraints for ungridded reading</span>
 <span class="sd">        (c.g. :class:`pyaerocom.io.ReadUngridded`).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">SUPPORTED_VERT_CODES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Column&#39;</span><span class="p">,</span> <span class="s1">&#39;Profile&#39;</span><span class="p">,</span> <span class="s1">&#39;Surface&#39;</span><span class="p">]</span>
     <span class="n">ALT_NAMES_VERT_CODES</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ModelLevel</span> <span class="o">=</span> <span class="s1">&#39;Profile&#39;</span><span class="p">)</span>
+
+    <span class="n">SUPPORTED_VERT_LOCS</span> <span class="o">=</span> <span class="n">DataSource</span><span class="o">.</span><span class="n">SUPPORTED_VERT_LOCS</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_type</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_ts_type_read</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">obs_aux_requires</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">obs_aux_funs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">obs_aux_units</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_aux_requires</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr_vert_loc</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">read_opts_ungridded</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -233,7 +240,7 @@
 
 <div class="viewcode-block" id="ObsConfigEval.check_add_obs"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers.ObsConfigEval.check_add_obs">[docs]</a>    <span class="k">def</span> <span class="nf">check_add_obs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if this dataset is an auxiliary post dataset&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_aux_requires</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_aux_requires</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_type</span> <span class="o">==</span> <span class="s1">&#39;ungridded&#39;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                     <span class="s1">&#39;Cannot initialise auxiliary setup for </span><span class="si">{}</span><span class="s1">. Aux obs reading &#39;</span>
@@ -260,8 +267,6 @@
         <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid input for obs_vars. Need list or str, &#39;</span>
                              <span class="s1">&#39;got: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vars</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_aux_units</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obs_aux_units</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">ovt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span>
         <span class="k">if</span> <span class="n">ovt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;obs_vert_type is not defined. Please specify &#39;</span>
@@ -278,7 +283,14 @@
                                      <span class="s1">&#39;(variable </span><span class="si">{}</span><span class="s1">). Supported codes are </span><span class="si">{}</span><span class="s1">.&#39;</span>
                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_vert_type</span><span class="p">,</span>
                                              <span class="n">var_name</span><span class="p">,</span>
-                                             <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_VERT_CODES</span><span class="p">))</span></div>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_VERT_CODES</span><span class="p">))</span>
+        <span class="n">ovl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instr_vert_loc</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ovl</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ovl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_VERT_LOCS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Invalid value for instr_vert_loc: </span><span class="si">{</span><span class="n">ovl</span><span class="si">}</span><span class="s1"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_id</span><span class="si">}</span><span class="s1">. &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Please choose from: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_VERT_LOCS</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">_check_ovt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ovt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if obs_vert_type string is valid alias</span>
 

@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -1305,12 +1302,16 @@
 <span class="sd">            filtered data object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">is_2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_latlon_coords</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">valid_default_region</span><span class="p">(</span><span class="n">region_id</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">region_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">reg</span> <span class="o">=</span> <span class="n">Region</span><span class="p">(</span><span class="n">region_id</span><span class="p">)</span>
             <span class="n">lon_range</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">lon_range</span>
             <span class="n">lat_range</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">lat_range</span>
             <span class="n">region_id</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">name</span>
 
+        <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">lat_range</span><span class="p">,</span> <span class="n">lon_range</span><span class="p">)]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please provide input, either for lat_range or &#39;</span>
+                             <span class="s1">&#39;lon_range or region_id&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">lon_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">lon_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">lat_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1354,6 +1355,24 @@
         <span class="k">return</span> <span class="n">ColocatedData</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ColocatedData.apply_region_mask"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.apply_region_mask">[docs]</a>    <span class="k">def</span> <span class="nf">apply_region_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_id</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a binary regions mask filter to data object. Available binary</span>
+<span class="sd">        regions IDs can be found at `pyaerocom.const.HTAP_REGIONS`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        region_id : str</span>
+<span class="sd">            ID of binary regions.</span>
+<span class="sd">        inplace : bool, optional</span>
+<span class="sd">            If True, the current instance, is modified, else a new instance</span>
+<span class="sd">            of `ColocatedData` is created and filtered. The default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data : ColocatedData</span>
+<span class="sd">            Filtered data object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -1380,7 +1399,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        region_id : str</span>
-<span class="sd">            valid ID of region</span>
+<span class="sd">            ID of region</span>
 <span class="sd">        inplace : bool</span>
 <span class="sd">            if True, the filtering is done directly in this instance, else</span>
 <span class="sd">            a new instance is returned</span>
@@ -1411,12 +1430,9 @@
 
         <span class="k">if</span> <span class="n">region_id</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">HTAP_REGIONS</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_region_mask</span><span class="p">(</span><span class="n">region_id</span><span class="p">,</span> <span class="n">inplace</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">region_id</span> <span class="ow">in</span> <span class="n">const</span><span class="o">.</span><span class="n">OLD_AEROCOM_REGIONS</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_latlon_filter</span><span class="p">(</span><span class="n">region_id</span><span class="o">=</span><span class="n">region_id</span><span class="p">,</span>
-                                            <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataExtractionError</span><span class="p">(</span><span class="s1">&#39;Failed to filter region </span><span class="si">{}</span><span class="s1">.&#39;</span>
-                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">region_id</span><span class="p">))</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_latlon_filter</span><span class="p">(</span><span class="n">region_id</span><span class="o">=</span><span class="n">region_id</span><span class="p">,</span>
+                                            <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ColocatedData.get_regional_timeseries"><a class="viewcode-back" href="../../api.html#pyaerocom.colocateddata.ColocatedData.get_regional_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">get_regional_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_id</span><span class="p">,</span> <span class="o">**</span><span class="n">filter_kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

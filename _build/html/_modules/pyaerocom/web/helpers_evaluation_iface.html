@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -165,6 +162,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">simplejson</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">start_stop_str</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="n">sort_dict_by_name</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="kn">import</span> <span class="n">save_dict_json</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.web.helpers</span> <span class="kn">import</span> <span class="n">read_json</span><span class="p">,</span> <span class="n">write_json</span>
@@ -172,6 +170,7 @@
                                  <span class="n">HEATMAP_FILENAME_EVAL_IFACE_DAILY</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.colocateddata</span> <span class="kn">import</span> <span class="n">ColocatedData</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.mathutils</span> <span class="kn">import</span> <span class="n">calc_statistics</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.colocation_auto</span> <span class="kn">import</span> <span class="n">Colocator</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.tstype</span> <span class="kn">import</span> <span class="n">TsType</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">DataDimensionError</span><span class="p">,</span> <span class="n">TemporalResolutionError</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.region</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_all_default_region_ids</span><span class="p">,</span>
@@ -179,6 +178,113 @@
                               <span class="n">get_all_default_regions</span><span class="p">,</span> <span class="n">Region</span><span class="p">)</span>
 
 <span class="c1">#from pyaerocom import __version__ as PYA_VERSION</span>
+<div class="viewcode-block" id="make_info_string"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers_evaluation_iface.make_info_string">[docs]</a><span class="k">def</span> <span class="nf">make_info_string</span><span class="p">(</span><span class="n">stp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert instance of :class:`AerocomEvaluation` into a descriptive string</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    BETA feature, this might crash!!</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stp : AerocomEvaluation</span>
+<span class="sd">        Instance of configuration class</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    st : str</span>
+<span class="sd">        Long string representation of the input configuration.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">modelnum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stp</span><span class="o">.</span><span class="n">model_config</span><span class="p">)</span>
+    <span class="n">obsnum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stp</span><span class="o">.</span><span class="n">obs_config</span><span class="p">)</span>
+    <span class="n">varnum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stp</span><span class="o">.</span><span class="n">all_obs_vars</span><span class="p">)</span>
+    <span class="n">colstp</span> <span class="o">=</span> <span class="n">stp</span><span class="o">.</span><span class="n">colocation_settings</span>
+
+    <span class="k">if</span> <span class="n">modelnum</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+        <span class="n">_modpost</span> <span class="o">=</span> <span class="s1">&#39;model&#39;</span> <span class="k">if</span> <span class="n">modelnum</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;models&#39;</span>
+        <span class="n">modstr</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;the following </span><span class="si">{</span><span class="n">modelnum</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">_modpost</span><span class="si">}</span><span class="s1">: &#39;</span>
+        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">stp</span><span class="o">.</span><span class="n">model_config</span><span class="p">:</span>
+            <span class="n">modstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mod</span><span class="si">}</span><span class="s1">, &#39;</span>
+
+        <span class="n">modstr</span> <span class="o">=</span> <span class="n">modstr</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">modstr</span> <span class="o">+=</span> <span class="s1">&#39;. &#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">modstr</span> <span class="o">=</span> <span class="s1">&#39;0 models. &#39;</span>
+    <span class="n">obsvarstr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">obsnum</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">obsvarstr</span> <span class="o">+=</span> <span class="s1">&#39;These are: &#39;</span>
+        <span class="k">for</span> <span class="n">oname</span><span class="p">,</span> <span class="n">ocfg</span> <span class="ow">in</span> <span class="n">stp</span><span class="o">.</span><span class="n">obs_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">obsvarstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">oname</span><span class="si">}</span><span class="s1"> (&#39;</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ocfg</span><span class="p">[</span><span class="s1">&#39;obs_vars&#39;</span><span class="p">]:</span>
+                <span class="n">obsvarstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">, &#39;</span>
+            <span class="n">obsvarstr</span> <span class="o">=</span> <span class="n">obsvarstr</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">obsvarstr</span> <span class="o">+=</span> <span class="s1">&#39;), &#39;</span>
+        <span class="n">obsvarstr</span> <span class="o">=</span> <span class="n">obsvarstr</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">obsvarstr</span> <span class="o">+=</span> <span class="s1">&#39;. &#39;</span>
+
+    <span class="n">obs_alt_time</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">startstop</span> <span class="o">=</span> <span class="n">start_stop_str</span><span class="p">(</span><span class="n">colstp</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                                   <span class="n">colstp</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+
+        <span class="n">obs_alt_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">startstop</span><span class="p">)</span>
+
+        <span class="n">timeinfo</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The evaluation is done for the following time &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;interval: </span><span class="si">{</span><span class="n">startstop</span><span class="si">}</span><span class="s1">. &#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="c1"># no start / stop time specified</span>
+        <span class="n">timeinfo</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;No specific time interval is specified for the analysis. Thus, &#39;</span>
+            <span class="s1">&#39;the interval is determined for each model and observation dataset &#39;</span>
+            <span class="s1">&#39;(and variable) individually, based on data availability. &#39;</span>
+            <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">TsType</span><span class="p">(</span><span class="n">colstp</span><span class="o">.</span><span class="n">ts_type</span><span class="p">))</span>
+        <span class="n">flexfreq</span> <span class="o">=</span> <span class="n">colstp</span><span class="o">.</span><span class="n">flex_ts_type_gridded</span>
+        <span class="n">freqinfo</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;The default colocation frequency is </span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">flexfreq</span><span class="p">:</span>
+            <span class="n">freqinfo</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="s1">&#39;, however, this requirement is flexible, that is, if a model &#39;</span>
+                <span class="s1">&#39;(or obs) is available in lower resolution it will still be &#39;</span>
+                <span class="s1">&#39;colocated, but then the computed statistics are only available &#39;</span>
+                <span class="s1">&#39;in that resolution. &#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">freqinfo</span> <span class="o">+=</span> <span class="s1">&#39;. &#39;</span>
+
+    <span class="k">except</span> <span class="n">pya</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TemporalResolutionError</span><span class="p">:</span>
+        <span class="n">freqinfo</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;The analysis is performed in the highest available &#39;</span>
+        <span class="s1">&#39;resolution. &#39;</span>
+        <span class="p">)</span>
+
+    <span class="n">freqinfo</span> <span class="o">+=</span> <span class="p">(</span>
+        <span class="s1">&#39;Note, however, that the minimum required resolution for the analysis &#39;</span>
+        <span class="s1">&#39;is monthly.&#39;</span>
+        <span class="p">)</span>
+
+
+    <span class="n">obsaltinfo</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">oname</span><span class="p">,</span> <span class="n">ocfg</span> <span class="ow">in</span> <span class="n">stp</span><span class="o">.</span><span class="n">obs_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">Colocator</span><span class="p">(</span><span class="o">**</span><span class="n">colstp</span><span class="p">)</span>
+        <span class="n">col</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">ocfg</span><span class="p">)</span>
+        <span class="n">tst</span> <span class="o">=</span> <span class="n">start_stop_str</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                             <span class="n">col</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tst</span> <span class="ow">in</span> <span class="n">obs_alt_time</span><span class="p">:</span>
+            <span class="n">obs_alt_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tst</span><span class="p">)</span>
+
+    <span class="c1">#if len(obsalt_times) &gt; 0:</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">stp</span><span class="o">.</span><span class="n">exp_id</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">stp</span><span class="o">.</span><span class="n">exp_name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">stp</span><span class="o">.</span><span class="n">exp_descr</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;The experiment contains </span><span class="si">{</span><span class="n">modstr</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;These models are evaluated against </span><span class="si">{</span><span class="n">obsnum</span><span class="si">}</span><span class="s1"> observational &#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;dataset(s) and a total of </span><span class="si">{</span><span class="n">varnum</span><span class="si">}</span><span class="s1"> variables. &#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obsvarstr</span><span class="si">}{</span><span class="n">timeinfo</span><span class="si">}{</span><span class="n">freqinfo</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">st</span></div>
 
 <div class="viewcode-block" id="delete_experiment_data_evaluation_iface"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.helpers_evaluation_iface.delete_experiment_data_evaluation_iface">[docs]</a><span class="k">def</span> <span class="nf">delete_experiment_data_evaluation_iface</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">proj_id</span><span class="p">,</span> <span class="n">exp_id</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Delete all data associated with a certain experiment</span>
@@ -375,8 +481,7 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">menu</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">menu</span> <span class="o">=</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">exp_id</span> <span class="ow">in</span> <span class="n">menu</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;No menu entry available for experiment </span><span class="si">{}</span><span class="s1">&#39;</span>
-                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">exp_id</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No menu entry available for experiment </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">exp_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">table</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">exp</span> <span class="o">=</span> <span class="n">menu</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">exp_id</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">obs_var</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">exp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>

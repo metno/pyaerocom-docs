@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -178,6 +175,10 @@
 <span class="sd">        version of data (e.g. 3)</span>
 <span class="sd">    data_level</span>
 <span class="sd">        level of data (e.g. 2)</span>
+<span class="sd">    framework : str</span>
+<span class="sd">        ID of framework to which data is associated (e.g. ACTRIS, GAW)</span>
+<span class="sd">    instr_vert_loc : str</span>
+<span class="sd">        Vertical location of measuring instrument(s).</span>
 <span class="sd">    revision_date</span>
 <span class="sd">        last revision date of dataset</span>
 <span class="sd">    ts_type_src</span>
@@ -188,10 +189,14 @@
 <span class="sd">        occur. The associated values of this attribute need to be sortable</span>
 <span class="sd">        (e.g. revision_date). This is only relevant in case overlaps occur.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SUPPORTED_VERT_LOCS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ground&quot;</span><span class="p">,</span> <span class="s2">&quot;space&quot;</span><span class="p">,</span> <span class="s2">&quot;airborne&quot;</span><span class="p">]</span>
+
     <span class="n">_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dataset_name</span>          <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">data_product</span>          <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">data_version</span>          <span class="o">=</span>   <span class="nb">float</span><span class="p">,</span>
                   <span class="n">data_level</span>            <span class="o">=</span>   <span class="nb">float</span><span class="p">,</span>
+                  <span class="n">framework</span>             <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">instr_vert_loc</span>        <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">ts_type_src</span>           <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">stat_merge_pref_attr</span>  <span class="o">=</span>   <span class="nb">str</span><span class="p">,</span>
                   <span class="n">revision_date</span>         <span class="o">=</span>   <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
@@ -205,6 +210,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_product</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_version</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_level</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">framework</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instr_vert_loc</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">revision_date</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">website</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -525,6 +533,8 @@
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_id</span></div>
+
+<span class="n">STANDARD_META_KEYS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">StationMetaData</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="n">StationMetaData</span><span class="p">(</span><span class="n">data_id</span> <span class="o">=</span> <span class="s1">&#39;AeronetSunV3Lev2.daily&#39;</span><span class="p">,</span>

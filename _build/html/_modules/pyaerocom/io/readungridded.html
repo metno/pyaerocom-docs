@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -283,7 +280,7 @@
                              <span class="s1">&#39;be read (</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">dsr</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">ds</span><span class="p">,</span> <span class="n">data_dir</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s1"> does not exist&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span> <span class="o">=</span> <span class="n">val</span>
 
     <span class="nd">@property</span>
@@ -520,7 +517,7 @@
         <span class="k">return</span> <span class="n">vtr</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span>
 
 <div class="viewcode-block" id="ReadUngridded.read_dataset"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.read_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                     <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filter_post</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read dataset into an instance of :class:`ReadUngridded`</span>
 
 <span class="sd">        Parameters</span>
@@ -533,9 +530,29 @@
 <span class="sd">            if True, then nothing is reloaded but only data is loaded that is</span>
 <span class="sd">            available as cached objects (not recommended to use but may be</span>
 <span class="sd">            used if working offline without connection to database)</span>
+<span class="sd">        filter_post : dict, optional</span>
+<span class="sd">            filters applied to `UngriddedData` object AFTER it is read into</span>
+<span class="sd">            memory, via :func:`UngriddedData.apply_filters`. This option was</span>
+<span class="sd">            introduced in pyaerocom version 0.10.0 and should be used</span>
+<span class="sd">            preferably over **kwargs. There is a certain flexibility with</span>
+<span class="sd">            respect to how these filters can be defined, for instance, sub</span>
+<span class="sd">            dicts for each `dataset_to_read`. The most common way would be</span>
+<span class="sd">            to provide directly the input needed for</span>
+<span class="sd">            `UngriddedData.apply_filters`. If you want to read multiple variables</span>
+<span class="sd">            from one or more datasets, and if you want to apply variable</span>
+<span class="sd">            specific filters, it is recommended to read the data individually</span>
+<span class="sd">            for each variable and corresponding set of filters and then</span>
+<span class="sd">            merge the individual filtered `UngriddedData` objects afterwards,</span>
+<span class="sd">            e.g. using `data_var1 &amp; data_var2`.</span>
 <span class="sd">        **kwargs</span>
-<span class="sd">            additional reading constraints. If any are provided, caching is</span>
-<span class="sd">            deactivated and the data will be read from disk.</span>
+<span class="sd">            Additional input options for reading of data, which are applied</span>
+<span class="sd">            WHILE the data is read. If any such additional options are</span>
+<span class="sd">            provided that are applied during the reading, then automatic</span>
+<span class="sd">            caching of the output `UngriddedData` object will be deactivated.</span>
+<span class="sd">            Thus, it is recommended to handle data filtering via `filter_post`</span>
+<span class="sd">            argument whenever possible, which will result in better performance</span>
+<span class="sd">            as the unconstrained original data is read in and cached, and then</span>
+<span class="sd">            the filtering is applied.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
@@ -633,10 +650,64 @@
 
         <span class="k">if</span> <span class="n">_caching</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">const</span><span class="o">.</span><span class="n">CACHING</span> <span class="o">=</span> <span class="n">_caching</span>
+
+        <span class="k">if</span> <span class="n">filter_post</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_filter_post</span><span class="p">(</span><span class="n">filter_post</span><span class="p">,</span>
+                                             <span class="n">dataset_to_read</span><span class="p">,</span>
+                                             <span class="n">vars_available</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filter_post</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Invalid input for filter_post in ReadUngridded: &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filter_post</span><span class="si">}</span><span class="s1">. Need dictionary.&#39;</span><span class="p">)</span>
+            <span class="n">data_out</span> <span class="o">=</span> <span class="n">data_out</span><span class="o">.</span><span class="n">apply_filters</span><span class="p">(</span><span class="o">**</span><span class="n">filters</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data_out</span></div>
 
+    <span class="k">def</span> <span class="nf">_eval_filter_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_post</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">vars_available</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filter_post</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;input filter_post must be dict, got &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">filter_post</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dataset_to_read</span> <span class="ow">in</span> <span class="n">filter_post</span><span class="p">:</span>
+            <span class="c1"># filters are specified specifically for that dataset</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="n">filter_post</span><span class="p">[</span><span class="n">dataset_to_read</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_filter_post</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span>
+                                          <span class="n">dataset_to_read</span><span class="p">,</span>
+                                          <span class="n">vars_available</span><span class="p">)</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">filter_post</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;ignore_station_names&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+                    <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;negate&#39;</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
+                        <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;negate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;negate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;station_name&#39;</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span> <span class="c1">#variable specific station filtering</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vars_available</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;Cannot filter different sites for multivariable &#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39;UngriddedData objects (i.e. apply filter &#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39;ignore_station_names=</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1"> for UngriddedData &#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39;object containing </span><span class="si">{</span><span class="n">vars_available</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># the variable that is available in the UngriddedData</span>
+                        <span class="c1"># object</span>
+                        <span class="n">var</span> <span class="o">=</span> <span class="n">vars_available</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;station_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;negate&#39;</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
+                                <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;negate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                            <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;negate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;station_name&#39;</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid input for ignore_station_names: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="n">filters</span>
+
 <div class="viewcode-block" id="ReadUngridded.read_dataset_post"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.read_dataset_post">[docs]</a>    <span class="k">def</span> <span class="nf">read_dataset_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_to_read</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="p">,</span>
-                          <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                          <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filter_post</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read dataset into an instance of :class:`ReadUngridded`</span>
 
 <span class="sd">        Parameters</span>
@@ -649,9 +720,29 @@
 <span class="sd">            if True, then nothing is reloaded but only data is loaded that is</span>
 <span class="sd">            available as cached objects (not recommended to use but may be</span>
 <span class="sd">            used if working offline without connection to database)</span>
+<span class="sd">        filter_post : dict, optional</span>
+<span class="sd">            filters applied to `UngriddedData` object AFTER it is read into</span>
+<span class="sd">            memory, via :func:`UngriddedData.apply_filters`. This option was</span>
+<span class="sd">            introduced in pyaerocom version 0.10.0 and should be used</span>
+<span class="sd">            preferably over **kwargs. There is a certain flexibility with</span>
+<span class="sd">            respect to how these filters can be defined, for instance, sub</span>
+<span class="sd">            dicts for each `dataset_to_read`. The most common way would be</span>
+<span class="sd">            to provide directly the input needed for</span>
+<span class="sd">            `UngriddedData.apply_filters`. If you want to read multiple variables</span>
+<span class="sd">            from one or more datasets, and if you want to apply variable</span>
+<span class="sd">            specific filters, it is recommended to read the data individually</span>
+<span class="sd">            for each variable and corresponding set of filters and then</span>
+<span class="sd">            merge the individual filtered `UngriddedData` objects afterwards,</span>
+<span class="sd">            e.g. using `data_var1 &amp; data_var2`.</span>
 <span class="sd">        **kwargs</span>
-<span class="sd">            additional reading constraints. If any are provided, caching is</span>
-<span class="sd">            deactivated and the data will be read from disk.</span>
+<span class="sd">            Additional input options for reading of data, which are applied</span>
+<span class="sd">            WHILE the data is read. If any such additional options are</span>
+<span class="sd">            provided that are applied during the reading, then automatic</span>
+<span class="sd">            caching of the output `UngriddedData` object will be deactivated.</span>
+<span class="sd">            Thus, it is recommended to handle data filtering via `filter_post`</span>
+<span class="sd">            argument whenever possible, which will result in better performance</span>
+<span class="sd">            as the unconstrained original data is read in and cached, and then</span>
+<span class="sd">            the filtering is applied.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
@@ -670,14 +761,22 @@
                                     <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="n">aux_vars</span><span class="p">,</span>
                                     <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
+                    <span class="k">for</span> <span class="n">aux_var</span> <span class="ow">in</span> <span class="n">aux_vars</span><span class="p">:</span>
+                        <span class="n">input_data_ids_vars</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">aux_data</span><span class="p">,</span> <span class="n">aux_id</span><span class="p">,</span> <span class="n">aux_var</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">aux_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataset</span><span class="p">(</span><span class="n">aux_id</span><span class="p">,</span>
-                                                 <span class="n">aux_vars</span><span class="p">,</span>
-                                                 <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
-                                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">aux_var</span> <span class="ow">in</span> <span class="n">aux_vars</span><span class="p">:</span>
-                    <span class="n">input_data_ids_vars</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">aux_data</span><span class="p">,</span> <span class="n">aux_id</span><span class="p">,</span> <span class="n">aux_var</span><span class="p">))</span>
+
+                    <span class="c1"># read variables individually, so filter_post is more</span>
+                    <span class="c1"># flexible if some post filters are specified for</span>
+                    <span class="c1"># individual variables...</span>
+                    <span class="k">for</span> <span class="n">aux_var</span> <span class="ow">in</span> <span class="n">aux_vars</span><span class="p">:</span>
+                        <span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataset</span><span class="p">(</span>
+                            <span class="n">aux_id</span><span class="p">,</span>
+                            <span class="n">aux_var</span><span class="p">,</span>
+                            <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
+                            <span class="n">filter_post</span><span class="o">=</span><span class="n">filter_post</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                        <span class="n">input_data_ids_vars</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">_data</span><span class="p">,</span> <span class="n">aux_id</span><span class="p">,</span> <span class="n">aux_var</span><span class="p">))</span>
+
 
             <span class="n">aux_merge_how</span> <span class="o">=</span> <span class="n">aux_info</span><span class="p">[</span><span class="s1">&#39;aux_merge_how&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
 
@@ -708,7 +807,7 @@
         <span class="k">return</span> <span class="n">first</span></div>
 
 <div class="viewcode-block" id="ReadUngridded.read"><a class="viewcode-back" href="../../../api.html#pyaerocom.io.readungridded.ReadUngridded.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets_to_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vars_to_retrieve</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+             <span class="n">only_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filter_post</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Read observations</span>
 
 <span class="sd">        Iter over all datasets in :attr:`datasets_to_read`, call</span>
@@ -724,6 +823,29 @@
 <span class="sd">            if True, then nothing is reloaded but only data is loaded that is</span>
 <span class="sd">            available as cached objects (not recommended to use but may be</span>
 <span class="sd">            used if working offline without connection to database)</span>
+<span class="sd">        filter_post : dict, optional</span>
+<span class="sd">            filters applied to `UngriddedData` object AFTER it is read into</span>
+<span class="sd">            memory, via :func:`UngriddedData.apply_filters`. This option was</span>
+<span class="sd">            introduced in pyaerocom version 0.10.0 and should be used</span>
+<span class="sd">            preferably over **kwargs. There is a certain flexibility with</span>
+<span class="sd">            respect to how these filters can be defined, for instance, sub</span>
+<span class="sd">            dicts for each `dataset_to_read`. The most common way would be</span>
+<span class="sd">            to provide directly the input needed for</span>
+<span class="sd">            `UngriddedData.apply_filters`. If you want to read multiple variables</span>
+<span class="sd">            from one or more datasets, and if you want to apply variable</span>
+<span class="sd">            specific filters, it is recommended to read the data individually</span>
+<span class="sd">            for each variable and corresponding set of filters and then</span>
+<span class="sd">            merge the individual filtered `UngriddedData` objects afterwards,</span>
+<span class="sd">            e.g. using `data_var1 &amp; data_var2`.</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Additional input options for reading of data, which are applied</span>
+<span class="sd">            WHILE the data is read. If any such additional options are</span>
+<span class="sd">            provided that are applied during the reading, then automatic</span>
+<span class="sd">            caching of the output `UngriddedData` object will be deactivated.</span>
+<span class="sd">            Thus, it is recommended to handle data filtering via `filter_post`</span>
+<span class="sd">            argument whenever possible, which will result in better performance</span>
+<span class="sd">            as the unconstrained original data is read in and cached, and then</span>
+<span class="sd">            the filtering is applied.</span>
 
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>
@@ -748,10 +870,12 @@
             <span class="k">if</span> <span class="n">ds</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_compute</span><span class="p">:</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_dataset_post</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">read_vars</span><span class="p">,</span>
                                                    <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
+                                                   <span class="n">filter_post</span><span class="o">=</span><span class="n">filter_post</span><span class="p">,</span>
                                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">read_vars</span><span class="p">,</span>
                                               <span class="n">only_cached</span><span class="o">=</span><span class="n">only_cached</span><span class="p">,</span>
+                                              <span class="n">filter_post</span><span class="o">=</span><span class="n">filter_post</span><span class="p">,</span>
                                               <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Successfully imported </span><span class="si">{}</span><span class="s1"> data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>

@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -171,24 +168,27 @@
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">seconds_in_periods</span>
 <span class="kn">from</span> <span class="nn">pyaerocom.exceptions</span> <span class="kn">import</span> <span class="n">UnitConversionError</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">seconds_in_periods</span>
 
 <span class="n">VARS</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">VARS</span>
 
-<span class="c1"># 1. DEFINITION OF MOLAR MASSES</span>
+<span class="c1"># 1. DEFINITION OF ATOM and MOLECULAR MASSES</span>
 
 <span class="c1"># Atoms</span>
-<span class="n">M_O</span> <span class="o">=</span> <span class="mf">15.999</span> <span class="c1"># g/mol</span>
-<span class="n">M_S</span> <span class="o">=</span> <span class="mf">32.065</span> <span class="c1"># g/mol</span>
+<span class="n">M_O</span> <span class="o">=</span> <span class="mf">15.999</span> <span class="c1"># u</span>
+<span class="n">M_S</span> <span class="o">=</span> <span class="mf">32.065</span> <span class="c1"># u</span>
+<span class="n">M_N</span> <span class="o">=</span> <span class="mf">14.0067</span> <span class="c1"># u</span>
+<span class="n">M_H</span> <span class="o">=</span> <span class="mf">1.00784</span> <span class="c1"># u</span>
 
 <span class="c1"># Molecules</span>
+<span class="n">M_SO2</span> <span class="o">=</span> <span class="n">M_S</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">M_O</span>
+<span class="n">M_SO4</span> <span class="o">=</span> <span class="n">M_S</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">M_O</span>
 
-<span class="n">M_SO4</span> <span class="o">=</span> <span class="n">M_S</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">M_O</span>
-<span class="n">M_SO2</span> <span class="o">=</span> <span class="n">M_S</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">M_O</span>
+<span class="n">M_NO2</span> <span class="o">=</span> <span class="n">M_N</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">M_O</span>
+<span class="n">M_NO3</span> <span class="o">=</span> <span class="n">M_N</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">M_O</span>
 
-<span class="c1"># 2. DEFINITION OF CONVERSION FACTORS FOR CERTAIN SPECIES</span>
-<span class="n">UCONV_FAC_S_SO4</span> <span class="o">=</span> <span class="n">M_SO4</span> <span class="o">/</span> <span class="n">M_S</span>
-<span class="n">UCONV_FAC_S_SO2</span> <span class="o">=</span> <span class="n">M_SO2</span> <span class="o">/</span> <span class="n">M_S</span>
+<span class="n">M_NH3</span> <span class="o">=</span> <span class="n">M_N</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">M_H</span>
+<span class="n">M_NH4</span> <span class="o">=</span> <span class="n">M_N</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">M_H</span>
+
 
 <span class="c1"># 2.1 Other conversion factors</span>
 <span class="n">HA_TO_SQM</span> <span class="o">=</span> <span class="mi">10000</span>   <span class="c1"># hectar to square metre.</span>
@@ -198,25 +198,30 @@
 <span class="c1"># logic of hierarchy is: variable -&gt; from unit -&gt; to_unit -&gt; conversion factor</span>
 <span class="n">UCONV_MUL_FACS</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
 
-    <span class="p">[</span><span class="s1">&#39;concso4&#39;</span><span class="p">,</span> <span class="s1">&#39;ug S/m3&#39;</span><span class="p">,</span> <span class="n">VARS</span><span class="o">.</span><span class="n">concso4</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="n">UCONV_FAC_S_SO4</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;concso2&#39;</span><span class="p">,</span> <span class="s1">&#39;ug S/m3&#39;</span><span class="p">,</span> <span class="n">VARS</span><span class="o">.</span><span class="n">concso2</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="n">UCONV_FAC_S_SO2</span><span class="p">],</span>
-
-    <span class="p">[</span><span class="s1">&#39;concbc&#39;</span><span class="p">,</span> <span class="s1">&#39;ug C/m3&#39;</span><span class="p">,</span> <span class="n">VARS</span><span class="o">.</span><span class="n">concbc</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;concoa&#39;</span><span class="p">,</span> <span class="s1">&#39;ug C/m3&#39;</span><span class="p">,</span> <span class="n">VARS</span><span class="o">.</span><span class="n">concoa</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;concoc&#39;</span><span class="p">,</span> <span class="s1">&#39;ug C/m3&#39;</span><span class="p">,</span> <span class="n">VARS</span><span class="o">.</span><span class="n">concoc</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;conctc&#39;</span><span class="p">,</span> <span class="s1">&#39;ug C/m3&#39;</span><span class="p">,</span> <span class="n">VARS</span><span class="o">.</span><span class="n">conctc</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-
-    <span class="p">[</span><span class="s1">&#39;wetso4&#39;</span><span class="p">,</span> <span class="s1">&#39;kg S/ha&#39;</span><span class="p">,</span> <span class="s1">&#39;kg m-2&#39;</span><span class="p">,</span> <span class="n">UCONV_FAC_S_SO4</span> <span class="o">/</span> <span class="n">HA_TO_SQM</span><span class="p">],</span>
-    <span class="p">[</span><span class="s1">&#39;concso4pr&#39;</span><span class="p">,</span> <span class="s1">&#39;mg S/L&#39;</span><span class="p">,</span> <span class="s1">&#39;g m-3&#39;</span><span class="p">,</span> <span class="n">UCONV_FAC_S_SO4</span><span class="p">]</span> <span class="c1"># 1mg/L = 1g/m3</span>
+    <span class="p">[</span><span class="s1">&#39;concso4&#39;</span>  <span class="p">,</span> <span class="s1">&#39;ug S/m3&#39;</span>     <span class="p">,</span> <span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="n">M_SO4</span> <span class="o">/</span> <span class="n">M_S</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;concso2&#39;</span>  <span class="p">,</span> <span class="s1">&#39;ug S/m3&#39;</span>     <span class="p">,</span> <span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="n">M_SO2</span> <span class="o">/</span> <span class="n">M_S</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;concbc&#39;</span>   <span class="p">,</span> <span class="s1">&#39;ug C/m3&#39;</span>     <span class="p">,</span> <span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;concoa&#39;</span>   <span class="p">,</span> <span class="s1">&#39;ug C/m3&#39;</span>     <span class="p">,</span> <span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;concoc&#39;</span>   <span class="p">,</span> <span class="s1">&#39;ug C/m3&#39;</span>     <span class="p">,</span> <span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;conctc&#39;</span>   <span class="p">,</span> <span class="s1">&#39;ug C/m3&#39;</span>     <span class="p">,</span> <span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;concno3&#39;</span>  <span class="p">,</span> <span class="s1">&#39;ug N/m3&#39;</span>     <span class="p">,</span> <span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="n">M_NO3</span> <span class="o">/</span> <span class="n">M_N</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;wetso4&#39;</span>   <span class="p">,</span> <span class="s1">&#39;kg S/ha&#39;</span>     <span class="p">,</span> <span class="s1">&#39;kg m-2&#39;</span><span class="p">,</span> <span class="n">M_SO4</span> <span class="o">/</span> <span class="n">M_S</span> <span class="o">/</span> <span class="n">HA_TO_SQM</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;concso4pr&#39;</span><span class="p">,</span> <span class="s1">&#39;mg S/L&#39;</span>      <span class="p">,</span> <span class="s1">&#39;g m-3&#39;</span> <span class="p">,</span> <span class="n">M_SO4</span> <span class="o">/</span> <span class="n">M_S</span><span class="p">]</span> <span class="c1"># 1mg/L = 1g/m3</span>
 
 <span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;var_name&#39;</span><span class="p">,</span> <span class="s1">&#39;from&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="s1">&#39;fac&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;var_name&#39;</span><span class="p">,</span> <span class="s1">&#39;from&#39;</span><span class="p">])</span>
 
 <span class="c1"># may be used to specify alternative names for custom units  defined</span>
 <span class="c1"># in UCONV_MUL_FACS</span>
-<span class="n">UALIASES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ug S m-3&#39;</span> <span class="p">:</span> <span class="s1">&#39;ug S/m3&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;ug C m-3&#39;</span> <span class="p">:</span> <span class="s1">&#39;ug C/m3&#39;</span><span class="p">}</span>
+<span class="n">UALIASES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ug S m-3&#39;</span>  <span class="p">:</span> <span class="s1">&#39;ug S/m3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ug C m-3&#39;</span>  <span class="p">:</span> <span class="s1">&#39;ug C/m3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ug N m-3&#39;</span>  <span class="p">:</span> <span class="s1">&#39;ug N/m3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/m&#39;</span>        <span class="p">:</span> <span class="s1">&#39;m-1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mgN/m2&#39;</span>    <span class="p">:</span> <span class="s1">&#39;mg N m-2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mgN/m2/h&#39;</span>  <span class="p">:</span> <span class="s1">&#39;mg N m-2 h-1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;mgN/m**2/h&#39;</span><span class="p">:</span> <span class="s1">&#39;mg N m-2 h-1&#39;</span>
+            <span class="p">}</span>
 
-<div class="viewcode-block" id="unit_conversion_fac_custom"><a class="viewcode-back" href="../../api.html#pyaerocom.units_helpers.unit_conversion_fac_custom">[docs]</a><span class="k">def</span> <span class="nf">unit_conversion_fac_custom</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">from_unit</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_unit_conversion_fac_custom</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">from_unit</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get custom conversion factor for a certain unit&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">from_unit</span> <span class="ow">in</span> <span class="n">UALIASES</span><span class="p">:</span>
         <span class="n">from_unit</span> <span class="o">=</span> <span class="n">UALIASES</span><span class="p">[</span><span class="n">from_unit</span><span class="p">]</span>
@@ -232,9 +237,9 @@
                                   <span class="s1">&#39;be inferred from table &#39;</span>
                                   <span class="s1">&#39;pyaerocom.units_helpers.UCONV_MUL_FACS&#39;</span>
                                   <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">var_name</span><span class="p">))</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">to</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">fac</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">to</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">fac</span><span class="p">)</span>
 
-<div class="viewcode-block" id="unit_conversion_fac"><a class="viewcode-back" href="../../api.html#pyaerocom.units_helpers.unit_conversion_fac">[docs]</a><span class="k">def</span> <span class="nf">unit_conversion_fac</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_unit_conversion_fac_si</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns multiplicative unit conversion factor for input units</span>
 
 <span class="sd">    Note</span>
@@ -264,7 +269,24 @@
         <span class="k">return</span> <span class="n">from_unit</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">UnitConversionError</span><span class="p">(</span><span class="s1">&#39;Failed to convert unit from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">))</span></div>
+                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">))</span>
+
+<div class="viewcode-block" id="get_unit_conversion_fac"><a class="viewcode-back" href="../../api.html#pyaerocom.units_helpers.get_unit_conversion_fac">[docs]</a><span class="k">def</span> <span class="nf">get_unit_conversion_fac</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="n">pre_conv_fac</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">from_unit</span> <span class="o">==</span> <span class="n">to_unit</span><span class="p">:</span>
+        <span class="c1"># nothing to do</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">var_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">UCONV_MUL_FACS</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">from_unit</span><span class="p">,</span> <span class="n">pre_conv_fac</span> <span class="o">=</span> <span class="n">_unit_conversion_fac_custom</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
+                                                                  <span class="n">from_unit</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">UnitConversionError</span><span class="p">:</span>
+            <span class="c1"># from_unit is likely not custom but standard... and if not</span>
+            <span class="c1"># call of unit_conversion_fac below will crash</span>
+            <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">_unit_conversion_fac_si</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span> <span class="o">*</span> <span class="n">pre_conv_fac</span></div>
 
 <div class="viewcode-block" id="convert_unit"><a class="viewcode-back" href="../../api.html#pyaerocom.units_helpers.convert_unit">[docs]</a><span class="k">def</span> <span class="nf">convert_unit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert unit of data</span>
@@ -279,7 +301,7 @@
 <span class="sd">        new unit of input data</span>
 <span class="sd">    var_name : str, optional</span>
 <span class="sd">        name of variable. If provided, method</span>
-<span class="sd">        :func:`unit_conversion_fac_custom` is called before the standard unit</span>
+<span class="sd">        :func:`_unit_conversion_fac_custom` is called before the standard unit</span>
 <span class="sd">        conversion is applied. That requires that `var_name` is specified in</span>
 <span class="sd">        :attr:`pyaerocom.molmasses.CONV_MUL_FACS`.</span>
 
@@ -288,24 +310,7 @@
 <span class="sd">    data</span>
 <span class="sd">        data in new unit</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">from_unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">from_unit</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_unit</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">to_unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">to_unit</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">from_unit</span> <span class="o">==</span> <span class="n">to_unit</span><span class="p">:</span>
-        <span class="c1"># nothing to do</span>
-        <span class="k">return</span> <span class="n">data</span>
-    <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">UCONV_MUL_FACS</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">from_unit</span><span class="p">,</span> <span class="n">pre_conv_fac</span> <span class="o">=</span> <span class="n">unit_conversion_fac_custom</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
-                                                                 <span class="n">from_unit</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">*=</span> <span class="n">pre_conv_fac</span>
-        <span class="k">except</span> <span class="n">UnitConversionError</span><span class="p">:</span>
-            <span class="c1"># from_unit is likely not custom but standard... and if not</span>
-            <span class="c1"># call of unit_conversion_fac below will crash</span>
-            <span class="k">pass</span>
-
-    <span class="n">conv_fac</span> <span class="o">=</span> <span class="n">unit_conversion_fac</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">)</span>
+    <span class="n">conv_fac</span> <span class="o">=</span> <span class="n">get_unit_conversion_fac</span><span class="p">(</span><span class="n">from_unit</span><span class="p">,</span> <span class="n">to_unit</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">conv_fac</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">*=</span> <span class="n">conv_fac</span>
     <span class="k">return</span> <span class="n">data</span></div>
@@ -323,7 +328,7 @@
 <span class="sd">        new unit of input data</span>
 <span class="sd">    var_name : str, optional</span>
 <span class="sd">        name of variable. If provided, method</span>
-<span class="sd">        :func:`unit_conversion_fac_custom` is called before the standard unit</span>
+<span class="sd">        :func:`_unit_conversion_fac_custom` is called before the standard unit</span>
 <span class="sd">        conversion is applied. That requires that `var_name` is specified in</span>
 <span class="sd">        :attr:`pyaerocom.molmasses.CONV_MUL_FACS`.</span>
 
@@ -333,15 +338,13 @@
 <span class="sd">        data in new unit</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="n">UCONV_MUL_FACS</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-        <span class="n">from_unit</span><span class="p">,</span> <span class="n">pre_conv_fac</span> <span class="o">=</span> <span class="n">unit_conversion_fac_custom</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span>
-                                                             <span class="n">to_unit</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pre_conv_fac</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;This method does not work at the moment, and &#39;</span>
+                              <span class="s1">&#39;it is unclear what this was developed for, &#39;</span>
+                              <span class="s1">&#39;please contact Jonas Gliss or raise an issue &#39;</span>
+                              <span class="s1">&#39;on pyaerocom github repo.&#39;</span><span class="p">)</span></div>
 
-    <span class="n">conv_fac</span> <span class="o">=</span> <span class="n">unit_conversion_fac</span><span class="p">(</span><span class="n">to_unit</span><span class="p">,</span> <span class="n">from_unit</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">conv_fac</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">conv_fac</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span></div>
+<div class="viewcode-block" id="is_deposition"><a class="viewcode-back" href="../../api.html#pyaerocom.units_helpers.is_deposition">[docs]</a><span class="k">def</span> <span class="nf">is_deposition</span><span class="p">(</span><span class="n">var_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">var_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;wet&#39;</span><span class="p">,</span> <span class="s1">&#39;dry&#39;</span><span class="p">)])</span> <span class="k">else</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="implicit_to_explicit_rates"><a class="viewcode-back" href="../../api.html#pyaerocom.units_helpers.implicit_to_explicit_rates">[docs]</a><span class="k">def</span> <span class="nf">implicit_to_explicit_rates</span><span class="p">(</span><span class="n">gridded</span><span class="p">,</span> <span class="n">ts_type</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -382,7 +385,9 @@
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="n">convert_unit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;ug m-3&#39;</span><span class="p">,</span> <span class="s1">&#39;g m-3&#39;</span><span class="p">,</span> <span class="s1">&#39;concso2&#39;</span><span class="p">))</span>
+    <span class="kn">import</span> <span class="nn">cf_units</span> <span class="k">as</span> <span class="nn">cfu</span>
+
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">cfu</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="s1">&#39;ug m-3&#39;</span><span class="p">)</span>
 </pre></div>
 
            </div>

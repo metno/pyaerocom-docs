@@ -83,12 +83,9 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#aerocom">AeroCom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#citation">Citation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#website-and-code-documentation">Website and code documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#requirements">Requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation-of-pyaerocom">Installation of pyaerocom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#access-to-users-database">Access to users database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../readme.html#getting-started">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyaerocom-tutorials/index.html">Tutorials</a></li>
@@ -162,15 +159,17 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">traceback</span> <span class="kn">import</span> <span class="n">format_exc</span>
 <span class="kn">import</span> <span class="nn">simplejson</span>
 
 <span class="c1"># internal pyaerocom imports</span>
 <span class="kn">from</span> <span class="nn">pyaerocom._lowlevel_helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_dirs_exist</span><span class="p">,</span> <span class="n">dict_to_str</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyaerocom</span> <span class="kn">import</span> <span class="n">const</span>
-<span class="c1">#from pyaerocom.region import Region, get_all_default_region_ids</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.colocation_auto</span> <span class="kn">import</span> <span class="n">ColocationSetup</span><span class="p">,</span> <span class="n">Colocator</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.colocateddata</span> <span class="kn">import</span> <span class="n">ColocatedData</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.helpers</span> <span class="kn">import</span> <span class="n">isnumeric</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom.io.helpers</span> <span class="kn">import</span> <span class="n">save_dict_json</span>
+<span class="kn">from</span> <span class="nn">pyaerocom.io</span> <span class="kn">import</span> <span class="n">ReadGridded</span>
 
 <span class="kn">from</span> <span class="nn">pyaerocom.web.helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ObsConfigEval</span><span class="p">,</span> <span class="n">ModelConfigEval</span><span class="p">,</span>
                                    <span class="n">read_json</span><span class="p">,</span> <span class="n">write_json</span><span class="p">)</span>
@@ -183,8 +182,7 @@
     <span class="n">compute_json_files_from_colocateddata</span><span class="p">,</span>
     <span class="n">delete_experiment_data_evaluation_iface</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">pyaerocom.colocation_auto</span> <span class="kn">import</span> <span class="n">ColocationSetup</span><span class="p">,</span> <span class="n">Colocator</span>
-<span class="kn">from</span> <span class="nn">pyaerocom.colocateddata</span> <span class="kn">import</span> <span class="n">ColocatedData</span>
+
 
 <div class="viewcode-block" id="AerocomEvaluation"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation">[docs]</a><span class="k">class</span> <span class="nc">AerocomEvaluation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for creating json files for Aerocom Evaluation interface</span>
@@ -244,6 +242,8 @@
 <span class="sd">        ID of experiment</span>
 <span class="sd">    exp_name : :obj:`str`, optional</span>
 <span class="sd">        name of experiment</span>
+<span class="sd">    exp_descr : str</span>
+<span class="sd">        string that explains in more detail what this project is about.</span>
 <span class="sd">    clear_existing_json : bool</span>
 <span class="sd">        Boolean specifying whether existing json files should be deleted for</span>
 <span class="sd">        var / obs / model combination before rerunning</span>
@@ -297,7 +297,8 @@
 <span class="sd">    var_order_menu : list, optional</span>
 <span class="sd">        order of variables in menu</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">OUT_DIR_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;ts/dw&#39;</span><span class="p">,</span> <span class="s1">&#39;scat&#39;</span><span class="p">,</span> <span class="s1">&#39;hm&#39;</span><span class="p">,</span> <span class="s1">&#39;profiles&#39;</span><span class="p">]</span>
+    <span class="n">OUT_DIR_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;ts/dw&#39;</span><span class="p">,</span> <span class="s1">&#39;scat&#39;</span><span class="p">,</span> <span class="s1">&#39;hm&#39;</span><span class="p">,</span> <span class="s1">&#39;profiles&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;contour&#39;</span><span class="p">]</span>
 
     <span class="c1">#: Vertical layer ranges</span>
     <span class="n">VERT_LAYERS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;0-2km&#39;</span>  <span class="p">:</span>   <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2000</span><span class="p">],</span>
@@ -321,6 +322,7 @@
             <span class="s1">&#39;raise_exceptions&#39;</span>    <span class="p">:</span> <span class="s1">&#39;Raise exceptions if they occur&#39;</span>
     <span class="p">}</span>
 
+    <span class="n">EXP_STATUS_VALS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;public&#39;</span><span class="p">,</span> <span class="s1">&#39;experimental&#39;</span><span class="p">]</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proj_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exp_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">try_load_json</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">):</span>
 
@@ -331,6 +333,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span> <span class="o">=</span> <span class="n">exp_id</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">exp_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp_descr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp_status</span> <span class="o">=</span> <span class="s1">&#39;experimental&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_existing_json</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -344,6 +350,15 @@
 
         <span class="c1">#: Directory that contains configuration files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span> <span class="o">=</span> <span class="n">config_dir</span>
+
+        <span class="c1">#: If True, process also model maps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_maps</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">maps_res_deg</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maps_vmin_vmax</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#: If True, process only maps (skip obs evaluation)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">only_maps</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1">#: Output directories for different types of json files (will be filled</span>
         <span class="c1">#: in :func:`init_dirs`)</span>
@@ -577,16 +592,39 @@
 
 <div class="viewcode-block" id="AerocomEvaluation.check_config"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.check_config">[docs]</a>    <span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;proj_id must be string, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_id</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;proj_id must be specified, &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;(current value: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_id</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;exp_id must be string, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;exp_id must be specified, &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;(current value: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_descr</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;exp_descr must be specified, &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;(current value: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_descr</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_descr</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;Experiment description (attr. exp_descr) is either missing or &#39;</span>
+                <span class="s1">&#39;rather short (less than 10 words). Consider providing more &#39;</span>
+                <span class="s1">&#39;information here! Current: </span><span class="si">{self.exp_descr}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_status</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;exp_status must be specified, &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;(current value: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_status</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_status</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">EXP_STATUS_VALS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Invalid input for exp_status (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_status</span><span class="si">}</span><span class="s1">). &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Choose from: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">EXP_STATUS_VALS</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;exp_name must be string, got </span><span class="si">{}</span><span class="s1">. Using &#39;</span>
                                     <span class="s1">&#39;exp_id </span><span class="si">{}</span><span class="s1"> for experiment name&#39;</span>
                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_id</span>
+
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="s1">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">k</span> <span class="ow">or</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
@@ -1127,11 +1165,85 @@
     <span class="k">def</span> <span class="nf">iface_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_and_get_iface_names</span><span class="p">()</span>
 
+<div class="viewcode-block" id="AerocomEvaluation.run_map_eval"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.run_map_eval">[docs]</a>    <span class="k">def</span> <span class="nf">run_map_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">var_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">all_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_obs_vars</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">var_name</span><span class="p">]</span>
+
+        <span class="n">model_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_config</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colocation_settings</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">model_cfg</span><span class="p">)</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_dirs</span><span class="p">[</span><span class="s1">&#39;contour&#39;</span><span class="p">]</span>
+
+        <span class="kn">from</span> <span class="nn">pyaerocom.web.web_maps_helpers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">calc_contour_json</span><span class="p">,</span>
+                                                    <span class="n">griddeddata_to_jsondict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">all_vars</span><span class="p">:</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Processing model maps for &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">model_cfg</span><span class="p">[</span><span class="s1">&#39;model_use_vars&#39;</span><span class="p">]:</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="n">model_cfg</span><span class="p">[</span><span class="s1">&#39;model_use_vars&#39;</span><span class="p">][</span><span class="n">var</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;model_data_dir&#39;</span> <span class="ow">in</span> <span class="n">model_cfg</span><span class="p">:</span>
+                <span class="n">data_dir</span> <span class="o">=</span> <span class="n">model_cfg</span><span class="p">[</span><span class="s1">&#39;model_data_dir&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_dir</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">ReadGridded</span><span class="p">(</span><span class="n">model_cfg</span><span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">],</span>
+                                 <span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">)</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_var</span><span class="p">(</span><span class="n">var</span><span class="p">,</span>
+                                   <span class="n">start</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span>
+                                   <span class="n">stop</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">],</span>
+                                   <span class="n">ts_type</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
+                                   <span class="n">flex_ts_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">vc</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">vert_code</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vc</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid vert_code </span><span class="si">{</span><span class="n">vc</span><span class="si">}</span><span class="s1"> in GriddedData&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">ts_type</span> <span class="o">==</span> <span class="s1">&#39;monthly&#39;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">resample_time</span><span class="p">(</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+
+            <span class="n">data</span><span class="o">.</span><span class="n">check_unit</span><span class="p">()</span>
+
+            <span class="n">outname</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">vc</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">&#39;</span>
+
+            <span class="n">vminmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps_vmin_vmax</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vminmax</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vminmax</span><span class="p">:</span>
+                <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">vminmax</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="c1"># first calcualate and save geojson with contour levels</span>
+            <span class="n">contourjson</span> <span class="o">=</span> <span class="n">calc_contour_json</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+
+
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">outname</span><span class="si">}</span><span class="s1">.geojson&#39;</span><span class="p">)</span>
+            <span class="n">save_dict_json</span><span class="p">(</span><span class="n">contourjson</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+
+            <span class="c1"># now calculate pixel data json file (basically a json file</span>
+            <span class="c1"># containing monthly mean timeseries at each grid point at</span>
+            <span class="c1"># a lower resolution)</span>
+            <span class="k">if</span> <span class="n">isnumeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maps_res_deg</span><span class="p">):</span>
+                <span class="n">lat_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps_res_deg</span>
+                <span class="n">lon_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps_res_deg</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lat_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps_res_deg</span><span class="p">[</span><span class="s1">&#39;lat_res_deg&#39;</span><span class="p">]</span>
+                <span class="n">lon_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps_res_deg</span><span class="p">[</span><span class="s1">&#39;lon_res_deg&#39;</span><span class="p">]</span>
+
+
+            <span class="n">datajson</span> <span class="o">=</span> <span class="n">griddeddata_to_jsondict</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span>
+                <span class="n">lat_res_deg</span><span class="o">=</span><span class="n">lat_res</span><span class="p">,</span>
+                <span class="n">lon_res_deg</span><span class="o">=</span><span class="n">lon_res</span><span class="p">)</span>
+
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">outname</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+            <span class="n">save_dict_json</span><span class="p">(</span><span class="n">datajson</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="AerocomEvaluation.run_evaluation"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.run_evaluation">[docs]</a>    <span class="k">def</span> <span class="nf">run_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">obs_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">update_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">reanalyse_existing</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_exceptions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">clear_existing_json</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">only_colocation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">only_json</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                       <span class="n">only_json</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">only_maps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create colocated data and json files for model / obs combination</span>
 
 <span class="sd">        Parameters</span>
@@ -1190,6 +1302,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">only_colocation</span> <span class="o">=</span> <span class="n">only_colocation</span>
         <span class="k">if</span> <span class="n">only_json</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">only_json</span> <span class="o">=</span> <span class="n">only_json</span>
+        <span class="k">if</span> <span class="n">only_maps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">only_maps</span> <span class="o">=</span> <span class="n">only_maps</span>
+
         <span class="c1">#self.iface_names = self._check_and_get_iface_names()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_existing_json</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clean_json_files</span><span class="p">()</span>
@@ -1208,32 +1323,38 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_custom_read_methods</span><span class="p">()</span>
 
-        <span class="k">for</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="n">obs_list</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_ignore</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping observation </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_name</span><span class="p">))</span>
-                <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_maps</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">model_list</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">model_name</span> <span class="o">==</span> <span class="n">obs_name</span><span class="p">:</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Cannot run same dataset against each other&#39;</span>
-                           <span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> vs. </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">model_name</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_map_eval</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_ignore</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping model </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">only_maps</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="n">obs_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">obs_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_ignore</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping observation </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_name</span><span class="p">))</span>
                     <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">model_list</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">model_name</span> <span class="o">==</span> <span class="n">obs_name</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Cannot run same dataset against each other&#39;</span>
+                               <span class="s1">&#39;(</span><span class="si">{}</span><span class="s1"> vs. </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">model_name</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="n">const</span><span class="o">.</span><span class="n">print_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="k">continue</span>
 
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">only_json</span><span class="p">:</span>
-                    <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_colocation</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">col</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">if</span> <span class="n">only_colocation</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping computation of json files for </span><span class="si">{}</span><span class="s1">&#39;</span>
-                                   <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_name</span><span class="p">,</span> <span class="n">model_name</span><span class="p">))</span>
-                    <span class="k">continue</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_json_files</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span>
-                                           <span class="n">colocator</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_ignore</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping model </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+                        <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">only_json</span><span class="p">:</span>
+                        <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_colocation</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">col</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="n">only_colocation</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping computation of json files for </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                       <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obs_name</span><span class="p">,</span> <span class="n">model_name</span><span class="p">))</span>
+                        <span class="k">continue</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_json_files</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">obs_name</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span>
+                                               <span class="n">colocator</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">update_interface</span><span class="p">:</span>
             <span class="c1">#self.clean_json_files()</span>
@@ -1378,14 +1499,13 @@
 <span class="sd">            - update and order heatmap file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_menu</span><span class="p">(</span><span class="o">**</span><span class="n">opts</span><span class="p">)</span>
-        <span class="c1">#self.make_regions_json()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">make_info_table_web</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_heatmap_json</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_dir</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span> <span class="c1"># if no data is available for this experiment</span>
-            <span class="k">pass</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_dir</span><span class="p">)</span></div>
-
+            <span class="k">pass</span></div>
+          
 <div class="viewcode-block" id="AerocomEvaluation.update_menu"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.update_menu">[docs]</a>    <span class="k">def</span> <span class="nf">update_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates menu.json based on existing map json files&quot;&quot;&quot;</span>
         <span class="n">update_menu_evaluation_iface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">)</span></div>
@@ -1439,7 +1559,7 @@
             <span class="n">delete_experiment_data_evaluation_iface</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">proj_id</span><span class="p">,</span> <span class="n">exp_id</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_interface</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_menu</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AerocomEvaluation.clean_json_files"><a class="viewcode-back" href="../../../api.html#pyaerocom.web.aerocom_evaluation.AerocomEvaluation.clean_json_files">[docs]</a>    <span class="k">def</span> <span class="nf">clean_json_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_interface</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Checks all existing json files and removes outdated data</span>
@@ -1619,11 +1739,17 @@
         <span class="k">return</span> <span class="n">s</span></div>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">cfg_dir</span> <span class="o">=</span> <span class="s1">&#39;/home/jonasg/github/aerocom_evaluation/data_new/config_files/&#39;</span>
-    <span class="n">stp</span> <span class="o">=</span> <span class="n">AerocomEvaluation</span><span class="p">(</span><span class="s1">&#39;aerocom&#39;</span><span class="p">,</span> <span class="s1">&#39;PIII-optics&#39;</span><span class="p">,</span> <span class="n">config_dir</span><span class="o">=</span><span class="n">cfg_dir</span><span class="p">)</span>
-    <span class="c1">#stp.make_info_table_web()</span>
-    <span class="n">stp</span><span class="o">.</span><span class="n">regions_how</span><span class="o">=</span><span class="s1">&#39;country&#39;</span>
-    <span class="n">stp</span><span class="o">.</span><span class="n">make_regions_json</span><span class="p">()</span>
+    <span class="kn">import</span> <span class="nn">pyaerocom</span> <span class="k">as</span> <span class="nn">pya</span>
+
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;A useless experiment called blub, in the bla project.&#39;</span>
+    <span class="n">descr</span> <span class="o">=</span> <span class="s1">&#39;This experiment is indeed, completely useless!&#39;</span>
+    <span class="n">stp</span> <span class="o">=</span> <span class="n">AerocomEvaluation</span><span class="p">(</span><span class="s1">&#39;bla&#39;</span><span class="p">,</span> <span class="s1">&#39;blub&#39;</span><span class="p">,</span> <span class="n">exp_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                            <span class="n">exp_descr</span><span class="o">=</span><span class="n">descr</span><span class="p">,</span> <span class="n">exp_status</span><span class="o">=</span><span class="s1">&#39;experimental&#39;</span><span class="p">)</span>
+
+
+
+    <span class="n">pya</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">helpers_evaluation_ifac</span>
 </pre></div>
 
            </div>
